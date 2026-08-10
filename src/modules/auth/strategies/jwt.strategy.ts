@@ -40,6 +40,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
                 roles: { include: { platformRole: true } },
               },
             },
+            companyMemberships: {
+              select: { id: true, status: true },
+            },
           },
         },
       },
@@ -55,6 +58,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
             item.platformRole.status === "ACTIVE",
         )
         .map((item: PlatformRoleAssignment) => item.platformRole.code) ?? [];
+    const hasPlatformMembership =
+      platformMember?.status === "ACTIVE" && roles.length > 0;
+    const hasCompanyMembership =
+      user?.companyMemberships.some((membership) => membership.status === "ACTIVE") ??
+      false;
 
     if (
       !session ||
@@ -65,9 +73,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
       user.deletedAt ||
       user.status !== "ACTIVE" ||
       !user.email ||
-      !platformMember ||
-      platformMember.status !== "ACTIVE" ||
-      !roles.includes("SUPER_ADMIN")
+      (!hasPlatformMembership && !hasCompanyMembership)
     ) {
       throw new UnauthorizedException("Session is invalid or expired");
     }
@@ -75,6 +81,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
     return {
       userId: user.id,
       sessionId: session.id,
+      platformMemberId: platformMember?.id,
       email: user.email,
       fullName: user.fullName,
       preferredLocale: user.preferredLocale,

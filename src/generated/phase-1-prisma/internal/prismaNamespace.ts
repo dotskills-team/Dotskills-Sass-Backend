@@ -413,6 +413,7 @@ export const ModelName = {
   CompanyMember: 'CompanyMember',
   CompanyRole: 'CompanyRole',
   CompanyMemberRole: 'CompanyMemberRole',
+  CompanyMemberScope: 'CompanyMemberScope',
   CompanyOwnership: 'CompanyOwnership',
   Subscription: 'Subscription',
   Invitation: 'Invitation',
@@ -435,7 +436,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "authSession" | "loginEvent" | "platformMember" | "platformRole" | "platformMemberRole" | "feature" | "plan" | "planPrice" | "planFeature" | "tenant" | "industry" | "company" | "companyMember" | "companyRole" | "companyMemberRole" | "companyOwnership" | "subscription" | "invitation" | "auditLog" | "permission" | "platformRolePermission" | "companyRolePermission"
+    modelProps: "user" | "authSession" | "loginEvent" | "platformMember" | "platformRole" | "platformMemberRole" | "feature" | "plan" | "planPrice" | "planFeature" | "tenant" | "industry" | "company" | "companyMember" | "companyRole" | "companyMemberRole" | "companyMemberScope" | "companyOwnership" | "subscription" | "invitation" | "auditLog" | "permission" | "platformRolePermission" | "companyRolePermission"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1623,6 +1624,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CompanyMemberScope: {
+      payload: Prisma.$CompanyMemberScopePayload<ExtArgs>
+      fields: Prisma.CompanyMemberScopeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CompanyMemberScopeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMemberScopePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CompanyMemberScopeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMemberScopePayload>
+        }
+        findFirst: {
+          args: Prisma.CompanyMemberScopeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMemberScopePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CompanyMemberScopeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMemberScopePayload>
+        }
+        findMany: {
+          args: Prisma.CompanyMemberScopeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMemberScopePayload>[]
+        }
+        create: {
+          args: Prisma.CompanyMemberScopeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMemberScopePayload>
+        }
+        createMany: {
+          args: Prisma.CompanyMemberScopeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CompanyMemberScopeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMemberScopePayload>[]
+        }
+        delete: {
+          args: Prisma.CompanyMemberScopeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMemberScopePayload>
+        }
+        update: {
+          args: Prisma.CompanyMemberScopeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMemberScopePayload>
+        }
+        deleteMany: {
+          args: Prisma.CompanyMemberScopeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CompanyMemberScopeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CompanyMemberScopeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMemberScopePayload>[]
+        }
+        upsert: {
+          args: Prisma.CompanyMemberScopeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CompanyMemberScopePayload>
+        }
+        aggregate: {
+          args: Prisma.CompanyMemberScopeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCompanyMemberScope>
+        }
+        groupBy: {
+          args: Prisma.CompanyMemberScopeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CompanyMemberScopeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CompanyMemberScopeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CompanyMemberScopeCountAggregateOutputType> | number
+        }
+      }
+    }
     CompanyOwnership: {
       payload: Prisma.$CompanyOwnershipPayload<ExtArgs>
       fields: Prisma.CompanyOwnershipFieldRefs
@@ -2426,6 +2501,23 @@ export const CompanyMemberRoleScalarFieldEnum = {
 export type CompanyMemberRoleScalarFieldEnum = (typeof CompanyMemberRoleScalarFieldEnum)[keyof typeof CompanyMemberRoleScalarFieldEnum]
 
 
+export const CompanyMemberScopeScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  companyId: 'companyId',
+  companyMemberId: 'companyMemberId',
+  scopeType: 'scopeType',
+  scopeKey: 'scopeKey',
+  conditions: 'conditions',
+  validFrom: 'validFrom',
+  validUntil: 'validUntil',
+  assignedByUserId: 'assignedByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type CompanyMemberScopeScalarFieldEnum = (typeof CompanyMemberScopeScalarFieldEnum)[keyof typeof CompanyMemberScopeScalarFieldEnum]
+
+
 export const CompanyOwnershipScalarFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
@@ -2774,6 +2866,20 @@ export type ListEnumCompanyMembershipStatusFieldRefInput<$PrismaModel> = FieldRe
 
 
 /**
+ * Reference to a field of type 'CompanyScopeType'
+ */
+export type EnumCompanyScopeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanyScopeType'>
+    
+
+
+/**
+ * Reference to a field of type 'CompanyScopeType[]'
+ */
+export type ListEnumCompanyScopeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CompanyScopeType[]'>
+    
+
+
+/**
  * Reference to a field of type 'SubscriptionStatus'
  */
 export type EnumSubscriptionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubscriptionStatus'>
@@ -3023,6 +3129,7 @@ export type GlobalOmitConfig = {
   companyMember?: Prisma.CompanyMemberOmit
   companyRole?: Prisma.CompanyRoleOmit
   companyMemberRole?: Prisma.CompanyMemberRoleOmit
+  companyMemberScope?: Prisma.CompanyMemberScopeOmit
   companyOwnership?: Prisma.CompanyOwnershipOmit
   subscription?: Prisma.SubscriptionOmit
   invitation?: Prisma.InvitationOmit

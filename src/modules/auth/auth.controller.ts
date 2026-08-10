@@ -28,17 +28,6 @@ export class AuthController {
     return this.authService.login(dto, this.requestMetadata(request));
   }
 
-
-// @Controller('auth')
-// export class AuthController {
-//   @Post('login')
-//   login(@Body() dto: LoginDto) {
-//     return this.authService.login(dto);
-//   }
-// }
-
-
-
   @Post("refresh")
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
@@ -72,4 +61,14 @@ export class AuthController {
       userAgent: request.get("user-agent")?.slice(0, 2000),
     };
   }
+
+  @Post("staff/login")
+@HttpCode(HttpStatus.OK)
+@Throttle({ default: { limit: 5, ttl: 60_000 } })
+staffLogin(@Body() dto: LoginDto, @Req() request: Request) {
+  return this.authService.staffLogin(
+    dto,
+    this.requestMetadata(request),
+  );
+}
 }

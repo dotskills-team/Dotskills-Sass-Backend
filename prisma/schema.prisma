@@ -1,4 +1,4 @@
-// DotSkills SaaS â€” Phase 1: Foundation & Super Admin Management
+// DotSkills SaaS — Phase 1: Access-control completion
 // This schema is intentionally standalone. Run migrations with prisma.phase-1.config.ts.
 
 generator client {
@@ -92,6 +92,13 @@ enum AuditActorType {
 enum PermissionEffect {
   ALLOW
   DENY
+}
+
+enum CompanyScopeType {
+  COMPANY
+  BRANCH
+  WAREHOUSE
+  POS_COUNTER
 }
 
 model User {
@@ -362,6 +369,7 @@ model CompanyMember {
   company      Company                 @relation(fields: [companyId], references: [id], onDelete: Restrict)
   user         User                    @relation(fields: [userId], references: [id], onDelete: Restrict)
   roles        CompanyMemberRole[]
+  scopes       CompanyMemberScope[]
   ownerships   CompanyOwnership[]      @relation("OwnershipMember")
 
   @@unique([tenantId, companyId, userId])
@@ -405,6 +413,25 @@ model CompanyMemberRole {
   @@id([companyMemberId, companyRoleId])
   @@index([companyRoleId])
   @@map("company_member_roles")
+}
+
+model CompanyMemberScope {
+  id               String           @id @default(uuid()) @db.Uuid
+  tenantId         String           @db.Uuid
+  companyId        String           @db.Uuid
+  companyMemberId  String           @db.Uuid
+  scopeType        CompanyScopeType
+  scopeKey         String           @default("*") @db.VarChar(120)
+  conditions       Json?            @db.JsonB
+  validFrom        DateTime         @default(now()) @db.Timestamptz(6)
+  validUntil       DateTime?        @db.Timestamptz(6)
+  assignedByUserId String?          @db.Uuid
+  createdAt        DateTime         @default(now()) @db.Timestamptz(6)
+  companyMember    CompanyMember    @relation(fields: [companyMemberId], references: [id], onDelete: Cascade)
+
+  @@unique([companyMemberId, scopeType, scopeKey])
+  @@index([tenantId, companyId, scopeType, scopeKey, validUntil])
+  @@map("company_member_scopes")
 }
 
 model CompanyOwnership {

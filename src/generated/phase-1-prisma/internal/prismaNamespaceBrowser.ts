@@ -67,6 +67,7 @@ export const ModelName = {
   CompanyMember: 'CompanyMember',
   CompanyRole: 'CompanyRole',
   CompanyMemberRole: 'CompanyMemberRole',
+  CompanyMemberScope: 'CompanyMemberScope',
   CompanyOwnership: 'CompanyOwnership',
   Subscription: 'Subscription',
   Invitation: 'Invitation',
@@ -336,6 +337,23 @@ export const CompanyMemberRoleScalarFieldEnum = {
 } as const
 
 export type CompanyMemberRoleScalarFieldEnum = (typeof CompanyMemberRoleScalarFieldEnum)[keyof typeof CompanyMemberRoleScalarFieldEnum]
+
+
+export const CompanyMemberScopeScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  companyId: 'companyId',
+  companyMemberId: 'companyMemberId',
+  scopeType: 'scopeType',
+  scopeKey: 'scopeKey',
+  conditions: 'conditions',
+  validFrom: 'validFrom',
+  validUntil: 'validUntil',
+  assignedByUserId: 'assignedByUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type CompanyMemberScopeScalarFieldEnum = (typeof CompanyMemberScopeScalarFieldEnum)[keyof typeof CompanyMemberScopeScalarFieldEnum]
 
 
 export const CompanyOwnershipScalarFieldEnum = {

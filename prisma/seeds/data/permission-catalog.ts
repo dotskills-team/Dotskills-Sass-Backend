@@ -257,6 +257,52 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
     name: 'Assign company role',
     description: 'Assign or remove roles from company staff.',
   },
+  // Company Owners
+{
+  code: 'company.owner.create',
+  moduleCode: 'company',
+  resource: 'owner',
+  action: 'create',
+  name: 'Create company owner',
+  description:
+    'Create or assign a user as the primary owner of a company.',
+},
+{
+  code: 'company.owner.read',
+  moduleCode: 'company',
+  resource: 'owner',
+  action: 'read',
+  name: 'View company owners',
+  description:
+    'View company owners and ownership information of a company.',
+},
+{
+  code: 'company.owner.update',
+  moduleCode: 'company',
+  resource: 'owner',
+  action: 'update',
+  name: 'Update company owner',
+  description:
+    'Update company owner account and membership information.',
+},
+{
+  code: 'company.owner.change',
+  moduleCode: 'company',
+  resource: 'owner',
+  action: 'change',
+  name: 'Change company owner',
+  description:
+    'Transfer primary ownership of a company to another active member.',
+},
+{
+  code: 'company.owner.status',
+  moduleCode: 'company',
+  resource: 'owner',
+  action: 'status',
+  name: 'Update company owner status',
+  description:
+    'Update the status of a company owner membership.',
+},
 ];
 
 export const PERMISSION_CODES = Object.freeze(

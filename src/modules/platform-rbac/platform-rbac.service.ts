@@ -5,14 +5,14 @@ import { PrismaService } from '../../prisma/prisma.service';
 const EXPECTED_PERMISSION_COUNT = 29;
 
 const EXPECTED_ROLES = [
-  { code: 'AUDITOR', permissionCount: 7 },
-  { code: 'COMPLIANCE_OFFICER', permissionCount: 7 },
-  { code: 'FINANCE_MANAGER', permissionCount: 6 },
-  { code: 'PLATFORM_ADMIN', permissionCount: 15 },
-  { code: 'PLATFORM_STAFF', permissionCount: 3 },
-  { code: 'SALES_MANAGER', permissionCount: 7 },
-  { code: 'SUPER_ADMIN', permissionCount: 21 },
-  { code: 'SUPPORT_MANAGER', permissionCount: 4 },
+  { code: 'AUDITOR', minimumPermissionCount: 7 },
+  { code: 'COMPLIANCE_OFFICER', minimumPermissionCount: 7 },
+  { code: 'FINANCE_MANAGER', minimumPermissionCount: 6 },
+  { code: 'PLATFORM_ADMIN', minimumPermissionCount: 15 },
+  { code: 'PLATFORM_STAFF', minimumPermissionCount: 3 },
+  { code: 'SALES_MANAGER', minimumPermissionCount: 7 },
+  { code: 'SUPER_ADMIN', minimumPermissionCount: 21 },
+  { code: 'SUPPORT_MANAGER', minimumPermissionCount: 4 },
 ] as const;
 
 const EXPECTED_ROLE_CODES = EXPECTED_ROLES.map((role) => role.code);
@@ -242,17 +242,17 @@ export class PlatformRbacService {
       return {
         code: expectedRole.code,
         exists: actualRolePermissionCounts.has(expectedRole.code),
-        expectedPermissionCount: expectedRole.permissionCount,
+        minimumPermissionCount: expectedRole.minimumPermissionCount,
         actualPermissionCount,
         valid:
           actualRolePermissionCounts.has(expectedRole.code) &&
-          actualPermissionCount === expectedRole.permissionCount,
+          actualPermissionCount >= expectedRole.minimumPermissionCount,
       };
     });
 
     const superAdmin = superAdminResult?.data;
     const permissionsValid =
-      permissionCount === EXPECTED_PERMISSION_COUNT;
+      permissionCount >= EXPECTED_PERMISSION_COUNT;
     const rolesValid =
       roles.length === EXPECTED_ROLES.length &&
       roleStatus.every((role) => role.valid);
@@ -268,7 +268,7 @@ export class PlatformRbacService {
       success: true,
       data: {
         permissions: {
-          expected: EXPECTED_PERMISSION_COUNT,
+          minimum: EXPECTED_PERMISSION_COUNT,
           actual: permissionCount,
           valid: permissionsValid,
         },

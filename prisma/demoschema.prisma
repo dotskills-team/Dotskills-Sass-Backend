@@ -1,0 +1,558 @@
+// DotSkills SaaS â€” Phase 1: Foundation & Super Admin Management
+// This schema is intentionally standalone. Run migrations with prisma.phase-1.config.ts.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/phase-1-prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+  LOCKED
+  SUSPENDED
+}
+
+enum PlatformMembershipStatus {
+  INVITED
+  ACTIVE
+  SUSPENDED
+  REVOKED
+}
+
+enum CompanyMembershipStatus {
+  INVITED
+  ACTIVE
+  SUSPENDED
+  REVOKED
+}
+
+enum TenantStatus {
+  DRAFT
+  TRIAL
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+}
+
+enum CompanyStatus {
+  DRAFT
+  ONBOARDING
+  READY
+  LIVE
+  SUSPENDED
+  CLOSED
+}
+
+enum PlanStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  GRACE
+  SUSPENDED
+  CANCELLED
+  EXPIRED
+}
+
+enum InvitationType {
+  COMPANY_OWNER
+  COMPANY_STAFF
+  PLATFORM_MEMBER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  REVOKED
+}
+
+enum AuditActorType {
+  PLATFORM_MEMBER
+  COMPANY_MEMBER
+  SYSTEM
+}
+
+enum PermissionEffect {
+  ALLOW
+  DENY
+}
+
+model User {
+  id                String        @id @default(uuid()) @db.Uuid
+  email             String?       @unique @db.VarChar(200)
+  phone             String?       @unique @db.VarChar(32)
+  passwordHash      String?       @db.Text
+  fullName          String        @db.VarChar(160)
+  preferredLocale   String        @default("bn-BD") @db.VarChar(20)
+  timezone          String        @default("Asia/Dhaka") @db.VarChar(80)
+  status            AccountStatus @default(ACTIVE)
+  emailVerifiedAt   DateTime?     @db.Timestamptz(6)
+  phoneVerifiedAt   DateTime?     @db.Timestamptz(6)
+  passwordChangedAt DateTime?     @db.Timestamptz(6)
+  failedLoginCount  Int           @default(0)
+  lockedUntil       DateTime?     @db.Timestamptz(6)
+  lastLoginAt       DateTime?     @db.Timestamptz(6)
+  createdAt         DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime      @updatedAt @db.Timestamptz(6)
+  deletedAt         DateTime?     @db.Timestamptz(6)
+
+  sessions           AuthSession[]
+  loginEvents        LoginEvent[]
+  platformMember     PlatformMember?
+  companyMemberships CompanyMember[]
+  createdCompanies   Company[]          @relation("CompanyCreatedBy")
+  ownerInvitations   Invitation[]       @relation("InvitationForUser")
+  sentInvitations    Invitation[]       @relation("InvitationSentBy")
+  ownershipAssigned  CompanyOwnership[] @relation("OwnershipAssignedBy")
+  auditLogs          AuditLog[]
+
+  @@index([status, deletedAt])
+  @@map("users")
+}
+
+model AuthSession {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @db.Uuid
+  refreshTokenHash String    @unique @db.Char(64)
+  deviceId         String?   @db.VarChar(160)
+  ipAddress        String?   @db.Inet
+  userAgent        String?   @db.Text
+  issuedAt         DateTime  @default(now()) @db.Timestamptz(6)
+  lastSeenAt       DateTime  @default(now()) @db.Timestamptz(6)
+  expiresAt        DateTime  @db.Timestamptz(6)
+  revokedAt        DateTime? @db.Timestamptz(6)
+  revokeReason     String?   @db.VarChar(120)
+  replacedByHash   String?   @db.Char(64)
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt, expiresAt])
+  @@index([expiresAt])
+  @@map("auth_sessions")
+}
+
+model LoginEvent {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String?  @db.Uuid
+  email      String?  @db.VarChar(200)
+  success    Boolean
+  reason     String?  @db.VarChar(120)
+  ipAddress  String?  @db.Inet
+  userAgent  String?  @db.Text
+  occurredAt DateTime @default(now()) @db.Timestamptz(6)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, occurredAt])
+  @@index([email, occurredAt])
+  @@index([success, occurredAt])
+  @@map("login_events")
+}
+
+model PlatformMember {
+  id           String                   @id @default(uuid()) @db.Uuid
+  userId       String                   @unique @db.Uuid
+  employeeCode String?                  @unique @db.VarChar(50)
+  status       PlatformMembershipStatus @default(INVITED)
+  invitedAt    DateTime?                @db.Timestamptz(6)
+  activatedAt  DateTime?                @db.Timestamptz(6)
+  createdAt    DateTime                 @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime                 @updatedAt @db.Timestamptz(6)
+  user         User                     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  roles        PlatformMemberRole[]
+
+  @@index([status])
+  @@map("platform_members")
+}
+
+model PlatformRole {
+  id          String                   @id @default(uuid()) @db.Uuid
+  code        String                   @unique @db.VarChar(60)
+  name        String                   @db.VarChar(120)
+  description String?                  @db.Text
+  status      PlanStatus               @default(ACTIVE)
+  createdAt   DateTime                 @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime                 @updatedAt @db.Timestamptz(6)
+  members     PlatformMemberRole[]
+  isSystem    Boolean                  @default(false)
+  permissions PlatformRolePermission[]
+
+  @@index([status])
+  @@map("platform_roles")
+}
+
+model PlatformMemberRole {
+  platformMemberId String         @db.Uuid
+  platformRoleId   String         @db.Uuid
+  assignedAt       DateTime       @default(now()) @db.Timestamptz(6)
+  assignedByUserId String?        @db.Uuid
+  platformMember   PlatformMember @relation(fields: [platformMemberId], references: [id], onDelete: Cascade)
+  platformRole     PlatformRole   @relation(fields: [platformRoleId], references: [id], onDelete: Restrict)
+
+  @@id([platformMemberId, platformRoleId])
+  @@index([platformRoleId])
+  @@map("platform_member_roles")
+}
+
+model Feature {
+  id           String        @id @default(uuid()) @db.Uuid
+  code         String        @unique @db.VarChar(80)
+  name         String        @db.VarChar(120)
+  module       String        @db.VarChar(80)
+  description  String?       @db.Text
+  status       PlanStatus    @default(ACTIVE)
+  createdAt    DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime      @updatedAt @db.Timestamptz(6)
+  planFeatures PlanFeature[]
+
+  @@index([module, status])
+  @@map("features")
+}
+
+model Plan {
+  id            String         @id @default(uuid()) @db.Uuid
+  code          String         @unique @db.VarChar(50)
+  name          String         @db.VarChar(120)
+  description   String?        @db.Text
+  trialDays     Int            @default(0)
+  isPublic      Boolean        @default(true)
+  status        PlanStatus     @default(ACTIVE)
+  createdAt     DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime       @updatedAt @db.Timestamptz(6)
+  prices        PlanPrice[]
+  features      PlanFeature[]
+  subscriptions Subscription[]
+
+  @@index([status, isPublic])
+  @@map("plans")
+}
+
+model PlanPrice {
+  id            String       @id @default(uuid()) @db.Uuid
+  planId        String       @db.Uuid
+  billingCycle  BillingCycle
+  currencyCode  String       @default("BDT") @db.Char(3)
+  amount        Decimal      @db.Decimal(20, 4)
+  effectiveFrom DateTime     @default(now()) @db.Timestamptz(6)
+  effectiveTo   DateTime?    @db.Timestamptz(6)
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now()) @db.Timestamptz(6)
+  plan          Plan         @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, billingCycle, currencyCode, effectiveFrom])
+  @@index([planId, billingCycle, isActive, effectiveFrom])
+  @@map("plan_prices")
+}
+
+model PlanFeature {
+  planId    String   @db.Uuid
+  featureId String   @db.Uuid
+  enabled   Boolean  @default(true)
+  limits    Json?    @db.JsonB
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  plan      Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  feature   Feature  @relation(fields: [featureId], references: [id], onDelete: Restrict)
+
+  @@id([planId, featureId])
+  @@index([featureId])
+  @@map("plan_features")
+}
+
+model Tenant {
+  id            String             @id @default(uuid()) @db.Uuid
+  code          String             @unique @db.VarChar(40)
+  name          String             @db.VarChar(160)
+  slug          String             @unique @db.VarChar(120)
+  status        TenantStatus       @default(DRAFT)
+  trialEndsAt   DateTime?          @db.Timestamptz(6)
+  activatedAt   DateTime?          @db.Timestamptz(6)
+  suspendedAt   DateTime?          @db.Timestamptz(6)
+  createdAt     DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime           @updatedAt @db.Timestamptz(6)
+  companies     Company[]
+  members       CompanyMember[]
+  companyRoles  CompanyRole[]
+  ownerships    CompanyOwnership[]
+  subscriptions Subscription[]
+  invitations   Invitation[]
+  auditLogs     AuditLog[]
+
+  @@index([status, trialEndsAt])
+  @@map("tenants")
+}
+
+model Industry {
+  id          String     @id @default(uuid()) @db.Uuid
+  code        String     @unique @db.VarChar(50)
+  name        String     @db.VarChar(120)
+  description String?    @db.Text
+  status      PlanStatus @default(ACTIVE)
+  createdAt   DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime   @updatedAt @db.Timestamptz(6)
+  companies   Company[]
+
+  @@map("industries")
+}
+
+model Company {
+  id               String             @id @default(uuid()) @db.Uuid
+  tenantId         String             @db.Uuid
+  industryId       String             @db.Uuid
+  createdByUserId  String?            @db.Uuid
+  code             String             @db.VarChar(40)
+  legalName        String             @db.VarChar(200)
+  tradeName        String?            @db.VarChar(200)
+  email            String?            @db.VarChar(200)
+  phone            String?            @db.VarChar(32)
+  taxId            String?            @db.VarChar(80)
+  registrationNo   String?            @db.VarChar(80)
+  baseCurrencyCode String             @default("BDT") @db.Char(3)
+  timezone         String             @default("Asia/Dhaka") @db.VarChar(80)
+  status           CompanyStatus      @default(DRAFT)
+  goLiveAt         DateTime?          @db.Timestamptz(6)
+  createdAt        DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime           @updatedAt @db.Timestamptz(6)
+  tenant           Tenant             @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  industry         Industry           @relation(fields: [industryId], references: [id], onDelete: Restrict)
+  createdBy        User?              @relation("CompanyCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  members          CompanyMember[]
+  roles            CompanyRole[]
+  ownerships       CompanyOwnership[]
+  subscriptions    Subscription[]
+  invitations      Invitation[]
+  auditLogs        AuditLog[]
+
+  @@unique([tenantId, code])
+  @@unique([tenantId, id])
+  @@index([tenantId, status])
+  @@index([industryId, status])
+  @@map("companies")
+}
+
+model CompanyMember {
+  id           String                  @id @default(uuid()) @db.Uuid
+  tenantId     String                  @db.Uuid
+  companyId    String                  @db.Uuid
+  userId       String                  @db.Uuid
+  employeeCode String?                 @db.VarChar(50)
+  designation  String?                 @db.VarChar(120)
+  status       CompanyMembershipStatus @default(INVITED)
+  invitedAt    DateTime?               @db.Timestamptz(6)
+  joinedAt     DateTime?               @db.Timestamptz(6)
+  activatedAt  DateTime?               @db.Timestamptz(6)
+  createdAt    DateTime                @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime                @updatedAt @db.Timestamptz(6)
+  tenant       Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company      Company                 @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  user         User                    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  roles        CompanyMemberRole[]
+  ownerships   CompanyOwnership[]      @relation("OwnershipMember")
+
+  @@unique([tenantId, companyId, userId])
+  @@unique([tenantId, companyId, employeeCode])
+  @@index([userId, status])
+  @@index([tenantId, companyId, status])
+  @@map("company_members")
+}
+
+model CompanyRole {
+  id          String              @id @default(uuid()) @db.Uuid
+  tenantId    String              @db.Uuid
+  companyId   String              @db.Uuid
+  code        String              @db.VarChar(60)
+  name        String              @db.VarChar(120)
+  description String?             @db.Text
+  isSystem    Boolean             @default(false)
+  status      PlanStatus          @default(ACTIVE)
+  createdAt   DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime            @updatedAt @db.Timestamptz(6)
+  tenant      Tenant              @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company     Company             @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  members     CompanyMemberRole[]
+
+  permissions CompanyRolePermission[]
+
+  @@unique([tenantId, companyId, code])
+  @@index([tenantId, companyId, status])
+  @@map("company_roles")
+}
+
+model CompanyMemberRole {
+  companyMemberId  String        @db.Uuid
+  companyRoleId    String        @db.Uuid
+  assignedAt       DateTime      @default(now()) @db.Timestamptz(6)
+  assignedByUserId String?       @db.Uuid
+  expiresAt        DateTime?     @db.Timestamptz(6)
+  companyMember    CompanyMember @relation(fields: [companyMemberId], references: [id], onDelete: Cascade)
+  companyRole      CompanyRole   @relation(fields: [companyRoleId], references: [id], onDelete: Restrict)
+
+  @@id([companyMemberId, companyRoleId])
+  @@index([companyRoleId])
+  @@map("company_member_roles")
+}
+
+model CompanyOwnership {
+  id               String        @id @default(uuid()) @db.Uuid
+  tenantId         String        @db.Uuid
+  companyId        String        @db.Uuid
+  companyMemberId  String        @db.Uuid
+  isPrimary        Boolean       @default(false)
+  startedAt        DateTime      @default(now()) @db.Timestamptz(6)
+  endedAt          DateTime?     @db.Timestamptz(6)
+  assignedByUserId String?       @db.Uuid
+  company          Company       @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  tenant           Tenant        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  companyMember    CompanyMember @relation("OwnershipMember", fields: [companyMemberId], references: [id], onDelete: Restrict)
+  assignedBy       User?         @relation("OwnershipAssignedBy", fields: [assignedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, companyId, endedAt])
+  @@index([companyMemberId, endedAt])
+  @@map("company_ownerships")
+}
+
+model Subscription {
+  id                 String             @id @default(uuid()) @db.Uuid
+  tenantId           String             @db.Uuid
+  companyId          String?            @db.Uuid
+  planId             String             @db.Uuid
+  status             SubscriptionStatus @default(TRIALING)
+  billingCycle       BillingCycle
+  startsAt           DateTime           @db.Timestamptz(6)
+  trialEndsAt        DateTime?          @db.Timestamptz(6)
+  currentPeriodStart DateTime           @db.Timestamptz(6)
+  currentPeriodEnd   DateTime           @db.Timestamptz(6)
+  graceEndsAt        DateTime?          @db.Timestamptz(6)
+  cancelledAt        DateTime?          @db.Timestamptz(6)
+  autoRenew          Boolean            @default(true)
+  priceSnapshot      Json               @db.JsonB
+  createdAt          DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime           @updatedAt @db.Timestamptz(6)
+  tenant             Tenant             @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company            Company?           @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  plan               Plan               @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, status, currentPeriodEnd])
+  @@index([companyId, status, currentPeriodEnd])
+  @@map("subscriptions")
+}
+
+model Invitation {
+  id            String           @id @default(uuid()) @db.Uuid
+  type          InvitationType
+  status        InvitationStatus @default(PENDING)
+  tenantId      String?          @db.Uuid
+  companyId     String?          @db.Uuid
+  invitedUserId String?          @db.Uuid
+  email         String           @db.VarChar(200)
+  tokenHash     String           @unique @db.Char(64)
+  expiresAt     DateTime         @db.Timestamptz(6)
+  acceptedAt    DateTime?        @db.Timestamptz(6)
+  revokedAt     DateTime?        @db.Timestamptz(6)
+  sentByUserId  String?          @db.Uuid
+  metadata      Json?            @db.JsonB
+  createdAt     DateTime         @default(now()) @db.Timestamptz(6)
+  company       Company?         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tenant        Tenant?          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invitedUser   User?            @relation("InvitationForUser", fields: [invitedUserId], references: [id], onDelete: SetNull)
+  sentBy        User?            @relation("InvitationSentBy", fields: [sentByUserId], references: [id], onDelete: SetNull)
+
+  @@index([email, status, expiresAt])
+  @@index([tenantId, companyId, status])
+  @@map("invitations")
+}
+
+model AuditLog {
+  id          String         @id @default(uuid()) @db.Uuid
+  tenantId    String?        @db.Uuid
+  companyId   String?        @db.Uuid
+  actorUserId String?        @db.Uuid
+  actorType   AuditActorType @default(SYSTEM)
+  action      String         @db.VarChar(120)
+  entityType  String         @db.VarChar(100)
+  entityId    String?        @db.Uuid
+  requestId   String?        @db.Uuid
+  ipAddress   String?        @db.Inet
+  userAgent   String?        @db.Text
+  beforeData  Json?          @db.JsonB
+  afterData   Json?          @db.JsonB
+  metadata    Json?          @db.JsonB
+  createdAt   DateTime       @default(now()) @db.Timestamptz(6)
+  tenant      Tenant?        @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  company     Company?       @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  actor       User?          @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, companyId, entityType, entityId, createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}
+
+model Permission {
+  id          String     @id @default(uuid()) @db.Uuid
+  code        String     @unique @db.VarChar(120)
+  moduleCode  String     @db.VarChar(80)
+  resource    String     @db.VarChar(80)
+  action      String     @db.VarChar(80)
+  name        String     @db.VarChar(160)
+  description String?    @db.Text
+  isSystem    Boolean    @default(true)
+  status      PlanStatus @default(ACTIVE)
+  createdAt   DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime   @updatedAt @db.Timestamptz(6)
+
+  platformRoles PlatformRolePermission[]
+  companyRoles  CompanyRolePermission[]
+
+  @@unique([moduleCode, resource, action])
+  @@index([moduleCode, status])
+  @@index([resource, action, status])
+  @@map("permissions")
+}
+
+model PlatformRolePermission {
+  platformRoleId   String           @db.Uuid
+  permissionId     String           @db.Uuid
+  effect           PermissionEffect @default(ALLOW)
+  conditions       Json?            @db.JsonB
+  assignedAt       DateTime         @default(now()) @db.Timestamptz(6)
+  assignedByUserId String?          @db.Uuid
+
+  platformRole PlatformRole @relation(fields: [platformRoleId], references: [id], onDelete: Cascade)
+  permission   Permission   @relation(fields: [permissionId], references: [id], onDelete: Restrict)
+
+  @@id([platformRoleId, permissionId])
+  @@index([permissionId, effect])
+  @@map("platform_role_permissions")
+}
+
+model CompanyRolePermission {
+  companyRoleId    String           @db.Uuid
+  permissionId     String           @db.Uuid
+  effect           PermissionEffect @default(ALLOW)
+  conditions       Json?            @db.JsonB
+  assignedAt       DateTime         @default(now()) @db.Timestamptz(6)
+  assignedByUserId String?          @db.Uuid
+
+  companyRole CompanyRole @relation(fields: [companyRoleId], references: [id], onDelete: Cascade)
+  permission  Permission  @relation(fields: [permissionId], references: [id], onDelete: Restrict)
+
+  @@id([companyRoleId, permissionId])
+  @@index([permissionId, effect])
+  @@map("company_role_permissions")
+}

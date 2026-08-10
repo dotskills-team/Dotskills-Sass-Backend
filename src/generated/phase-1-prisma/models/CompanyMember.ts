@@ -242,6 +242,7 @@ export type CompanyMemberWhereInput = {
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   roles?: Prisma.CompanyMemberRoleListRelationFilter
+  scopes?: Prisma.CompanyMemberScopeListRelationFilter
   ownerships?: Prisma.CompanyOwnershipListRelationFilter
 }
 
@@ -262,6 +263,7 @@ export type CompanyMemberOrderByWithRelationInput = {
   company?: Prisma.CompanyOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
   roles?: Prisma.CompanyMemberRoleOrderByRelationAggregateInput
+  scopes?: Prisma.CompanyMemberScopeOrderByRelationAggregateInput
   ownerships?: Prisma.CompanyOwnershipOrderByRelationAggregateInput
 }
 
@@ -287,6 +289,7 @@ export type CompanyMemberWhereUniqueInput = Prisma.AtLeast<{
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   roles?: Prisma.CompanyMemberRoleListRelationFilter
+  scopes?: Prisma.CompanyMemberScopeListRelationFilter
   ownerships?: Prisma.CompanyOwnershipListRelationFilter
 }, "id" | "tenantId_companyId_userId" | "tenantId_companyId_employeeCode">
 
@@ -340,6 +343,7 @@ export type CompanyMemberCreateInput = {
   company: Prisma.CompanyCreateNestedOneWithoutMembersInput
   user: Prisma.UserCreateNestedOneWithoutCompanyMembershipsInput
   roles?: Prisma.CompanyMemberRoleCreateNestedManyWithoutCompanyMemberInput
+  scopes?: Prisma.CompanyMemberScopeCreateNestedManyWithoutCompanyMemberInput
   ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutCompanyMemberInput
 }
 
@@ -357,6 +361,7 @@ export type CompanyMemberUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.CompanyMemberRoleUncheckedCreateNestedManyWithoutCompanyMemberInput
+  scopes?: Prisma.CompanyMemberScopeUncheckedCreateNestedManyWithoutCompanyMemberInput
   ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutCompanyMemberInput
 }
 
@@ -374,6 +379,7 @@ export type CompanyMemberUpdateInput = {
   company?: Prisma.CompanyUpdateOneRequiredWithoutMembersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutCompanyMembershipsNestedInput
   roles?: Prisma.CompanyMemberRoleUpdateManyWithoutCompanyMemberNestedInput
+  scopes?: Prisma.CompanyMemberScopeUpdateManyWithoutCompanyMemberNestedInput
   ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutCompanyMemberNestedInput
 }
 
@@ -391,6 +397,7 @@ export type CompanyMemberUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.CompanyMemberRoleUncheckedUpdateManyWithoutCompanyMemberNestedInput
+  scopes?: Prisma.CompanyMemberScopeUncheckedUpdateManyWithoutCompanyMemberNestedInput
   ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutCompanyMemberNestedInput
 }
 
@@ -652,6 +659,20 @@ export type CompanyMemberUpdateOneRequiredWithoutRolesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyMemberUpdateToOneWithWhereWithoutRolesInput, Prisma.CompanyMemberUpdateWithoutRolesInput>, Prisma.CompanyMemberUncheckedUpdateWithoutRolesInput>
 }
 
+export type CompanyMemberCreateNestedOneWithoutScopesInput = {
+  create?: Prisma.XOR<Prisma.CompanyMemberCreateWithoutScopesInput, Prisma.CompanyMemberUncheckedCreateWithoutScopesInput>
+  connectOrCreate?: Prisma.CompanyMemberCreateOrConnectWithoutScopesInput
+  connect?: Prisma.CompanyMemberWhereUniqueInput
+}
+
+export type CompanyMemberUpdateOneRequiredWithoutScopesNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyMemberCreateWithoutScopesInput, Prisma.CompanyMemberUncheckedCreateWithoutScopesInput>
+  connectOrCreate?: Prisma.CompanyMemberCreateOrConnectWithoutScopesInput
+  upsert?: Prisma.CompanyMemberUpsertWithoutScopesInput
+  connect?: Prisma.CompanyMemberWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyMemberUpdateToOneWithWhereWithoutScopesInput, Prisma.CompanyMemberUpdateWithoutScopesInput>, Prisma.CompanyMemberUncheckedUpdateWithoutScopesInput>
+}
+
 export type CompanyMemberCreateNestedOneWithoutOwnershipsInput = {
   create?: Prisma.XOR<Prisma.CompanyMemberCreateWithoutOwnershipsInput, Prisma.CompanyMemberUncheckedCreateWithoutOwnershipsInput>
   connectOrCreate?: Prisma.CompanyMemberCreateOrConnectWithoutOwnershipsInput
@@ -679,6 +700,7 @@ export type CompanyMemberCreateWithoutUserInput = {
   tenant: Prisma.TenantCreateNestedOneWithoutMembersInput
   company: Prisma.CompanyCreateNestedOneWithoutMembersInput
   roles?: Prisma.CompanyMemberRoleCreateNestedManyWithoutCompanyMemberInput
+  scopes?: Prisma.CompanyMemberScopeCreateNestedManyWithoutCompanyMemberInput
   ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutCompanyMemberInput
 }
 
@@ -695,6 +717,7 @@ export type CompanyMemberUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.CompanyMemberRoleUncheckedCreateNestedManyWithoutCompanyMemberInput
+  scopes?: Prisma.CompanyMemberScopeUncheckedCreateNestedManyWithoutCompanyMemberInput
   ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutCompanyMemberInput
 }
 
@@ -755,6 +778,7 @@ export type CompanyMemberCreateWithoutTenantInput = {
   company: Prisma.CompanyCreateNestedOneWithoutMembersInput
   user: Prisma.UserCreateNestedOneWithoutCompanyMembershipsInput
   roles?: Prisma.CompanyMemberRoleCreateNestedManyWithoutCompanyMemberInput
+  scopes?: Prisma.CompanyMemberScopeCreateNestedManyWithoutCompanyMemberInput
   ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutCompanyMemberInput
 }
 
@@ -771,6 +795,7 @@ export type CompanyMemberUncheckedCreateWithoutTenantInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.CompanyMemberRoleUncheckedCreateNestedManyWithoutCompanyMemberInput
+  scopes?: Prisma.CompanyMemberScopeUncheckedCreateNestedManyWithoutCompanyMemberInput
   ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutCompanyMemberInput
 }
 
@@ -813,6 +838,7 @@ export type CompanyMemberCreateWithoutCompanyInput = {
   tenant: Prisma.TenantCreateNestedOneWithoutMembersInput
   user: Prisma.UserCreateNestedOneWithoutCompanyMembershipsInput
   roles?: Prisma.CompanyMemberRoleCreateNestedManyWithoutCompanyMemberInput
+  scopes?: Prisma.CompanyMemberScopeCreateNestedManyWithoutCompanyMemberInput
   ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutCompanyMemberInput
 }
 
@@ -829,6 +855,7 @@ export type CompanyMemberUncheckedCreateWithoutCompanyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.CompanyMemberRoleUncheckedCreateNestedManyWithoutCompanyMemberInput
+  scopes?: Prisma.CompanyMemberScopeUncheckedCreateNestedManyWithoutCompanyMemberInput
   ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutCompanyMemberInput
 }
 
@@ -871,6 +898,7 @@ export type CompanyMemberCreateWithoutRolesInput = {
   tenant: Prisma.TenantCreateNestedOneWithoutMembersInput
   company: Prisma.CompanyCreateNestedOneWithoutMembersInput
   user: Prisma.UserCreateNestedOneWithoutCompanyMembershipsInput
+  scopes?: Prisma.CompanyMemberScopeCreateNestedManyWithoutCompanyMemberInput
   ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutCompanyMemberInput
 }
 
@@ -887,6 +915,7 @@ export type CompanyMemberUncheckedCreateWithoutRolesInput = {
   activatedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  scopes?: Prisma.CompanyMemberScopeUncheckedCreateNestedManyWithoutCompanyMemberInput
   ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutCompanyMemberInput
 }
 
@@ -919,6 +948,7 @@ export type CompanyMemberUpdateWithoutRolesInput = {
   tenant?: Prisma.TenantUpdateOneRequiredWithoutMembersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutMembersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutCompanyMembershipsNestedInput
+  scopes?: Prisma.CompanyMemberScopeUpdateManyWithoutCompanyMemberNestedInput
   ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutCompanyMemberNestedInput
 }
 
@@ -935,6 +965,91 @@ export type CompanyMemberUncheckedUpdateWithoutRolesInput = {
   activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  scopes?: Prisma.CompanyMemberScopeUncheckedUpdateManyWithoutCompanyMemberNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutCompanyMemberNestedInput
+}
+
+export type CompanyMemberCreateWithoutScopesInput = {
+  id?: string
+  employeeCode?: string | null
+  designation?: string | null
+  status?: $Enums.CompanyMembershipStatus
+  invitedAt?: Date | string | null
+  joinedAt?: Date | string | null
+  activatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutMembersInput
+  company: Prisma.CompanyCreateNestedOneWithoutMembersInput
+  user: Prisma.UserCreateNestedOneWithoutCompanyMembershipsInput
+  roles?: Prisma.CompanyMemberRoleCreateNestedManyWithoutCompanyMemberInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutCompanyMemberInput
+}
+
+export type CompanyMemberUncheckedCreateWithoutScopesInput = {
+  id?: string
+  tenantId: string
+  companyId: string
+  userId: string
+  employeeCode?: string | null
+  designation?: string | null
+  status?: $Enums.CompanyMembershipStatus
+  invitedAt?: Date | string | null
+  joinedAt?: Date | string | null
+  activatedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  roles?: Prisma.CompanyMemberRoleUncheckedCreateNestedManyWithoutCompanyMemberInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutCompanyMemberInput
+}
+
+export type CompanyMemberCreateOrConnectWithoutScopesInput = {
+  where: Prisma.CompanyMemberWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyMemberCreateWithoutScopesInput, Prisma.CompanyMemberUncheckedCreateWithoutScopesInput>
+}
+
+export type CompanyMemberUpsertWithoutScopesInput = {
+  update: Prisma.XOR<Prisma.CompanyMemberUpdateWithoutScopesInput, Prisma.CompanyMemberUncheckedUpdateWithoutScopesInput>
+  create: Prisma.XOR<Prisma.CompanyMemberCreateWithoutScopesInput, Prisma.CompanyMemberUncheckedCreateWithoutScopesInput>
+  where?: Prisma.CompanyMemberWhereInput
+}
+
+export type CompanyMemberUpdateToOneWithWhereWithoutScopesInput = {
+  where?: Prisma.CompanyMemberWhereInput
+  data: Prisma.XOR<Prisma.CompanyMemberUpdateWithoutScopesInput, Prisma.CompanyMemberUncheckedUpdateWithoutScopesInput>
+}
+
+export type CompanyMemberUpdateWithoutScopesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumCompanyMembershipStatusFieldUpdateOperationsInput | $Enums.CompanyMembershipStatus
+  invitedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutMembersNestedInput
+  company?: Prisma.CompanyUpdateOneRequiredWithoutMembersNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutCompanyMembershipsNestedInput
+  roles?: Prisma.CompanyMemberRoleUpdateManyWithoutCompanyMemberNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutCompanyMemberNestedInput
+}
+
+export type CompanyMemberUncheckedUpdateWithoutScopesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  employeeCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumCompanyMembershipStatusFieldUpdateOperationsInput | $Enums.CompanyMembershipStatus
+  invitedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  joinedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  roles?: Prisma.CompanyMemberRoleUncheckedUpdateManyWithoutCompanyMemberNestedInput
   ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutCompanyMemberNestedInput
 }
 
@@ -952,6 +1067,7 @@ export type CompanyMemberCreateWithoutOwnershipsInput = {
   company: Prisma.CompanyCreateNestedOneWithoutMembersInput
   user: Prisma.UserCreateNestedOneWithoutCompanyMembershipsInput
   roles?: Prisma.CompanyMemberRoleCreateNestedManyWithoutCompanyMemberInput
+  scopes?: Prisma.CompanyMemberScopeCreateNestedManyWithoutCompanyMemberInput
 }
 
 export type CompanyMemberUncheckedCreateWithoutOwnershipsInput = {
@@ -968,6 +1084,7 @@ export type CompanyMemberUncheckedCreateWithoutOwnershipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   roles?: Prisma.CompanyMemberRoleUncheckedCreateNestedManyWithoutCompanyMemberInput
+  scopes?: Prisma.CompanyMemberScopeUncheckedCreateNestedManyWithoutCompanyMemberInput
 }
 
 export type CompanyMemberCreateOrConnectWithoutOwnershipsInput = {
@@ -1000,6 +1117,7 @@ export type CompanyMemberUpdateWithoutOwnershipsInput = {
   company?: Prisma.CompanyUpdateOneRequiredWithoutMembersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutCompanyMembershipsNestedInput
   roles?: Prisma.CompanyMemberRoleUpdateManyWithoutCompanyMemberNestedInput
+  scopes?: Prisma.CompanyMemberScopeUpdateManyWithoutCompanyMemberNestedInput
 }
 
 export type CompanyMemberUncheckedUpdateWithoutOwnershipsInput = {
@@ -1016,6 +1134,7 @@ export type CompanyMemberUncheckedUpdateWithoutOwnershipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.CompanyMemberRoleUncheckedUpdateManyWithoutCompanyMemberNestedInput
+  scopes?: Prisma.CompanyMemberScopeUncheckedUpdateManyWithoutCompanyMemberNestedInput
 }
 
 export type CompanyMemberCreateManyUserInput = {
@@ -1045,6 +1164,7 @@ export type CompanyMemberUpdateWithoutUserInput = {
   tenant?: Prisma.TenantUpdateOneRequiredWithoutMembersNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutMembersNestedInput
   roles?: Prisma.CompanyMemberRoleUpdateManyWithoutCompanyMemberNestedInput
+  scopes?: Prisma.CompanyMemberScopeUpdateManyWithoutCompanyMemberNestedInput
   ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutCompanyMemberNestedInput
 }
 
@@ -1061,6 +1181,7 @@ export type CompanyMemberUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.CompanyMemberRoleUncheckedUpdateManyWithoutCompanyMemberNestedInput
+  scopes?: Prisma.CompanyMemberScopeUncheckedUpdateManyWithoutCompanyMemberNestedInput
   ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutCompanyMemberNestedInput
 }
 
@@ -1105,6 +1226,7 @@ export type CompanyMemberUpdateWithoutTenantInput = {
   company?: Prisma.CompanyUpdateOneRequiredWithoutMembersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutCompanyMembershipsNestedInput
   roles?: Prisma.CompanyMemberRoleUpdateManyWithoutCompanyMemberNestedInput
+  scopes?: Prisma.CompanyMemberScopeUpdateManyWithoutCompanyMemberNestedInput
   ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutCompanyMemberNestedInput
 }
 
@@ -1121,6 +1243,7 @@ export type CompanyMemberUncheckedUpdateWithoutTenantInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.CompanyMemberRoleUncheckedUpdateManyWithoutCompanyMemberNestedInput
+  scopes?: Prisma.CompanyMemberScopeUncheckedUpdateManyWithoutCompanyMemberNestedInput
   ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutCompanyMemberNestedInput
 }
 
@@ -1165,6 +1288,7 @@ export type CompanyMemberUpdateWithoutCompanyInput = {
   tenant?: Prisma.TenantUpdateOneRequiredWithoutMembersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutCompanyMembershipsNestedInput
   roles?: Prisma.CompanyMemberRoleUpdateManyWithoutCompanyMemberNestedInput
+  scopes?: Prisma.CompanyMemberScopeUpdateManyWithoutCompanyMemberNestedInput
   ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutCompanyMemberNestedInput
 }
 
@@ -1181,6 +1305,7 @@ export type CompanyMemberUncheckedUpdateWithoutCompanyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   roles?: Prisma.CompanyMemberRoleUncheckedUpdateManyWithoutCompanyMemberNestedInput
+  scopes?: Prisma.CompanyMemberScopeUncheckedUpdateManyWithoutCompanyMemberNestedInput
   ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutCompanyMemberNestedInput
 }
 
@@ -1205,11 +1330,13 @@ export type CompanyMemberUncheckedUpdateManyWithoutCompanyInput = {
 
 export type CompanyMemberCountOutputType = {
   roles: number
+  scopes: number
   ownerships: number
 }
 
 export type CompanyMemberCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   roles?: boolean | CompanyMemberCountOutputTypeCountRolesArgs
+  scopes?: boolean | CompanyMemberCountOutputTypeCountScopesArgs
   ownerships?: boolean | CompanyMemberCountOutputTypeCountOwnershipsArgs
 }
 
@@ -1228,6 +1355,13 @@ export type CompanyMemberCountOutputTypeDefaultArgs<ExtArgs extends runtime.Type
  */
 export type CompanyMemberCountOutputTypeCountRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.CompanyMemberRoleWhereInput
+}
+
+/**
+ * CompanyMemberCountOutputType without action
+ */
+export type CompanyMemberCountOutputTypeCountScopesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CompanyMemberScopeWhereInput
 }
 
 /**
@@ -1255,6 +1389,7 @@ export type CompanyMemberSelect<ExtArgs extends runtime.Types.Extensions.Interna
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   roles?: boolean | Prisma.CompanyMember$rolesArgs<ExtArgs>
+  scopes?: boolean | Prisma.CompanyMember$scopesArgs<ExtArgs>
   ownerships?: boolean | Prisma.CompanyMember$ownershipsArgs<ExtArgs>
   _count?: boolean | Prisma.CompanyMemberCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["companyMember"]>
@@ -1316,6 +1451,7 @@ export type CompanyMemberInclude<ExtArgs extends runtime.Types.Extensions.Intern
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   roles?: boolean | Prisma.CompanyMember$rolesArgs<ExtArgs>
+  scopes?: boolean | Prisma.CompanyMember$scopesArgs<ExtArgs>
   ownerships?: boolean | Prisma.CompanyMember$ownershipsArgs<ExtArgs>
   _count?: boolean | Prisma.CompanyMemberCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1337,6 +1473,7 @@ export type $CompanyMemberPayload<ExtArgs extends runtime.Types.Extensions.Inter
     company: Prisma.$CompanyPayload<ExtArgs>
     user: Prisma.$UserPayload<ExtArgs>
     roles: Prisma.$CompanyMemberRolePayload<ExtArgs>[]
+    scopes: Prisma.$CompanyMemberScopePayload<ExtArgs>[]
     ownerships: Prisma.$CompanyOwnershipPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1750,6 +1887,7 @@ export interface Prisma__CompanyMemberClient<T, Null = never, ExtArgs extends ru
   company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   roles<T extends Prisma.CompanyMember$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyMember$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanyMemberRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  scopes<T extends Prisma.CompanyMember$scopesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyMember$scopesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanyMemberScopePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ownerships<T extends Prisma.CompanyMember$ownershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyMember$ownershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanyOwnershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2214,6 +2352,30 @@ export type CompanyMember$rolesArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.CompanyMemberRoleScalarFieldEnum | Prisma.CompanyMemberRoleScalarFieldEnum[]
+}
+
+/**
+ * CompanyMember.scopes
+ */
+export type CompanyMember$scopesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CompanyMemberScope
+   */
+  select?: Prisma.CompanyMemberScopeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CompanyMemberScope
+   */
+  omit?: Prisma.CompanyMemberScopeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CompanyMemberScopeInclude<ExtArgs> | null
+  where?: Prisma.CompanyMemberScopeWhereInput
+  orderBy?: Prisma.CompanyMemberScopeOrderByWithRelationInput | Prisma.CompanyMemberScopeOrderByWithRelationInput[]
+  cursor?: Prisma.CompanyMemberScopeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CompanyMemberScopeScalarFieldEnum | Prisma.CompanyMemberScopeScalarFieldEnum[]
 }
 
 /**

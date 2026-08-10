@@ -426,6 +426,23 @@ export type EnumCompanyMembershipStatusWithAggregatesFilter<$PrismaModel = never
   _max?: Prisma.NestedEnumCompanyMembershipStatusFilter<$PrismaModel>
 }
 
+export type EnumCompanyScopeTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyScopeType | Prisma.EnumCompanyScopeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyScopeType[] | Prisma.ListEnumCompanyScopeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyScopeType[] | Prisma.ListEnumCompanyScopeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyScopeTypeFilter<$PrismaModel> | $Enums.CompanyScopeType
+}
+
+export type EnumCompanyScopeTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyScopeType | Prisma.EnumCompanyScopeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyScopeType[] | Prisma.ListEnumCompanyScopeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyScopeType[] | Prisma.ListEnumCompanyScopeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyScopeTypeWithAggregatesFilter<$PrismaModel> | $Enums.CompanyScopeType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCompanyScopeTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCompanyScopeTypeFilter<$PrismaModel>
+}
+
 export type EnumSubscriptionStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.SubscriptionStatus | Prisma.EnumSubscriptionStatusFieldRefInput<$PrismaModel>
   in?: $Enums.SubscriptionStatus[] | Prisma.ListEnumSubscriptionStatusFieldRefInput<$PrismaModel>
@@ -954,6 +971,23 @@ export type NestedEnumCompanyMembershipStatusWithAggregatesFilter<$PrismaModel =
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumCompanyMembershipStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumCompanyMembershipStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumCompanyScopeTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyScopeType | Prisma.EnumCompanyScopeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyScopeType[] | Prisma.ListEnumCompanyScopeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyScopeType[] | Prisma.ListEnumCompanyScopeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyScopeTypeFilter<$PrismaModel> | $Enums.CompanyScopeType
+}
+
+export type NestedEnumCompanyScopeTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.CompanyScopeType | Prisma.EnumCompanyScopeTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.CompanyScopeType[] | Prisma.ListEnumCompanyScopeTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.CompanyScopeType[] | Prisma.ListEnumCompanyScopeTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumCompanyScopeTypeWithAggregatesFilter<$PrismaModel> | $Enums.CompanyScopeType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumCompanyScopeTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumCompanyScopeTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumSubscriptionStatusFilter<$PrismaModel = never> = {

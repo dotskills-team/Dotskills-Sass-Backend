@@ -98,6 +98,11 @@ export type CompanyRole = Prisma.CompanyRoleModel
  */
 export type CompanyMemberRole = Prisma.CompanyMemberRoleModel
 /**
+ * Model CompanyMemberScope
+ * 
+ */
+export type CompanyMemberScope = Prisma.CompanyMemberScopeModel
+/**
  * Model CompanyOwnership
  * 
  */

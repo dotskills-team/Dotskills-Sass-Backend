@@ -20,6 +20,9 @@ type PlatformUser = Prisma.UserGetPayload<{
     platformMember: {
       include: { roles: { include: { platformRole: true } } };
     };
+    companyMemberships: {
+      select: { id: true; status: true };
+    };
   };
 }>;
 
@@ -63,7 +66,25 @@ export class AuthService {
     this.dummyHashPromise = argon2.hash(randomBytes(32), this.argonOptions());
   }
 
+  // async login(dto: LoginDto, metadata: RequestMetadata) {
+
+
+
   async login(dto: LoginDto, metadata: RequestMetadata) {
+    return this.authenticate(dto, metadata, false);
+  }
+
+  async staffLogin(dto: LoginDto, metadata: RequestMetadata) {
+    return this.authenticate(dto, metadata, true);
+  }
+
+  private async authenticate(
+    dto: LoginDto,
+    metadata: RequestMetadata,
+    requirePlatformStaff: boolean,
+  ) {
+
+
     const email = dto.email.trim().toLowerCase();
     let user = await this.findPlatformUserByEmail(email);
     const now = new Date();
@@ -110,11 +131,16 @@ export class AuthService {
       throw this.invalidCredentials();
     }
 
+    // const roles = this.activeRoleCodes(user);
+    // if (!this.hasActiveMembership(user, roles)) {
+
     const roles = this.activeRoleCodes(user);
-    if (
-      user.platformMember?.status !== "ACTIVE" ||
-      !roles.includes("SUPER_ADMIN")
-    ) {
+
+    const hasRequiredMembership = requirePlatformStaff
+      ? this.hasActivePlatformMembership(user, roles)
+      : this.hasActiveMembership(user, roles);
+
+    if (!hasRequiredMembership) {
       await this.recordLoginEvent(
         user.id,
         email,
@@ -180,12 +206,35 @@ export class AuthService {
       }),
     ]);
 
+    // return {
+    //   ...tokens,
+    //   tokenType: "Bearer",
+    //   accessTokenExpiresIn: this.accessTtlSeconds,
+    //   refreshTokenExpiresIn: this.refreshTtlSeconds,
+    //   user: this.toAuthenticatedUser(user, sessionId, roles),
+    // };
+    const authenticatedUser = this.toAuthenticatedUser(
+      user,
+      sessionId,
+      roles,
+    );
+
+    const permissions = requirePlatformStaff
+      ? await this.effectivePlatformPermissions(user.id, roles)
+      : undefined;
+
     return {
       ...tokens,
       tokenType: "Bearer",
       accessTokenExpiresIn: this.accessTtlSeconds,
       refreshTokenExpiresIn: this.refreshTtlSeconds,
-      user: this.toAuthenticatedUser(user, sessionId, roles),
+      user: requirePlatformStaff
+        ? {
+          ...authenticatedUser,
+          userType: "PLATFORM_STAFF" as const,
+          permissions,
+        }
+        : authenticatedUser,
     };
   }
 
@@ -200,6 +249,9 @@ export class AuthService {
           include: {
             platformMember: {
               include: { roles: { include: { platformRole: true } } },
+            },
+            companyMemberships: {
+              select: { id: true, status: true },
             },
           },
         },
@@ -235,8 +287,7 @@ export class AuthService {
     if (
       user.deletedAt ||
       user.status !== "ACTIVE" ||
-      user.platformMember?.status !== "ACTIVE" ||
-      !roles.includes("SUPER_ADMIN")
+      !this.hasActiveMembership(user, roles)
     ) {
       await this.revokeAllSessions(user.id, "ACCOUNT_UNAVAILABLE");
       throw new UnauthorizedException("Account is unavailable");
@@ -299,7 +350,6 @@ export class AuthService {
 
     return { success: true, message: "Logged out successfully" };
   }
-
   async logoutAll(userId: string) {
     const result = await this.revokeAllSessions(userId, "LOGOUT_ALL");
     return {
@@ -315,6 +365,9 @@ export class AuthService {
       include: {
         platformMember: {
           include: { roles: { include: { platformRole: true } } },
+        },
+        companyMemberships: {
+          select: { id: true, status: true },
         },
       },
     });
@@ -349,6 +402,7 @@ export class AuthService {
     return {
       userId: user.id,
       sessionId,
+      platformMemberId: user.platformMember?.id,
       email: user.email!,
       fullName: user.fullName,
       preferredLocale: user.preferredLocale,
@@ -357,6 +411,117 @@ export class AuthService {
     };
   }
 
+  // private hasActiveMembership(user: PlatformUser, roles: string[]): boolean {
+  //   const hasPlatformMembership =
+  //     user.platformMember?.status === "ACTIVE" && roles.length > 0;
+  //   const hasCompanyMembership = user.companyMemberships.some(
+  //     (membership) => membership.status === "ACTIVE",
+  //   );
+  //   return hasPlatformMembership || hasCompanyMembership;
+  // }
+private hasActiveMembership(
+  user: PlatformUser,
+  roles: string[],
+): boolean {
+  const hasPlatformMembership =
+    this.hasActivePlatformMembership(user, roles);
+
+  const hasCompanyMembership = user.companyMemberships.some(
+    (membership) => membership.status === "ACTIVE",
+  );
+
+  return hasPlatformMembership || hasCompanyMembership;
+}
+
+private hasActivePlatformMembership(
+  user: PlatformUser,
+  roles: string[],
+): boolean {
+  return (
+    user.platformMember?.status === "ACTIVE" &&
+    roles.length > 0
+  );
+}
+
+private async effectivePlatformPermissions(
+  userId: string,
+  roles: string[],
+): Promise<string[]> {
+  if (roles.includes("SUPER_ADMIN")) {
+    const permissions = await this.prisma.permission.findMany({
+      where: {
+        isSystem: true,
+        status: "ACTIVE",
+      },
+      select: {
+        code: true,
+      },
+      orderBy: {
+        code: "asc",
+      },
+    });
+
+    return permissions.map((permission) => permission.code);
+  }
+
+  const member = await this.prisma.platformMember.findFirst({
+    where: {
+      userId,
+      status: "ACTIVE",
+    },
+    select: {
+      roles: {
+        where: {
+          platformRole: {
+            status: "ACTIVE",
+          },
+        },
+        select: {
+          platformRole: {
+            select: {
+              permissions: {
+                where: {
+                  permission: {
+                    status: "ACTIVE",
+                  },
+                },
+                select: {
+                  effect: true,
+                  permission: {
+                    select: {
+                      code: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const effects = new Map<string, Set<string>>();
+
+  for (const assignment of member?.roles ?? []) {
+    for (const item of assignment.platformRole.permissions) {
+      const permissionEffects =
+        effects.get(item.permission.code) ?? new Set<string>();
+
+      permissionEffects.add(item.effect);
+      effects.set(item.permission.code, permissionEffects);
+    }
+  }
+
+  return [...effects.entries()]
+    .filter(
+      ([, permissionEffects]) =>
+        permissionEffects.has("ALLOW") &&
+        !permissionEffects.has("DENY"),
+    )
+    .map(([code]) => code)
+    .sort();
+}
   private async registerFailedLogin(
     user: PlatformUser,
     email: string,

@@ -126,3 +126,13 @@ export const PermissionEffect = {
 } as const
 
 export type PermissionEffect = (typeof PermissionEffect)[keyof typeof PermissionEffect]
+
+
+export const CompanyScopeType = {
+  COMPANY: 'COMPANY',
+  BRANCH: 'BRANCH',
+  WAREHOUSE: 'WAREHOUSE',
+  POS_COUNTER: 'POS_COUNTER'
+} as const
+
+export type CompanyScopeType = (typeof CompanyScopeType)[keyof typeof CompanyScopeType]
