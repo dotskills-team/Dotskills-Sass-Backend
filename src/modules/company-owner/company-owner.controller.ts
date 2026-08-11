@@ -56,7 +56,7 @@ export class CompanyOwnerController {
 
     return this.ownerService.create(
       dto,
-      req.user.id,
+      req.user.userId,
     );
   }
 
@@ -125,7 +125,7 @@ export class CompanyOwnerController {
       companyId,
       ownerMemberId,
       dto,
-      req.user.id,
+      req.user.userId,
     );
   }
 
@@ -151,7 +151,7 @@ export class CompanyOwnerController {
     return this.ownerService.changeOwner(
       companyId,
       ownerMemberId,
-      req.user.id,
+      req.user.userId,
     );
   }
 
@@ -180,7 +180,7 @@ export class CompanyOwnerController {
       companyId,
       ownerMemberId,
       dto,
-      req.user.id,
+      req.user.userId,
     );
   }
 }

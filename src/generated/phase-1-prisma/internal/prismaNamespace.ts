@@ -2768,6 +2768,34 @@ export type ListEnumPlatformMembershipStatusFieldRefInput<$PrismaModel> = FieldR
 
 
 /**
+ * Reference to a field of type 'RoleStatus'
+ */
+export type EnumRoleStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'RoleStatus[]'
+ */
+export type ListEnumRoleStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RoleStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'FeatureStatus'
+ */
+export type EnumFeatureStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FeatureStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'FeatureStatus[]'
+ */
+export type ListEnumFeatureStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FeatureStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'PlanStatus'
  */
 export type EnumPlanStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlanStatus'>
@@ -2834,6 +2862,20 @@ export type EnumTenantStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
  * Reference to a field of type 'TenantStatus[]'
  */
 export type ListEnumTenantStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TenantStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'IndustryStatus'
+ */
+export type EnumIndustryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IndustryStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'IndustryStatus[]'
+ */
+export type ListEnumIndustryStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IndustryStatus[]'>
     
 
 
@@ -2932,6 +2974,20 @@ export type EnumAuditActorTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$P
  * Reference to a field of type 'AuditActorType[]'
  */
 export type ListEnumAuditActorTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditActorType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PermissionStatus'
+ */
+export type EnumPermissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PermissionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PermissionStatus[]'
+ */
+export type ListEnumPermissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PermissionStatus[]'>
     
 
 

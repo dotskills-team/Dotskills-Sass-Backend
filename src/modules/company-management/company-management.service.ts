@@ -24,6 +24,24 @@ export class CompanyManagementService {
     dto: CreateCompanyDto,
     createdByUserId: string,
   ) {
+
+const creator = await this.prisma.user.findUnique({
+    where: {
+      id: createdByUserId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!creator) {
+    throw new NotFoundException(
+      'Creating user not found',
+    );
+  }
+
+
+
     const tenant = await this.prisma.tenant.findUnique({
       where: {
         id: dto.tenantId,
@@ -71,7 +89,8 @@ export class CompanyManagementService {
       data: {
         tenantId: dto.tenantId,
         industryId: dto.industryId,
-        createdByUserId,
+        createdByUserId: creator.id,
+
         code: dto.code,
         legalName: dto.legalName,
         tradeName: dto.tradeName,

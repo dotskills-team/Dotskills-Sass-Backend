@@ -49,11 +49,37 @@ enum CompanyStatus {
   CLOSED
 }
 
+
+
+
 enum PlanStatus {
   ACTIVE
   INACTIVE
   ARCHIVED
 }
+
+enum FeatureStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum IndustryStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum PermissionStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum RoleStatus {
+  ACTIVE
+  INACTIVE
+}
+
 
 enum BillingCycle {
   MONTHLY
@@ -192,7 +218,7 @@ model PlatformRole {
   code        String                   @unique @db.VarChar(60)
   name        String                   @db.VarChar(120)
   description String?                  @db.Text
-  status      PlanStatus               @default(ACTIVE)
+  status      RoleStatus               @default(ACTIVE)
   createdAt   DateTime                 @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime                 @updatedAt @db.Timestamptz(6)
   members     PlatformMemberRole[]
@@ -222,7 +248,8 @@ model Feature {
   name         String        @db.VarChar(120)
   module       String        @db.VarChar(80)
   description  String?       @db.Text
-  status       PlanStatus    @default(ACTIVE)
+  status       FeatureStatus @default(ACTIVE)
+
   createdAt    DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime      @updatedAt @db.Timestamptz(6)
   planFeatures PlanFeature[]
@@ -309,7 +336,9 @@ model Industry {
   code        String     @unique @db.VarChar(50)
   name        String     @db.VarChar(120)
   description String?    @db.Text
-  status      PlanStatus @default(ACTIVE)
+    status IndustryStatus @default(ACTIVE)
+
+
   createdAt   DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime   @updatedAt @db.Timestamptz(6)
   companies   Company[]
@@ -387,7 +416,8 @@ model CompanyRole {
   name        String              @db.VarChar(120)
   description String?             @db.Text
   isSystem    Boolean             @default(false)
-  status      PlanStatus          @default(ACTIVE)
+  status      RoleStatus          @default(ACTIVE)
+
   createdAt   DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime            @updatedAt @db.Timestamptz(6)
   tenant      Tenant              @relation(fields: [tenantId], references: [id], onDelete: Restrict)
@@ -539,7 +569,8 @@ model Permission {
   name        String     @db.VarChar(160)
   description String?    @db.Text
   isSystem    Boolean    @default(true)
-  status      PlanStatus @default(ACTIVE)
+    status      PermissionStatus @default(ACTIVE)
+
   createdAt   DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime   @updatedAt @db.Timestamptz(6)
 

@@ -30,7 +30,7 @@ export type FeatureMinAggregateOutputType = {
   name: string | null
   module: string | null
   description: string | null
-  status: $Enums.PlanStatus | null
+  status: $Enums.FeatureStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -41,7 +41,7 @@ export type FeatureMaxAggregateOutputType = {
   name: string | null
   module: string | null
   description: string | null
-  status: $Enums.PlanStatus | null
+  status: $Enums.FeatureStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -171,7 +171,7 @@ export type FeatureGroupByOutputType = {
   name: string
   module: string
   description: string | null
-  status: $Enums.PlanStatus
+  status: $Enums.FeatureStatus
   createdAt: Date
   updatedAt: Date
   _count: FeatureCountAggregateOutputType | null
@@ -203,7 +203,7 @@ export type FeatureWhereInput = {
   name?: Prisma.StringFilter<"Feature"> | string
   module?: Prisma.StringFilter<"Feature"> | string
   description?: Prisma.StringNullableFilter<"Feature"> | string | null
-  status?: Prisma.EnumPlanStatusFilter<"Feature"> | $Enums.PlanStatus
+  status?: Prisma.EnumFeatureStatusFilter<"Feature"> | $Enums.FeatureStatus
   createdAt?: Prisma.DateTimeFilter<"Feature"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Feature"> | Date | string
   planFeatures?: Prisma.PlanFeatureListRelationFilter
@@ -230,7 +230,7 @@ export type FeatureWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Feature"> | string
   module?: Prisma.StringFilter<"Feature"> | string
   description?: Prisma.StringNullableFilter<"Feature"> | string | null
-  status?: Prisma.EnumPlanStatusFilter<"Feature"> | $Enums.PlanStatus
+  status?: Prisma.EnumFeatureStatusFilter<"Feature"> | $Enums.FeatureStatus
   createdAt?: Prisma.DateTimeFilter<"Feature"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Feature"> | Date | string
   planFeatures?: Prisma.PlanFeatureListRelationFilter
@@ -259,7 +259,7 @@ export type FeatureScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Feature"> | string
   module?: Prisma.StringWithAggregatesFilter<"Feature"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Feature"> | string | null
-  status?: Prisma.EnumPlanStatusWithAggregatesFilter<"Feature"> | $Enums.PlanStatus
+  status?: Prisma.EnumFeatureStatusWithAggregatesFilter<"Feature"> | $Enums.FeatureStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Feature"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Feature"> | Date | string
 }
@@ -270,7 +270,7 @@ export type FeatureCreateInput = {
   name: string
   module: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.FeatureStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   planFeatures?: Prisma.PlanFeatureCreateNestedManyWithoutFeatureInput
@@ -282,7 +282,7 @@ export type FeatureUncheckedCreateInput = {
   name: string
   module: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.FeatureStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   planFeatures?: Prisma.PlanFeatureUncheckedCreateNestedManyWithoutFeatureInput
@@ -294,7 +294,7 @@ export type FeatureUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   module?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumFeatureStatusFieldUpdateOperationsInput | $Enums.FeatureStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   planFeatures?: Prisma.PlanFeatureUpdateManyWithoutFeatureNestedInput
@@ -306,7 +306,7 @@ export type FeatureUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   module?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumFeatureStatusFieldUpdateOperationsInput | $Enums.FeatureStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   planFeatures?: Prisma.PlanFeatureUncheckedUpdateManyWithoutFeatureNestedInput
@@ -318,7 +318,7 @@ export type FeatureCreateManyInput = {
   name: string
   module: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.FeatureStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -329,7 +329,7 @@ export type FeatureUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   module?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumFeatureStatusFieldUpdateOperationsInput | $Enums.FeatureStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -340,7 +340,7 @@ export type FeatureUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   module?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumFeatureStatusFieldUpdateOperationsInput | $Enums.FeatureStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -383,6 +383,10 @@ export type FeatureScalarRelationFilter = {
   isNot?: Prisma.FeatureWhereInput
 }
 
+export type EnumFeatureStatusFieldUpdateOperationsInput = {
+  set?: $Enums.FeatureStatus
+}
+
 export type FeatureCreateNestedOneWithoutPlanFeaturesInput = {
   create?: Prisma.XOR<Prisma.FeatureCreateWithoutPlanFeaturesInput, Prisma.FeatureUncheckedCreateWithoutPlanFeaturesInput>
   connectOrCreate?: Prisma.FeatureCreateOrConnectWithoutPlanFeaturesInput
@@ -403,7 +407,7 @@ export type FeatureCreateWithoutPlanFeaturesInput = {
   name: string
   module: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.FeatureStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -414,7 +418,7 @@ export type FeatureUncheckedCreateWithoutPlanFeaturesInput = {
   name: string
   module: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.FeatureStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -441,7 +445,7 @@ export type FeatureUpdateWithoutPlanFeaturesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   module?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumFeatureStatusFieldUpdateOperationsInput | $Enums.FeatureStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -452,7 +456,7 @@ export type FeatureUncheckedUpdateWithoutPlanFeaturesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   module?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumFeatureStatusFieldUpdateOperationsInput | $Enums.FeatureStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -553,7 +557,7 @@ export type $FeaturePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     name: string
     module: string
     description: string | null
-    status: $Enums.PlanStatus
+    status: $Enums.FeatureStatus
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["feature"]>
@@ -985,7 +989,7 @@ export interface FeatureFieldRefs {
   readonly name: Prisma.FieldRef<"Feature", 'String'>
   readonly module: Prisma.FieldRef<"Feature", 'String'>
   readonly description: Prisma.FieldRef<"Feature", 'String'>
-  readonly status: Prisma.FieldRef<"Feature", 'PlanStatus'>
+  readonly status: Prisma.FieldRef<"Feature", 'FeatureStatus'>
   readonly createdAt: Prisma.FieldRef<"Feature", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Feature", 'DateTime'>
 }

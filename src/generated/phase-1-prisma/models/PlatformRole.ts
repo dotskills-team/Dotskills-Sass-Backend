@@ -29,7 +29,7 @@ export type PlatformRoleMinAggregateOutputType = {
   code: string | null
   name: string | null
   description: string | null
-  status: $Enums.PlanStatus | null
+  status: $Enums.RoleStatus | null
   createdAt: Date | null
   updatedAt: Date | null
   isSystem: boolean | null
@@ -40,7 +40,7 @@ export type PlatformRoleMaxAggregateOutputType = {
   code: string | null
   name: string | null
   description: string | null
-  status: $Enums.PlanStatus | null
+  status: $Enums.RoleStatus | null
   createdAt: Date | null
   updatedAt: Date | null
   isSystem: boolean | null
@@ -170,7 +170,7 @@ export type PlatformRoleGroupByOutputType = {
   code: string
   name: string
   description: string | null
-  status: $Enums.PlanStatus
+  status: $Enums.RoleStatus
   createdAt: Date
   updatedAt: Date
   isSystem: boolean
@@ -202,7 +202,7 @@ export type PlatformRoleWhereInput = {
   code?: Prisma.StringFilter<"PlatformRole"> | string
   name?: Prisma.StringFilter<"PlatformRole"> | string
   description?: Prisma.StringNullableFilter<"PlatformRole"> | string | null
-  status?: Prisma.EnumPlanStatusFilter<"PlatformRole"> | $Enums.PlanStatus
+  status?: Prisma.EnumRoleStatusFilter<"PlatformRole"> | $Enums.RoleStatus
   createdAt?: Prisma.DateTimeFilter<"PlatformRole"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PlatformRole"> | Date | string
   isSystem?: Prisma.BoolFilter<"PlatformRole"> | boolean
@@ -231,7 +231,7 @@ export type PlatformRoleWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.PlatformRoleWhereInput | Prisma.PlatformRoleWhereInput[]
   name?: Prisma.StringFilter<"PlatformRole"> | string
   description?: Prisma.StringNullableFilter<"PlatformRole"> | string | null
-  status?: Prisma.EnumPlanStatusFilter<"PlatformRole"> | $Enums.PlanStatus
+  status?: Prisma.EnumRoleStatusFilter<"PlatformRole"> | $Enums.RoleStatus
   createdAt?: Prisma.DateTimeFilter<"PlatformRole"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PlatformRole"> | Date | string
   isSystem?: Prisma.BoolFilter<"PlatformRole"> | boolean
@@ -261,7 +261,7 @@ export type PlatformRoleScalarWhereWithAggregatesInput = {
   code?: Prisma.StringWithAggregatesFilter<"PlatformRole"> | string
   name?: Prisma.StringWithAggregatesFilter<"PlatformRole"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"PlatformRole"> | string | null
-  status?: Prisma.EnumPlanStatusWithAggregatesFilter<"PlatformRole"> | $Enums.PlanStatus
+  status?: Prisma.EnumRoleStatusWithAggregatesFilter<"PlatformRole"> | $Enums.RoleStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PlatformRole"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PlatformRole"> | Date | string
   isSystem?: Prisma.BoolWithAggregatesFilter<"PlatformRole"> | boolean
@@ -272,7 +272,7 @@ export type PlatformRoleCreateInput = {
   code: string
   name: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.RoleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   isSystem?: boolean
@@ -285,7 +285,7 @@ export type PlatformRoleUncheckedCreateInput = {
   code: string
   name: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.RoleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   isSystem?: boolean
@@ -298,7 +298,7 @@ export type PlatformRoleUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumRoleStatusFieldUpdateOperationsInput | $Enums.RoleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -311,7 +311,7 @@ export type PlatformRoleUncheckedUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumRoleStatusFieldUpdateOperationsInput | $Enums.RoleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -324,7 +324,7 @@ export type PlatformRoleCreateManyInput = {
   code: string
   name: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.RoleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   isSystem?: boolean
@@ -335,7 +335,7 @@ export type PlatformRoleUpdateManyMutationInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumRoleStatusFieldUpdateOperationsInput | $Enums.RoleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -346,7 +346,7 @@ export type PlatformRoleUncheckedUpdateManyInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumRoleStatusFieldUpdateOperationsInput | $Enums.RoleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -390,8 +390,8 @@ export type PlatformRoleScalarRelationFilter = {
   isNot?: Prisma.PlatformRoleWhereInput
 }
 
-export type EnumPlanStatusFieldUpdateOperationsInput = {
-  set?: $Enums.PlanStatus
+export type EnumRoleStatusFieldUpdateOperationsInput = {
+  set?: $Enums.RoleStatus
 }
 
 export type PlatformRoleCreateNestedOneWithoutMembersInput = {
@@ -427,7 +427,7 @@ export type PlatformRoleCreateWithoutMembersInput = {
   code: string
   name: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.RoleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   isSystem?: boolean
@@ -439,7 +439,7 @@ export type PlatformRoleUncheckedCreateWithoutMembersInput = {
   code: string
   name: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.RoleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   isSystem?: boolean
@@ -467,7 +467,7 @@ export type PlatformRoleUpdateWithoutMembersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumRoleStatusFieldUpdateOperationsInput | $Enums.RoleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -479,7 +479,7 @@ export type PlatformRoleUncheckedUpdateWithoutMembersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumRoleStatusFieldUpdateOperationsInput | $Enums.RoleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -491,7 +491,7 @@ export type PlatformRoleCreateWithoutPermissionsInput = {
   code: string
   name: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.RoleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   isSystem?: boolean
@@ -503,7 +503,7 @@ export type PlatformRoleUncheckedCreateWithoutPermissionsInput = {
   code: string
   name: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.RoleStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   isSystem?: boolean
@@ -531,7 +531,7 @@ export type PlatformRoleUpdateWithoutPermissionsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumRoleStatusFieldUpdateOperationsInput | $Enums.RoleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -543,7 +543,7 @@ export type PlatformRoleUncheckedUpdateWithoutPermissionsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumRoleStatusFieldUpdateOperationsInput | $Enums.RoleStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -657,7 +657,7 @@ export type $PlatformRolePayload<ExtArgs extends runtime.Types.Extensions.Intern
     code: string
     name: string
     description: string | null
-    status: $Enums.PlanStatus
+    status: $Enums.RoleStatus
     createdAt: Date
     updatedAt: Date
     isSystem: boolean
@@ -1090,7 +1090,7 @@ export interface PlatformRoleFieldRefs {
   readonly code: Prisma.FieldRef<"PlatformRole", 'String'>
   readonly name: Prisma.FieldRef<"PlatformRole", 'String'>
   readonly description: Prisma.FieldRef<"PlatformRole", 'String'>
-  readonly status: Prisma.FieldRef<"PlatformRole", 'PlanStatus'>
+  readonly status: Prisma.FieldRef<"PlatformRole", 'RoleStatus'>
   readonly createdAt: Prisma.FieldRef<"PlatformRole", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PlatformRole", 'DateTime'>
   readonly isSystem: Prisma.FieldRef<"PlatformRole", 'Boolean'>

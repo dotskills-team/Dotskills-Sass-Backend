@@ -463,6 +463,10 @@ export type PlanScalarRelationFilter = {
   isNot?: Prisma.PlanWhereInput
 }
 
+export type EnumPlanStatusFieldUpdateOperationsInput = {
+  set?: $Enums.PlanStatus
+}
+
 export type PlanCreateNestedOneWithoutPricesInput = {
   create?: Prisma.XOR<Prisma.PlanCreateWithoutPricesInput, Prisma.PlanUncheckedCreateWithoutPricesInput>
   connectOrCreate?: Prisma.PlanCreateOrConnectWithoutPricesInput

@@ -71,6 +71,40 @@ export const PlanStatus = {
 export type PlanStatus = (typeof PlanStatus)[keyof typeof PlanStatus]
 
 
+export const FeatureStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type FeatureStatus = (typeof FeatureStatus)[keyof typeof FeatureStatus]
+
+
+export const IndustryStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type IndustryStatus = (typeof IndustryStatus)[keyof typeof IndustryStatus]
+
+
+export const PermissionStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type PermissionStatus = (typeof PermissionStatus)[keyof typeof PermissionStatus]
+
+
+export const RoleStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type RoleStatus = (typeof RoleStatus)[keyof typeof RoleStatus]
+
+
 export const BillingCycle = {
   MONTHLY: 'MONTHLY',
   YEARLY: 'YEARLY'

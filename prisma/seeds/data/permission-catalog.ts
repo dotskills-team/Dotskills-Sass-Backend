@@ -303,6 +303,8 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
   description:
     'Update the status of a company owner membership.',
 },
+
+
 ];
 
 export const PERMISSION_CODES = Object.freeze(

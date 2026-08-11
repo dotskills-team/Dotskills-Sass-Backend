@@ -44,243 +44,321 @@ void bootstrap();
 
 
 
-
-
-
-
-// folder structure 
 // dotskills-sass-backend/
 // │
-// ├── prisma/                                      # 🗄️ Prisma + PostgreSQL database layer
+// ├── prisma/
 // │   │
-// │   ├── migrations/                              # 🔄 Database migration history
-// │   │                                             # Schema change-এর version history
+// │   ├── schema.prisma
+// │   ├── prisma.config.ts
+// │   ├── phase-1.config.ts
 // │   │
-// │   ├── seed.ts                                  # 🌱 Initial/seed data
-// │   │                                             # Roles, permissions, plans, demo data
+// │   ├── migrations/
+// │   │   ├── 2026xxxxxxxx_initial/
+// │   │   ├── 20260810045809_002_access_control_completion/
+// │   │   └── ...
 // │   │
-// │   └── schema.prisma                            # 🧩 Complete database schema
-// │                                                 # User, Company, Customer, Product etc.
+// │   └── seed/
+// │       ├── seed.ts
+// │       ├── platform/
+// │       ├── permissions/
+// │       ├── roles/
+// │       └── business-modules/
 // │
 // ├── src/
 // │   │
-// │   ├── config/                                  # ⚙️ Application configuration
+// │   ├── main.ts
+// │   ├── app.module.ts
 // │   │
-// │   │   ├── app.config.ts                        # App settings
-// │   │                                             # PORT, API prefix, environment
+// │   ├── config/
+// │   │   ├── app.config.ts
+// │   │   ├── auth.config.ts
+// │   │   ├── database.config.ts
+// │   │   ├── redis.config.ts
+// │   │   ├── security.config.ts
+// │   │   └── index.ts
 // │   │
-// │   │   ├── database.config.ts                   # 🗄️ Database configuration
-// │   │                                             # Database-related settings
+// │   ├── database/
+// │   │   ├── prisma.module.ts
+// │   │   └── prisma.service.ts
 // │   │
-// │   │   ├── auth.config.ts                       # 🔐 Authentication configuration
-// │   │                                             # JWT/token/cookie settings
+// │   ├── generated/
+// │   │   └── phase-1-prisma/
 // │   │
-// │   │   └── env.validation.ts                    # ✅ Environment validation
-// │                                                 # DATABASE_URL, JWT secrets etc.
+// │   ├── common/
+// │   │   │
+// │   │   ├── constants/
+// │   │   │   ├── app.constants.ts
+// │   │   │   ├── auth.constants.ts
+// │   │   │   ├── permission.constants.ts
+// │   │   │   ├── role.constants.ts
+// │   │   │   └── module.constants.ts
+// │   │   │
+// │   │   ├── decorators/
+// │   │   │   ├── auth-user.decorator.ts
+// │   │   │   ├── permissions.decorator.ts
+// │   │   │   ├── public.decorator.ts
+// │   │   │   ├── roles.decorator.ts
+// │   │   │   ├── company-context.decorator.ts
+// │   │   │   └── tenant-context.decorator.ts
+// │   │   │
+// │   │   ├── guards/
+// │   │   │   ├── access-token.guard.ts
+// │   │   │   ├── permission.guard.ts
+// │   │   │   ├── platform-permission.guard.ts
+// │   │   │   ├── company-permission.guard.ts
+// │   │   │   ├── company-context.guard.ts
+// │   │   │   ├── tenant-context.guard.ts
+// │   │   │   ├── module-access.guard.ts
+// │   │   │   └── scope.guard.ts
+// │   │   │
+// │   │   ├── interceptors/
+// │   │   │   ├── request-context.interceptor.ts
+// │   │   │   ├── audit.interceptor.ts
+// │   │   │   └── logging.interceptor.ts
+// │   │   │
+// │   │   ├── filters/
+// │   │   │   ├── http-exception.filter.ts
+// │   │   │   └── prisma-exception.filter.ts
+// │   │   │
+// │   │   ├── pipes/
+// │   │   │   ├── validation.pipe.ts
+// │   │   │   └── parse-uuid.pipe.ts
+// │   │   │
+// │   │   ├── middleware/
+// │   │   │   ├── request-id.middleware.ts
+// │   │   │   └── tenant.middleware.ts
+// │   │   │
+// │   │   ├── types/
+// │   │   │   ├── authenticated-user.type.ts
+// │   │   │   ├── company-context.type.ts
+// │   │   │   ├── tenant-context.type.ts
+// │   │   │   ├── permission.type.ts
+// │   │   │   └── pagination.type.ts
+// │   │   │
+// │   │   └── utils/
+// │   │       ├── pagination.util.ts
+// │   │       ├── password.util.ts
+// │   │       ├── date.util.ts
+// │   │       └── response.util.ts
+// │   │
+// │   └── modules/
+// │       │
+// │       ├── auth/
+// │       │   ├── auth.module.ts
+// │       │   ├── auth.controller.ts
+// │       │   ├── auth.service.ts
+// │       │   │
+// │       │   ├── dto/
+// │       │   │   ├── login.dto.ts
+// │       │   │   ├── refresh-token.dto.ts
+// │       │   │   └── logout.dto.ts
+// │       │   │
+// │       │   ├── guards/
+// │       │   ├── strategies/
+// │       │   └── types/
+// │       │
+// │       ├── identity/
+// │       │   ├── users/
+// │       │   ├── sessions/
+// │       │   └── identity.module.ts
+// │       │
+// │       ├── access-control/
+// │       │   │
+// │       │   ├── platform/
+// │       │   │   ├── platform-rbac/
+// │       │   │   ├── platform-staff/
+// │       │   │   ├── platform-roles/
+// │       │   │   ├── platform-permissions/
+// │       │   │   └── access-control-setup/
+// │       │   │
+// │       │   ├── company/
+// │       │   │   ├── company-rbac/
+// │       │   │   ├── company-roles/
+// │       │   │   ├── company-permissions/
+// │       │   │   ├── company-members/
+// │       │   │   └── company-scopes/
+// │       │   │
+// │       │   └── access-control.module.ts
+// │       │
+// │       ├── tenant/
+// │       │   ├── tenant.module.ts
+// │       │   ├── tenant.controller.ts
+// │       │   ├── tenant.service.ts
+// │       │   └── dto/
+// │       │
+// │       ├── company/
+// │       │   ├── company.module.ts
+// │       │   ├── company.controller.ts
+// │       │   ├── company.service.ts
+// │       │   │
+// │       │   ├── dto/
+// │       │   │   ├── create-company.dto.ts
+// │       │   │   ├── update-company.dto.ts
+// │       │   │   └── company-query.dto.ts
+// │       │   │
+// │       │   ├── types/
+// │       │   └── policies/
+// │       │
+// │       ├── platform/
+// │       │   │
+// │       │   ├── dashboard/
+// │       │   │   ├── dashboard.module.ts
+// │       │   │   ├── dashboard.controller.ts
+// │       │   │   ├── dashboard.service.ts
+// │       │   │   └── dto/
+// │       │   │
+// │       │   ├── companies/
+// │       │   │   ├── companies.module.ts
+// │       │   │   ├── companies.controller.ts
+// │       │   │   ├── companies.service.ts
+// │       │   │   │
+// │       │   │   ├── dto/
+// │       │   │   │   ├── create-company.dto.ts
+// │       │   │   │   ├── update-company.dto.ts
+// │       │   │   │   ├── company-query.dto.ts
+// │       │   │   │   └── company-status.dto.ts
+// │       │   │   │
+// │       │   │   └── types/
+// │       │   │
+// │       │   ├── packages/
+// │       │   │   ├── packages.module.ts
+// │       │   │   ├── packages.controller.ts
+// │       │   │   ├── packages.service.ts
+// │       │   │   │
+// │       │   │   ├── dto/
+// │       │   │   ├── package-features/
+// │       │   │   ├── package-limits/
+// │       │   │   └── package-modules/
+// │       │   │
+// │       │   ├── subscriptions/
+// │       │   │   ├── subscriptions.module.ts
+// │       │   │   ├── subscriptions.controller.ts
+// │       │   │   ├── subscriptions.service.ts
+// │       │   │   │
+// │       │   │   ├── dto/
+// │       │   │   ├── renewal/
+// │       │   │   ├── extension/
+// │       │   │   ├── grace-period/
+// │       │   │   └── cancellation/
+// │       │   │
+// │       │   ├── company-activation/
+// │       │   │   ├── company-activation.module.ts
+// │       │   │   ├── company-activation.controller.ts
+// │       │   │   ├── company-activation.service.ts
+// │       │   │   └── validators/
+// │       │   │
+// │       │   ├── addons/
+// │       │   │   ├── addons.module.ts
+// │       │   │   ├── addons.controller.ts
+// │       │   │   ├── addons.service.ts
+// │       │   │   └── dto/
+// │       │   │
+// │       │   ├── modules/
+// │       │   │   ├── modules.module.ts
+// │       │   │   ├── modules.controller.ts
+// │       │   │   ├── modules.service.ts
+// │       │   │   └── dto/
+// │       │   │
+// │       │   ├── audit/
+// │       │   │   ├── audit.module.ts
+// │       │   │   ├── audit.controller.ts
+// │       │   │   ├── audit.service.ts
+// │       │   │   └── dto/
+// │       │   │
+// │       │   └── settings/
+// │       │       ├── settings.module.ts
+// │       │       ├── settings.controller.ts
+// │       │       ├── settings.service.ts
+// │       │       └── dto/
+// │       │
+// │       └── business/
+// │           │
+// │           ├── core/
+// │           │   │
+// │           │   ├── branches/
+// │           │   ├── outlets/
+// │           │   ├── warehouses/
+// │           │   ├── pos/
+// │           │   ├── employees/
+// │           │   ├── customers/
+// │           │   ├── suppliers/
+// │           │   ├── products/
+// │           │   ├── categories/
+// │           │   ├── brands/
+// │           │   ├── units/
+// │           │   ├── inventory/
+// │           │   ├── purchases/
+// │           │   ├── sales/
+// │           │   ├── payments/
+// │           │   ├── expenses/
+// │           │   └── reports/
+// │           │
+// │           ├── super-shop/
+// │           │   ├── super-shop.module.ts
+// │           │   ├── promotions/
+// │           │   ├── discounts/
+// │           │   ├── price-rules/
+// │           │   ├── loyalty/
+// │           │   └── reports/
+// │           │
+// │           ├── pharmacy/
+// │           │   ├── pharmacy.module.ts
+// │           │   ├── medicines/
+// │           │   ├── generics/
+// │           │   ├── dosage-forms/
+// │           │   ├── strengths/
+// │           │   ├── batches/
+// │           │   ├── expiry/
+// │           │   ├── prescriptions/
+// │           │   ├── drug-schedules/
+// │           │   └── reports/
+// │           │
+// │           ├── restaurant/
+// │           │   ├── restaurant.module.ts
+// │           │   ├── menus/
+// │           │   ├── menu-items/
+// │           │   ├── recipes/
+// │           │   ├── ingredients/
+// │           │   ├── modifiers/
+// │           │   ├── tables/
+// │           │   ├── kitchens/
+// │           │   ├── kitchen-orders/
+// │           │   ├── orders/
+// │           │   ├── delivery/
+// │           │   └── reports/
+// │           │
+// │           ├── fashion/
+// │           │   ├── fashion.module.ts
+// │           │   ├── collections/
+// │           │   ├── variants/
+// │           │   ├── sizes/
+// │           │   ├── colors/
+// │           │   ├── attributes/
+// │           │   ├── style-codes/
+// │           │   ├── seasonal-products/
+// │           │   └── reports/
+// │           │
+// │           └── service-business/
+// │               ├── service-business.module.ts
+// │               ├── services/
+// │               ├── service-categories/
+// │               ├── bookings/
+// │               ├── appointments/
+// │               ├── schedules/
+// │               ├── staff-schedules/
+// │               ├── invoices/
+// │               └── reports/
 // │
-// │   ├── common/                                  # 🧰 Shared application infrastructure
-// │   │                                             # কোনো specific business module-এর না
-// │   │
-// │   │   ├── constants/                           # 📌 Shared constant values
-// │   │                                             # API limits, messages, keys etc.
-// │   │
-// │   │   ├── decorators/                          # 🏷️ Custom NestJS decorators
-// │   │                                             # @CurrentUser(), @CurrentCompany()
-// │   │
-// │   │   ├── enums/                               # 🔤 Shared enums
-// │   │                                             # UserStatus, CompanyStatus etc.
-// │   │
-// │   │   ├── exceptions/                          # ❌ Custom business exceptions
-// │   │
-// │   │   ├── filters/                             # 🚨 Global exception filters
-// │   │                                             # সব API error consistent করবে
-// │   │
-// │   │   ├── guards/                              # 🛡️ Global authorization/security guards
-// │   │                                             # Authentication/RBAC/Tenant guards
-// │   │
-// │   │   ├── interceptors/                        # 🔄 Request/response interceptors
-// │   │                                             # Logging/response processing
-// │   │
-// │   │   ├── middleware/                          # 🔧 Global/custom middleware
-// │   │                                             # Request processing
-// │   │
-// │   │   ├── pipes/                               # 🧪 Validation/transformation
-// │   │                                             # DTO validation
-// │   │
-// │   │   ├── serializers/                         # 📦 Response serialization
-// │   │                                             # Sensitive field hide/format
-// │   │
-// │   │   ├── types/                               # 📝 Shared TypeScript types
-// │   │
-// │   │   └── utils/                               # 🔨 Reusable helper functions
-// │   │                                             # Date, pagination, slug etc.
+// ├── test/
+// │   ├── unit/
+// │   ├── integration/
+// │   └── e2e/
 // │
-// │   ├── prisma/                                  # 🔌 NestJS ↔ Prisma integration
-// │   │
-// │   │   ├── prisma.module.ts                     # Prisma NestJS module
-// │   │                                             # PrismaService provide/export করবে
-// │   │
-// │   │   └── prisma.service.ts                    # 🗄️ Central PrismaService
-// │                                                 # PostgreSQL access করবে
-// │
-// │   ├── modules/                                 # 🧩 Business feature modules
-// │   │                                             # Feature-based architecture
-// │   │
-// │   │   ├── auth/                                # 🔐 Authentication
-// │   │   │   ├── dto/                             # Login/Register DTO
-// │   │   │   ├── guards/                          # Auth-specific guards
-// │   │   │   ├── strategies/                      # JWT authentication strategies
-// │   │   │   ├── auth.controller.ts               # Auth API endpoints
-// │   │   │   ├── auth.service.ts                  # Login/Register business logic
-// │   │   │   └── auth.module.ts                   # Auth module
-// │   │
-// │   │   ├── users/                               # 👤 User management
-// │   │   │   ├── dto/                             # Create/update user DTO
-// │   │   │   ├── users.controller.ts              # User API
-// │   │   │   ├── users.service.ts                 # User business logic
-// │   │   │   └── users.module.ts                  # User module
-// │   │
-// │   │   ├── companies/                           # 🏢 Tenant/company management
-// │   │   │   ├── dto/                             # Company DTO
-// │   │   │   ├── companies.controller.ts          # Company API
-// │   │   │   ├── companies.service.ts             # Company business logic
-// │   │   │   └── companies.module.ts              # Company module
-// │   │
-// │   │   ├── memberships/                         # 👥 User ↔ Company relationship
-// │   │   │   ├── dto/                             # Membership DTO
-// │   │   │   ├── memberships.controller.ts        # Membership API
-// │   │   │   ├── memberships.service.ts           # Membership logic
-// │   │   │   └── memberships.module.ts            # Membership module
-// │   │
-// │   │   ├── roles/                               # 🎭 Role management
-// │   │   │   ├── dto/                             # Role DTO
-// │   │   │   ├── roles.controller.ts              # Role API
-// │   │   │   ├── roles.service.ts                 # Role logic
-// │   │   │   └── roles.module.ts                  # Role module
-// │   │
-// │   │   ├── permissions/                         # 🔑 Permission management
-// │   │   │   ├── dto/                             # Permission DTO
-// │   │   │   ├── permissions.controller.ts        # Permission API
-// │   │   │   ├── permissions.service.ts           # Permission logic
-// │   │   │   └── permissions.module.ts            # Permission module
-// │   │
-// │   │   ├── subscriptions/                       # 💳 SaaS subscription
-// │   │   │   ├── dto/                             # Subscription DTO
-// │   │   │   ├── subscriptions.controller.ts     # Subscription API
-// │   │   │   ├── subscriptions.service.ts        # Subscription logic
-// │   │   │   └── subscriptions.module.ts         # Subscription module
-// │   │
-// │   │   ├── customers/                           # 👨‍💼 Customer management
-// │   │   │   ├── dto/                             # Customer DTO
-// │   │   │   ├── customers.controller.ts          # Customer API
-// │   │   │   ├── customers.service.ts             # Customer logic
-// │   │   │   └── customers.module.ts              # Customer module
-// │   │
-// │   │   ├── products/                            # 📦 Product management
-// │   │   │   ├── dto/                             # Product DTO
-// │   │   │   ├── products.controller.ts          # Product API
-// │   │   │   ├── products.service.ts             # Product logic
-// │   │   │   └── products.module.ts              # Product module
-// │   │
-// │   │   ├── categories/                          # 🗂️ Category management
-// │   │   │   ├── dto/                             # Category DTO
-// │   │   │   ├── categories.controller.ts        # Category API
-// │   │   │   ├── categories.service.ts           # Category logic
-// │   │   │   └── categories.module.ts            # Category module
-// │   │
-// │   │   ├── sales/                               # 🛒 Sales/order management
-// │   │   │   ├── dto/
-// │   │   │   ├── sales.controller.ts
-// │   │   │   ├── sales.service.ts
-// │   │   │   └── sales.module.ts
-// │   │
-// │   │   ├── purchases/                           # 🧾 Purchase management
-// │   │   │   ├── dto/
-// │   │   │   ├── purchases.controller.ts
-// │   │   │   ├── purchases.service.ts
-// │   │   │   └── purchases.module.ts
-// │   │
-// │   │   ├── inventory/                           # 📊 Inventory/stock management
-// │   │   │   ├── dto/
-// │   │   │   ├── inventory.controller.ts
-// │   │   │   ├── inventory.service.ts
-// │   │   │   └── inventory.module.ts
-// │   │
-// │   │   ├── payments/                            # 💰 Payment/transaction management
-// │   │   │   ├── dto/
-// │   │   │   ├── payments.controller.ts
-// │   │   │   ├── payments.service.ts
-// │   │   │   └── payments.module.ts
-// │   │
-// │   │   ├── expenses/                            # 💸 Business expense management
-// │   │   │   ├── dto/
-// │   │   │   ├── expenses.controller.ts
-// │   │   │   ├── expenses.service.ts
-// │   │   │   └── expenses.module.ts
-// │   │
-// │   │   ├── accounting/                          # 📚 Accounting/financial records
-// │   │   │   ├── dto/
-// │   │   │   ├── accounting.controller.ts
-// │   │   │   ├── accounting.service.ts
-// │   │   │   └── accounting.module.ts
-// │   │
-// │   │   ├── reports/                             # 📈 Reports & analytics
-// │   │   │   ├── dto/
-// │   │   │   ├── reports.controller.ts
-// │   │   │   ├── reports.service.ts
-// │   │   │   └── reports.module.ts
-// │   │
-// │   │   ├── notifications/                       # 🔔 Notifications
-// │   │   │   ├── dto/
-// │   │   │   ├── notifications.controller.ts
-// │   │   │   ├── notifications.service.ts
-// │   │   │   └── notifications.module.ts
-// │   │
-// │   │   ├── files/                               # 📁 File/document management
-// │   │   │   ├── dto/
-// │   │   │   ├── files.controller.ts
-// │   │   │   ├── files.service.ts
-// │   │   │   └── files.module.ts
-// │   │
-// │   │   └── audit-logs/                          # 📝 Audit trail
-// │   │       ├── dto/
-// │   │       ├── audit-logs.controller.ts
-// │   │       ├── audit-logs.service.ts
-// │   │       └── audit-logs.module.ts
-// │   │
-// │   ├── health/                                  # ❤️ Health monitoring
-// │   │   ├── health.controller.ts                 # GET /api/v1/health
-// │   │   └── health.module.ts
-// │   │
-// │   ├── app.module.ts                            # 🏠 Root NestJS module
-// │   │                                             # সব modules এখানে register/import
-// │   │
-// │   └── main.ts                                  # 🚀 Application bootstrap
-// │                                                 # CORS, ValidationPipe,
-// │                                                 # API version/prefix, Swagger etc.
-// │
-// ├── test/                                        # 🧪 Automated testing
-// │   │
-// │   ├── unit/                                    # Individual service/function tests
-// │   │
-// │   └── integration/                             # API + DB integration tests
-// │
-// ├── .env                                         # 🔐 Local secrets/config
-// │                                                 # ❌ GitHub-এ commit করবে না
-// │
-// ├── .env.example                                 # 📋 Environment variable template
-// │                                                 # ✅ GitHub-এ রাখা যাবে
-// │
-// ├── .gitignore                                   # 🚫 Ignored files
-// │                                                 # node_modules, .env etc.
-// │
-// ├── prisma.config.ts                             # ⚙️ Prisma 7 configuration
-// │                                                 # Schema + migrations + DATABASE_URL
-// │
-// ├── package.json                                 # 📦 Dependencies + scripts
-// │
-// ├── tsconfig.json                                # 🟦 TypeScript configuration
-// │
-// ├── nest-cli.json                                # 🐱 NestJS CLI configuration
-// │
-// └── README.md                                    # 📖 Project documentation
+// ├── .env
+// ├── .env.example
+// ├── .gitignore
+// ├── nest-cli.json
+// ├── package.json
+// ├── tsconfig.json
+// ├── tsconfig.build.json
+// └── README.md

@@ -33,7 +33,7 @@ export type PermissionMinAggregateOutputType = {
   name: string | null
   description: string | null
   isSystem: boolean | null
-  status: $Enums.PlanStatus | null
+  status: $Enums.PermissionStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -47,7 +47,7 @@ export type PermissionMaxAggregateOutputType = {
   name: string | null
   description: string | null
   isSystem: boolean | null
-  status: $Enums.PlanStatus | null
+  status: $Enums.PermissionStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -192,7 +192,7 @@ export type PermissionGroupByOutputType = {
   name: string
   description: string | null
   isSystem: boolean
-  status: $Enums.PlanStatus
+  status: $Enums.PermissionStatus
   createdAt: Date
   updatedAt: Date
   _count: PermissionCountAggregateOutputType | null
@@ -227,7 +227,7 @@ export type PermissionWhereInput = {
   name?: Prisma.StringFilter<"Permission"> | string
   description?: Prisma.StringNullableFilter<"Permission"> | string | null
   isSystem?: Prisma.BoolFilter<"Permission"> | boolean
-  status?: Prisma.EnumPlanStatusFilter<"Permission"> | $Enums.PlanStatus
+  status?: Prisma.EnumPermissionStatusFilter<"Permission"> | $Enums.PermissionStatus
   createdAt?: Prisma.DateTimeFilter<"Permission"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Permission"> | Date | string
   platformRoles?: Prisma.PlatformRolePermissionListRelationFilter
@@ -263,7 +263,7 @@ export type PermissionWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Permission"> | string
   description?: Prisma.StringNullableFilter<"Permission"> | string | null
   isSystem?: Prisma.BoolFilter<"Permission"> | boolean
-  status?: Prisma.EnumPlanStatusFilter<"Permission"> | $Enums.PlanStatus
+  status?: Prisma.EnumPermissionStatusFilter<"Permission"> | $Enums.PermissionStatus
   createdAt?: Prisma.DateTimeFilter<"Permission"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Permission"> | Date | string
   platformRoles?: Prisma.PlatformRolePermissionListRelationFilter
@@ -299,7 +299,7 @@ export type PermissionScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Permission"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Permission"> | string | null
   isSystem?: Prisma.BoolWithAggregatesFilter<"Permission"> | boolean
-  status?: Prisma.EnumPlanStatusWithAggregatesFilter<"Permission"> | $Enums.PlanStatus
+  status?: Prisma.EnumPermissionStatusWithAggregatesFilter<"Permission"> | $Enums.PermissionStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Permission"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Permission"> | Date | string
 }
@@ -313,7 +313,7 @@ export type PermissionCreateInput = {
   name: string
   description?: string | null
   isSystem?: boolean
-  status?: $Enums.PlanStatus
+  status?: $Enums.PermissionStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   platformRoles?: Prisma.PlatformRolePermissionCreateNestedManyWithoutPermissionInput
@@ -329,7 +329,7 @@ export type PermissionUncheckedCreateInput = {
   name: string
   description?: string | null
   isSystem?: boolean
-  status?: $Enums.PlanStatus
+  status?: $Enums.PermissionStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   platformRoles?: Prisma.PlatformRolePermissionUncheckedCreateNestedManyWithoutPermissionInput
@@ -345,7 +345,7 @@ export type PermissionUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumPermissionStatusFieldUpdateOperationsInput | $Enums.PermissionStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   platformRoles?: Prisma.PlatformRolePermissionUpdateManyWithoutPermissionNestedInput
@@ -361,7 +361,7 @@ export type PermissionUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumPermissionStatusFieldUpdateOperationsInput | $Enums.PermissionStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   platformRoles?: Prisma.PlatformRolePermissionUncheckedUpdateManyWithoutPermissionNestedInput
@@ -377,7 +377,7 @@ export type PermissionCreateManyInput = {
   name: string
   description?: string | null
   isSystem?: boolean
-  status?: $Enums.PlanStatus
+  status?: $Enums.PermissionStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -391,7 +391,7 @@ export type PermissionUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumPermissionStatusFieldUpdateOperationsInput | $Enums.PermissionStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -405,7 +405,7 @@ export type PermissionUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumPermissionStatusFieldUpdateOperationsInput | $Enums.PermissionStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -463,6 +463,10 @@ export type PermissionScalarRelationFilter = {
   isNot?: Prisma.PermissionWhereInput
 }
 
+export type EnumPermissionStatusFieldUpdateOperationsInput = {
+  set?: $Enums.PermissionStatus
+}
+
 export type PermissionCreateNestedOneWithoutPlatformRolesInput = {
   create?: Prisma.XOR<Prisma.PermissionCreateWithoutPlatformRolesInput, Prisma.PermissionUncheckedCreateWithoutPlatformRolesInput>
   connectOrCreate?: Prisma.PermissionCreateOrConnectWithoutPlatformRolesInput
@@ -500,7 +504,7 @@ export type PermissionCreateWithoutPlatformRolesInput = {
   name: string
   description?: string | null
   isSystem?: boolean
-  status?: $Enums.PlanStatus
+  status?: $Enums.PermissionStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   companyRoles?: Prisma.CompanyRolePermissionCreateNestedManyWithoutPermissionInput
@@ -515,7 +519,7 @@ export type PermissionUncheckedCreateWithoutPlatformRolesInput = {
   name: string
   description?: string | null
   isSystem?: boolean
-  status?: $Enums.PlanStatus
+  status?: $Enums.PermissionStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   companyRoles?: Prisma.CompanyRolePermissionUncheckedCreateNestedManyWithoutPermissionInput
@@ -546,7 +550,7 @@ export type PermissionUpdateWithoutPlatformRolesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumPermissionStatusFieldUpdateOperationsInput | $Enums.PermissionStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyRoles?: Prisma.CompanyRolePermissionUpdateManyWithoutPermissionNestedInput
@@ -561,7 +565,7 @@ export type PermissionUncheckedUpdateWithoutPlatformRolesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumPermissionStatusFieldUpdateOperationsInput | $Enums.PermissionStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyRoles?: Prisma.CompanyRolePermissionUncheckedUpdateManyWithoutPermissionNestedInput
@@ -576,7 +580,7 @@ export type PermissionCreateWithoutCompanyRolesInput = {
   name: string
   description?: string | null
   isSystem?: boolean
-  status?: $Enums.PlanStatus
+  status?: $Enums.PermissionStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   platformRoles?: Prisma.PlatformRolePermissionCreateNestedManyWithoutPermissionInput
@@ -591,7 +595,7 @@ export type PermissionUncheckedCreateWithoutCompanyRolesInput = {
   name: string
   description?: string | null
   isSystem?: boolean
-  status?: $Enums.PlanStatus
+  status?: $Enums.PermissionStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   platformRoles?: Prisma.PlatformRolePermissionUncheckedCreateNestedManyWithoutPermissionInput
@@ -622,7 +626,7 @@ export type PermissionUpdateWithoutCompanyRolesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumPermissionStatusFieldUpdateOperationsInput | $Enums.PermissionStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   platformRoles?: Prisma.PlatformRolePermissionUpdateManyWithoutPermissionNestedInput
@@ -637,7 +641,7 @@ export type PermissionUncheckedUpdateWithoutCompanyRolesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isSystem?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumPermissionStatusFieldUpdateOperationsInput | $Enums.PermissionStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   platformRoles?: Prisma.PlatformRolePermissionUncheckedUpdateManyWithoutPermissionNestedInput
@@ -766,7 +770,7 @@ export type $PermissionPayload<ExtArgs extends runtime.Types.Extensions.Internal
     name: string
     description: string | null
     isSystem: boolean
-    status: $Enums.PlanStatus
+    status: $Enums.PermissionStatus
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["permission"]>
@@ -1202,7 +1206,7 @@ export interface PermissionFieldRefs {
   readonly name: Prisma.FieldRef<"Permission", 'String'>
   readonly description: Prisma.FieldRef<"Permission", 'String'>
   readonly isSystem: Prisma.FieldRef<"Permission", 'Boolean'>
-  readonly status: Prisma.FieldRef<"Permission", 'PlanStatus'>
+  readonly status: Prisma.FieldRef<"Permission", 'PermissionStatus'>
   readonly createdAt: Prisma.FieldRef<"Permission", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Permission", 'DateTime'>
 }

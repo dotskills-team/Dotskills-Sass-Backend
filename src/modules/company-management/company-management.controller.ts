@@ -43,7 +43,7 @@ create(
 ) {
   return this.companyService.create(
     dto,
-    req.user.id,
+    req.user.userId,
   );
 }
 

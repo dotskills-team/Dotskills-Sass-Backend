@@ -29,7 +29,7 @@ export type IndustryMinAggregateOutputType = {
   code: string | null
   name: string | null
   description: string | null
-  status: $Enums.PlanStatus | null
+  status: $Enums.IndustryStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -39,7 +39,7 @@ export type IndustryMaxAggregateOutputType = {
   code: string | null
   name: string | null
   description: string | null
-  status: $Enums.PlanStatus | null
+  status: $Enums.IndustryStatus | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -164,7 +164,7 @@ export type IndustryGroupByOutputType = {
   code: string
   name: string
   description: string | null
-  status: $Enums.PlanStatus
+  status: $Enums.IndustryStatus
   createdAt: Date
   updatedAt: Date
   _count: IndustryCountAggregateOutputType | null
@@ -195,7 +195,7 @@ export type IndustryWhereInput = {
   code?: Prisma.StringFilter<"Industry"> | string
   name?: Prisma.StringFilter<"Industry"> | string
   description?: Prisma.StringNullableFilter<"Industry"> | string | null
-  status?: Prisma.EnumPlanStatusFilter<"Industry"> | $Enums.PlanStatus
+  status?: Prisma.EnumIndustryStatusFilter<"Industry"> | $Enums.IndustryStatus
   createdAt?: Prisma.DateTimeFilter<"Industry"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Industry"> | Date | string
   companies?: Prisma.CompanyListRelationFilter
@@ -220,7 +220,7 @@ export type IndustryWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.IndustryWhereInput | Prisma.IndustryWhereInput[]
   name?: Prisma.StringFilter<"Industry"> | string
   description?: Prisma.StringNullableFilter<"Industry"> | string | null
-  status?: Prisma.EnumPlanStatusFilter<"Industry"> | $Enums.PlanStatus
+  status?: Prisma.EnumIndustryStatusFilter<"Industry"> | $Enums.IndustryStatus
   createdAt?: Prisma.DateTimeFilter<"Industry"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Industry"> | Date | string
   companies?: Prisma.CompanyListRelationFilter
@@ -247,7 +247,7 @@ export type IndustryScalarWhereWithAggregatesInput = {
   code?: Prisma.StringWithAggregatesFilter<"Industry"> | string
   name?: Prisma.StringWithAggregatesFilter<"Industry"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Industry"> | string | null
-  status?: Prisma.EnumPlanStatusWithAggregatesFilter<"Industry"> | $Enums.PlanStatus
+  status?: Prisma.EnumIndustryStatusWithAggregatesFilter<"Industry"> | $Enums.IndustryStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Industry"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Industry"> | Date | string
 }
@@ -257,7 +257,7 @@ export type IndustryCreateInput = {
   code: string
   name: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.IndustryStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyCreateNestedManyWithoutIndustryInput
@@ -268,7 +268,7 @@ export type IndustryUncheckedCreateInput = {
   code: string
   name: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.IndustryStatus
   createdAt?: Date | string
   updatedAt?: Date | string
   companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutIndustryInput
@@ -279,7 +279,7 @@ export type IndustryUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumIndustryStatusFieldUpdateOperationsInput | $Enums.IndustryStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUpdateManyWithoutIndustryNestedInput
@@ -290,7 +290,7 @@ export type IndustryUncheckedUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumIndustryStatusFieldUpdateOperationsInput | $Enums.IndustryStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companies?: Prisma.CompanyUncheckedUpdateManyWithoutIndustryNestedInput
@@ -301,7 +301,7 @@ export type IndustryCreateManyInput = {
   code: string
   name: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.IndustryStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -311,7 +311,7 @@ export type IndustryUpdateManyMutationInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumIndustryStatusFieldUpdateOperationsInput | $Enums.IndustryStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -321,7 +321,7 @@ export type IndustryUncheckedUpdateManyInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumIndustryStatusFieldUpdateOperationsInput | $Enums.IndustryStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -361,6 +361,10 @@ export type IndustryScalarRelationFilter = {
   isNot?: Prisma.IndustryWhereInput
 }
 
+export type EnumIndustryStatusFieldUpdateOperationsInput = {
+  set?: $Enums.IndustryStatus
+}
+
 export type IndustryCreateNestedOneWithoutCompaniesInput = {
   create?: Prisma.XOR<Prisma.IndustryCreateWithoutCompaniesInput, Prisma.IndustryUncheckedCreateWithoutCompaniesInput>
   connectOrCreate?: Prisma.IndustryCreateOrConnectWithoutCompaniesInput
@@ -380,7 +384,7 @@ export type IndustryCreateWithoutCompaniesInput = {
   code: string
   name: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.IndustryStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -390,7 +394,7 @@ export type IndustryUncheckedCreateWithoutCompaniesInput = {
   code: string
   name: string
   description?: string | null
-  status?: $Enums.PlanStatus
+  status?: $Enums.IndustryStatus
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -416,7 +420,7 @@ export type IndustryUpdateWithoutCompaniesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumIndustryStatusFieldUpdateOperationsInput | $Enums.IndustryStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -426,7 +430,7 @@ export type IndustryUncheckedUpdateWithoutCompaniesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
+  status?: Prisma.EnumIndustryStatusFieldUpdateOperationsInput | $Enums.IndustryStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -522,7 +526,7 @@ export type $IndustryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     code: string
     name: string
     description: string | null
-    status: $Enums.PlanStatus
+    status: $Enums.IndustryStatus
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["industry"]>
@@ -953,7 +957,7 @@ export interface IndustryFieldRefs {
   readonly code: Prisma.FieldRef<"Industry", 'String'>
   readonly name: Prisma.FieldRef<"Industry", 'String'>
   readonly description: Prisma.FieldRef<"Industry", 'String'>
-  readonly status: Prisma.FieldRef<"Industry", 'PlanStatus'>
+  readonly status: Prisma.FieldRef<"Industry", 'IndustryStatus'>
   readonly createdAt: Prisma.FieldRef<"Industry", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Industry", 'DateTime'>
 }
