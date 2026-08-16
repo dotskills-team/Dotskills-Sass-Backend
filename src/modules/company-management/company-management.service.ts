@@ -6,7 +6,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-
+import { CompanyStatus } from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
 
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -354,72 +354,139 @@ const creator = await this.prisma.user.findUnique({
     });
   }
 
-  async activate(id: string) {
-    const company =
-      await this.prisma.company.findUnique({
-        where: {
-          id,
-        },
-        select: {
-          id: true,
-          status: true,
-        },
-      });
+//   async activate(id: string) {
+//     const company =
+//       await this.prisma.company.findUnique({
+//         where: {
+//           id,
+//         },
+//         select: {
+//           id: true,
+//           status: true,
+//         },
+//       });
 
-    if (!company) {
-      throw new NotFoundException(
-        'Company not found',
-      );
-    }
+//     if (!company) {
+//       throw new NotFoundException(
+//         'Company not found',
+//       );
+//     }
 
-    if (company.status === 'CLOSED') {
-      throw new BadRequestException(
-        'Closed company cannot be activated',
-      );
-    }
+//     if (company.status === 'CLOSED') {
+//       throw new BadRequestException(
+//         'Closed company cannot be activated',
+//       );
+//     }
 
-    return this.prisma.company.update({
-      where: {
-        id,
-      },
-      data: {
-        status: 'ACTIVE' as any,
-        goLiveAt: new Date(),
-      },
-    });
+//     // return this.prisma.company.update({
+//     //   where: {
+//     //     id,
+//     //   },
+//     //   data: {
+//     //     status: 'ACTIVE' as any,
+//     //     goLiveAt: new Date(),
+//     //   },
+//     // });
+//     return this.prisma.company.update({
+//   where: { id },
+//   data: {
+//     status: 'LIVE'as any,
+//     goLiveAt: new Date(),
+//   },
+// });
+//   }
+async activate(id: string) {
+  const company = await this.prisma.company.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      status: true,
+    },
+  });
+
+  if (!company) {
+    throw new NotFoundException('Company not found');
   }
 
+  if (company.status === CompanyStatus.CLOSED) {
+    throw new BadRequestException(
+      'Closed company cannot be activated',
+    );
+  }
+
+  if (company.status === CompanyStatus.LIVE) {
+    return company;
+  }
+
+  return this.prisma.company.update({
+    where: { id },
+    data: {
+      status: CompanyStatus.LIVE,
+      goLiveAt: new Date(),
+    },
+  });
+}
+  // async suspend(id: string) {
+  //   const company =
+  //     await this.prisma.company.findUnique({
+  //       where: {
+  //         id,
+  //       },
+  //       select: {
+  //         id: true,
+  //         status: true,
+  //       },
+  //     });
+
+  //   if (!company) {
+  //     throw new NotFoundException(
+  //       'Company not found',
+  //     );
+  //   }
+
+  //   if (company.status === 'CLOSED') {
+  //     throw new BadRequestException(
+  //       'Closed company cannot be suspended',
+  //     );
+  //   }
+
+  //   return this.prisma.company.update({
+  //     where: {
+  //       id,
+  //     },
+  //     data: {
+  //       status: 'SUSPENDED' as any,
+  //     },
+  //   });
+  // }
   async suspend(id: string) {
-    const company =
-      await this.prisma.company.findUnique({
-        where: {
-          id,
-        },
-        select: {
-          id: true,
-          status: true,
-        },
-      });
+  const company = await this.prisma.company.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      status: true,
+    },
+  });
 
-    if (!company) {
-      throw new NotFoundException(
-        'Company not found',
-      );
-    }
-
-    if (company.status === 'CLOSED') {
-      throw new BadRequestException(
-        'Closed company cannot be suspended',
-      );
-    }
-
-    return this.prisma.company.update({
-      where: {
-        id,
-      },
-      data: {
-        status: 'SUSPENDED' as any,
-      },
-    });
+  if (!company) {
+    throw new NotFoundException('Company not found');
   }
+
+  if (company.status === CompanyStatus.CLOSED) {
+    throw new BadRequestException(
+      'Closed company cannot be suspended',
+    );
+  }
+
+  if (company.status === CompanyStatus.SUSPENDED) {
+    return company;
+  }
+
+  return this.prisma.company.update({
+    where: { id },
+    data: {
+      status: CompanyStatus.SUSPENDED,
+    },
+  });
+}
 }

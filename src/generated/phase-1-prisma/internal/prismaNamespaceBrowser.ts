@@ -70,6 +70,7 @@ export const ModelName = {
   CompanyMemberScope: 'CompanyMemberScope',
   CompanyOwnership: 'CompanyOwnership',
   Subscription: 'Subscription',
+  SubscriptionEvent: 'SubscriptionEvent',
   Invitation: 'Invitation',
   AuditLog: 'AuditLog',
   Permission: 'Permission',
@@ -386,10 +387,31 @@ export const SubscriptionScalarFieldEnum = {
   autoRenew: 'autoRenew',
   priceSnapshot: 'priceSnapshot',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  suspendedAt: 'suspendedAt',
+  pastDueEndsAt: 'pastDueEndsAt',
+  suspensionExpiresAt: 'suspensionExpiresAt'
 } as const
 
 export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
+
+
+export const SubscriptionEventScalarFieldEnum = {
+  id: 'id',
+  subscriptionId: 'subscriptionId',
+  tenantId: 'tenantId',
+  companyId: 'companyId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  reason: 'reason',
+  source: 'source',
+  actorUserId: 'actorUserId',
+  idempotencyKey: 'idempotencyKey',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type SubscriptionEventScalarFieldEnum = (typeof SubscriptionEventScalarFieldEnum)[keyof typeof SubscriptionEventScalarFieldEnum]
 
 
 export const InvitationScalarFieldEnum = {

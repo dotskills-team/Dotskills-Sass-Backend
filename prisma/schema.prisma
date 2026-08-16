@@ -483,6 +483,9 @@ model CompanyOwnership {
   @@map("company_ownerships")
 }
 
+
+
+
 model Subscription {
   id                 String             @id @default(uuid()) @db.Uuid
   tenantId           String             @db.Uuid
@@ -504,11 +507,40 @@ model Subscription {
   company            Company?           @relation(fields: [companyId], references: [id], onDelete: Restrict)
   plan               Plan               @relation(fields: [planId], references: [id], onDelete: Restrict)
 
+  suspendedAt        DateTime? @db.Timestamptz(6)
+  pastDueEndsAt       DateTime? @db.Timestamptz(6)
+  suspensionExpiresAt DateTime? @db.Timestamptz(6)
+  events             SubscriptionEvent[]
+
+
   @@index([tenantId, status, currentPeriodEnd])
   @@index([companyId, status, currentPeriodEnd])
   @@map("subscriptions")
-}
 
+  @@index([status, trialEndsAt])
+  @@index([status, pastDueEndsAt])
+  @@index([status, graceEndsAt])
+  @@index([status, suspensionExpiresAt])
+}
+model SubscriptionEvent {
+  id              String              @id @default(uuid()) @db.Uuid
+  subscriptionId  String              @db.Uuid
+  tenantId        String              @db.Uuid
+  companyId       String?             @db.Uuid
+  fromStatus      SubscriptionStatus?
+  toStatus        SubscriptionStatus
+  reason          String              @db.VarChar(160)
+  source          String              @db.VarChar(40)
+  actorUserId     String?             @db.Uuid
+  idempotencyKey  String?             @unique @db.VarChar(200)
+  metadata        Json?               @db.JsonB
+  createdAt       DateTime            @default(now()) @db.Timestamptz(6)
+  subscription    Subscription        @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId, createdAt])
+  @@index([tenantId, companyId, createdAt])
+  @@map("subscription_events")
+}
 model Invitation {
   id            String           @id @default(uuid()) @db.Uuid
   type          InvitationType

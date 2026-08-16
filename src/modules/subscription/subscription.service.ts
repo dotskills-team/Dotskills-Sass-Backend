@@ -1,0 +1,578 @@
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+// import {
+//   AuditActorType,
+//   BillingCycle,
+//   PlanStatus,
+//   Prisma,
+//   SubscriptionStatus,
+// } from "../../generated/phase-1-prisma";
+import { PrismaService } from "../../prisma/prisma.service";
+import { CancelSubscriptionDto } from "./dto/cancel-subscription.dto";
+import { ChangeSubscriptionPlanDto } from "./dto/change-subscription-plan.dto";
+import { CreateSubscriptionDto } from "./dto/create-subscription.dto";
+import { UpdateAutoRenewDto } from "./dto/update-auto-renew.dto";
+import { SUBSCRIPTION_CONSTANTS } from "./subscription.constants";
+import { SubscriptionLifecycleService } from "./subscription-lifecycle.service";
+// import { PriceSnapshot, SubscriptionContext } from "./subscription.types";
+import {
+  CreateSubscriptionContext,
+  PlatformSubscriptionContext,
+  PriceSnapshot,
+  SubscriptionContext,
+} from "./subscription.types";
+import { AuditActorType, BillingCycle, PlanStatus, SubscriptionStatus } from "src/generated/phase-1-prisma/enums";
+import { Prisma } from "src/generated/phase-1-prisma/client";
+
+@Injectable()
+export class SubscriptionService {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly lifecycle: SubscriptionLifecycleService,
+  ) {}
+
+  // async create(dto: CreateSubscriptionDto, context: SubscriptionContext) {
+  async create(
+  dto: CreateSubscriptionDto,
+  context: CreateSubscriptionContext,
+) {
+    if (!context.companyId) {
+  throw new BadRequestException(
+    "x-company-id header is required.",
+  );
+}
+
+if (dto.companyId !== context.companyId) {
+  throw new BadRequestException(
+    "x-company-id must match body companyId.",
+  );
+}
+
+const company = await this.prisma.company.findUnique({
+  where: {
+    id: dto.companyId,
+  },
+});
+
+if (!company) {
+  throw new NotFoundException("Company not found.");
+}
+
+const isSuperAdmin = context.roles.includes("SUPER_ADMIN");
+
+if (!isSuperAdmin) {
+  const membership = await this.prisma.companyMember.findFirst({
+    where: {
+      userId: context.userId,
+      tenantId: company.tenantId,
+      companyId: company.id,
+      status: "ACTIVE",
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!membership) {
+    throw new NotFoundException("Company not found.");
+  }
+}
+
+
+    
+    const plan = await this.getPlan(dto.planId);
+    const price = await this.getPrice(
+      dto.planId,
+      dto.billingCycle,
+      company.baseCurrencyCode,
+    );
+    const existing = await this.prisma.subscription.findFirst({
+      where: {
+        // tenantId: context.tenantId,
+        tenantId: company.tenantId,
+        companyId: company.id,
+        status: {
+          notIn: [SubscriptionStatus.CANCELLED, SubscriptionStatus.EXPIRED],
+        },
+      },
+    });
+    if (existing)
+      throw new ConflictException(
+        "Company already has an open subscription lifecycle.",
+      );
+
+    const now = new Date();
+    const trialEndsAt =
+      plan.trialDays > 0 ? this.addDays(now, plan.trialDays) : null;
+    const periodStart = trialEndsAt ?? now;
+    const snapshot: PriceSnapshot = {
+      planId: plan.id,
+      planCode: plan.code,
+      planName: plan.name,
+      billingCycle: dto.billingCycle,
+      currencyCode: price.currencyCode,
+      amount: price.amount.toString(),
+      capturedAt: now.toISOString(),
+    };
+    return this.prisma.$transaction(async (tx) => {
+      const subscription = await tx.subscription.create({
+        data: {
+          // tenantId: context.tenantId,
+            tenantId: company.tenantId,
+  companyId: company.id,
+          planId: plan.id,
+          status: trialEndsAt
+            ? SubscriptionStatus.TRIALING
+            : SubscriptionStatus.ACTIVE,
+          billingCycle: dto.billingCycle,
+          startsAt: now,
+          trialEndsAt,
+          currentPeriodStart: periodStart,
+          currentPeriodEnd: this.lifecycle.calculatePeriodEnd(
+            periodStart,
+            dto.billingCycle,
+          ),
+          autoRenew: true,
+          priceSnapshot: snapshot as unknown as Prisma.InputJsonValue,
+        },
+      });
+      await tx.subscriptionEvent.create({
+        data: {
+          subscriptionId: subscription.id,
+          tenantId: subscription.tenantId,
+          companyId: subscription.companyId,
+          fromStatus: null,
+          toStatus: subscription.status,
+          reason: "SUBSCRIPTION_CREATED",
+          source: "API",
+          actorUserId: context.userId,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          // tenantId: context.tenantId,
+          tenantId: company.tenantId,
+          companyId: company.id,
+          actorUserId: context.userId,
+          actorType: context.actorType ?? AuditActorType.COMPANY_MEMBER,
+          action: "SUBSCRIPTION_CREATED",
+          entityType: "Subscription",
+          entityId: subscription.id,
+          afterData: { status: subscription.status, planId: plan.id },
+        },
+      });
+      return subscription;
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+  getCurrent(context: SubscriptionContext) {
+    return this.prisma.subscription.findFirst({
+      where: {
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+        status: { not: SubscriptionStatus.EXPIRED },
+      },
+      include: {
+        plan: { include: { features: { include: { feature: true } } } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  findAll(context: SubscriptionContext) {
+    return this.prisma.subscription.findMany({
+      where: { tenantId: context.tenantId, companyId: context.companyId },
+      include: { plan: true },
+      orderBy: { createdAt: "desc" },
+      take: SUBSCRIPTION_CONSTANTS.MAX_HISTORY_LIMIT,
+    });
+  }
+
+  async findOne(id: string, context: SubscriptionContext) {
+    const row = await this.prisma.subscription.findFirst({
+      where: { id, tenantId: context.tenantId, companyId: context.companyId },
+      include: {
+        plan: { include: { features: { include: { feature: true } } } },
+        events: { orderBy: { createdAt: "desc" }, take: 100 },
+      },
+    });
+    if (!row) throw new NotFoundException("Subscription not found.");
+    return row;
+  }
+
+  async updateAutoRenew(
+    id: string,
+    dto: UpdateAutoRenewDto,
+    context: SubscriptionContext,
+  ) {
+    const row = await this.scoped(id, context);
+    // if (
+    //   [SubscriptionStatus.CANCELLED, SubscriptionStatus.EXPIRED].includes(
+    //     row.status,
+    //   )
+    // )
+    if (
+  row.status === SubscriptionStatus.CANCELLED ||
+  row.status === SubscriptionStatus.EXPIRED
+)
+      throw new BadRequestException(
+        "Auto-renew cannot be changed in this state.",
+      );
+    return this.prisma.subscription.update({
+      where: { id },
+      data: { autoRenew: dto.autoRenew },
+    });
+  }
+
+  async changePlan(
+    id: string,
+    dto: ChangeSubscriptionPlanDto,
+    context: SubscriptionContext,
+  ) {
+    const row = await this.scoped(id, context);
+    // if (
+    //   [SubscriptionStatus.CANCELLED, SubscriptionStatus.EXPIRED].includes(
+    //     row.status,
+    //   )
+    // )
+    if (
+  row.status === SubscriptionStatus.CANCELLED ||
+  row.status === SubscriptionStatus.EXPIRED
+)
+      throw new BadRequestException("Plan cannot be changed in this state.");
+    const plan = await this.getPlan(dto.planId);
+    const company = await this.prisma.company.findUniqueOrThrow({
+      where: { id: context.companyId },
+    });
+    const price = await this.getPrice(
+      plan.id,
+      dto.billingCycle,
+      company.baseCurrencyCode,
+    );
+    const snapshot: PriceSnapshot = {
+      planId: plan.id,
+      planCode: plan.code,
+      planName: plan.name,
+      billingCycle: dto.billingCycle,
+      currencyCode: price.currencyCode,
+      amount: price.amount.toString(),
+      capturedAt: new Date().toISOString(),
+    };
+    return this.prisma.subscription.update({
+      where: { id },
+      data: {
+        planId: plan.id,
+        billingCycle: dto.billingCycle,
+        priceSnapshot: snapshot as unknown as Prisma.InputJsonValue,
+      },
+    });
+  }
+
+  async cancel(
+    id: string,
+    dto: CancelSubscriptionDto,
+    context: SubscriptionContext,
+  ) {
+    const row = await this.scoped(id, context);
+    return this.lifecycle.transition(
+      row,
+      SubscriptionStatus.CANCELLED,
+      context,
+      {
+        reason: dto.reason ?? "USER_CANCELLED",
+        source: "API",
+        patch: { cancelledAt: new Date(), autoRenew: false },
+      },
+    );
+  }
+
+  async reactivate(id: string, context: SubscriptionContext) {
+    const row = await this.scoped(id, context);
+    if (row.status !== SubscriptionStatus.CANCELLED)
+      throw new BadRequestException(
+        "Only CANCELLED subscriptions can be reactivated.",
+      );
+    if (row.currentPeriodEnd <= new Date())
+      throw new BadRequestException(
+        "Cancellation period has ended; create or renew a subscription instead.",
+      );
+    return this.lifecycle.transition(row, SubscriptionStatus.ACTIVE, context, {
+      reason: "USER_REACTIVATED",
+      source: "API",
+      patch: { cancelledAt: null, autoRenew: true },
+    });
+  }
+
+findAllForPlatform() {
+  return this.prisma.subscription.findMany({
+    include: {
+      plan: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: SUBSCRIPTION_CONSTANTS.MAX_HISTORY_LIMIT,
+  });
+}
+
+async findOneForPlatform(id: string) {
+  const subscription =
+    await this.prisma.subscription.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        plan: {
+          include: {
+            features: {
+              include: {
+                feature: true,
+              },
+            },
+          },
+        },
+        events: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 100,
+        },
+      },
+    });
+
+  if (!subscription) {
+    throw new NotFoundException(
+      "Subscription not found.",
+    );
+  }
+
+  return subscription;
+}
+async suspendForPlatform(
+  id: string,
+  reason: string | undefined,
+  context: PlatformSubscriptionContext,
+) {
+  const subscription = await this.findForPlatformAction(id);
+
+  if (
+    subscription.status === SubscriptionStatus.SUSPENDED
+  ) {
+    throw new BadRequestException(
+      "Subscription is already suspended.",
+    );
+  }
+
+  if (
+    subscription.status === SubscriptionStatus.EXPIRED
+  ) {
+    throw new BadRequestException(
+      "Expired subscription cannot be suspended.",
+    );
+  }
+
+  const now = new Date();
+
+  return this.lifecycle.transition(
+    subscription,
+    SubscriptionStatus.SUSPENDED,
+    context,
+    {
+      reason: reason ?? "PLATFORM_ADMIN_SUSPENDED",
+      source: "API",
+      patch: {
+        suspendedAt: now,
+        suspensionExpiresAt: this.addDays(
+          now,
+          SUBSCRIPTION_CONSTANTS.DEFAULT_SUSPENSION_DAYS,
+        ),
+      },
+      metadata: {
+        action: "PLATFORM_SUSPEND",
+      },
+    },
+  );
+}
+
+async reactivateForPlatform(
+  id: string,
+  reason: string | undefined,
+  context: PlatformSubscriptionContext,
+) {
+  const subscription = await this.findForPlatformAction(id);
+
+  if (
+    subscription.status !== SubscriptionStatus.SUSPENDED
+  ) {
+    throw new BadRequestException(
+      "Only SUSPENDED subscriptions can be reactivated.",
+    );
+  }
+
+  return this.lifecycle.transition(
+    subscription,
+    SubscriptionStatus.ACTIVE,
+    context,
+    {
+      reason: reason ?? "PLATFORM_ADMIN_REACTIVATED",
+      source: "API",
+      patch: {
+        suspendedAt: null,
+        suspensionExpiresAt: null,
+        graceEndsAt: null,
+        pastDueEndsAt: null,
+        cancelledAt: null,
+      },
+      metadata: {
+        action: "PLATFORM_REACTIVATE",
+      },
+    },
+  );
+}
+
+async cancelForPlatform(
+  id: string,
+  reason: string | undefined,
+  context: PlatformSubscriptionContext,
+) {
+  const subscription = await this.findForPlatformAction(id);
+
+  if (
+    subscription.status === SubscriptionStatus.CANCELLED ||
+    subscription.status === SubscriptionStatus.EXPIRED
+  ) {
+    throw new BadRequestException(
+      `Subscription cannot be cancelled from ${subscription.status} state.`,
+    );
+  }
+
+  return this.lifecycle.transition(
+    subscription,
+    SubscriptionStatus.CANCELLED,
+    context,
+    {
+      reason: reason ?? "PLATFORM_ADMIN_CANCELLED",
+      source: "API",
+      patch: {
+        cancelledAt: new Date(),
+        autoRenew: false,
+      },
+      metadata: {
+        action: "PLATFORM_CANCEL",
+      },
+    },
+  );
+}
+
+async expireForPlatform(
+  id: string,
+  reason: string | undefined,
+  context: PlatformSubscriptionContext,
+) {
+  const subscription = await this.findForPlatformAction(id);
+
+  if (
+    subscription.status === SubscriptionStatus.EXPIRED
+  ) {
+    throw new BadRequestException(
+      "Subscription is already expired.",
+    );
+  }
+
+  return this.lifecycle.transition(
+    subscription,
+    SubscriptionStatus.EXPIRED,
+    context,
+    {
+      reason: reason ?? "PLATFORM_ADMIN_EXPIRED",
+      source: "API",
+      patch: {
+        autoRenew: false,
+      },
+      metadata: {
+        action: "PLATFORM_EXPIRE",
+      },
+    },
+  );
+}
+
+private async findForPlatformAction(id: string) {
+  const subscription =
+    await this.prisma.subscription.findUnique({
+      where: { id },
+    });
+
+  if (!subscription) {
+    throw new NotFoundException(
+      "Subscription not found.",
+    );
+  }
+
+  return subscription;
+}
+
+
+  private async scoped(id: string, context: SubscriptionContext) {
+    const row = await this.prisma.subscription.findFirst({
+      where: { id, tenantId: context.tenantId, companyId: context.companyId },
+    });
+    if (!row) throw new NotFoundException("Subscription not found.");
+    return row;
+  }
+
+  private async getPlan(id: string) {
+    const plan = await this.prisma.plan.findFirst({
+      where: { id, status: PlanStatus.ACTIVE },
+    });
+    if (!plan) throw new NotFoundException("Active plan not found.");
+    return plan;
+  }
+
+  private async getPrice(
+    planId: string,
+    billingCycle: BillingCycle,
+    currencyCode: string,
+  ) {
+    const now = new Date();
+    const price = await this.prisma.planPrice.findFirst({
+      where: {
+        planId,
+        billingCycle,
+        currencyCode,
+        isActive: true,
+        effectiveFrom: { lte: now },
+        OR: [{ effectiveTo: null }, { effectiveTo: { gt: now } }],
+      },
+      orderBy: { effectiveFrom: "desc" },
+    });
+    if (!price)
+      throw new NotFoundException(
+        "Active plan price not found for the company currency.",
+      );
+    return price;
+  }
+
+  private addDays(date: Date, days: number) {
+    const result = new Date(date);
+    result.setUTCDate(result.getUTCDate() + days);
+    return result;
+  }
+
+
+
+  
+}

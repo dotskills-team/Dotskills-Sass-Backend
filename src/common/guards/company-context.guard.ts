@@ -17,23 +17,51 @@ type CompanyRequest = Request & {
 
 @Injectable()
 export class CompanyContextGuard implements CanActivate {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<CompanyRequest>();
-    const routeCompanyId = String(request.params.companyId ?? "");
-    const headerCompanyId = request.header("x-company-id") ?? "";
-    if (!routeCompanyId || !headerCompanyId || routeCompanyId !== headerCompanyId) {
+    // const routeCompanyId = String(request.params.companyId ?? "");
+    // const headerCompanyId = request.header("x-company-id") ?? "";
+    // if (!routeCompanyId || !headerCompanyId || routeCompanyId !== headerCompanyId) {
+    //   throw new BadRequestException(
+    //     "x-company-id header must match the companyId route parameter",
+    //   );
+    // }
+    const routeCompanyId = String(
+      request.params.companyId ?? "",
+    ).trim();
+
+    const headerCompanyId = String(
+      request.header("x-company-id") ?? "",
+    ).trim();
+
+    if (!headerCompanyId) {
+      throw new BadRequestException(
+        "x-company-id header is required",
+      );
+    }
+
+    if (
+      routeCompanyId &&
+      routeCompanyId !== headerCompanyId
+    ) {
       throw new BadRequestException(
         "x-company-id header must match the companyId route parameter",
       );
     }
 
+    const resolvedCompanyId =
+      routeCompanyId || headerCompanyId;
+
+
+
     const now = new Date();
     const member = await this.prisma.companyMember.findFirst({
       where: {
         userId: request.user.userId,
-        companyId: routeCompanyId,
+        // companyId: routeCompanyId,
+        companyId: resolvedCompanyId,
         status: "ACTIVE",
       },
       select: {

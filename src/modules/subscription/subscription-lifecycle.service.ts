@@ -1,0 +1,776 @@
+import {
+  BadRequestException,
+
+  Logger,
+  NotFoundException,
+} from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { Injectable } from "@nestjs/common";
+
+import {
+  AuditActorType,
+  SubscriptionStatus,
+} from "src/generated/phase-1-prisma/enums";
+
+import {
+  LifecycleRunResult,
+  PlatformSubscriptionContext,
+  SubscriptionContext,
+  SystemSubscriptionContext,
+  TransitionOptions,
+} from "./subscription.types";
+import {
+  Prisma,
+  Subscription,
+} from "src/generated/phase-1-prisma/client";
+
+import {
+  ALLOWED_SUBSCRIPTION_TRANSITIONS,
+  SUBSCRIPTION_CONSTANTS,
+} from "./subscription.constants";
+
+// type ActorContext = SubscriptionContext | SystemSubscriptionContext;
+type ActorContext =
+  | SubscriptionContext
+  | SystemSubscriptionContext
+  | PlatformSubscriptionContext;
+
+@Injectable()
+export class SubscriptionLifecycleService {
+
+
+
+
+
+
+
+
+
+
+  
+  private readonly logger = new Logger(SubscriptionLifecycleService.name);
+
+  constructor(private readonly prisma: PrismaService) {}
+
+  async paymentSucceeded(
+    id: string,
+    context: ActorContext,
+    idempotencyKey: string,
+  ) {
+    // Scope validation must happen before returning an idempotent replay.
+    const subscription = await this.getScoped(id, context);
+
+    const replay = await this.findIdempotentResult(id, idempotencyKey);
+    if (replay) return replay;
+
+    const recoverableStatuses: readonly SubscriptionStatus[] = [
+      SubscriptionStatus.PAST_DUE,
+      SubscriptionStatus.GRACE,
+      SubscriptionStatus.SUSPENDED,
+    ];
+
+    if (!recoverableStatuses.includes(subscription.status)) {
+      throw new BadRequestException(
+        "Payment recovery is allowed only for PAST_DUE, GRACE or SUSPENDED subscriptions.",
+      );
+    }
+    const now = new Date();
+    return this.transition(subscription, SubscriptionStatus.ACTIVE, context, {
+      reason: "PAYMENT_SUCCEEDED",
+      source: "PAYMENT",
+      idempotencyKey,
+      patch: {
+        currentPeriodStart: now,
+        currentPeriodEnd: this.calculatePeriodEnd(
+          now,
+          subscription.billingCycle,
+        ),
+        graceEndsAt: null,
+        pastDueEndsAt: null,
+        suspendedAt: null,
+        suspensionExpiresAt: null,
+        cancelledAt: null,
+      },
+    });
+  }
+
+  async paymentFailed(
+    id: string,
+    context: ActorContext,
+    idempotencyKey: string,
+  ) {
+    // Scope validation must happen before returning an idempotent replay.
+    const subscription = await this.getScoped(id, context);
+
+    const replay = await this.findIdempotentResult(id, idempotencyKey);
+    if (replay) return replay;
+    if (subscription.status === SubscriptionStatus.ACTIVE) {
+      return this.transition(
+        subscription,
+        SubscriptionStatus.PAST_DUE,
+        context,
+        {
+          reason: "PAYMENT_FAILED",
+          source: "PAYMENT",
+          idempotencyKey,
+          patch: {
+            pastDueEndsAt: this.addDays(
+              new Date(),
+              SUBSCRIPTION_CONSTANTS.DEFAULT_PAST_DUE_DAYS,
+            ),
+          },
+        },
+      );
+    }
+    if (subscription.status === SubscriptionStatus.PAST_DUE) {
+      return this.transition(subscription, SubscriptionStatus.GRACE, context, {
+        reason: "PAYMENT_RETRY_FAILED",
+        source: "PAYMENT",
+        idempotencyKey,
+        patch: {
+          graceEndsAt: this.addDays(
+            new Date(),
+            SUBSCRIPTION_CONSTANTS.DEFAULT_GRACE_DAYS,
+          ),
+        },
+      });
+    }
+    throw new BadRequestException(
+      "Payment failure can only move ACTIVE→PAST_DUE or PAST_DUE→GRACE.",
+    );
+  }
+
+  async transition(
+    subscription: Subscription,
+    to: SubscriptionStatus,
+    context: ActorContext,
+    options: TransitionOptions,
+  ) {
+    if (!ALLOWED_SUBSCRIPTION_TRANSITIONS[subscription.status].includes(to)) {
+      throw new BadRequestException(
+        `Transition ${subscription.status} → ${to} is not allowed.`,
+      );
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      if (options.idempotencyKey) {
+        const prior = await tx.subscriptionEvent.findUnique({
+          where: { idempotencyKey: options.idempotencyKey },
+        });
+        if (prior)
+          return tx.subscription.findUniqueOrThrow({
+            where: { id: subscription.id },
+          });
+      }
+
+      // Optimistic compare-and-set prevents two workers from applying the same state change.
+      const changed = await tx.subscription.updateMany({
+        where: { id: subscription.id, status: subscription.status },
+        data: {
+          status: to,
+          ...(options.patch as
+            | Prisma.SubscriptionUpdateManyMutationInput
+            | undefined),
+        },
+      });
+      if (changed.count !== 1)
+        throw new BadRequestException(
+          "Subscription changed concurrently; retry the operation.",
+        );
+
+      await tx.subscriptionEvent.create({
+        data: {
+          subscriptionId: subscription.id,
+          tenantId: subscription.tenantId,
+          companyId: subscription.companyId,
+          fromStatus: subscription.status,
+          toStatus: to,
+          reason: options.reason,
+          source: options.source,
+          actorUserId: "userId" in context ? context.userId : null,
+          idempotencyKey: options.idempotencyKey,
+          metadata: options.metadata as Prisma.InputJsonValue | undefined,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          tenantId: subscription.tenantId,
+          companyId: subscription.companyId,
+          actorUserId: "userId" in context ? context.userId : null,
+          actorType: context.actorType ?? AuditActorType.COMPANY_MEMBER,
+          action: `SUBSCRIPTION_${to}`,
+          entityType: "Subscription",
+          entityId: subscription.id,
+          beforeData: { status: subscription.status },
+          afterData: { status: to, reason: options.reason },
+        },
+      });
+      return tx.subscription.findUniqueOrThrow({
+        where: { id: subscription.id },
+      });
+    });
+  }
+
+  async runDueTransitions(now = new Date()): Promise<LifecycleRunResult> {
+    const result: LifecycleRunResult = {
+      trialsActivated: 0,
+      activeMarkedPastDue: 0,
+      pastDueMovedToGrace: 0,
+      graceSuspended: 0,
+      suspendedExpired: 0,
+      cancelledExpired: 0,
+      failures: [],
+    };
+    await this.processDue(
+      SubscriptionStatus.TRIALING,
+      { trialEndsAt: { lte: now } },
+      SubscriptionStatus.ACTIVE,
+      result,
+      "trialsActivated",
+      () => ({ trialEndsAt: null }),
+    );
+    await this.processDue(
+      SubscriptionStatus.ACTIVE,
+      { currentPeriodEnd: { lte: now }, autoRenew: true },
+      SubscriptionStatus.PAST_DUE,
+      result,
+      "activeMarkedPastDue",
+      () => ({
+        pastDueEndsAt: this.addDays(
+          now,
+          SUBSCRIPTION_CONSTANTS.DEFAULT_PAST_DUE_DAYS,
+        ),
+      }),
+    );
+    await this.processDue(
+      SubscriptionStatus.ACTIVE,
+      { currentPeriodEnd: { lte: now }, autoRenew: false },
+      SubscriptionStatus.EXPIRED,
+      result,
+      "cancelledExpired",
+    );
+    await this.processDue(
+      SubscriptionStatus.PAST_DUE,
+      { pastDueEndsAt: { lte: now } },
+      SubscriptionStatus.GRACE,
+      result,
+      "pastDueMovedToGrace",
+      () => ({
+        pastDueEndsAt: null,
+        graceEndsAt: this.addDays(
+          now,
+          SUBSCRIPTION_CONSTANTS.DEFAULT_GRACE_DAYS,
+        ),
+      }),
+    );
+    await this.processDue(
+      SubscriptionStatus.GRACE,
+      { graceEndsAt: { lte: now } },
+      SubscriptionStatus.SUSPENDED,
+      result,
+      "graceSuspended",
+      () => ({
+        suspendedAt: now,
+        suspensionExpiresAt: this.addDays(
+          now,
+          SUBSCRIPTION_CONSTANTS.DEFAULT_SUSPENSION_DAYS,
+        ),
+      }),
+    );
+    await this.processDue(
+      SubscriptionStatus.SUSPENDED,
+      { suspensionExpiresAt: { lte: now } },
+      SubscriptionStatus.EXPIRED,
+      result,
+      "suspendedExpired",
+    );
+    await this.processDue(
+      SubscriptionStatus.CANCELLED,
+      { currentPeriodEnd: { lte: now } },
+      SubscriptionStatus.EXPIRED,
+      result,
+      "cancelledExpired",
+    );
+    return result;
+  }
+
+  private async processDue(
+    from: SubscriptionStatus,
+    due: Prisma.SubscriptionWhereInput,
+    to: SubscriptionStatus,
+    result: LifecycleRunResult,
+    counter: keyof Omit<LifecycleRunResult, "failures">,
+    patch: (subscription: Subscription) => Record<string, unknown> = () => ({}),
+  ) {
+    const rows = await this.prisma.subscription.findMany({
+      where: { status: from, ...due },
+      take: SUBSCRIPTION_CONSTANTS.LIFECYCLE_BATCH_SIZE,
+      orderBy: { updatedAt: "asc" },
+    });
+    for (const row of rows) {
+      try {
+        if (!row.companyId) {
+          throw new BadRequestException(
+            "Company-scoped subscription is missing companyId.",
+          );
+        }
+
+        await this.transition(
+          row,
+          to,
+          {
+            tenantId: row.tenantId,
+            companyId: row.companyId,
+            actorType: AuditActorType.SYSTEM,
+          },
+          {
+            reason: "SCHEDULED_LIFECYCLE",
+            source: "SCHEDULER",
+            patch: patch(row),
+          },
+        );
+        result[counter] += 1;
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Unknown lifecycle error";
+        result.failures.push({ subscriptionId: row.id, from, message });
+        this.logger.error({ subscriptionId: row.id, from, to, message });
+      }
+    }
+  }
+
+  // private async getScoped(id: string, context: ActorContext) {
+  //   const subscription = await this.prisma.subscription.findFirst({
+  //     where: { id, tenantId: context.tenantId, companyId: context.companyId },
+  //   });
+  //   if (!subscription) throw new NotFoundException("Subscription not found.");
+  //   return subscription;
+  // }
+private async getScoped(id: string, context: ActorContext) {
+  if ("tenantId" in context && "companyId" in context) {
+    const subscription = await this.prisma.subscription.findFirst({
+      where: {
+        id,
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
+    });
+
+    if (!subscription) {
+      throw new NotFoundException("Subscription not found.");
+    }
+
+    return subscription;
+  }
+
+  const subscription = await this.prisma.subscription.findUnique({
+    where: { id },
+  });
+
+  if (!subscription) {
+    throw new NotFoundException("Subscription not found.");
+  }
+
+  return subscription;
+}
+  private async findIdempotentResult(
+    subscriptionId: string,
+    idempotencyKey: string,
+  ) {
+    const event = await this.prisma.subscriptionEvent.findUnique({
+      where: { idempotencyKey },
+    });
+    if (!event) return null;
+    if (event.subscriptionId !== subscriptionId) {
+      throw new BadRequestException(
+        "Idempotency key was already used for another subscription.",
+      );
+    }
+    return this.prisma.subscription.findUniqueOrThrow({
+      where: { id: subscriptionId },
+    });
+  }
+
+  calculatePeriodEnd(start: Date, cycle: "MONTHLY" | "YEARLY") {
+    const result = new Date(start);
+    if (cycle === "MONTHLY") result.setUTCMonth(result.getUTCMonth() + 1);
+    else result.setUTCFullYear(result.getUTCFullYear() + 1);
+    return result;
+  }
+
+  private addDays(date: Date, days: number) {
+    const result = new Date(date);
+    result.setUTCDate(result.getUTCDate() + days);
+    return result;
+  }
+
+}
+
+
+
+
+
+// import {
+//   BadRequestException,
+//   Injectable,
+//   Logger,
+//   NotFoundException,
+// } from "@nestjs/common";
+// // import {
+// //   AuditActorType,
+// //   Prisma,
+// //   Subscription,
+// //   SubscriptionStatus,
+// // } from "../../generated/phase-1-prisma";
+// import { PrismaService } from "../../prisma/prisma.service";
+// import {
+//   ALLOWED_SUBSCRIPTION_TRANSITIONS,
+//   SUBSCRIPTION_CONSTANTS,
+// } from "./subscription.constants";
+// import {
+//   LifecycleRunResult,
+//   SubscriptionContext,
+//   SystemSubscriptionContext,
+//   TransitionOptions,
+// } from "./subscription.types";
+// import { AuditActorType, SubscriptionStatus } from "src/generated/phase-1-prisma/enums";
+// import { Prisma, Subscription } from "src/generated/phase-1-prisma/client";
+
+// type ActorContext = SubscriptionContext | SystemSubscriptionContext;
+
+// @Injectable()
+// export class SubscriptionLifecycleService {
+//   private readonly logger = new Logger(SubscriptionLifecycleService.name);
+
+//   constructor(private readonly prisma: PrismaService) { }
+
+//   async paymentSucceeded(
+//     id: string,
+//     context: ActorContext,
+//     idempotencyKey: string,
+//   ) {
+//     const replay = await this.findIdempotentResult(id, idempotencyKey);
+//     if (replay) return replay;
+//     // const subscription = await this.getScoped(id, context);
+//     // if (
+//     //   ![
+//     //     SubscriptionStatus.PAST_DUE,
+//     //     SubscriptionStatus.GRACE,
+//     //     SubscriptionStatus.SUSPENDED,
+//     //   ].includes(subscription.status)
+//     // ) {
+//     //   throw new BadRequestException(
+//     //     "Payment recovery is allowed only for PAST_DUE, GRACE or SUSPENDED subscriptions.",
+//     //   );
+//     // }
+//     const subscription = await this.getScoped(id, context);
+
+//     const recoverableStatuses: readonly SubscriptionStatus[] = [
+//       SubscriptionStatus.PAST_DUE,
+//       SubscriptionStatus.GRACE,
+//       SubscriptionStatus.SUSPENDED,
+//     ];
+
+//     if (!recoverableStatuses.includes(subscription.status)) {
+//       throw new BadRequestException(
+//         "Payment recovery is allowed only for PAST_DUE, GRACE or SUSPENDED subscriptions.",
+//       );
+//     }
+//     const now = new Date();
+//     return this.transition(subscription, SubscriptionStatus.ACTIVE, context, {
+//       reason: "PAYMENT_SUCCEEDED",
+//       source: "PAYMENT",
+//       idempotencyKey,
+//       patch: {
+//         currentPeriodStart: now,
+//         currentPeriodEnd: this.calculatePeriodEnd(
+//           now,
+//           subscription.billingCycle,
+//         ),
+//         graceEndsAt: null,
+//         pastDueEndsAt: null,
+//         suspendedAt: null,
+//         suspensionExpiresAt: null,
+//         cancelledAt: null,
+//       },
+//     });
+//   }
+
+//   async paymentFailed(
+//     id: string,
+//     context: ActorContext,
+//     idempotencyKey: string,
+//   ) {
+//     const replay = await this.findIdempotentResult(id, idempotencyKey);
+//     if (replay) return replay;
+//     const subscription = await this.getScoped(id, context);
+//     if (subscription.status === SubscriptionStatus.ACTIVE) {
+//       return this.transition(
+//         subscription,
+//         SubscriptionStatus.PAST_DUE,
+//         context,
+//         {
+//           reason: "PAYMENT_FAILED",
+//           source: "PAYMENT",
+//           idempotencyKey,
+//           patch: {
+//             pastDueEndsAt: this.addDays(
+//               new Date(),
+//               SUBSCRIPTION_CONSTANTS.DEFAULT_PAST_DUE_DAYS,
+//             ),
+//           },
+//         },
+//       );
+//     }
+//     if (subscription.status === SubscriptionStatus.PAST_DUE) {
+//       return this.transition(subscription, SubscriptionStatus.GRACE, context, {
+//         reason: "PAYMENT_RETRY_FAILED",
+//         source: "PAYMENT",
+//         idempotencyKey,
+//         patch: {
+//           graceEndsAt: this.addDays(
+//             new Date(),
+//             SUBSCRIPTION_CONSTANTS.DEFAULT_GRACE_DAYS,
+//           ),
+//         },
+//       });
+//     }
+//     throw new BadRequestException(
+//       "Payment failure can only move ACTIVE→PAST_DUE or PAST_DUE→GRACE.",
+//     );
+//   }
+
+//   async transition(
+//     subscription: Subscription,
+//     to: SubscriptionStatus,
+//     context: ActorContext,
+//     options: TransitionOptions,
+//   ) {
+//     if (!ALLOWED_SUBSCRIPTION_TRANSITIONS[subscription.status].includes(to)) {
+//       throw new BadRequestException(
+//         `Transition ${subscription.status} → ${to} is not allowed.`,
+//       );
+//     }
+
+//     return this.prisma.$transaction(async (tx) => {
+//       if (options.idempotencyKey) {
+//         const prior = await tx.subscriptionEvent.findUnique({
+//           where: { idempotencyKey: options.idempotencyKey },
+//         });
+//         if (prior)
+//           return tx.subscription.findUniqueOrThrow({
+//             where: { id: subscription.id },
+//           });
+//       }
+
+//       // Optimistic compare-and-set prevents two workers from applying the same state change.
+//       const changed = await tx.subscription.updateMany({
+//         where: { id: subscription.id, status: subscription.status },
+//         data: {
+//           status: to,
+//           ...(options.patch as
+//             | Prisma.SubscriptionUpdateManyMutationInput
+//             | undefined),
+//         },
+//       });
+//       if (changed.count !== 1)
+//         throw new BadRequestException(
+//           "Subscription changed concurrently; retry the operation.",
+//         );
+
+//       await tx.subscriptionEvent.create({
+//         data: {
+//           subscriptionId: subscription.id,
+//           tenantId: subscription.tenantId,
+//           companyId: subscription.companyId,
+//           fromStatus: subscription.status,
+//           toStatus: to,
+//           reason: options.reason,
+//           source: options.source,
+//           actorUserId: "userId" in context ? context.userId : null,
+//           idempotencyKey: options.idempotencyKey,
+//           metadata: options.metadata as Prisma.InputJsonValue | undefined,
+//         },
+//       });
+
+//       await tx.auditLog.create({
+//         data: {
+//           tenantId: subscription.tenantId,
+//           companyId: subscription.companyId,
+//           actorUserId: "userId" in context ? context.userId : null,
+//           actorType: context.actorType ?? AuditActorType.COMPANY_MEMBER,
+//           action: `SUBSCRIPTION_${to}`,
+//           entityType: "Subscription",
+//           entityId: subscription.id,
+//           beforeData: { status: subscription.status },
+//           afterData: { status: to, reason: options.reason },
+//         },
+//       });
+//       return tx.subscription.findUniqueOrThrow({
+//         where: { id: subscription.id },
+//       });
+//     });
+//   }
+
+//   async runDueTransitions(now = new Date()): Promise<LifecycleRunResult> {
+//     const result: LifecycleRunResult = {
+//       trialsActivated: 0,
+//       activeMarkedPastDue: 0,
+//       pastDueMovedToGrace: 0,
+//       graceSuspended: 0,
+//       suspendedExpired: 0,
+//       cancelledExpired: 0,
+//       failures: [],
+//     };
+//     await this.processDue(
+//       SubscriptionStatus.TRIALING,
+//       { trialEndsAt: { lte: now } },
+//       SubscriptionStatus.ACTIVE,
+//       result,
+//       "trialsActivated",
+//       () => ({ trialEndsAt: null }),
+//     );
+//     await this.processDue(
+//       SubscriptionStatus.ACTIVE,
+//       { currentPeriodEnd: { lte: now }, autoRenew: true },
+//       SubscriptionStatus.PAST_DUE,
+//       result,
+//       "activeMarkedPastDue",
+//       () => ({
+//         pastDueEndsAt: this.addDays(
+//           now,
+//           SUBSCRIPTION_CONSTANTS.DEFAULT_PAST_DUE_DAYS,
+//         ),
+//       }),
+//     );
+//     await this.processDue(
+//       SubscriptionStatus.ACTIVE,
+//       { currentPeriodEnd: { lte: now }, autoRenew: false },
+//       SubscriptionStatus.EXPIRED,
+//       result,
+//       "cancelledExpired",
+//     );
+//     await this.processDue(
+//       SubscriptionStatus.PAST_DUE,
+//       { pastDueEndsAt: { lte: now } },
+//       SubscriptionStatus.GRACE,
+//       result,
+//       "pastDueMovedToGrace",
+//       () => ({
+//         pastDueEndsAt: null,
+//         graceEndsAt: this.addDays(
+//           now,
+//           SUBSCRIPTION_CONSTANTS.DEFAULT_GRACE_DAYS,
+//         ),
+//       }),
+//     );
+//     await this.processDue(
+//       SubscriptionStatus.GRACE,
+//       { graceEndsAt: { lte: now } },
+//       SubscriptionStatus.SUSPENDED,
+//       result,
+//       "graceSuspended",
+//       () => ({
+//         suspendedAt: now,
+//         suspensionExpiresAt: this.addDays(
+//           now,
+//           SUBSCRIPTION_CONSTANTS.DEFAULT_SUSPENSION_DAYS,
+//         ),
+//       }),
+//     );
+//     await this.processDue(
+//       SubscriptionStatus.SUSPENDED,
+//       { suspensionExpiresAt: { lte: now } },
+//       SubscriptionStatus.EXPIRED,
+//       result,
+//       "suspendedExpired",
+//     );
+//     await this.processDue(
+//       SubscriptionStatus.CANCELLED,
+//       { currentPeriodEnd: { lte: now } },
+//       SubscriptionStatus.EXPIRED,
+//       result,
+//       "cancelledExpired",
+//     );
+//     return result;
+//   }
+
+//   private async processDue(
+//     from: SubscriptionStatus,
+//     due: Prisma.SubscriptionWhereInput,
+//     to: SubscriptionStatus,
+//     result: LifecycleRunResult,
+//     counter: keyof Omit<LifecycleRunResult, "failures">,
+//     patch: (subscription: Subscription) => Record<string, unknown> = () => ({}),
+//   ) {
+//     const rows = await this.prisma.subscription.findMany({
+//       where: { status: from, ...due },
+//       take: SUBSCRIPTION_CONSTANTS.LIFECYCLE_BATCH_SIZE,
+//       orderBy: { updatedAt: "asc" },
+//     });
+//     for (const row of rows) {
+//       try {
+//         await this.transition(
+//           row,
+//           to,
+//           {
+//             tenantId: row.tenantId,
+//             companyId: row.companyId,
+//             actorType: AuditActorType.SYSTEM,
+//           },
+//           {
+//             reason: "SCHEDULED_LIFECYCLE",
+//             source: "SCHEDULER",
+//             patch: patch(row),
+//           },
+//         );
+//         result[counter] += 1;
+//       } catch (error) {
+//         const message =
+//           error instanceof Error ? error.message : "Unknown lifecycle error";
+//         result.failures.push({ subscriptionId: row.id, from, message });
+//         this.logger.error({ subscriptionId: row.id, from, to, message });
+//       }
+//     }
+//   }
+
+//   private async getScoped(id: string, context: ActorContext) {
+//     const subscription = await this.prisma.subscription.findFirst({
+//       where: { id, tenantId: context.tenantId, companyId: context.companyId },
+//     });
+//     if (!subscription) throw new NotFoundException("Subscription not found.");
+//     return subscription;
+//   }
+
+//   private async findIdempotentResult(
+//     subscriptionId: string,
+//     idempotencyKey: string,
+//   ) {
+//     const event = await this.prisma.subscriptionEvent.findUnique({
+//       where: { idempotencyKey },
+//     });
+//     if (!event) return null;
+//     if (event.subscriptionId !== subscriptionId) {
+//       throw new BadRequestException(
+//         "Idempotency key was already used for another subscription.",
+//       );
+//     }
+//     return this.prisma.subscription.findUniqueOrThrow({
+//       where: { id: subscriptionId },
+//     });
+//   }
+
+//   calculatePeriodEnd(start: Date, cycle: "MONTHLY" | "YEARLY") {
+//     const result = new Date(start);
+//     if (cycle === "MONTHLY") result.setUTCMonth(result.getUTCMonth() + 1);
+//     else result.setUTCFullYear(result.getUTCFullYear() + 1);
+//     return result;
+//   }
+
+//   private addDays(date: Date, days: number) {
+//     const result = new Date(date);
+//     result.setUTCDate(result.getUTCDate() + days);
+//     return result;
+//   }
+// }

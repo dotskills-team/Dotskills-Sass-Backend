@@ -416,6 +416,7 @@ export const ModelName = {
   CompanyMemberScope: 'CompanyMemberScope',
   CompanyOwnership: 'CompanyOwnership',
   Subscription: 'Subscription',
+  SubscriptionEvent: 'SubscriptionEvent',
   Invitation: 'Invitation',
   AuditLog: 'AuditLog',
   Permission: 'Permission',
@@ -436,7 +437,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "authSession" | "loginEvent" | "platformMember" | "platformRole" | "platformMemberRole" | "feature" | "plan" | "planPrice" | "planFeature" | "tenant" | "industry" | "company" | "companyMember" | "companyRole" | "companyMemberRole" | "companyMemberScope" | "companyOwnership" | "subscription" | "invitation" | "auditLog" | "permission" | "platformRolePermission" | "companyRolePermission"
+    modelProps: "user" | "authSession" | "loginEvent" | "platformMember" | "platformRole" | "platformMemberRole" | "feature" | "plan" | "planPrice" | "planFeature" | "tenant" | "industry" | "company" | "companyMember" | "companyRole" | "companyMemberRole" | "companyMemberScope" | "companyOwnership" | "subscription" | "subscriptionEvent" | "invitation" | "auditLog" | "permission" | "platformRolePermission" | "companyRolePermission"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1846,6 +1847,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SubscriptionEvent: {
+      payload: Prisma.$SubscriptionEventPayload<ExtArgs>
+      fields: Prisma.SubscriptionEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SubscriptionEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SubscriptionEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionEventPayload>
+        }
+        findFirst: {
+          args: Prisma.SubscriptionEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SubscriptionEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionEventPayload>
+        }
+        findMany: {
+          args: Prisma.SubscriptionEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionEventPayload>[]
+        }
+        create: {
+          args: Prisma.SubscriptionEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionEventPayload>
+        }
+        createMany: {
+          args: Prisma.SubscriptionEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SubscriptionEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionEventPayload>[]
+        }
+        delete: {
+          args: Prisma.SubscriptionEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionEventPayload>
+        }
+        update: {
+          args: Prisma.SubscriptionEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.SubscriptionEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SubscriptionEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SubscriptionEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.SubscriptionEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionEventPayload>
+        }
+        aggregate: {
+          args: Prisma.SubscriptionEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSubscriptionEvent>
+        }
+        groupBy: {
+          args: Prisma.SubscriptionEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SubscriptionEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SubscriptionEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SubscriptionEventCountAggregateOutputType> | number
+        }
+      }
+    }
     Invitation: {
       payload: Prisma.$InvitationPayload<ExtArgs>
       fields: Prisma.InvitationFieldRefs
@@ -2548,10 +2623,31 @@ export const SubscriptionScalarFieldEnum = {
   autoRenew: 'autoRenew',
   priceSnapshot: 'priceSnapshot',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  suspendedAt: 'suspendedAt',
+  pastDueEndsAt: 'pastDueEndsAt',
+  suspensionExpiresAt: 'suspensionExpiresAt'
 } as const
 
 export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]
+
+
+export const SubscriptionEventScalarFieldEnum = {
+  id: 'id',
+  subscriptionId: 'subscriptionId',
+  tenantId: 'tenantId',
+  companyId: 'companyId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  reason: 'reason',
+  source: 'source',
+  actorUserId: 'actorUserId',
+  idempotencyKey: 'idempotencyKey',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type SubscriptionEventScalarFieldEnum = (typeof SubscriptionEventScalarFieldEnum)[keyof typeof SubscriptionEventScalarFieldEnum]
 
 
 export const InvitationScalarFieldEnum = {
@@ -3188,6 +3284,7 @@ export type GlobalOmitConfig = {
   companyMemberScope?: Prisma.CompanyMemberScopeOmit
   companyOwnership?: Prisma.CompanyOwnershipOmit
   subscription?: Prisma.SubscriptionOmit
+  subscriptionEvent?: Prisma.SubscriptionEventOmit
   invitation?: Prisma.InvitationOmit
   auditLog?: Prisma.AuditLogOmit
   permission?: Prisma.PermissionOmit

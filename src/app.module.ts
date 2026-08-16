@@ -43,6 +43,10 @@ import { TenantManagementModule } from './modules/tenant-management/tenant-manag
 import { IndustryManagementModule } from './modules/industry-management/industry-management.module';
 import { PlanModule } from './modules/plan/plan.module';
 import { PlanFeatureModule } from './modules/plan-feature/plan-feature.module';
+import { PlanPricingModule } from './modules/plan-pricing/plan-pricing.module';
+// import { SubscriptionModule } from './modules/subscription-management/subscription.module';
+import { FeatureModule } from './modules/features-list/feature.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -61,6 +65,12 @@ import { PlanFeatureModule } from './modules/plan-feature/plan-feature.module';
     IndustryManagementModule,
     PlanModule,
     PlanFeatureModule,
+    PlanPricingModule,
+     FeatureModule,
+    SubscriptionModule,
+    
+
+
 
 
   ],

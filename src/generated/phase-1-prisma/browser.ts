@@ -113,6 +113,11 @@ export type CompanyOwnership = Prisma.CompanyOwnershipModel
  */
 export type Subscription = Prisma.SubscriptionModel
 /**
+ * Model SubscriptionEvent
+ * 
+ */
+export type SubscriptionEvent = Prisma.SubscriptionEventModel
+/**
  * Model Invitation
  * 
  */
