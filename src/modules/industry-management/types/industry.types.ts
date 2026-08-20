@@ -1,13 +1,9 @@
 // import { PlanStatus } from '../../../generated/phase-1-prisma';
 
-import { PlanStatus } from "src/generated/phase-1-prisma/enums";
+import { PlanStatus } from 'src/generated/phase-1-prisma/enums';
 
 export type IndustrySortField =
-  | 'createdAt'
-  | 'updatedAt'
-  | 'name'
-  | 'code'
-  | 'status';
+  'createdAt' | 'updatedAt' | 'name' | 'code' | 'status';
 
 export type IndustrySortOrder = 'asc' | 'desc';
 

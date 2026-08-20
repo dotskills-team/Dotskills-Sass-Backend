@@ -3,12 +3,12 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
-} from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import type { Request } from "express";
-import { PrismaService } from "../../prisma/prisma.service";
-import { COMPANY_PERMISSIONS_KEY } from "../decorators/require-company-permissions.decorator";
-import type { CompanyContext } from "../types/company-context.type";
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import type { Request } from 'express';
+import { PrismaService } from '../../prisma/prisma.service';
+import { COMPANY_PERMISSIONS_KEY } from '../decorators/require-company-permissions.decorator';
+import type { CompanyContext } from '../types/company-context.type';
 
 type CompanyRequest = Request & { companyContext: CompanyContext };
 
@@ -28,7 +28,8 @@ export class CompanyPermissionsGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest<CompanyRequest>();
     const companyContext = request.companyContext;
-    if (!companyContext) throw new ForbiddenException("Company context is missing");
+    if (!companyContext)
+      throw new ForbiddenException('Company context is missing');
     const now = new Date();
 
     const assignments = await this.prisma.companyMemberRole.findMany({
@@ -38,7 +39,7 @@ export class CompanyPermissionsGuard implements CanActivate {
         companyRole: {
           companyId: companyContext.companyId,
           tenantId: companyContext.tenantId,
-          status: "ACTIVE",
+          status: 'ACTIVE',
         },
       },
       select: {
@@ -46,7 +47,7 @@ export class CompanyPermissionsGuard implements CanActivate {
           select: {
             permissions: {
               where: {
-                permission: { code: { in: required }, status: "ACTIVE" },
+                permission: { code: { in: required }, status: 'ACTIVE' },
               },
               select: {
                 effect: true,
@@ -69,9 +70,10 @@ export class CompanyPermissionsGuard implements CanActivate {
 
     const allowed = required.every((code) => {
       const set = effects.get(code);
-      return Boolean(set?.has("ALLOW") && !set.has("DENY"));
+      return Boolean(set?.has('ALLOW') && !set.has('DENY'));
     });
-    if (!allowed) throw new ForbiddenException("Required company permission is missing");
+    if (!allowed)
+      throw new ForbiddenException('Required company permission is missing');
     return true;
   }
 }

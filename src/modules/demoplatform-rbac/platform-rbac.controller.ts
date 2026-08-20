@@ -6,9 +6,7 @@ import { PlatformRbacService } from './platform-rbac.service';
 @Controller('platform-rbac')
 @UseGuards(DevelopmentOnlyGuard)
 export class PlatformRbacController {
-  constructor(
-    private readonly platformRbacService: PlatformRbacService,
-  ) {}
+  constructor(private readonly platformRbacService: PlatformRbacService) {}
 
   @Get('seed-status')
   getSeedStatus() {

@@ -4,16 +4,10 @@ import { TenantManagementController } from './tenant-management.controller';
 import { TenantManagementService } from './tenant-management.service';
 
 @Module({
-  controllers: [
-    TenantManagementController,
-  ],
+  controllers: [TenantManagementController],
 
-  providers: [
-    TenantManagementService,
-  ],
+  providers: [TenantManagementService],
 
-  exports: [
-    TenantManagementService,
-  ],
+  exports: [TenantManagementService],
 })
 export class TenantManagementModule {}

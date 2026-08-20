@@ -13,8 +13,7 @@ export class UpdatePlanPriceDto {
       maxDecimalPlaces: 4,
     },
     {
-      message:
-        'amount must have maximum 4 decimal places',
+      message: 'amount must have maximum 4 decimal places',
     },
   )
   @Min(0, {

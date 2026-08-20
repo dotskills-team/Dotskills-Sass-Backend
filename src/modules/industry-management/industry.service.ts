@@ -1,4 +1,3 @@
-
 import {
   BadRequestException,
   ConflictException,
@@ -13,17 +12,13 @@ import { IndustryQueryDto } from './dto/industry-query.dto';
 import { UpdateIndustryDto } from './dto/update-industry.dto';
 import { UpdateIndustryStatusDto } from './dto/update-industry-status.dto';
 
-import {
-  IndustryStatus,
-} from 'src/generated/phase-1-prisma/enums';
+import { IndustryStatus } from 'src/generated/phase-1-prisma/enums';
 
 import { Prisma } from 'src/generated/phase-1-prisma/client';
 
 @Injectable()
 export class IndustryService {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * CREATE INDUSTRY
@@ -38,70 +33,61 @@ export class IndustryService {
     const code = dto.code.trim().toUpperCase();
     const name = dto.name.trim();
 
-    const existingIndustry =
-      await this.prisma.industry.findFirst({
-        where: {
-          OR: [
-            {
-              code,
+    const existingIndustry = await this.prisma.industry.findFirst({
+      where: {
+        OR: [
+          {
+            code,
+          },
+          {
+            name: {
+              equals: name,
+              mode: 'insensitive',
             },
-            {
-              name: {
-                equals: name,
-                mode: 'insensitive',
-              },
-            },
-          ],
-        },
-        select: {
-          id: true,
-          code: true,
-          name: true,
-        },
-      });
+          },
+        ],
+      },
+      select: {
+        id: true,
+        code: true,
+        name: true,
+      },
+    });
 
     if (existingIndustry) {
       if (existingIndustry.code === code) {
-        throw new ConflictException(
-          `Industry code "${code}" already exists`,
-        );
+        throw new ConflictException(`Industry code "${code}" already exists`);
       }
 
-      throw new ConflictException(
-        `Industry name "${name}" already exists`,
-      );
+      throw new ConflictException(`Industry name "${name}" already exists`);
     }
 
-    const industry =
-      await this.prisma.$transaction(async (tx) => {
-        const created = await tx.industry.create({
-          data: {
-            code,
-            name,
-            description: dto.description?.trim() || null,
-            status: IndustryStatus.ACTIVE,
-          },
-        });
-
-        await tx.auditLog.create({
-          data: {
-            actorUserId: actorUserId ?? null,
-            actorType: actorUserId
-              ? 'PLATFORM_MEMBER'
-              : 'SYSTEM',
-            action: 'INDUSTRY_CREATED',
-            entityType: 'Industry',
-            entityId: created.id,
-            requestId: requestId ?? null,
-            ipAddress: ipAddress ?? null,
-            userAgent: userAgent ?? null,
-            afterData:
-              created as unknown as Prisma.InputJsonValue,
-          },
-        });
-
-        return created;
+    const industry = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.industry.create({
+        data: {
+          code,
+          name,
+          description: dto.description?.trim() || null,
+          status: IndustryStatus.ACTIVE,
+        },
       });
+
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actorUserId ?? null,
+          actorType: actorUserId ? 'PLATFORM_MEMBER' : 'SYSTEM',
+          action: 'INDUSTRY_CREATED',
+          entityType: 'Industry',
+          entityId: created.id,
+          requestId: requestId ?? null,
+          ipAddress: ipAddress ?? null,
+          userAgent: userAgent ?? null,
+          afterData: created,
+        },
+      });
+
+      return created;
+    });
 
     return industry;
   }
@@ -152,28 +138,27 @@ export class IndustryService {
       ];
     }
 
-    const [data, total] =
-      await this.prisma.$transaction([
-        this.prisma.industry.findMany({
-          where,
-          skip,
-          take: limit,
-          orderBy: {
-            [sortBy]: sortOrder,
-          },
-          include: {
-            _count: {
-              select: {
-                companies: true,
-              },
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.industry.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: {
+          [sortBy]: sortOrder,
+        },
+        include: {
+          _count: {
+            select: {
+              companies: true,
             },
           },
-        }),
+        },
+      }),
 
-        this.prisma.industry.count({
-          where,
-        }),
-      ]);
+      this.prisma.industry.count({
+        where,
+      }),
+    ]);
 
     const totalPages = Math.ceil(total / limit);
 
@@ -194,24 +179,21 @@ export class IndustryService {
    * GET SINGLE INDUSTRY
    */
   async findOne(id: string) {
-    const industry =
-      await this.prisma.industry.findUnique({
-        where: {
-          id,
-        },
-        include: {
-          _count: {
-            select: {
-              companies: true,
-            },
+    const industry = await this.prisma.industry.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        _count: {
+          select: {
+            companies: true,
           },
         },
-      });
+      },
+    });
 
     if (!industry) {
-      throw new NotFoundException(
-        `Industry with ID "${id}" not found`,
-      );
+      throw new NotFoundException(`Industry with ID "${id}" not found`);
     }
 
     return industry;
@@ -228,26 +210,18 @@ export class IndustryService {
     ipAddress?: string,
     userAgent?: string,
   ) {
-    const existingIndustry =
-      await this.prisma.industry.findUnique({
-        where: {
-          id,
-        },
-      });
+    const existingIndustry = await this.prisma.industry.findUnique({
+      where: {
+        id,
+      },
+    });
 
     if (!existingIndustry) {
-      throw new NotFoundException(
-        `Industry with ID "${id}" not found`,
-      );
+      throw new NotFoundException(`Industry with ID "${id}" not found`);
     }
 
-    if (
-      existingIndustry.status ===
-      IndustryStatus.ARCHIVED
-    ) {
-      throw new BadRequestException(
-        'Archived industry cannot be updated',
-      );
+    if (existingIndustry.status === IndustryStatus.ARCHIVED) {
+      throw new BadRequestException('Archived industry cannot be updated');
     }
 
     const data: Prisma.IndustryUpdateInput = {};
@@ -261,18 +235,14 @@ export class IndustryService {
     }
 
     if (dto.description !== undefined) {
-      data.description =
-        dto.description.trim() || null;
+      data.description = dto.description.trim() || null;
     }
 
     if (Object.keys(data).length === 0) {
-      throw new BadRequestException(
-        'At least one field is required to update',
-      );
+      throw new BadRequestException('At least one field is required to update');
     }
 
-    const duplicateConditions: Prisma.IndustryWhereInput[] =
-      [];
+    const duplicateConditions: Prisma.IndustryWhereInput[] = [];
 
     if (data.code) {
       duplicateConditions.push({
@@ -290,21 +260,17 @@ export class IndustryService {
     }
 
     if (duplicateConditions.length > 0) {
-      const duplicate =
-        await this.prisma.industry.findFirst({
-          where: {
-            id: {
-              not: id,
-            },
-            OR: duplicateConditions,
+      const duplicate = await this.prisma.industry.findFirst({
+        where: {
+          id: {
+            not: id,
           },
-        });
+          OR: duplicateConditions,
+        },
+      });
 
       if (duplicate) {
-        if (
-          data.code &&
-          duplicate.code === data.code
-        ) {
+        if (data.code && duplicate.code === data.code) {
           throw new ConflictException(
             `Industry code "${data.code}" already exists`,
           );
@@ -316,37 +282,31 @@ export class IndustryService {
       }
     }
 
-    const updatedIndustry =
-      await this.prisma.$transaction(async (tx) => {
-        const updated =
-          await tx.industry.update({
-            where: {
-              id,
-            },
-            data,
-          });
-
-        await tx.auditLog.create({
-          data: {
-            actorUserId: actorUserId ?? null,
-            actorType: actorUserId
-              ? 'PLATFORM_MEMBER'
-              : 'SYSTEM',
-            action: 'INDUSTRY_UPDATED',
-            entityType: 'Industry',
-            entityId: updated.id,
-            requestId: requestId ?? null,
-            ipAddress: ipAddress ?? null,
-            userAgent: userAgent ?? null,
-            beforeData:
-              existingIndustry as unknown as Prisma.InputJsonValue,
-            afterData:
-              updated as unknown as Prisma.InputJsonValue,
-          },
-        });
-
-        return updated;
+    const updatedIndustry = await this.prisma.$transaction(async (tx) => {
+      const updated = await tx.industry.update({
+        where: {
+          id,
+        },
+        data,
       });
+
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actorUserId ?? null,
+          actorType: actorUserId ? 'PLATFORM_MEMBER' : 'SYSTEM',
+          action: 'INDUSTRY_UPDATED',
+          entityType: 'Industry',
+          entityId: updated.id,
+          requestId: requestId ?? null,
+          ipAddress: ipAddress ?? null,
+          userAgent: userAgent ?? null,
+          beforeData: existingIndustry,
+          afterData: updated,
+        },
+      });
+
+      return updated;
+    });
 
     return updatedIndustry;
   }
@@ -423,24 +383,21 @@ export class IndustryService {
     ipAddress?: string,
     userAgent?: string,
   ) {
-    const industry =
-      await this.prisma.industry.findUnique({
-        where: {
-          id,
-        },
-        include: {
-          _count: {
-            select: {
-              companies: true,
-            },
+    const industry = await this.prisma.industry.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        _count: {
+          select: {
+            companies: true,
           },
         },
-      });
+      },
+    });
 
     if (!industry) {
-      throw new NotFoundException(
-        `Industry with ID "${id}" not found`,
-      );
+      throw new NotFoundException(`Industry with ID "${id}" not found`);
     }
 
     if (industry.status === status) {
@@ -469,45 +426,40 @@ export class IndustryService {
      * However, archived industries must not be
      * assigned to newly created companies.
      */
-    const updated =
-      await this.prisma.$transaction(async (tx) => {
-        const result =
-          await tx.industry.update({
-            where: {
-              id,
-            },
-            data: {
-              status,
-            },
-          });
-
-        await tx.auditLog.create({
-          data: {
-            actorUserId: actorUserId ?? null,
-            actorType: actorUserId
-              ? 'PLATFORM_MEMBER'
-              : 'SYSTEM',
-            action: `INDUSTRY_STATUS_CHANGED_TO_${status}`,
-            entityType: 'Industry',
-            entityId: id,
-            requestId: requestId ?? null,
-            ipAddress: ipAddress ?? null,
-            userAgent: userAgent ?? null,
-            beforeData: {
-              status: industry.status,
-            },
-            afterData: {
-              status: result.status,
-            },
-            metadata: {
-              companyCount:
-                industry._count.companies,
-            },
-          },
-        });
-
-        return result;
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.industry.update({
+        where: {
+          id,
+        },
+        data: {
+          status,
+        },
       });
+
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actorUserId ?? null,
+          actorType: actorUserId ? 'PLATFORM_MEMBER' : 'SYSTEM',
+          action: `INDUSTRY_STATUS_CHANGED_TO_${status}`,
+          entityType: 'Industry',
+          entityId: id,
+          requestId: requestId ?? null,
+          ipAddress: ipAddress ?? null,
+          userAgent: userAgent ?? null,
+          beforeData: {
+            status: industry.status,
+          },
+          afterData: {
+            status: result.status,
+          },
+          metadata: {
+            companyCount: industry._count.companies,
+          },
+        },
+      });
+
+      return result;
+    });
 
     return updated;
   }
@@ -534,11 +486,6 @@ export class IndustryService {
     );
   }
 }
-
-
-
-
-
 
 // import {
 //   BadRequestException,

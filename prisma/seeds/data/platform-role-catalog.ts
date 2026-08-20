@@ -1,132 +1,102 @@
+import { PLATFORM_PERMISSIONS } from '../../../src/common/constants/permission.constants';
+import {
+  PLATFORM_ADMIN_PERMISSION_CODES,
+  SUPER_ADMIN_PERMISSION_CODES,
+} from '../../../src/common/constants/permission-catalog';
+
 export type PlatformRoleDefinition = {
   code: string;
   name: string;
   description: string;
-  permissionCodes: string[];
+  permissionCodes: readonly string[];
 };
 
-const ALL_PLATFORM_PERMISSIONS = [
-  'platform.staff.create',
-  'platform.staff.read',
-  'platform.staff.update',
-  'platform.staff.deactivate',
-
-  'platform.role.create',
-  'platform.role.read',
-  'platform.role.update',
-  'platform.role.assign',
-
-  'company.create',
-  'company.read',
-  'company.update',
-  'company.suspend',
-
-  'subscription.assign',
-  'subscription.read',
-  'subscription.update',
-
-  'billing.read',
-  'billing.collect',
-  'billing.refund',
-
-  'support.read',
-  'support.manage',
-  'audit.read',
-];
-
+/**
+ * এই role catalog আগে নিজস্ব, হাতে-লেখা permission code (যেমন
+ * 'company.create', 'subscription.assign', 'support.read') ব্যবহার
+ * করত — যেগুলো runtime-এ ব্যবহৃত `permission.constants.ts`-এর সাথে
+ * মিলত না (real code হলো 'platform.company.create', 'subscription:create'
+ * ইত্যাদি)। এখন SUPER_ADMIN ও PLATFORM_ADMIN — এই দুটো role (যেগুলো
+ * `access-control-setup` runtime bootstrap-ও touch করে) সেই একই
+ * canonical code list থেকে আসে, যাতে `prisma db seed` কখনো
+ * `access-control-setup`-এর assign করা permission মুছে না ফেলে।
+ *
+ * SALES_MANAGER/FINANCE_MANAGER/SUPPORT_MANAGER/COMPLIANCE_OFFICER/
+ * AUDITOR/PLATFORM_STAFF — এই ৬টা role `access-control-setup` touch
+ * করে না, কিন্তু এদেরও এখন শুধু বাস্তবে-বিদ্যমান PLATFORM_PERMISSIONS
+ * code ব্যবহার করা হচ্ছে। আগে এদের কিছু permission (support.*, audit.*)
+ * `permission.constants.ts`-এ কোনোভাবেই সংজ্ঞায়িত নেই — সেগুলো বাদ
+ * দেওয়া হয়েছে (নতুন permission invent করা হয়নি)।
+ */
 export const PLATFORM_ROLE_CATALOG: PlatformRoleDefinition[] = [
   {
     code: 'SUPER_ADMIN',
     name: 'Super Admin',
     description: 'Complete administrative access to the DotSkills platform.',
-    permissionCodes: ALL_PLATFORM_PERMISSIONS,
+    permissionCodes: SUPER_ADMIN_PERMISSION_CODES,
   },
   {
     code: 'PLATFORM_ADMIN',
     name: 'Platform Admin',
     description: 'Manages platform staff, companies, and subscriptions.',
-    permissionCodes: [
-      'platform.staff.create',
-      'platform.staff.read',
-      'platform.staff.update',
-      'platform.staff.deactivate',
-      'platform.role.read',
-      'platform.role.assign',
-      'company.create',
-      'company.read',
-      'company.update',
-      'company.suspend',
-      'subscription.assign',
-      'subscription.read',
-      'subscription.update',
-      'support.read',
-      'audit.read',
-    ],
+    permissionCodes: PLATFORM_ADMIN_PERMISSION_CODES,
   },
   {
     code: 'SALES_MANAGER',
     name: 'Sales Manager',
     description: 'Manages company onboarding and subscription assignment.',
     permissionCodes: [
-      'company.create',
-      'company.read',
-      'company.update',
-      'subscription.assign',
-      'subscription.read',
-      'subscription.update',
-      'billing.read',
+      PLATFORM_PERMISSIONS.COMPANY_CREATE,
+      PLATFORM_PERMISSIONS.COMPANY_READ,
+      PLATFORM_PERMISSIONS.COMPANY_UPDATE,
+      PLATFORM_PERMISSIONS.SUBSCRIPTION_CREATE,
+      PLATFORM_PERMISSIONS.SUBSCRIPTION_READ,
+      PLATFORM_PERMISSIONS.SUBSCRIPTION_UPDATE,
+      PLATFORM_PERMISSIONS.BILLING_READ,
     ],
   },
   {
     code: 'FINANCE_MANAGER',
     name: 'Finance Manager',
-    description: 'Manages billing, collections, and refunds.',
+    description: 'Manages billing and collections.',
     permissionCodes: [
-      'company.read',
-      'subscription.read',
-      'billing.read',
-      'billing.collect',
-      'billing.refund',
-      'audit.read',
+      PLATFORM_PERMISSIONS.COMPANY_READ,
+      PLATFORM_PERMISSIONS.SUBSCRIPTION_READ,
+      PLATFORM_PERMISSIONS.BILLING_READ,
+      PLATFORM_PERMISSIONS.BILLING_PROCESS,
     ],
   },
   {
     code: 'SUPPORT_MANAGER',
     name: 'Support Manager',
-    description: 'Manages customer support operations.',
+    description: 'Read-only access for customer support operations.',
     permissionCodes: [
-      'company.read',
-      'subscription.read',
-      'support.read',
-      'support.manage',
+      PLATFORM_PERMISSIONS.COMPANY_READ,
+      PLATFORM_PERMISSIONS.SUBSCRIPTION_READ,
     ],
   },
   {
     code: 'COMPLIANCE_OFFICER',
     name: 'Compliance Officer',
-    description: 'Monitors companies, compliance, and audit records.',
+    description: 'Monitors companies, subscriptions, and billing.',
     permissionCodes: [
-      'platform.staff.read',
-      'platform.role.read',
-      'company.read',
-      'subscription.read',
-      'billing.read',
-      'support.read',
-      'audit.read',
+      PLATFORM_PERMISSIONS.STAFF_READ,
+      PLATFORM_PERMISSIONS.ROLE_READ,
+      PLATFORM_PERMISSIONS.COMPANY_READ,
+      PLATFORM_PERMISSIONS.SUBSCRIPTION_READ,
+      PLATFORM_PERMISSIONS.BILLING_READ,
     ],
   },
   {
     code: 'AUDITOR',
     name: 'Auditor',
-    description: 'Read-only access to business and audit information.',
+    description: 'Read-only access to business information.',
     permissionCodes: [
-      'platform.staff.read',
-      'platform.role.read',
-      'company.read',
-      'subscription.read',
-      'billing.read',
-      'support.read',
-      'audit.read',
+      PLATFORM_PERMISSIONS.STAFF_READ,
+      PLATFORM_PERMISSIONS.ROLE_READ,
+      PLATFORM_PERMISSIONS.COMPANY_READ,
+      PLATFORM_PERMISSIONS.SUBSCRIPTION_READ,
+      PLATFORM_PERMISSIONS.BILLING_READ,
     ],
   },
   {
@@ -134,9 +104,8 @@ export const PLATFORM_ROLE_CATALOG: PlatformRoleDefinition[] = [
     name: 'Platform Staff',
     description: 'Basic platform staff role with limited read access.',
     permissionCodes: [
-      'company.read',
-      'subscription.read',
-      'support.read',
+      PLATFORM_PERMISSIONS.COMPANY_READ,
+      PLATFORM_PERMISSIONS.SUBSCRIPTION_READ,
     ],
   },
 ];

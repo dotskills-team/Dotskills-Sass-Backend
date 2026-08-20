@@ -28,9 +28,7 @@ interface AuditContext {
 
 @Injectable()
 export class PlanService {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Normalize plan code.
@@ -49,98 +47,83 @@ export class PlanService {
   /**
    * Create Plan
    */
-  async create(
-    dto: CreatePlanDto,
-    context: AuditContext,
-  ) {
+  async create(dto: CreatePlanDto, context: AuditContext) {
     const code = this.normalizeCode(dto.code);
     const name = this.normalizeName(dto.name);
 
-    const existingPlan =
-      await this.prisma.plan.findUnique({
-        where: {
+    const existingPlan = await this.prisma.plan.findUnique({
+      where: {
+        code,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (existingPlan) {
+      throw new ConflictException(`Plan with code "${code}" already exists`);
+    }
+
+    const plan = await this.prisma.$transaction(async (tx) => {
+      const createdPlan = await tx.plan.create({
+        data: {
           code,
+          name,
+          description: dto.description?.trim() || null,
+          trialDays: dto.trialDays ?? 0,
+          isPublic: dto.isPublic ?? true,
+          status: PlanStatus.ACTIVE,
         },
         select: {
           id: true,
+          code: true,
+          name: true,
+          description: true,
+          trialDays: true,
+          isPublic: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
         },
       });
 
-    if (existingPlan) {
-      throw new ConflictException(
-        `Plan with code "${code}" already exists`,
-      );
-    }
+      await tx.auditLog.create({
+        data: {
+          actorUserId: context.actorUserId ?? null,
+          actorType: context.actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
 
-    const plan = await this.prisma.$transaction(
-      async (tx) => {
-        const createdPlan = await tx.plan.create({
-          data: {
-            code,
-            name,
-            description:
-              dto.description?.trim() || null,
-            trialDays: dto.trialDays ?? 0,
-            isPublic: dto.isPublic ?? true,
-            status: PlanStatus.ACTIVE,
+          action: 'PLAN_CREATED',
+          entityType: 'PLAN',
+          entityId: createdPlan.id,
+
+          requestId: context.requestId ?? null,
+
+          ipAddress: context.ipAddress ?? null,
+
+          userAgent: context.userAgent ?? null,
+
+          beforeData: Prisma.JsonNull,
+
+          afterData: {
+            id: createdPlan.id,
+            code: createdPlan.code,
+            name: createdPlan.name,
+            description: createdPlan.description,
+            trialDays: createdPlan.trialDays,
+            isPublic: createdPlan.isPublic,
+            status: createdPlan.status,
           },
-          select: {
-            id: true,
-            code: true,
-            name: true,
-            description: true,
-            trialDays: true,
-            isPublic: true,
-            status: true,
-            createdAt: true,
-            updatedAt: true,
+
+          metadata: {
+            source: 'PLAN_SERVICE',
           },
-        });
+        },
+      });
 
-        await tx.auditLog.create({
-          data: {
-            actorUserId:
-              context.actorUserId ?? null,
-            actorType:
-              context.actorUserId
-                ? AuditActorType.PLATFORM_MEMBER
-                : AuditActorType.SYSTEM,
-
-            action: 'PLAN_CREATED',
-            entityType: 'PLAN',
-            entityId: createdPlan.id,
-
-            requestId:
-              context.requestId ?? null,
-
-            ipAddress:
-              context.ipAddress ?? null,
-
-            userAgent:
-              context.userAgent ?? null,
-
-            beforeData: Prisma.JsonNull,
-
-            afterData: {
-              id: createdPlan.id,
-              code: createdPlan.code,
-              name: createdPlan.name,
-              description:
-                createdPlan.description,
-              trialDays: createdPlan.trialDays,
-              isPublic: createdPlan.isPublic,
-              status: createdPlan.status,
-            },
-
-            metadata: {
-              source: 'PLAN_SERVICE',
-            },
-          },
-        });
-
-        return createdPlan;
-      },
-    );
+      return createdPlan;
+    });
 
     return {
       success: true,
@@ -159,9 +142,7 @@ export class PlanService {
     const skip = (page - 1) * limit;
 
     const isPublic =
-      query.isPublic !== undefined
-        ? query.isPublic === 'true'
-        : undefined;
+      query.isPublic !== undefined ? query.isPublic === 'true' : undefined;
 
     const where: Prisma.PlanWhereInput = {
       ...(query.status && {
@@ -176,15 +157,13 @@ export class PlanService {
         OR: [
           {
             code: {
-              contains:
-                query.search.trim(),
+              contains: query.search.trim(),
               mode: 'insensitive',
             },
           },
           {
             name: {
-              contains:
-                query.search.trim(),
+              contains: query.search.trim(),
               mode: 'insensitive',
             },
           },
@@ -192,43 +171,41 @@ export class PlanService {
       }),
     };
 
-    const [plans, total] =
-      await this.prisma.$transaction([
-        this.prisma.plan.findMany({
-          where,
-          skip,
-          take: limit,
-          orderBy: {
-            createdAt: 'desc',
-          },
-          select: {
-            id: true,
-            code: true,
-            name: true,
-            description: true,
-            trialDays: true,
-            isPublic: true,
-            status: true,
-            createdAt: true,
-            updatedAt: true,
+    const [plans, total] = await this.prisma.$transaction([
+      this.prisma.plan.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: {
+          id: true,
+          code: true,
+          name: true,
+          description: true,
+          trialDays: true,
+          isPublic: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
 
-            _count: {
-              select: {
-                features: true,
-                prices: true,
-                subscriptions: true,
-              },
+          _count: {
+            select: {
+              features: true,
+              prices: true,
+              subscriptions: true,
             },
           },
-        }),
+        },
+      }),
 
-        this.prisma.plan.count({
-          where,
-        }),
-      ]);
+      this.prisma.plan.count({
+        where,
+      }),
+    ]);
 
-    const totalPages =
-      Math.ceil(total / limit);
+    const totalPages = Math.ceil(total / limit);
 
     return {
       success: true,
@@ -241,10 +218,8 @@ export class PlanService {
         limit,
         total,
         totalPages,
-        hasNextPage:
-          page < totalPages,
-        hasPreviousPage:
-          page > 1,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
       },
     };
   }
@@ -253,76 +228,73 @@ export class PlanService {
    * Get Single Plan
    */
   async findOne(id: string) {
-    const plan =
-      await this.prisma.plan.findUnique({
-        where: {
-          id,
-        },
+    const plan = await this.prisma.plan.findUnique({
+      where: {
+        id,
+      },
 
-        select: {
-          id: true,
-          code: true,
-          name: true,
-          description: true,
-          trialDays: true,
-          isPublic: true,
-          status: true,
-          createdAt: true,
-          updatedAt: true,
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        description: true,
+        trialDays: true,
+        isPublic: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
 
-          features: {
-            select: {
-              enabled: true,
-              limits: true,
-              createdAt: true,
-              updatedAt: true,
+        features: {
+          select: {
+            enabled: true,
+            limits: true,
+            createdAt: true,
+            updatedAt: true,
 
-              feature: {
-                select: {
-                  id: true,
-                  code: true,
-                  name: true,
-                  module: true,
-                  description: true,
-                  status: true,
-                },
+            feature: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+                module: true,
+                description: true,
+                status: true,
               },
             },
-
-            orderBy: {
-              createdAt: 'asc',
-            },
           },
 
-          prices: {
-            select: {
-              id: true,
-              billingCycle: true,
-              currencyCode: true,
-              amount: true,
-              effectiveFrom: true,
-              effectiveTo: true,
-              isActive: true,
-              createdAt: true,
-            },
-
-            orderBy: {
-              effectiveFrom: 'desc',
-            },
-          },
-
-          _count: {
-            select: {
-              subscriptions: true,
-            },
+          orderBy: {
+            createdAt: 'asc',
           },
         },
-      });
+
+        prices: {
+          select: {
+            id: true,
+            billingCycle: true,
+            currencyCode: true,
+            amount: true,
+            effectiveFrom: true,
+            effectiveTo: true,
+            isActive: true,
+            createdAt: true,
+          },
+
+          orderBy: {
+            effectiveFrom: 'desc',
+          },
+        },
+
+        _count: {
+          select: {
+            subscriptions: true,
+          },
+        },
+      },
+    });
 
     if (!plan) {
-      throw new NotFoundException(
-        'Plan not found',
-      );
+      throw new NotFoundException('Plan not found');
     }
 
     return {
@@ -335,80 +307,62 @@ export class PlanService {
   /**
    * Update Plan
    */
-  async update(
-    id: string,
-    dto: UpdatePlanDto,
-    context: AuditContext,
-  ) {
-    const existingPlan =
-      await this.prisma.plan.findUnique({
-        where: {
-          id,
-        },
+  async update(id: string, dto: UpdatePlanDto, context: AuditContext) {
+    const existingPlan = await this.prisma.plan.findUnique({
+      where: {
+        id,
+      },
 
-        select: {
-          id: true,
-          code: true,
-          name: true,
-          description: true,
-          trialDays: true,
-          isPublic: true,
-          status: true,
-        },
-      });
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        description: true,
+        trialDays: true,
+        isPublic: true,
+        status: true,
+      },
+    });
 
     if (!existingPlan) {
-      throw new NotFoundException(
-        'Plan not found',
-      );
+      throw new NotFoundException('Plan not found');
     }
 
-    if (
-      existingPlan.status ===
-      PlanStatus.ARCHIVED
-    ) {
-      throw new BadRequestException(
-        'Archived plan cannot be updated',
-      );
+    if (existingPlan.status === PlanStatus.ARCHIVED) {
+      throw new BadRequestException('Archived plan cannot be updated');
     }
 
     const data: Prisma.PlanUpdateInput = {};
 
     if (dto.code !== undefined) {
-      const code =
-        this.normalizeCode(dto.code);
+      const code = this.normalizeCode(dto.code);
 
-      const duplicate =
-        await this.prisma.plan.findFirst({
-          where: {
-            code,
-            NOT: {
-              id,
-            },
+      const duplicate = await this.prisma.plan.findFirst({
+        where: {
+          code,
+          NOT: {
+            id,
           },
+        },
 
-          select: {
-            id: true,
-          },
-        });
+        select: {
+          id: true,
+        },
+      });
 
       if (duplicate) {
-        throw new ConflictException(
-          `Plan with code "${code}" already exists`,
-        );
+        throw new ConflictException(`Plan with code "${code}" already exists`);
       }
 
       data.code = code;
     }
 
     if (dto.name !== undefined) {
-      data.name =
-        this.normalizeName(dto.name);
+      data.name = this.normalizeName(dto.name);
     }
 
     if (dto.description !== undefined) {
-      data.description =
-        dto.description.trim() || null;
+      data.description = dto.description.trim() || null;
     }
 
     if (dto.trialDays !== undefined) {
@@ -420,95 +374,76 @@ export class PlanService {
     }
 
     if (Object.keys(data).length === 0) {
-      throw new BadRequestException(
-        'No fields provided for update',
-      );
+      throw new BadRequestException('No fields provided for update');
     }
 
-    const updatedPlan =
-      await this.prisma.$transaction(
-        async (tx) => {
-          const plan =
-            await tx.plan.update({
-              where: {
-                id,
-              },
-
-              data,
-
-              select: {
-                id: true,
-                code: true,
-                name: true,
-                description: true,
-                trialDays: true,
-                isPublic: true,
-                status: true,
-                createdAt: true,
-                updatedAt: true,
-              },
-            });
-
-          await tx.auditLog.create({
-            data: {
-              actorUserId:
-                context.actorUserId ?? null,
-
-              actorType:
-                context.actorUserId
-                  ? AuditActorType.PLATFORM_MEMBER
-                  : AuditActorType.SYSTEM,
-
-              action: 'PLAN_UPDATED',
-
-              entityType: 'PLAN',
-
-              entityId: plan.id,
-
-              requestId:
-                context.requestId ?? null,
-
-              ipAddress:
-                context.ipAddress ?? null,
-
-              userAgent:
-                context.userAgent ?? null,
-
-              beforeData: {
-                code: existingPlan.code,
-                name: existingPlan.name,
-                description:
-                  existingPlan.description,
-                trialDays:
-                  existingPlan.trialDays,
-                isPublic:
-                  existingPlan.isPublic,
-                status:
-                  existingPlan.status,
-              },
-
-              afterData: {
-                code: plan.code,
-                name: plan.name,
-                description:
-                  plan.description,
-                trialDays:
-                  plan.trialDays,
-                isPublic:
-                  plan.isPublic,
-                status:
-                  plan.status,
-              },
-
-              metadata: {
-                source: 'PLAN_SERVICE',
-              },
-            },
-          });
-
-          return plan;
+    const updatedPlan = await this.prisma.$transaction(async (tx) => {
+      const plan = await tx.plan.update({
+        where: {
+          id,
         },
-      );
+
+        data,
+
+        select: {
+          id: true,
+          code: true,
+          name: true,
+          description: true,
+          trialDays: true,
+          isPublic: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          actorUserId: context.actorUserId ?? null,
+
+          actorType: context.actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
+
+          action: 'PLAN_UPDATED',
+
+          entityType: 'PLAN',
+
+          entityId: plan.id,
+
+          requestId: context.requestId ?? null,
+
+          ipAddress: context.ipAddress ?? null,
+
+          userAgent: context.userAgent ?? null,
+
+          beforeData: {
+            code: existingPlan.code,
+            name: existingPlan.name,
+            description: existingPlan.description,
+            trialDays: existingPlan.trialDays,
+            isPublic: existingPlan.isPublic,
+            status: existingPlan.status,
+          },
+
+          afterData: {
+            code: plan.code,
+            name: plan.name,
+            description: plan.description,
+            trialDays: plan.trialDays,
+            isPublic: plan.isPublic,
+            status: plan.status,
+          },
+
+          metadata: {
+            source: 'PLAN_SERVICE',
+          },
+        },
+      });
+
+      return plan;
+    });
 
     return {
       success: true,
@@ -520,15 +455,45 @@ export class PlanService {
   /**
    * Change Plan Status
    */
-  async updateStatus(
-    id: string,
-    status: PlanStatus,
-    context: AuditContext,
-  ) {
-    const existingPlan =
-      await this.prisma.plan.findUnique({
+  async updateStatus(id: string, status: PlanStatus, context: AuditContext) {
+    const existingPlan = await this.prisma.plan.findUnique({
+      where: {
+        id,
+      },
+
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        status: true,
+        isPublic: true,
+      },
+    });
+
+    if (!existingPlan) {
+      throw new NotFoundException('Plan not found');
+    }
+
+    if (existingPlan.status === PlanStatus.ARCHIVED) {
+      throw new BadRequestException('Archived plan status cannot be changed');
+    }
+
+    if (existingPlan.status === status) {
+      throw new BadRequestException(`Plan is already ${status}`);
+    }
+
+    const updatedPlan = await this.prisma.$transaction(async (tx) => {
+      const plan = await tx.plan.update({
         where: {
           id,
+        },
+
+        data: {
+          status,
+
+          ...(status === PlanStatus.INACTIVE && {
+            isPublic: false,
+          }),
         },
 
         select: {
@@ -537,111 +502,52 @@ export class PlanService {
           name: true,
           status: true,
           isPublic: true,
+          updatedAt: true,
         },
       });
 
-    if (!existingPlan) {
-      throw new NotFoundException(
-        'Plan not found',
-      );
-    }
+      await tx.auditLog.create({
+        data: {
+          actorUserId: context.actorUserId ?? null,
 
-    if (
-      existingPlan.status ===
-      PlanStatus.ARCHIVED
-    ) {
-      throw new BadRequestException(
-        'Archived plan status cannot be changed',
-      );
-    }
+          actorType: context.actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
 
-    if (existingPlan.status === status) {
-      throw new BadRequestException(
-        `Plan is already ${status}`,
-      );
-    }
+          action: 'PLAN_STATUS_CHANGED',
 
-    const updatedPlan =
-      await this.prisma.$transaction(
-        async (tx) => {
-          const plan =
-            await tx.plan.update({
-              where: {
-                id,
-              },
+          entityType: 'PLAN',
 
-              data: {
-                status,
+          entityId: plan.id,
 
-                ...(status ===
-                  PlanStatus.INACTIVE && {
-                  isPublic: false,
-                }),
-              },
+          requestId: context.requestId ?? null,
 
-              select: {
-                id: true,
-                code: true,
-                name: true,
-                status: true,
-                isPublic: true,
-                updatedAt: true,
-              },
-            });
+          ipAddress: context.ipAddress ?? null,
 
-          await tx.auditLog.create({
-            data: {
-              actorUserId:
-                context.actorUserId ?? null,
+          userAgent: context.userAgent ?? null,
 
-              actorType:
-                context.actorUserId
-                  ? AuditActorType.PLATFORM_MEMBER
-                  : AuditActorType.SYSTEM,
+          beforeData: {
+            status: existingPlan.status,
+            isPublic: existingPlan.isPublic,
+          },
 
-              action:
-                'PLAN_STATUS_CHANGED',
+          afterData: {
+            status: plan.status,
+            isPublic: plan.isPublic,
+          },
 
-              entityType: 'PLAN',
-
-              entityId: plan.id,
-
-              requestId:
-                context.requestId ?? null,
-
-              ipAddress:
-                context.ipAddress ?? null,
-
-              userAgent:
-                context.userAgent ?? null,
-
-              beforeData: {
-                status:
-                  existingPlan.status,
-                isPublic:
-                  existingPlan.isPublic,
-              },
-
-              afterData: {
-                status: plan.status,
-                isPublic:
-                  plan.isPublic,
-              },
-
-              metadata: {
-                source: 'PLAN_SERVICE',
-              },
-            },
-          });
-
-          return plan;
+          metadata: {
+            source: 'PLAN_SERVICE',
+          },
         },
-      );
+      });
+
+      return plan;
+    });
 
     return {
       success: true,
-      message:
-        'Plan status updated successfully',
+      message: 'Plan status updated successfully',
       data: updatedPlan,
     };
   }
@@ -649,14 +555,51 @@ export class PlanService {
   /**
    * Archive Plan
    */
-  async archive(
-    id: string,
-    context: AuditContext,
-  ) {
-    const existingPlan =
-      await this.prisma.plan.findUnique({
+  async archive(id: string, context: AuditContext) {
+    const existingPlan = await this.prisma.plan.findUnique({
+      where: {
+        id,
+      },
+
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        status: true,
+        isPublic: true,
+
+        _count: {
+          select: {
+            subscriptions: true,
+          },
+        },
+      },
+    });
+
+    if (!existingPlan) {
+      throw new NotFoundException('Plan not found');
+    }
+
+    if (existingPlan.status === PlanStatus.ARCHIVED) {
+      throw new BadRequestException('Plan is already archived');
+    }
+
+    if (existingPlan._count.subscriptions > 0) {
+      throw new BadRequestException(
+        'Plan cannot be archived because subscriptions are associated with it',
+      );
+    }
+
+    const archivedPlan = await this.prisma.$transaction(async (tx) => {
+      const plan = await tx.plan.update({
         where: {
           id,
+        },
+
+        data: {
+          status: PlanStatus.ARCHIVED,
+
+          isPublic: false,
         },
 
         select: {
@@ -665,117 +608,52 @@ export class PlanService {
           name: true,
           status: true,
           isPublic: true,
+          updatedAt: true,
+        },
+      });
 
-          _count: {
-            select: {
-              subscriptions: true,
-            },
+      await tx.auditLog.create({
+        data: {
+          actorUserId: context.actorUserId ?? null,
+
+          actorType: context.actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
+
+          action: 'PLAN_ARCHIVED',
+
+          entityType: 'PLAN',
+
+          entityId: plan.id,
+
+          requestId: context.requestId ?? null,
+
+          ipAddress: context.ipAddress ?? null,
+
+          userAgent: context.userAgent ?? null,
+
+          beforeData: {
+            status: existingPlan.status,
+            isPublic: existingPlan.isPublic,
+          },
+
+          afterData: {
+            status: plan.status,
+            isPublic: plan.isPublic,
+          },
+
+          metadata: {
+            source: 'PLAN_SERVICE',
           },
         },
       });
 
-    if (!existingPlan) {
-      throw new NotFoundException(
-        'Plan not found',
-      );
-    }
-
-    if (
-      existingPlan.status ===
-      PlanStatus.ARCHIVED
-    ) {
-      throw new BadRequestException(
-        'Plan is already archived',
-      );
-    }
-
-    if (
-      existingPlan._count.subscriptions > 0
-    ) {
-      throw new BadRequestException(
-        'Plan cannot be archived because subscriptions are associated with it',
-      );
-    }
-
-    const archivedPlan =
-      await this.prisma.$transaction(
-        async (tx) => {
-          const plan =
-            await tx.plan.update({
-              where: {
-                id,
-              },
-
-              data: {
-                status:
-                  PlanStatus.ARCHIVED,
-
-                isPublic: false,
-              },
-
-              select: {
-                id: true,
-                code: true,
-                name: true,
-                status: true,
-                isPublic: true,
-                updatedAt: true,
-              },
-            });
-
-          await tx.auditLog.create({
-            data: {
-              actorUserId:
-                context.actorUserId ?? null,
-
-              actorType:
-                context.actorUserId
-                  ? AuditActorType.PLATFORM_MEMBER
-                  : AuditActorType.SYSTEM,
-
-              action: 'PLAN_ARCHIVED',
-
-              entityType: 'PLAN',
-
-              entityId: plan.id,
-
-              requestId:
-                context.requestId ?? null,
-
-              ipAddress:
-                context.ipAddress ?? null,
-
-              userAgent:
-                context.userAgent ?? null,
-
-              beforeData: {
-                status:
-                  existingPlan.status,
-                isPublic:
-                  existingPlan.isPublic,
-              },
-
-              afterData: {
-                status:
-                  plan.status,
-                isPublic:
-                  plan.isPublic,
-              },
-
-              metadata: {
-                source: 'PLAN_SERVICE',
-              },
-            },
-          });
-
-          return plan;
-        },
-      );
+      return plan;
+    });
 
     return {
       success: true,
-      message:
-        'Plan archived successfully',
+      message: 'Plan archived successfully',
       data: archivedPlan,
     };
   }

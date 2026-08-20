@@ -1,9 +1,9 @@
-import { Module } from "@nestjs/common";
-import { PrismaModule } from "../../prisma/prisma.module";
-import { PlatformPermissionsGuard } from "../../common/guards/platform-permissions.guard";
-import { PlatformStaffController } from "./platform-staff.controller";
-import { PlatformStaffService } from "./platform-staff.service";
-import { AuthModule } from "../auth/auth.module";
+import { Module } from '@nestjs/common';
+import { PrismaModule } from '../../prisma/prisma.module';
+import { PlatformPermissionsGuard } from '../../common/guards/platform-permissions.guard';
+import { PlatformStaffController } from './platform-staff.controller';
+import { PlatformStaffService } from './platform-staff.service';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [PrismaModule, AuthModule],

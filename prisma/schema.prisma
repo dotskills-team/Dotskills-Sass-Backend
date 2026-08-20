@@ -127,6 +127,42 @@ enum CompanyScopeType {
   POS_COUNTER
 }
 
+enum BillingStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  SKIPPED
+}
+enum BillingAttemptStatus {
+  STARTED
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  CANCELLED
+  VOID
+}
+
+enum PaymentProvider {
+  SSLCOMMERZ
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+
 model User {
   id                String        @id @default(uuid()) @db.Uuid
   email             String?       @unique @db.VarChar(200)
@@ -324,6 +360,9 @@ model Tenant {
   companyRoles  CompanyRole[]
   ownerships    CompanyOwnership[]
   subscriptions Subscription[]
+  billings      Billing[]
+  invoices      Invoice[]
+  payments      Payment[]
   invitations   Invitation[]
   auditLogs     AuditLog[]
 
@@ -371,6 +410,9 @@ model Company {
   roles            CompanyRole[]
   ownerships       CompanyOwnership[]
   subscriptions    Subscription[]
+  billings         Billing[]
+  invoices         Invoice[]
+  payments         Payment[]
   invitations      Invitation[]
   auditLogs        AuditLog[]
 
@@ -511,6 +553,9 @@ model Subscription {
   pastDueEndsAt       DateTime? @db.Timestamptz(6)
   suspensionExpiresAt DateTime? @db.Timestamptz(6)
   events             SubscriptionEvent[]
+  billings           Billing[]
+  invoices           Invoice[]
+  payments           Payment[]
 
 
   @@index([tenantId, status, currentPeriodEnd])
@@ -522,6 +567,195 @@ model Subscription {
   @@index([status, graceEndsAt])
   @@index([status, suspensionExpiresAt])
 }
+
+model Billing {
+  id                  String        @id @default(uuid()) @db.Uuid
+
+  tenantId            String        @db.Uuid
+  companyId           String?       @db.Uuid
+  subscriptionId      String        @db.Uuid
+
+  status              BillingStatus @default(PENDING)
+
+  billingCycle        BillingCycle
+  currencyCode        String        @db.Char(3)
+
+  amount              Decimal       @db.Decimal(20, 4)
+
+  periodStart         DateTime      @db.Timestamptz(6)
+  periodEnd           DateTime      @db.Timestamptz(6)
+
+  dueAt               DateTime      @db.Timestamptz(6)
+
+  processedAt         DateTime?     @db.Timestamptz(6)
+  failedAt            DateTime?     @db.Timestamptz(6)
+  cancelledAt         DateTime?     @db.Timestamptz(6)
+
+  attemptCount        Int           @default(0)
+  nextAttemptAt       DateTime?     @db.Timestamptz(6)
+
+  idempotencyKey      String        @unique @db.VarChar(200)
+
+  priceSnapshot      Json          @db.JsonB
+
+  metadata            Json?         @db.JsonB
+
+  createdAt           DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime      @updatedAt @db.Timestamptz(6)
+
+  tenant              Tenant        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company             Company?      @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  subscription        Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
+
+  attempts            BillingAttempt[]
+  invoice             Invoice?
+  @@unique([subscriptionId, periodStart, periodEnd])
+  @@index([tenantId, status, dueAt])
+  @@index([companyId, status, dueAt])
+  @@index([subscriptionId, periodStart, periodEnd])
+  @@index([status, nextAttemptAt])
+  @@map("billings")
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+model BillingAttempt {
+  id                String               @id @default(uuid()) @db.Uuid
+
+  billingId         String               @db.Uuid
+
+  attemptNumber     Int
+
+  status            BillingAttemptStatus @default(STARTED)
+
+  attemptedAt       DateTime             @default(now()) @db.Timestamptz(6)
+  completedAt       DateTime?            @db.Timestamptz(6)
+
+  failureCode       String?              @db.VarChar(100)
+  failureMessage    String?              @db.Text
+
+  idempotencyKey    String               @unique @db.VarChar(200)
+
+  metadata          Json?                @db.JsonB
+
+  createdAt         DateTime             @default(now()) @db.Timestamptz(6)
+
+  billing           Billing              @relation(fields: [billingId], references: [id], onDelete: Cascade)
+
+  @@unique([billingId, attemptNumber])
+  @@index([billingId, createdAt])
+  @@index([status, attemptedAt])
+  @@map("billing_attempts")
+}
+
+model Invoice {
+  id             String        @id @default(uuid()) @db.Uuid
+
+  tenantId       String        @db.Uuid
+  companyId      String?       @db.Uuid
+  subscriptionId String        @db.Uuid
+  billingId      String        @unique @db.Uuid
+
+  invoiceNumber  String        @unique @db.VarChar(40)
+
+  status         InvoiceStatus @default(DRAFT)
+
+  currencyCode   String        @db.Char(3)
+  subtotal       Decimal       @db.Decimal(20, 4)
+  discountAmount Decimal       @default(0) @db.Decimal(20, 4)
+  taxAmount      Decimal       @default(0) @db.Decimal(20, 4)
+  totalAmount    Decimal       @db.Decimal(20, 4)
+
+  priceSnapshot  Json          @db.JsonB
+
+  issuedAt       DateTime?     @db.Timestamptz(6)
+  dueAt          DateTime      @db.Timestamptz(6)
+  paidAt         DateTime?     @db.Timestamptz(6)
+  cancelledAt    DateTime?     @db.Timestamptz(6)
+  voidedAt       DateTime?     @db.Timestamptz(6)
+
+  metadata       Json?         @db.JsonB
+
+  createdAt      DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @db.Timestamptz(6)
+
+  tenant         Tenant        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company        Company?      @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
+  billing        Billing       @relation(fields: [billingId], references: [id], onDelete: Restrict)
+  payments       Payment[]
+
+  @@index([tenantId, status, dueAt])
+  @@index([companyId, status])
+  @@index([subscriptionId, createdAt])
+  @@map("invoices")
+}
+
+model InvoiceSequence {
+  yearKey    String @id @db.VarChar(4)
+  lastNumber Int    @default(0)
+
+  @@map("invoice_sequences")
+}
+
+model Payment {
+  id                     String          @id @default(uuid()) @db.Uuid
+
+  tenantId               String          @db.Uuid
+  companyId              String?         @db.Uuid
+  subscriptionId         String          @db.Uuid
+  invoiceId              String          @db.Uuid
+
+  provider               PaymentProvider
+  status                 PaymentStatus   @default(PENDING)
+
+  currencyCode           String          @db.Char(3)
+  amount                 Decimal         @db.Decimal(20, 4)
+
+  providerTransactionId  String          @unique @db.VarChar(64)
+  gatewayReference       String?         @unique @db.VarChar(64)
+
+  idempotencyKey         String          @unique @db.VarChar(200)
+
+  failureReason          String?         @db.Text
+
+  rawInitiateResponse    Json?           @db.JsonB
+  rawVerifyResponse      Json?           @db.JsonB
+  metadata               Json?           @db.JsonB
+
+  initiatedAt            DateTime?       @db.Timestamptz(6)
+  succeededAt            DateTime?       @db.Timestamptz(6)
+  failedAt               DateTime?       @db.Timestamptz(6)
+  cancelledAt            DateTime?       @db.Timestamptz(6)
+
+  createdAt              DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime        @updatedAt @db.Timestamptz(6)
+
+  tenant                 Tenant          @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company                Company?        @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  subscription            Subscription    @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
+  invoice                Invoice         @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, status])
+  @@index([companyId, status])
+  @@index([invoiceId, status])
+  @@map("payments")
+}
+
+
+
+
 model SubscriptionEvent {
   id              String              @id @default(uuid()) @db.Uuid
   subscriptionId  String              @db.Uuid

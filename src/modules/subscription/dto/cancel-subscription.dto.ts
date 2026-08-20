@@ -1,4 +1,4 @@
-import { IsOptional, IsString, MaxLength } from "class-validator";
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CancelSubscriptionDto {
   @IsOptional() @IsString() @MaxLength(500) reason?: string;

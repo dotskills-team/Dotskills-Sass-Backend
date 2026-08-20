@@ -29,10 +29,7 @@ export class CompanyOwnerService {
    * CREATE / ASSIGN COMPANY OWNER
    * ============================================================
    */
-  async create(
-    dto: CreateCompanyOwnerDto,
-    actorUserId: string,
-  ) {
+  async create(dto: CreateCompanyOwnerDto, actorUserId: string) {
     return this.prisma.$transaction(async (tx) => {
       /**
        * ========================================================
@@ -77,9 +74,7 @@ export class CompanyOwnerService {
       });
 
       if (!tenant) {
-        throw new NotFoundException(
-          'Company tenant not found',
-        );
+        throw new NotFoundException('Company tenant not found');
       }
 
       /**
@@ -87,9 +82,7 @@ export class CompanyOwnerService {
        * 3. NORMALIZE EMAIL
        * ========================================================
        */
-      const normalizedEmail = dto.email
-        .trim()
-        .toLowerCase();
+      const normalizedEmail = dto.email.trim().toLowerCase();
 
       /**
        * ========================================================
@@ -110,10 +103,7 @@ export class CompanyOwnerService {
        * ========================================================
        */
       if (!user) {
-        const passwordHash = await bcrypt.hash(
-          dto.password,
-          12,
-        );
+        const passwordHash = await bcrypt.hash(dto.password, 12);
 
         user = await tx.user.create({
           data: {
@@ -131,21 +121,15 @@ export class CompanyOwnerService {
          * Existing account validation
          */
         if (user.status === 'LOCKED') {
-          throw new BadRequestException(
-            'Existing user account is locked',
-          );
+          throw new BadRequestException('Existing user account is locked');
         }
 
         if (user.status === 'SUSPENDED') {
-          throw new BadRequestException(
-            'Existing user account is suspended',
-          );
+          throw new BadRequestException('Existing user account is suspended');
         }
 
         if (user.status === 'INACTIVE') {
-          throw new BadRequestException(
-            'Existing user account is inactive',
-          );
+          throw new BadRequestException('Existing user account is inactive');
         }
       }
 
@@ -154,73 +138,55 @@ export class CompanyOwnerService {
        * 6. CREATE / REUSE COMPANY MEMBER
        * ========================================================
        */
-      let companyMember =
-        await tx.companyMember.findFirst({
-          where: {
+      let companyMember = await tx.companyMember.findFirst({
+        where: {
+          tenantId: company.tenantId,
+          companyId: company.id,
+          userId: user.id,
+        },
+      });
+
+      if (!companyMember) {
+        companyMember = await tx.companyMember.create({
+          data: {
             tenantId: company.tenantId,
             companyId: company.id,
             userId: user.id,
+            designation: dto.designation ?? 'Company Owner',
+            status: CompanyMembershipStatus.ACTIVE,
+            joinedAt: new Date(),
+            activatedAt: new Date(),
           },
         });
-
-      if (!companyMember) {
-        companyMember =
-          await tx.companyMember.create({
-            data: {
-              tenantId: company.tenantId,
-              companyId: company.id,
-              userId: user.id,
-              designation:
-                dto.designation ?? 'Company Owner',
-              status:
-                CompanyMembershipStatus.ACTIVE,
-              joinedAt: new Date(),
-              activatedAt: new Date(),
-            },
-          });
       } else {
         /**
          * Existing membership validation
          */
-        if (
-          companyMember.status ===
-          CompanyMembershipStatus.REVOKED
-        ) {
+        if (companyMember.status === CompanyMembershipStatus.REVOKED) {
           throw new ConflictException(
             'User membership for this company has been revoked',
           );
         }
 
-        if (
-          companyMember.status ===
-          CompanyMembershipStatus.SUSPENDED
-        ) {
-          throw new BadRequestException(
-            'Company membership is suspended',
-          );
+        if (companyMember.status === CompanyMembershipStatus.SUSPENDED) {
+          throw new BadRequestException('Company membership is suspended');
         }
 
         /**
          * Reactivate / update membership
          */
-        companyMember =
-          await tx.companyMember.update({
-            where: {
-              id: companyMember.id,
-            },
-            data: {
-              status:
-                CompanyMembershipStatus.ACTIVE,
+        companyMember = await tx.companyMember.update({
+          where: {
+            id: companyMember.id,
+          },
+          data: {
+            status: CompanyMembershipStatus.ACTIVE,
 
-              activatedAt:
-                companyMember.activatedAt ??
-                new Date(),
+            activatedAt: companyMember.activatedAt ?? new Date(),
 
-              designation:
-                dto.designation ??
-                companyMember.designation,
-            },
-          });
+            designation: dto.designation ?? companyMember.designation,
+          },
+        });
       }
 
       /**
@@ -228,29 +194,26 @@ export class CompanyOwnerService {
        * 7. FIND / CREATE COMPANY OWNER ROLE
        * ========================================================
        */
-      let ownerRole =
-        await tx.companyRole.findFirst({
-          where: {
+      let ownerRole = await tx.companyRole.findFirst({
+        where: {
+          tenantId: company.tenantId,
+          companyId: company.id,
+          code: this.OWNER_ROLE_CODE,
+        },
+      });
+
+      if (!ownerRole) {
+        ownerRole = await tx.companyRole.create({
+          data: {
             tenantId: company.tenantId,
             companyId: company.id,
             code: this.OWNER_ROLE_CODE,
+            name: 'Company Owner',
+            description: 'Full administrative access to the company',
+            isSystem: true,
+            status: 'ACTIVE',
           },
         });
-
-      if (!ownerRole) {
-        ownerRole =
-          await tx.companyRole.create({
-            data: {
-              tenantId: company.tenantId,
-              companyId: company.id,
-              code: this.OWNER_ROLE_CODE,
-              name: 'Company Owner',
-              description:
-                'Full administrative access to the company',
-              isSystem: true,
-              status: 'ACTIVE',
-            },
-          });
       }
 
       /**
@@ -258,15 +221,14 @@ export class CompanyOwnerService {
        * 8. FIND CURRENT PRIMARY OWNER
        * ========================================================
        */
-      const oldPrimaryOwnership =
-        await tx.companyOwnership.findFirst({
-          where: {
-            tenantId: company.tenantId,
-            companyId: company.id,
-            isPrimary: true,
-            endedAt: null,
-          },
-        });
+      const oldPrimaryOwnership = await tx.companyOwnership.findFirst({
+        where: {
+          tenantId: company.tenantId,
+          companyId: company.id,
+          isPrimary: true,
+          endedAt: null,
+        },
+      });
 
       /**
        * ========================================================
@@ -301,8 +263,7 @@ export class CompanyOwnerService {
        */
       if (
         oldPrimaryOwnership &&
-        oldPrimaryOwnership.companyMemberId !==
-          companyMember.id
+        oldPrimaryOwnership.companyMemberId !== companyMember.id
       ) {
         await tx.companyOwnership.update({
           where: {
@@ -320,8 +281,7 @@ export class CompanyOwnerService {
          */
         await tx.companyMemberRole.deleteMany({
           where: {
-            companyMemberId:
-              oldPrimaryOwnership.companyMemberId,
+            companyMemberId: oldPrimaryOwnership.companyMemberId,
 
             companyRoleId: ownerRole.id,
           },
@@ -333,42 +293,39 @@ export class CompanyOwnerService {
        * 11. FIND EXISTING OWNERSHIP
        * ========================================================
        */
-      const existingOwnership =
-        await tx.companyOwnership.findFirst({
-          where: {
-            tenantId: company.tenantId,
-            companyId: company.id,
-            companyMemberId: companyMember.id,
-            endedAt: null,
-          },
-        });
+      const existingOwnership = await tx.companyOwnership.findFirst({
+        where: {
+          tenantId: company.tenantId,
+          companyId: company.id,
+          companyMemberId: companyMember.id,
+          endedAt: null,
+        },
+      });
 
       let ownership;
 
       if (existingOwnership) {
-        ownership =
-          await tx.companyOwnership.update({
-            where: {
-              id: existingOwnership.id,
-            },
+        ownership = await tx.companyOwnership.update({
+          where: {
+            id: existingOwnership.id,
+          },
 
-            data: {
-              isPrimary: true,
-              assignedByUserId: actorUserId,
-            },
-          });
+          data: {
+            isPrimary: true,
+            assignedByUserId: actorUserId,
+          },
+        });
       } else {
-        ownership =
-          await tx.companyOwnership.create({
-            data: {
-              tenantId: company.tenantId,
-              companyId: company.id,
-              companyMemberId: companyMember.id,
-              isPrimary: true,
-              startedAt: new Date(),
-              assignedByUserId: actorUserId,
-            },
-          });
+        ownership = await tx.companyOwnership.create({
+          data: {
+            tenantId: company.tenantId,
+            companyId: company.id,
+            companyMemberId: companyMember.id,
+            isPrimary: true,
+            startedAt: new Date(),
+            assignedByUserId: actorUserId,
+          },
+        });
       }
 
       /**
@@ -383,11 +340,9 @@ export class CompanyOwnerService {
        */
       const beforeData = oldPrimaryOwnership
         ? {
-            oldOwnerMemberId:
-              oldPrimaryOwnership.companyMemberId,
+            oldOwnerMemberId: oldPrimaryOwnership.companyMemberId,
 
-            oldOwnershipId:
-              oldPrimaryOwnership.id,
+            oldOwnershipId: oldPrimaryOwnership.id,
           }
         : {};
 
@@ -457,8 +412,7 @@ export class CompanyOwnerService {
           companyMember: {
             id: companyMember.id,
             status: companyMember.status,
-            designation:
-              companyMember.designation,
+            designation: companyMember.designation,
           },
 
           ownership: {
@@ -509,54 +463,51 @@ export class CompanyOwnerService {
     });
 
     if (!company) {
-      throw new NotFoundException(
-        'Company not found',
-      );
+      throw new NotFoundException('Company not found');
     }
 
     /**
      * Get active owners
      */
-    const owners =
-      await this.prisma.companyOwnership.findMany({
-        where: {
-          companyId: company.id,
-          tenantId: company.tenantId,
-          endedAt: null,
+    const owners = await this.prisma.companyOwnership.findMany({
+      where: {
+        companyId: company.id,
+        tenantId: company.tenantId,
+        endedAt: null,
+      },
+
+      orderBy: [
+        {
+          isPrimary: 'desc',
         },
+        {
+          startedAt: 'asc',
+        },
+      ],
 
-        orderBy: [
-          {
-            isPrimary: 'desc',
-          },
-          {
-            startedAt: 'asc',
-          },
-        ],
-
-        include: {
-          companyMember: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  email: true,
-                  phone: true,
-                  fullName: true,
-                  status: true,
-                  lastLoginAt: true,
-                },
+      include: {
+        companyMember: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                phone: true,
+                fullName: true,
+                status: true,
+                lastLoginAt: true,
               },
+            },
 
-              roles: {
-                include: {
-                  companyRole: true,
-                },
+            roles: {
+              include: {
+                companyRole: true,
               },
             },
           },
         },
-      });
+      },
+    });
 
     return {
       success: true,
@@ -570,55 +521,49 @@ export class CompanyOwnerService {
    * GET SINGLE COMPANY OWNER
    * ============================================================
    */
-  async findOne(
-    companyId: string,
-    ownerMemberId: string,
-  ) {
-    const ownership =
-      await this.prisma.companyOwnership.findFirst({
-        where: {
-          companyId,
-          companyMemberId: ownerMemberId,
-          endedAt: null,
+  async findOne(companyId: string, ownerMemberId: string) {
+    const ownership = await this.prisma.companyOwnership.findFirst({
+      where: {
+        companyId,
+        companyMemberId: ownerMemberId,
+        endedAt: null,
+      },
+
+      include: {
+        company: {
+          select: {
+            id: true,
+            tenantId: true,
+            legalName: true,
+            status: true,
+          },
         },
 
-        include: {
-          company: {
-            select: {
-              id: true,
-              tenantId: true,
-              legalName: true,
-              status: true,
-            },
-          },
-
-          companyMember: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  email: true,
-                  phone: true,
-                  fullName: true,
-                  status: true,
-                  lastLoginAt: true,
-                },
+        companyMember: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                phone: true,
+                fullName: true,
+                status: true,
+                lastLoginAt: true,
               },
+            },
 
-              roles: {
-                include: {
-                  companyRole: true,
-                },
+            roles: {
+              include: {
+                companyRole: true,
               },
             },
           },
         },
-      });
+      },
+    });
 
     if (!ownership) {
-      throw new NotFoundException(
-        'Company owner not found',
-      );
+      throw new NotFoundException('Company owner not found');
     }
 
     return {
@@ -644,32 +589,29 @@ export class CompanyOwnerService {
        * 1. FIND ACTIVE OWNERSHIP
        * ========================================================
        */
-      const ownership =
-        await tx.companyOwnership.findFirst({
-          where: {
-            companyId,
-            companyMemberId: ownerMemberId,
-            endedAt: null,
-          },
+      const ownership = await tx.companyOwnership.findFirst({
+        where: {
+          companyId,
+          companyMemberId: ownerMemberId,
+          endedAt: null,
+        },
 
-          select: {
-            id: true,
-            tenantId: true,
+        select: {
+          id: true,
+          tenantId: true,
 
-            companyMember: {
-              select: {
-                id: true,
-                userId: true,
-                designation: true,
-              },
+          companyMember: {
+            select: {
+              id: true,
+              userId: true,
+              designation: true,
             },
           },
-        });
+        },
+      });
 
       if (!ownership) {
-        throw new NotFoundException(
-          'Company owner not found',
-        );
+        throw new NotFoundException('Company owner not found');
       }
 
       /**
@@ -677,24 +619,21 @@ export class CompanyOwnerService {
        * 2. GET EXISTING USER
        * ========================================================
        */
-      const existingUser =
-        await tx.user.findUnique({
-          where: {
-            id: ownership.companyMember.userId,
-          },
+      const existingUser = await tx.user.findUnique({
+        where: {
+          id: ownership.companyMember.userId,
+        },
 
-          select: {
-            id: true,
-            email: true,
-            fullName: true,
-            phone: true,
-          },
-        });
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          phone: true,
+        },
+      });
 
       if (!existingUser) {
-        throw new NotFoundException(
-          'Owner user account not found',
-        );
+        throw new NotFoundException('Owner user account not found');
       }
 
       /**
@@ -703,9 +642,7 @@ export class CompanyOwnerService {
        * ========================================================
        */
       const normalizedEmail =
-        dto.email !== undefined
-          ? dto.email.trim().toLowerCase()
-          : undefined;
+        dto.email !== undefined ? dto.email.trim().toLowerCase() : undefined;
 
       /**
        * ========================================================
@@ -716,24 +653,18 @@ export class CompanyOwnerService {
         normalizedEmail !== undefined &&
         normalizedEmail !== existingUser.email
       ) {
-        const emailExists =
-          await tx.user.findUnique({
-            where: {
-              email: normalizedEmail,
-            },
+        const emailExists = await tx.user.findUnique({
+          where: {
+            email: normalizedEmail,
+          },
 
-            select: {
-              id: true,
-            },
-          });
+          select: {
+            id: true,
+          },
+        });
 
-        if (
-          emailExists &&
-          emailExists.id !== existingUser.id
-        ) {
-          throw new ConflictException(
-            'Email address is already in use',
-          );
+        if (emailExists && emailExists.id !== existingUser.id) {
+          throw new ConflictException('Email address is already in use');
         }
       }
 
@@ -775,24 +706,23 @@ export class CompanyOwnerService {
        * 6. UPDATE COMPANY MEMBER
        * ========================================================
        */
-      const member =
-        await tx.companyMember.update({
-          where: {
-            id: ownerMemberId,
-          },
+      const member = await tx.companyMember.update({
+        where: {
+          id: ownerMemberId,
+        },
 
-          data: {
-            ...(dto.designation !== undefined && {
-              designation: dto.designation.trim(),
-            }),
-          },
+        data: {
+          ...(dto.designation !== undefined && {
+            designation: dto.designation.trim(),
+          }),
+        },
 
-          select: {
-            id: true,
-            designation: true,
-            status: true,
-          },
-        });
+        select: {
+          id: true,
+          designation: true,
+          status: true,
+        },
+      });
 
       /**
        * ========================================================
@@ -813,8 +743,7 @@ export class CompanyOwnerService {
 
         companyMember: {
           id: ownership.companyMember.id,
-          designation:
-            ownership.companyMember.designation,
+          designation: ownership.companyMember.designation,
         },
       };
 
@@ -867,8 +796,7 @@ export class CompanyOwnerService {
       return {
         success: true,
 
-        message:
-          'Company owner updated successfully',
+        message: 'Company owner updated successfully',
 
         data: {
           user,
@@ -910,9 +838,7 @@ export class CompanyOwnerService {
       });
 
       if (!company) {
-        throw new NotFoundException(
-          'Company not found',
-        );
+        throw new NotFoundException('Company not found');
       }
 
       if (company.status === CompanyStatus.CLOSED) {
@@ -926,35 +852,29 @@ export class CompanyOwnerService {
        * 2. VERIFY NEW MEMBER
        * ========================================================
        */
-      const newMember =
-        await tx.companyMember.findFirst({
-          where: {
-            id: newOwnerMemberId,
-            companyId: company.id,
-            tenantId: company.tenantId,
-          },
+      const newMember = await tx.companyMember.findFirst({
+        where: {
+          id: newOwnerMemberId,
+          companyId: company.id,
+          tenantId: company.tenantId,
+        },
 
-          include: {
-            user: {
-              select: {
-                id: true,
-                fullName: true,
-                email: true,
-              },
+        include: {
+          user: {
+            select: {
+              id: true,
+              fullName: true,
+              email: true,
             },
           },
-        });
+        },
+      });
 
       if (!newMember) {
-        throw new NotFoundException(
-          'Company member not found',
-        );
+        throw new NotFoundException('Company member not found');
       }
 
-      if (
-        newMember.status !==
-        CompanyMembershipStatus.ACTIVE
-      ) {
+      if (newMember.status !== CompanyMembershipStatus.ACTIVE) {
         throw new BadRequestException(
           'Only active company members can become owner',
         );
@@ -965,14 +885,13 @@ export class CompanyOwnerService {
        * 3. FIND OWNER ROLE
        * ========================================================
        */
-      const ownerRole =
-        await tx.companyRole.findFirst({
-          where: {
-            tenantId: company.tenantId,
-            companyId: company.id,
-            code: this.OWNER_ROLE_CODE,
-          },
-        });
+      const ownerRole = await tx.companyRole.findFirst({
+        where: {
+          tenantId: company.tenantId,
+          companyId: company.id,
+          code: this.OWNER_ROLE_CODE,
+        },
+      });
 
       if (!ownerRole) {
         throw new NotFoundException(
@@ -985,26 +904,21 @@ export class CompanyOwnerService {
        * 4. FIND CURRENT PRIMARY OWNER
        * ========================================================
        */
-      const oldOwnership =
-        await tx.companyOwnership.findFirst({
-          where: {
-            companyId: company.id,
-            tenantId: company.tenantId,
-            isPrimary: true,
-            endedAt: null,
-          },
-        });
+      const oldOwnership = await tx.companyOwnership.findFirst({
+        where: {
+          companyId: company.id,
+          tenantId: company.tenantId,
+          isPrimary: true,
+          endedAt: null,
+        },
+      });
 
       /**
        * ========================================================
        * 5. ALREADY PRIMARY OWNER
        * ========================================================
        */
-      if (
-        oldOwnership &&
-        oldOwnership.companyMemberId ===
-          newOwnerMemberId
-      ) {
+      if (oldOwnership && oldOwnership.companyMemberId === newOwnerMemberId) {
         throw new BadRequestException(
           'This member is already the primary company owner',
         );
@@ -1032,8 +946,7 @@ export class CompanyOwnerService {
          */
         await tx.companyMemberRole.deleteMany({
           where: {
-            companyMemberId:
-              oldOwnership.companyMemberId,
+            companyMemberId: oldOwnership.companyMemberId,
 
             companyRoleId: ownerRole.id,
           },
@@ -1071,42 +984,39 @@ export class CompanyOwnerService {
        * 8. CHECK EXISTING ACTIVE OWNERSHIP
        * ========================================================
        */
-      const existingNewOwnership =
-        await tx.companyOwnership.findFirst({
-          where: {
-            tenantId: company.tenantId,
-            companyId: company.id,
-            companyMemberId: newOwnerMemberId,
-            endedAt: null,
-          },
-        });
+      const existingNewOwnership = await tx.companyOwnership.findFirst({
+        where: {
+          tenantId: company.tenantId,
+          companyId: company.id,
+          companyMemberId: newOwnerMemberId,
+          endedAt: null,
+        },
+      });
 
       let ownership;
 
       if (existingNewOwnership) {
-        ownership =
-          await tx.companyOwnership.update({
-            where: {
-              id: existingNewOwnership.id,
-            },
+        ownership = await tx.companyOwnership.update({
+          where: {
+            id: existingNewOwnership.id,
+          },
 
-            data: {
-              isPrimary: true,
-              assignedByUserId: actorUserId,
-            },
-          });
+          data: {
+            isPrimary: true,
+            assignedByUserId: actorUserId,
+          },
+        });
       } else {
-        ownership =
-          await tx.companyOwnership.create({
-            data: {
-              tenantId: company.tenantId,
-              companyId: company.id,
-              companyMemberId: newOwnerMemberId,
-              isPrimary: true,
-              startedAt: new Date(),
-              assignedByUserId: actorUserId,
-            },
-          });
+        ownership = await tx.companyOwnership.create({
+          data: {
+            tenantId: company.tenantId,
+            companyId: company.id,
+            companyMemberId: newOwnerMemberId,
+            isPrimary: true,
+            startedAt: new Date(),
+            assignedByUserId: actorUserId,
+          },
+        });
       }
 
       /**
@@ -1127,11 +1037,9 @@ export class CompanyOwnerService {
        */
       const beforeData = oldOwnership
         ? {
-            oldOwnerMemberId:
-              oldOwnership.companyMemberId,
+            oldOwnerMemberId: oldOwnership.companyMemberId,
 
-            oldOwnershipId:
-              oldOwnership.id,
+            oldOwnershipId: oldOwnership.id,
           }
         : {};
 
@@ -1185,8 +1093,7 @@ export class CompanyOwnerService {
       return {
         success: true,
 
-        message:
-          'Company owner changed successfully',
+        message: 'Company owner changed successfully',
 
         data: {
           ownershipId: ownership.id,
@@ -1220,26 +1127,23 @@ export class CompanyOwnerService {
        * 1. FIND ACTIVE OWNER
        * ========================================================
        */
-      const ownership =
-        await tx.companyOwnership.findFirst({
-          where: {
-            companyId,
-            companyMemberId: ownerMemberId,
-            endedAt: null,
-          },
+      const ownership = await tx.companyOwnership.findFirst({
+        where: {
+          companyId,
+          companyMemberId: ownerMemberId,
+          endedAt: null,
+        },
 
-          select: {
-            id: true,
-            tenantId: true,
-            companyMemberId: true,
-            isPrimary: true,
-          },
-        });
+        select: {
+          id: true,
+          tenantId: true,
+          companyMemberId: true,
+          isPrimary: true,
+        },
+      });
 
       if (!ownership) {
-        throw new NotFoundException(
-          'Company owner not found',
-        );
+        throw new NotFoundException('Company owner not found');
       }
 
       /**
@@ -1249,10 +1153,8 @@ export class CompanyOwnerService {
        */
       if (
         ownership.isPrimary &&
-        (dto.status ===
-          CompanyMembershipStatus.SUSPENDED ||
-          dto.status ===
-            CompanyMembershipStatus.REVOKED)
+        (dto.status === CompanyMembershipStatus.SUSPENDED ||
+          dto.status === CompanyMembershipStatus.REVOKED)
       ) {
         throw new BadRequestException(
           'Transfer primary ownership before suspending or revoking the owner',
@@ -1264,23 +1166,20 @@ export class CompanyOwnerService {
        * 3. GET CURRENT MEMBER
        * ========================================================
        */
-      const currentMember =
-        await tx.companyMember.findUnique({
-          where: {
-            id: ownerMemberId,
-          },
+      const currentMember = await tx.companyMember.findUnique({
+        where: {
+          id: ownerMemberId,
+        },
 
-          select: {
-            id: true,
-            status: true,
-            activatedAt: true,
-          },
-        });
+        select: {
+          id: true,
+          status: true,
+          activatedAt: true,
+        },
+      });
 
       if (!currentMember) {
-        throw new NotFoundException(
-          'Company member not found',
-        );
+        throw new NotFoundException('Company member not found');
       }
 
       /**
@@ -1288,14 +1187,11 @@ export class CompanyOwnerService {
        * 4. NO-OP PROTECTION
        * ========================================================
        */
-      if (
-        currentMember.status === dto.status
-      ) {
+      if (currentMember.status === dto.status) {
         return {
           success: true,
 
-          message:
-            'Company owner status is already up to date',
+          message: 'Company owner status is already up to date',
 
           data: currentMember,
         };
@@ -1306,35 +1202,31 @@ export class CompanyOwnerService {
        * 5. UPDATE MEMBER STATUS
        * ========================================================
        */
-      const member =
-        await tx.companyMember.update({
-          where: {
-            id: ownerMemberId,
-          },
+      const member = await tx.companyMember.update({
+        where: {
+          id: ownerMemberId,
+        },
 
-          data: {
-            status: dto.status,
+        data: {
+          status: dto.status,
 
-            ...(dto.status ===
-              CompanyMembershipStatus.ACTIVE && {
-              activatedAt:
-                currentMember.activatedAt ??
-                new Date(),
-            }),
-          },
+          ...(dto.status === CompanyMembershipStatus.ACTIVE && {
+            activatedAt: currentMember.activatedAt ?? new Date(),
+          }),
+        },
 
-          include: {
-            user: {
-              select: {
-                id: true,
-                email: true,
-                fullName: true,
-                phone: true,
-                status: true,
-              },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              fullName: true,
+              phone: true,
+              status: true,
             },
           },
-        });
+        },
+      });
 
       /**
        * ========================================================
@@ -1364,8 +1256,7 @@ export class CompanyOwnerService {
 
           actorType: 'PLATFORM_MEMBER',
 
-          action:
-            'COMPANY_OWNER_STATUS_UPDATED',
+          action: 'COMPANY_OWNER_STATUS_UPDATED',
 
           entityType: 'CompanyMember',
 
@@ -1385,8 +1276,7 @@ export class CompanyOwnerService {
       return {
         success: true,
 
-        message:
-          'Company owner status updated successfully',
+        message: 'Company owner status updated successfully',
 
         data: member,
       };

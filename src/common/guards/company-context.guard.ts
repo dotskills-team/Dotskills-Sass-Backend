@@ -4,11 +4,11 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
-} from "@nestjs/common";
-import type { Request } from "express";
-import { PrismaService } from "../../prisma/prisma.service";
-import type { AuthenticatedUser } from "../types/authenticated-user.type";
-import type { CompanyContext } from "../types/company-context.type";
+} from '@nestjs/common';
+import type { Request } from 'express';
+import { PrismaService } from '../../prisma/prisma.service';
+import type { AuthenticatedUser } from '../types/authenticated-user.type';
+import type { CompanyContext } from '../types/company-context.type';
 
 type CompanyRequest = Request & {
   user: AuthenticatedUser;
@@ -17,7 +17,7 @@ type CompanyRequest = Request & {
 
 @Injectable()
 export class CompanyContextGuard implements CanActivate {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<CompanyRequest>();
@@ -28,33 +28,21 @@ export class CompanyContextGuard implements CanActivate {
     //     "x-company-id header must match the companyId route parameter",
     //   );
     // }
-    const routeCompanyId = String(
-      request.params.companyId ?? "",
-    ).trim();
+    const routeCompanyId = String(request.params.companyId ?? '').trim();
 
-    const headerCompanyId = String(
-      request.header("x-company-id") ?? "",
-    ).trim();
+    const headerCompanyId = String(request.header('x-company-id') ?? '').trim();
 
     if (!headerCompanyId) {
+      throw new BadRequestException('x-company-id header is required');
+    }
+
+    if (routeCompanyId && routeCompanyId !== headerCompanyId) {
       throw new BadRequestException(
-        "x-company-id header is required",
+        'x-company-id header must match the companyId route parameter',
       );
     }
 
-    if (
-      routeCompanyId &&
-      routeCompanyId !== headerCompanyId
-    ) {
-      throw new BadRequestException(
-        "x-company-id header must match the companyId route parameter",
-      );
-    }
-
-    const resolvedCompanyId =
-      routeCompanyId || headerCompanyId;
-
-
+    const resolvedCompanyId = routeCompanyId || headerCompanyId;
 
     const now = new Date();
     const member = await this.prisma.companyMember.findFirst({
@@ -62,7 +50,7 @@ export class CompanyContextGuard implements CanActivate {
         userId: request.user.userId,
         // companyId: routeCompanyId,
         companyId: resolvedCompanyId,
-        status: "ACTIVE",
+        status: 'ACTIVE',
       },
       select: {
         id: true,
@@ -84,12 +72,13 @@ export class CompanyContextGuard implements CanActivate {
       },
     });
 
-    if (!member) throw new ForbiddenException("Company membership is not active");
-    if (["SUSPENDED", "CLOSED"].includes(member.company.status)) {
-      throw new ForbiddenException("Company is unavailable");
+    if (!member)
+      throw new ForbiddenException('Company membership is not active');
+    if (['SUSPENDED', 'CLOSED'].includes(member.company.status)) {
+      throw new ForbiddenException('Company is unavailable');
     }
-    if (["SUSPENDED", "CANCELLED"].includes(member.company.tenant.status)) {
-      throw new ForbiddenException("Tenant is unavailable");
+    if (['SUSPENDED', 'CANCELLED'].includes(member.company.tenant.status)) {
+      throw new ForbiddenException('Tenant is unavailable');
     }
 
     request.companyContext = {

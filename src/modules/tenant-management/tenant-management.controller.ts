@@ -26,14 +26,9 @@ import { PlatformPermissionsGuard } from '../../common/guards/platform-permissio
 import { RequirePlatformPermissions } from '../../common/decorators/require-platform-permissions.decorator';
 
 @Controller('platform/tenants')
-@UseGuards(
-  JwtAuthGuard,
-  PlatformPermissionsGuard,
-)
+@UseGuards(JwtAuthGuard, PlatformPermissionsGuard)
 export class TenantManagementController {
-  constructor(
-    private readonly tenantService: TenantManagementService,
-  ) {}
+  constructor(private readonly tenantService: TenantManagementService) {}
 
   /**
    * CREATE TENANT
@@ -42,17 +37,9 @@ export class TenantManagementController {
    * /api/v1/platform/tenants
    */
   @Post()
-  @RequirePlatformPermissions(
-    'platform.tenant.create',
-  )
-  create(
-    @Body() dto: CreateTenantDto,
-    @Req() req: any,
-  ) {
-    return this.tenantService.create(
-      dto,
-      req.user.userId,
-    );
+  @RequirePlatformPermissions('platform.tenant.create')
+  create(@Body() dto: CreateTenantDto, @Req() req: any) {
+    return this.tenantService.create(dto, req.user.userId);
   }
 
   /**
@@ -62,12 +49,8 @@ export class TenantManagementController {
    * /api/v1/platform/tenants
    */
   @Get()
-  @RequirePlatformPermissions(
-    'platform.tenant.read',
-  )
-  findAll(
-    @Query() query: TenantQueryDto,
-  ) {
+  @RequirePlatformPermissions('platform.tenant.read')
+  findAll(@Query() query: TenantQueryDto) {
     return this.tenantService.findAll(query);
   }
 
@@ -78,9 +61,7 @@ export class TenantManagementController {
    * /api/v1/platform/tenants/:id
    */
   @Get(':id')
-  @RequirePlatformPermissions(
-    'platform.tenant.read',
-  )
+  @RequirePlatformPermissions('platform.tenant.read')
   findOne(
     @Param('id', ParseUUIDPipe)
     id: string,
@@ -95,9 +76,7 @@ export class TenantManagementController {
    * /api/v1/platform/tenants/:id
    */
   @Patch(':id')
-  @RequirePlatformPermissions(
-    'platform.tenant.update',
-  )
+  @RequirePlatformPermissions('platform.tenant.update')
   update(
     @Param('id', ParseUUIDPipe)
     id: string,
@@ -106,11 +85,7 @@ export class TenantManagementController {
 
     @Req() req: any,
   ) {
-    return this.tenantService.update(
-      id,
-      dto,
-      req.user.userId,
-    );
+    return this.tenantService.update(id, dto, req.user.userId);
   }
 
   /**
@@ -120,9 +95,7 @@ export class TenantManagementController {
    * /api/v1/platform/tenants/:id/status
    */
   @Patch(':id/status')
-  @RequirePlatformPermissions(
-    'platform.tenant.status',
-  )
+  @RequirePlatformPermissions('platform.tenant.status')
   updateStatus(
     @Param('id', ParseUUIDPipe)
     id: string,
@@ -131,11 +104,7 @@ export class TenantManagementController {
 
     @Req() req: any,
   ) {
-    return this.tenantService.updateStatus(
-      id,
-      dto,
-      req.user.userId,
-    );
+    return this.tenantService.updateStatus(id, dto, req.user.userId);
   }
 
   /**
@@ -149,18 +118,13 @@ export class TenantManagementController {
    * It changes status -> CANCELLED.
    */
   @Delete(':id')
-  @RequirePlatformPermissions(
-    'platform.tenant.delete',
-  )
+  @RequirePlatformPermissions('platform.tenant.delete')
   remove(
     @Param('id', ParseUUIDPipe)
     id: string,
 
     @Req() req: any,
   ) {
-    return this.tenantService.remove(
-      id,
-      req.user.userId,
-    );
+    return this.tenantService.remove(id, req.user.userId);
   }
 }

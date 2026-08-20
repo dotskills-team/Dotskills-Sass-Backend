@@ -1,6 +1,6 @@
-import { createParamDecorator, ExecutionContext } from "@nestjs/common";
-import type { Request } from "express";
-import type { CompanyContext } from "../types/company-context.type";
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import type { Request } from 'express';
+import type { CompanyContext } from '../types/company-context.type';
 
 type CompanyRequest = Request & { companyContext: CompanyContext };
 

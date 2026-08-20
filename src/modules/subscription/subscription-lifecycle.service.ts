@@ -1,16 +1,11 @@
-import {
-  BadRequestException,
-
-  Logger,
-  NotFoundException,
-} from "@nestjs/common";
-import { PrismaService } from "../../prisma/prisma.service";
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../../prisma/prisma.service';
+import { Injectable } from '@nestjs/common';
 
 import {
   AuditActorType,
   SubscriptionStatus,
-} from "src/generated/phase-1-prisma/enums";
+} from 'src/generated/phase-1-prisma/enums';
 
 import {
   LifecycleRunResult,
@@ -18,36 +13,20 @@ import {
   SubscriptionContext,
   SystemSubscriptionContext,
   TransitionOptions,
-} from "./subscription.types";
-import {
-  Prisma,
-  Subscription,
-} from "src/generated/phase-1-prisma/client";
+} from './subscription.types';
+import { Prisma, Subscription } from 'src/generated/phase-1-prisma/client';
 
 import {
   ALLOWED_SUBSCRIPTION_TRANSITIONS,
   SUBSCRIPTION_CONSTANTS,
-} from "./subscription.constants";
+} from './subscription.constants';
 
 // type ActorContext = SubscriptionContext | SystemSubscriptionContext;
 type ActorContext =
-  | SubscriptionContext
-  | SystemSubscriptionContext
-  | PlatformSubscriptionContext;
+  SubscriptionContext | SystemSubscriptionContext | PlatformSubscriptionContext;
 
 @Injectable()
 export class SubscriptionLifecycleService {
-
-
-
-
-
-
-
-
-
-
-  
   private readonly logger = new Logger(SubscriptionLifecycleService.name);
 
   constructor(private readonly prisma: PrismaService) {}
@@ -56,6 +35,7 @@ export class SubscriptionLifecycleService {
     id: string,
     context: ActorContext,
     idempotencyKey: string,
+    tx?: Prisma.TransactionClient,
   ) {
     // Scope validation must happen before returning an idempotent replay.
     const subscription = await this.getScoped(id, context);
@@ -71,33 +51,40 @@ export class SubscriptionLifecycleService {
 
     if (!recoverableStatuses.includes(subscription.status)) {
       throw new BadRequestException(
-        "Payment recovery is allowed only for PAST_DUE, GRACE or SUSPENDED subscriptions.",
+        'Payment recovery is allowed only for PAST_DUE, GRACE or SUSPENDED subscriptions.',
       );
     }
     const now = new Date();
-    return this.transition(subscription, SubscriptionStatus.ACTIVE, context, {
-      reason: "PAYMENT_SUCCEEDED",
-      source: "PAYMENT",
-      idempotencyKey,
-      patch: {
-        currentPeriodStart: now,
-        currentPeriodEnd: this.calculatePeriodEnd(
-          now,
-          subscription.billingCycle,
-        ),
-        graceEndsAt: null,
-        pastDueEndsAt: null,
-        suspendedAt: null,
-        suspensionExpiresAt: null,
-        cancelledAt: null,
+    return this.transition(
+      subscription,
+      SubscriptionStatus.ACTIVE,
+      context,
+      {
+        reason: 'PAYMENT_SUCCEEDED',
+        source: 'PAYMENT',
+        idempotencyKey,
+        patch: {
+          currentPeriodStart: now,
+          currentPeriodEnd: this.calculatePeriodEnd(
+            now,
+            subscription.billingCycle,
+          ),
+          graceEndsAt: null,
+          pastDueEndsAt: null,
+          suspendedAt: null,
+          suspensionExpiresAt: null,
+          cancelledAt: null,
+        },
       },
-    });
+      tx,
+    );
   }
 
   async paymentFailed(
     id: string,
     context: ActorContext,
     idempotencyKey: string,
+    tx?: Prisma.TransactionClient,
   ) {
     // Scope validation must happen before returning an idempotent replay.
     const subscription = await this.getScoped(id, context);
@@ -110,8 +97,8 @@ export class SubscriptionLifecycleService {
         SubscriptionStatus.PAST_DUE,
         context,
         {
-          reason: "PAYMENT_FAILED",
-          source: "PAYMENT",
+          reason: 'PAYMENT_FAILED',
+          source: 'PAYMENT',
           idempotencyKey,
           patch: {
             pastDueEndsAt: this.addDays(
@@ -120,23 +107,30 @@ export class SubscriptionLifecycleService {
             ),
           },
         },
+        tx,
       );
     }
     if (subscription.status === SubscriptionStatus.PAST_DUE) {
-      return this.transition(subscription, SubscriptionStatus.GRACE, context, {
-        reason: "PAYMENT_RETRY_FAILED",
-        source: "PAYMENT",
-        idempotencyKey,
-        patch: {
-          graceEndsAt: this.addDays(
-            new Date(),
-            SUBSCRIPTION_CONSTANTS.DEFAULT_GRACE_DAYS,
-          ),
+      return this.transition(
+        subscription,
+        SubscriptionStatus.GRACE,
+        context,
+        {
+          reason: 'PAYMENT_RETRY_FAILED',
+          source: 'PAYMENT',
+          idempotencyKey,
+          patch: {
+            graceEndsAt: this.addDays(
+              new Date(),
+              SUBSCRIPTION_CONSTANTS.DEFAULT_GRACE_DAYS,
+            ),
+          },
         },
-      });
+        tx,
+      );
     }
     throw new BadRequestException(
-      "Payment failure can only move ACTIVE→PAST_DUE or PAST_DUE→GRACE.",
+      'Payment failure can only move ACTIVE→PAST_DUE or PAST_DUE→GRACE.',
     );
   }
 
@@ -145,6 +139,7 @@ export class SubscriptionLifecycleService {
     to: SubscriptionStatus,
     context: ActorContext,
     options: TransitionOptions,
+    tx?: Prisma.TransactionClient,
   ) {
     if (!ALLOWED_SUBSCRIPTION_TRANSITIONS[subscription.status].includes(to)) {
       throw new BadRequestException(
@@ -152,7 +147,7 @@ export class SubscriptionLifecycleService {
       );
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    const run = async (tx: Prisma.TransactionClient) => {
       if (options.idempotencyKey) {
         const prior = await tx.subscriptionEvent.findUnique({
           where: { idempotencyKey: options.idempotencyKey },
@@ -169,13 +164,12 @@ export class SubscriptionLifecycleService {
         data: {
           status: to,
           ...(options.patch as
-            | Prisma.SubscriptionUpdateManyMutationInput
-            | undefined),
+            Prisma.SubscriptionUpdateManyMutationInput | undefined),
         },
       });
       if (changed.count !== 1)
         throw new BadRequestException(
-          "Subscription changed concurrently; retry the operation.",
+          'Subscription changed concurrently; retry the operation.',
         );
 
       await tx.subscriptionEvent.create({
@@ -187,7 +181,7 @@ export class SubscriptionLifecycleService {
           toStatus: to,
           reason: options.reason,
           source: options.source,
-          actorUserId: "userId" in context ? context.userId : null,
+          actorUserId: 'userId' in context ? context.userId : null,
           idempotencyKey: options.idempotencyKey,
           metadata: options.metadata as Prisma.InputJsonValue | undefined,
         },
@@ -197,10 +191,10 @@ export class SubscriptionLifecycleService {
         data: {
           tenantId: subscription.tenantId,
           companyId: subscription.companyId,
-          actorUserId: "userId" in context ? context.userId : null,
+          actorUserId: 'userId' in context ? context.userId : null,
           actorType: context.actorType ?? AuditActorType.COMPANY_MEMBER,
           action: `SUBSCRIPTION_${to}`,
-          entityType: "Subscription",
+          entityType: 'Subscription',
           entityId: subscription.id,
           beforeData: { status: subscription.status },
           afterData: { status: to, reason: options.reason },
@@ -209,7 +203,13 @@ export class SubscriptionLifecycleService {
       return tx.subscription.findUniqueOrThrow({
         where: { id: subscription.id },
       });
-    });
+    };
+
+    // যদি caller ইতিমধ্যে একটি transaction client দিয়ে থাকে (যেমন BillingService,
+    // যাতে Billing + Subscription আপডেট একসাথে atomic থাকে), সেটাই reuse করা হয় —
+    // নতুন করে $transaction() খোলা হয় না।
+    if (tx) return run(tx);
+    return this.prisma.$transaction(run);
   }
 
   async runDueTransitions(now = new Date()): Promise<LifecycleRunResult> {
@@ -227,7 +227,7 @@ export class SubscriptionLifecycleService {
       { trialEndsAt: { lte: now } },
       SubscriptionStatus.ACTIVE,
       result,
-      "trialsActivated",
+      'trialsActivated',
       () => ({ trialEndsAt: null }),
     );
     await this.processDue(
@@ -235,7 +235,7 @@ export class SubscriptionLifecycleService {
       { currentPeriodEnd: { lte: now }, autoRenew: true },
       SubscriptionStatus.PAST_DUE,
       result,
-      "activeMarkedPastDue",
+      'activeMarkedPastDue',
       () => ({
         pastDueEndsAt: this.addDays(
           now,
@@ -248,14 +248,14 @@ export class SubscriptionLifecycleService {
       { currentPeriodEnd: { lte: now }, autoRenew: false },
       SubscriptionStatus.EXPIRED,
       result,
-      "cancelledExpired",
+      'cancelledExpired',
     );
     await this.processDue(
       SubscriptionStatus.PAST_DUE,
       { pastDueEndsAt: { lte: now } },
       SubscriptionStatus.GRACE,
       result,
-      "pastDueMovedToGrace",
+      'pastDueMovedToGrace',
       () => ({
         pastDueEndsAt: null,
         graceEndsAt: this.addDays(
@@ -269,7 +269,7 @@ export class SubscriptionLifecycleService {
       { graceEndsAt: { lte: now } },
       SubscriptionStatus.SUSPENDED,
       result,
-      "graceSuspended",
+      'graceSuspended',
       () => ({
         suspendedAt: now,
         suspensionExpiresAt: this.addDays(
@@ -283,14 +283,14 @@ export class SubscriptionLifecycleService {
       { suspensionExpiresAt: { lte: now } },
       SubscriptionStatus.EXPIRED,
       result,
-      "suspendedExpired",
+      'suspendedExpired',
     );
     await this.processDue(
       SubscriptionStatus.CANCELLED,
       { currentPeriodEnd: { lte: now } },
       SubscriptionStatus.EXPIRED,
       result,
-      "cancelledExpired",
+      'cancelledExpired',
     );
     return result;
   }
@@ -300,19 +300,19 @@ export class SubscriptionLifecycleService {
     due: Prisma.SubscriptionWhereInput,
     to: SubscriptionStatus,
     result: LifecycleRunResult,
-    counter: keyof Omit<LifecycleRunResult, "failures">,
+    counter: keyof Omit<LifecycleRunResult, 'failures'>,
     patch: (subscription: Subscription) => Record<string, unknown> = () => ({}),
   ) {
     const rows = await this.prisma.subscription.findMany({
       where: { status: from, ...due },
       take: SUBSCRIPTION_CONSTANTS.LIFECYCLE_BATCH_SIZE,
-      orderBy: { updatedAt: "asc" },
+      orderBy: { updatedAt: 'asc' },
     });
     for (const row of rows) {
       try {
         if (!row.companyId) {
           throw new BadRequestException(
-            "Company-scoped subscription is missing companyId.",
+            'Company-scoped subscription is missing companyId.',
           );
         }
 
@@ -325,15 +325,15 @@ export class SubscriptionLifecycleService {
             actorType: AuditActorType.SYSTEM,
           },
           {
-            reason: "SCHEDULED_LIFECYCLE",
-            source: "SCHEDULER",
+            reason: 'SCHEDULED_LIFECYCLE',
+            source: 'SCHEDULER',
             patch: patch(row),
           },
         );
         result[counter] += 1;
       } catch (error) {
         const message =
-          error instanceof Error ? error.message : "Unknown lifecycle error";
+          error instanceof Error ? error.message : 'Unknown lifecycle error';
         result.failures.push({ subscriptionId: row.id, from, message });
         this.logger.error({ subscriptionId: row.id, from, to, message });
       }
@@ -347,33 +347,33 @@ export class SubscriptionLifecycleService {
   //   if (!subscription) throw new NotFoundException("Subscription not found.");
   //   return subscription;
   // }
-private async getScoped(id: string, context: ActorContext) {
-  if ("tenantId" in context && "companyId" in context) {
-    const subscription = await this.prisma.subscription.findFirst({
-      where: {
-        id,
-        tenantId: context.tenantId,
-        companyId: context.companyId,
-      },
+  private async getScoped(id: string, context: ActorContext) {
+    if ('tenantId' in context && 'companyId' in context) {
+      const subscription = await this.prisma.subscription.findFirst({
+        where: {
+          id,
+          tenantId: context.tenantId,
+          companyId: context.companyId,
+        },
+      });
+
+      if (!subscription) {
+        throw new NotFoundException('Subscription not found.');
+      }
+
+      return subscription;
+    }
+
+    const subscription = await this.prisma.subscription.findUnique({
+      where: { id },
     });
 
     if (!subscription) {
-      throw new NotFoundException("Subscription not found.");
+      throw new NotFoundException('Subscription not found.');
     }
 
     return subscription;
   }
-
-  const subscription = await this.prisma.subscription.findUnique({
-    where: { id },
-  });
-
-  if (!subscription) {
-    throw new NotFoundException("Subscription not found.");
-  }
-
-  return subscription;
-}
   private async findIdempotentResult(
     subscriptionId: string,
     idempotencyKey: string,
@@ -384,7 +384,7 @@ private async getScoped(id: string, context: ActorContext) {
     if (!event) return null;
     if (event.subscriptionId !== subscriptionId) {
       throw new BadRequestException(
-        "Idempotency key was already used for another subscription.",
+        'Idempotency key was already used for another subscription.',
       );
     }
     return this.prisma.subscription.findUniqueOrThrow({
@@ -392,9 +392,9 @@ private async getScoped(id: string, context: ActorContext) {
     });
   }
 
-  calculatePeriodEnd(start: Date, cycle: "MONTHLY" | "YEARLY") {
+  calculatePeriodEnd(start: Date, cycle: 'MONTHLY' | 'YEARLY') {
     const result = new Date(start);
-    if (cycle === "MONTHLY") result.setUTCMonth(result.getUTCMonth() + 1);
+    if (cycle === 'MONTHLY') result.setUTCMonth(result.getUTCMonth() + 1);
     else result.setUTCFullYear(result.getUTCFullYear() + 1);
     return result;
   }
@@ -404,12 +404,7 @@ private async getScoped(id: string, context: ActorContext) {
     result.setUTCDate(result.getUTCDate() + days);
     return result;
   }
-
 }
-
-
-
-
 
 // import {
 //   BadRequestException,

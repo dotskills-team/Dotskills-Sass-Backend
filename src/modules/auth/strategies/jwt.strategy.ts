@@ -1,17 +1,17 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { PassportStrategy } from "@nestjs/passport";
-import { ExtractJwt, Strategy } from "passport-jwt";
-import { PrismaService } from "../../../prisma/prisma.service";
-import type { AuthenticatedUser } from "../../../common/types/authenticated-user.type";
-import type { AccessTokenPayload } from "../interfaces/jwt-payload.interface";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { PrismaService } from '../../../prisma/prisma.service';
+import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
+import type { AccessTokenPayload } from '../interfaces/jwt-payload.interface';
 
 type PlatformRoleAssignment = {
   platformRole: { status: string; code: string };
 };
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     configService: ConfigService,
     private readonly prisma: PrismaService,
@@ -19,15 +19,15 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.getOrThrow<string>("JWT_ACCESS_SECRET"),
-      issuer: configService.get<string>("JWT_ISSUER", "dotskills-api"),
-      audience: configService.get<string>("JWT_AUDIENCE", "dotskills-web"),
+      secretOrKey: configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
+      issuer: configService.get<string>('JWT_ISSUER', 'dotskills-api'),
+      audience: configService.get<string>('JWT_AUDIENCE', 'dotskills-web'),
     });
   }
 
   async validate(payload: AccessTokenPayload): Promise<AuthenticatedUser> {
-    if (payload.type !== "access" || !payload.sub || !payload.sid) {
-      throw new UnauthorizedException("Invalid access token");
+    if (payload.type !== 'access' || !payload.sub || !payload.sid) {
+      throw new UnauthorizedException('Invalid access token');
     }
 
     const session = await this.prisma.authSession.findUnique({
@@ -55,14 +55,15 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
       platformMember?.roles
         .filter(
           (item: PlatformRoleAssignment) =>
-            item.platformRole.status === "ACTIVE",
+            item.platformRole.status === 'ACTIVE',
         )
         .map((item: PlatformRoleAssignment) => item.platformRole.code) ?? [];
     const hasPlatformMembership =
-      platformMember?.status === "ACTIVE" && roles.length > 0;
+      platformMember?.status === 'ACTIVE' && roles.length > 0;
     const hasCompanyMembership =
-      user?.companyMemberships.some((membership) => membership.status === "ACTIVE") ??
-      false;
+      user?.companyMemberships.some(
+        (membership) => membership.status === 'ACTIVE',
+      ) ?? false;
 
     if (
       !session ||
@@ -71,11 +72,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, "jwt") {
       session.expiresAt <= now ||
       !user ||
       user.deletedAt ||
-      user.status !== "ACTIVE" ||
+      user.status !== 'ACTIVE' ||
       !user.email ||
       (!hasPlatformMembership && !hasCompanyMembership)
     ) {
-      throw new UnauthorizedException("Session is invalid or expired");
+      throw new UnauthorizedException('Session is invalid or expired');
     }
 
     return {

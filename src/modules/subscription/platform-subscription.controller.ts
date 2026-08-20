@@ -1,9 +1,3 @@
-
-
-
-
-
-
 import {
   BadRequestException,
   Body,
@@ -16,16 +10,16 @@ import {
   Req,
   UnauthorizedException,
   UseGuards,
-} from "@nestjs/common";
-import type { Request } from "express";
+} from '@nestjs/common';
+import type { Request } from 'express';
 
-import { PLATFORM_PERMISSIONS } from "../../common/constants/permission.constants";
-import { RequirePlatformPermissions } from "../../common/decorators/require-platform-permissions.decorator";
-import { PlatformPermissionsGuard } from "../../common/guards/platform-permissions.guard";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
-import { AdminSubscriptionActionDto } from "./dto/admin-subscription-action.dto";
-import { CreateSubscriptionDto } from "./dto/create-subscription.dto";
-import { SubscriptionService } from "./subscription.service";
+import { PLATFORM_PERMISSIONS } from '../../common/constants/permission.constants';
+import { RequirePlatformPermissions } from '../../common/decorators/require-platform-permissions.decorator';
+import { PlatformPermissionsGuard } from '../../common/guards/platform-permissions.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AdminSubscriptionActionDto } from './dto/admin-subscription-action.dto';
+import { CreateSubscriptionDto } from './dto/create-subscription.dto';
+import { SubscriptionService } from './subscription.service';
 // import {
 //   PlatformSubscriptionContext,
 // } from "./subscription.types";
@@ -34,11 +28,9 @@ import {
   PlatformSubscriptionContext,
   PriceSnapshot,
   SubscriptionContext,
-} from "./subscription.types";
+} from './subscription.types';
 
-import {
-  AuditActorType,
-} from "src/generated/phase-1-prisma/enums";
+import { AuditActorType } from 'src/generated/phase-1-prisma/enums';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -54,7 +46,7 @@ interface AuthenticatedRequest extends Request {
  * প্রতিটি endpoint-এ আলাদা granular permission ব্যবহার করা হয়েছে।
  * তাই class-level SUBSCRIPTION_MANAGE permission প্রয়োজন নেই।
  */
-@Controller("platform/subscriptions")
+@Controller('platform/subscriptions')
 @UseGuards(JwtAuthGuard, PlatformPermissionsGuard)
 export class PlatformSubscriptionController {
   constructor(private readonly service: SubscriptionService) {}
@@ -64,18 +56,18 @@ export class PlatformSubscriptionController {
   @RequirePlatformPermissions(PLATFORM_PERMISSIONS.SUBSCRIPTION_CREATE)
   create(
     @Body() dto: CreateSubscriptionDto,
-    @Headers("x-company-id") companyId: string | undefined,
+    @Headers('x-company-id') companyId: string | undefined,
     @Req() req: AuthenticatedRequest,
   ) {
     if (!companyId?.trim()) {
-      throw new BadRequestException("x-company-id header is required.");
+      throw new BadRequestException('x-company-id header is required.');
     }
 
     const normalizedCompanyId = companyId.trim();
 
     if (dto.companyId !== normalizedCompanyId) {
       throw new BadRequestException(
-        "Body companyId and x-company-id must match.",
+        'Body companyId and x-company-id must match.',
       );
     }
 
@@ -94,70 +86,58 @@ export class PlatformSubscriptionController {
   }
 
   /** Platform থেকে একটি subscription-এর details দেখা। */
-  @Get(":id")
+  @Get(':id')
   @RequirePlatformPermissions(PLATFORM_PERMISSIONS.SUBSCRIPTION_READ)
-  findOne(@Param("id", ParseUUIDPipe) id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.service.findOneForPlatform(id);
   }
 
-@Post(":id/suspend")
-async suspend(
-  @Param("id", ParseUUIDPipe) id: string,
-  @Body() dto: AdminSubscriptionActionDto,
-  @Req() req: AuthenticatedRequest,
-) {
-  return this.service.suspendForPlatform(
-    id,
-    dto.reason,
-    this.actor(req),
-  );
-}
+  @Post(':id/suspend')
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.SUBSCRIPTION_SUSPEND)
+  async suspend(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: AdminSubscriptionActionDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.service.suspendForPlatform(id, dto.reason, this.actor(req));
+  }
 
-@Post(":id/reactivate")
-async reactivate(
-  @Param("id", ParseUUIDPipe) id: string,
-  @Body() dto: AdminSubscriptionActionDto,
-  @Req() req: AuthenticatedRequest,
-) {
-  return this.service.reactivateForPlatform(
-    id,
-    dto.reason,
-    this.actor(req),
-  );
-}
+  @Post(':id/reactivate')
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.SUBSCRIPTION_REACTIVATE)
+  async reactivate(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: AdminSubscriptionActionDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.service.reactivateForPlatform(id, dto.reason, this.actor(req));
+  }
 
-@Post(":id/cancel")
-async cancel(
-  @Param("id", ParseUUIDPipe) id: string,
-  @Body() dto: AdminSubscriptionActionDto,
-  @Req() req: AuthenticatedRequest,
-) {
-  return this.service.cancelForPlatform(
-    id,
-    dto.reason,
-    this.actor(req),
-  );
-}
+  @Post(':id/cancel')
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.SUBSCRIPTION_CANCEL)
+  async cancel(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: AdminSubscriptionActionDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.service.cancelForPlatform(id, dto.reason, this.actor(req));
+  }
 
-@Post(":id/expire")
-async expire(
-  @Param("id", ParseUUIDPipe) id: string,
-  @Body() dto: AdminSubscriptionActionDto,
-  @Req() req: AuthenticatedRequest,
-) {
-  return this.service.expireForPlatform(
-    id,
-    dto.reason,
-    this.actor(req),
-  );
-}
+  @Post(':id/expire')
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.SUBSCRIPTION_EXPIRE)
+  async expire(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: AdminSubscriptionActionDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.service.expireForPlatform(id, dto.reason, this.actor(req));
+  }
 
   /** JWT payload থেকে authenticated user ID বের করে। */
   private getUserId(req: AuthenticatedRequest): string {
     const userId = req.user?.userId ?? req.user?.id;
 
     if (!userId) {
-      throw new UnauthorizedException("Authenticated user ID is missing.");
+      throw new UnauthorizedException('Authenticated user ID is missing.');
     }
 
     return userId;
@@ -171,25 +151,14 @@ async expire(
   //   };
   // }
 
-
   private actor(req: AuthenticatedRequest): PlatformSubscriptionContext {
-  return {
-    userId: this.getUserId(req),
-    roles: req.user?.roles ?? [],
-    actorType: AuditActorType.PLATFORM_MEMBER,
-  };
+    return {
+      userId: this.getUserId(req),
+      roles: req.user?.roles ?? [],
+      actorType: AuditActorType.PLATFORM_MEMBER,
+    };
+  }
 }
-}
-
-
-
-
-
-
-
-
-
-
 
 // import {
 //   BadRequestException,

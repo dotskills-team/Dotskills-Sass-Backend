@@ -1,8 +1,4 @@
-import {
-  IsBooleanString,
-  IsEnum,
-  IsOptional,
-} from 'class-validator';
+import { IsBooleanString, IsEnum, IsOptional } from 'class-validator';
 import { BillingCycle } from 'src/generated/phase-1-prisma/enums';
 
 // import { BillingCycle } from 'src/generated/phase-1-prisma';

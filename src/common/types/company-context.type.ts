@@ -1,5 +1,5 @@
 export type CompanyScope = {
-  type: "COMPANY" | "BRANCH" | "WAREHOUSE" | "POS_COUNTER";
+  type: 'COMPANY' | 'BRANCH' | 'WAREHOUSE' | 'POS_COUNTER';
   key: string;
 };
 

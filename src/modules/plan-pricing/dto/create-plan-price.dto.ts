@@ -17,7 +17,6 @@ export class CreatePlanPriceDto {
   @IsEnum(BillingCycle, {
     message: 'billingCycle must be either MONTHLY or YEARLY',
   })
-  
   billingCycle!: BillingCycle;
 
   @IsOptional()
@@ -26,8 +25,7 @@ export class CreatePlanPriceDto {
     message: 'currencyCode must be exactly 3 characters',
   })
   @Matches(/^[A-Z]{3}$/, {
-    message:
-      'currencyCode must be a valid 3-letter uppercase currency code',
+    message: 'currencyCode must be a valid 3-letter uppercase currency code',
   })
   currencyCode?: string;
 

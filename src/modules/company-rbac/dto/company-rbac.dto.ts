@@ -9,8 +9,8 @@ import {
   MaxLength,
   MinLength,
   ValidateNested,
-} from "class-validator";
-import { Type } from "class-transformer";
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class BootstrapCompanyRbacDto {
   @IsOptional()
@@ -59,8 +59,8 @@ export class UpdateCompanyRoleDto {
 }
 
 export enum PermissionEffectDtoValue {
-  ALLOW = "ALLOW",
-  DENY = "DENY",
+  ALLOW = 'ALLOW',
+  DENY = 'DENY',
 }
 
 export class CompanyRolePermissionItemDto {
@@ -113,9 +113,9 @@ export class CreateCompanyMemberDto {
 }
 
 export enum CompanyMemberStatusDtoValue {
-  ACTIVE = "ACTIVE",
-  SUSPENDED = "SUSPENDED",
-  REVOKED = "REVOKED",
+  ACTIVE = 'ACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  REVOKED = 'REVOKED',
 }
 
 export class UpdateCompanyMemberStatusDto {
@@ -131,10 +131,10 @@ export class ReplaceCompanyMemberRolesDto {
 }
 
 export enum CompanyScopeTypeDtoValue {
-  COMPANY = "COMPANY",
-  BRANCH = "BRANCH",
-  WAREHOUSE = "WAREHOUSE",
-  POS_COUNTER = "POS_COUNTER",
+  COMPANY = 'COMPANY',
+  BRANCH = 'BRANCH',
+  WAREHOUSE = 'WAREHOUSE',
+  POS_COUNTER = 'POS_COUNTER',
 }
 
 export class CompanyMemberScopeItemDto {

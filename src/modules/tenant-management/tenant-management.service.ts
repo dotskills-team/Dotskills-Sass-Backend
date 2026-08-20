@@ -20,17 +20,12 @@ import { TenantQueryDto } from './dto/tenant-query.dto';
 
 @Injectable()
 export class TenantManagementService {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   /**
    * CREATE TENANT
    */
-  async create(
-    dto: CreateTenantDto,
-    actorUserId: string,
-  ) {
+  async create(dto: CreateTenantDto, actorUserId: string) {
     const code = dto.code.trim().toUpperCase();
     const name = dto.name.trim();
     const slug = dto.slug.trim().toLowerCase();
@@ -58,53 +53,47 @@ export class TenantManagementService {
 
     if (existing) {
       if (existing.code === code) {
-        throw new ConflictException(
-          'Tenant code already exists',
-        );
+        throw new ConflictException('Tenant code already exists');
       }
 
       if (existing.slug === slug) {
-        throw new ConflictException(
-          'Tenant slug already exists',
-        );
+        throw new ConflictException('Tenant slug already exists');
       }
     }
 
     /**
      * Create tenant + audit log
      */
-    const tenant = await this.prisma.$transaction(
-      async (tx) => {
-        const created = await tx.tenant.create({
-          data: {
-            code,
-            name,
-            slug,
-            status: TenantStatus.DRAFT,
-          },
-        });
+    const tenant = await this.prisma.$transaction(async (tx) => {
+      const created = await tx.tenant.create({
+        data: {
+          code,
+          name,
+          slug,
+          status: TenantStatus.DRAFT,
+        },
+      });
 
-        await tx.auditLog.create({
-          data: {
-            tenantId: created.id,
-            actorUserId,
-            actorType: AuditActorType.PLATFORM_MEMBER,
-            action: 'TENANT_CREATED',
-            entityType: 'TENANT',
-            entityId: created.id,
-            afterData: {
-              id: created.id,
-              code: created.code,
-              name: created.name,
-              slug: created.slug,
-              status: created.status,
-            },
+      await tx.auditLog.create({
+        data: {
+          tenantId: created.id,
+          actorUserId,
+          actorType: AuditActorType.PLATFORM_MEMBER,
+          action: 'TENANT_CREATED',
+          entityType: 'TENANT',
+          entityId: created.id,
+          afterData: {
+            id: created.id,
+            code: created.code,
+            name: created.name,
+            slug: created.slug,
+            status: created.status,
           },
-        });
+        },
+      });
 
-        return created;
-      },
-    );
+      return created;
+    });
 
     return {
       success: true,
@@ -159,31 +148,30 @@ export class TenantManagementService {
       ];
     }
 
-    const [items, total] =
-      await this.prisma.$transaction([
-        this.prisma.tenant.findMany({
-          where,
-          skip,
-          take: limit,
-          orderBy: {
-            createdAt: 'desc',
-          },
-          include: {
-            _count: {
-              select: {
-                companies: true,
-                members: true,
-                subscriptions: true,
-                invitations: true,
-              },
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.tenant.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        include: {
+          _count: {
+            select: {
+              companies: true,
+              members: true,
+              subscriptions: true,
+              invitations: true,
             },
           },
-        }),
+        },
+      }),
 
-        this.prisma.tenant.count({
-          where,
-        }),
-      ]);
+      this.prisma.tenant.count({
+        where,
+      }),
+    ]);
 
     return {
       success: true,
@@ -220,9 +208,7 @@ export class TenantManagementService {
     });
 
     if (!tenant) {
-      throw new NotFoundException(
-        'Tenant not found',
-      );
+      throw new NotFoundException('Tenant not found');
     }
 
     return {
@@ -235,22 +221,15 @@ export class TenantManagementService {
   /**
    * UPDATE TENANT
    */
-  async update(
-    id: string,
-    dto: UpdateTenantDto,
-    actorUserId: string,
-  ) {
-    const existing =
-      await this.prisma.tenant.findUnique({
-        where: {
-          id,
-        },
-      });
+  async update(id: string, dto: UpdateTenantDto, actorUserId: string) {
+    const existing = await this.prisma.tenant.findUnique({
+      where: {
+        id,
+      },
+    });
 
     if (!existing) {
-      throw new NotFoundException(
-        'Tenant not found',
-      );
+      throw new NotFoundException('Tenant not found');
     }
 
     const data: Prisma.TenantUpdateInput = {};
@@ -262,9 +241,7 @@ export class TenantManagementService {
       const name = dto.name.trim();
 
       if (!name) {
-        throw new BadRequestException(
-          'Tenant name cannot be empty',
-        );
+        throw new BadRequestException('Tenant name cannot be empty');
       }
 
       data.name = name;
@@ -274,78 +251,64 @@ export class TenantManagementService {
      * Update slug
      */
     if (dto.slug !== undefined) {
-      const slug = dto.slug
-        .trim()
-        .toLowerCase();
+      const slug = dto.slug.trim().toLowerCase();
 
       if (!slug) {
-        throw new BadRequestException(
-          'Tenant slug cannot be empty',
-        );
+        throw new BadRequestException('Tenant slug cannot be empty');
       }
 
-      const slugExists =
-        await this.prisma.tenant.findFirst({
-          where: {
-            slug,
-            NOT: {
-              id,
-            },
+      const slugExists = await this.prisma.tenant.findFirst({
+        where: {
+          slug,
+          NOT: {
+            id,
           },
-          select: {
-            id: true,
-          },
-        });
+        },
+        select: {
+          id: true,
+        },
+      });
 
       if (slugExists) {
-        throw new ConflictException(
-          'Tenant slug already exists',
-        );
+        throw new ConflictException('Tenant slug already exists');
       }
 
       data.slug = slug;
     }
 
     if (Object.keys(data).length === 0) {
-      throw new BadRequestException(
-        'No valid fields provided for update',
-      );
+      throw new BadRequestException('No valid fields provided for update');
     }
 
-    const updated =
-      await this.prisma.$transaction(
-        async (tx) => {
-          const result =
-            await tx.tenant.update({
-              where: {
-                id,
-              },
-              data,
-            });
-
-          await tx.auditLog.create({
-            data: {
-              tenantId: result.id,
-              actorUserId,
-              actorType:
-                AuditActorType.PLATFORM_MEMBER,
-              action: 'TENANT_UPDATED',
-              entityType: 'TENANT',
-              entityId: result.id,
-              beforeData: {
-                name: existing.name,
-                slug: existing.slug,
-              },
-              afterData: {
-                name: result.name,
-                slug: result.slug,
-              },
-            },
-          });
-
-          return result;
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.tenant.update({
+        where: {
+          id,
         },
-      );
+        data,
+      });
+
+      await tx.auditLog.create({
+        data: {
+          tenantId: result.id,
+          actorUserId,
+          actorType: AuditActorType.PLATFORM_MEMBER,
+          action: 'TENANT_UPDATED',
+          entityType: 'TENANT',
+          entityId: result.id,
+          beforeData: {
+            name: existing.name,
+            slug: existing.slug,
+          },
+          afterData: {
+            name: result.name,
+            slug: result.slug,
+          },
+        },
+      });
+
+      return result;
+    });
 
     return {
       success: true,
@@ -362,37 +325,29 @@ export class TenantManagementService {
     dto: UpdateTenantStatusDto,
     actorUserId: string,
   ) {
-    const existing =
-      await this.prisma.tenant.findUnique({
-        where: {
-          id,
-        },
-        include: {
-          _count: {
-            select: {
-              companies: true,
-            },
+    const existing = await this.prisma.tenant.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        _count: {
+          select: {
+            companies: true,
           },
         },
-      });
+      },
+    });
 
     if (!existing) {
-      throw new NotFoundException(
-        'Tenant not found',
-      );
+      throw new NotFoundException('Tenant not found');
     }
 
     /**
      * Cancelled tenant cannot be activated
      * through normal status update.
      */
-    if (
-      existing.status ===
-      TenantStatus.CANCELLED
-    ) {
-      throw new BadRequestException(
-        'Cancelled tenant cannot change status',
-      );
+    if (existing.status === TenantStatus.CANCELLED) {
+      throw new BadRequestException('Cancelled tenant cannot change status');
     }
 
     const nextStatus = dto.status;
@@ -404,62 +359,50 @@ export class TenantManagementService {
     /**
      * ACTIVE timestamp
      */
-    if (
-      nextStatus === TenantStatus.ACTIVE &&
-      !existing.activatedAt
-    ) {
+    if (nextStatus === TenantStatus.ACTIVE && !existing.activatedAt) {
       data.activatedAt = new Date();
     }
 
     /**
      * SUSPENDED timestamp
      */
-    if (
-      nextStatus === TenantStatus.SUSPENDED
-    ) {
+    if (nextStatus === TenantStatus.SUSPENDED) {
       data.suspendedAt = new Date();
     } else {
       data.suspendedAt = null;
     }
 
-    const updated =
-      await this.prisma.$transaction(
-        async (tx) => {
-          const result =
-            await tx.tenant.update({
-              where: {
-                id,
-              },
-              data,
-            });
-
-          await tx.auditLog.create({
-            data: {
-              tenantId: result.id,
-              actorUserId,
-              actorType:
-                AuditActorType.PLATFORM_MEMBER,
-              action:
-                'TENANT_STATUS_CHANGED',
-              entityType: 'TENANT',
-              entityId: result.id,
-              beforeData: {
-                status: existing.status,
-              },
-              afterData: {
-                status: result.status,
-              },
-            },
-          });
-
-          return result;
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.tenant.update({
+        where: {
+          id,
         },
-      );
+        data,
+      });
+
+      await tx.auditLog.create({
+        data: {
+          tenantId: result.id,
+          actorUserId,
+          actorType: AuditActorType.PLATFORM_MEMBER,
+          action: 'TENANT_STATUS_CHANGED',
+          entityType: 'TENANT',
+          entityId: result.id,
+          beforeData: {
+            status: existing.status,
+          },
+          afterData: {
+            status: result.status,
+          },
+        },
+      });
+
+      return result;
+    });
 
     return {
       success: true,
-      message:
-        'Tenant status updated successfully',
+      message: 'Tenant status updated successfully',
       data: updated,
     };
   }
@@ -472,72 +415,54 @@ export class TenantManagementService {
    * Tenant is a core SaaS entity and has
    * multiple dependent records.
    */
-  async remove(
-    id: string,
-    actorUserId: string,
-  ) {
-    const existing =
-      await this.prisma.tenant.findUnique({
+  async remove(id: string, actorUserId: string) {
+    const existing = await this.prisma.tenant.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!existing) {
+      throw new NotFoundException('Tenant not found');
+    }
+
+    if (existing.status === TenantStatus.CANCELLED) {
+      throw new BadRequestException('Tenant is already cancelled');
+    }
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const result = await tx.tenant.update({
         where: {
           id,
         },
+        data: {
+          status: TenantStatus.CANCELLED,
+        },
       });
 
-    if (!existing) {
-      throw new NotFoundException(
-        'Tenant not found',
-      );
-    }
-
-    if (
-      existing.status ===
-      TenantStatus.CANCELLED
-    ) {
-      throw new BadRequestException(
-        'Tenant is already cancelled',
-      );
-    }
-
-    const updated =
-      await this.prisma.$transaction(
-        async (tx) => {
-          const result =
-            await tx.tenant.update({
-              where: {
-                id,
-              },
-              data: {
-                status:
-                  TenantStatus.CANCELLED,
-              },
-            });
-
-          await tx.auditLog.create({
-            data: {
-              tenantId: result.id,
-              actorUserId,
-              actorType:
-                AuditActorType.PLATFORM_MEMBER,
-              action: 'TENANT_CANCELLED',
-              entityType: 'TENANT',
-              entityId: result.id,
-              beforeData: {
-                status: existing.status,
-              },
-              afterData: {
-                status: result.status,
-              },
-            },
-          });
-
-          return result;
+      await tx.auditLog.create({
+        data: {
+          tenantId: result.id,
+          actorUserId,
+          actorType: AuditActorType.PLATFORM_MEMBER,
+          action: 'TENANT_CANCELLED',
+          entityType: 'TENANT',
+          entityId: result.id,
+          beforeData: {
+            status: existing.status,
+          },
+          afterData: {
+            status: result.status,
+          },
         },
-      );
+      });
+
+      return result;
+    });
 
     return {
       success: true,
-      message:
-        'Tenant cancelled successfully',
+      message: 'Tenant cancelled successfully',
       data: updated,
     };
   }

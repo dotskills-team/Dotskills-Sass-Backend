@@ -5,16 +5,10 @@ import { PlanFeatureService } from './plan-feature.service';
 import { PlanFeatureController } from './plan-feature.controller';
 
 @Module({
-  controllers: [
-    PlanFeatureController,
-  ],
+  controllers: [PlanFeatureController],
 
-  providers: [
-    PlanFeatureService,
-  ],
+  providers: [PlanFeatureService],
 
-  exports: [
-    PlanFeatureService,
-  ],
+  exports: [PlanFeatureService],
 })
 export class PlanFeatureModule {}

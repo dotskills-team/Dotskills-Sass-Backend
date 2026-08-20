@@ -8,23 +8,23 @@ import {
   Put,
   Query,
   UseGuards,
-} from "@nestjs/common";
-import { PLATFORM_PERMISSIONS } from "../../common/constants/permission.constants";
-import { CurrentUser } from "../../common/decorators/current-user.decorator";
-import { RequirePlatformPermissions } from "../../common/decorators/require-platform-permissions.decorator";
-import { PlatformPermissionsGuard } from "../../common/guards/platform-permissions.guard";
-import type { AuthenticatedUser } from "../../common/types/authenticated-user.type";
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+} from '@nestjs/common';
+import { PLATFORM_PERMISSIONS } from '../../common/constants/permission.constants';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { RequirePlatformPermissions } from '../../common/decorators/require-platform-permissions.decorator';
+import { PlatformPermissionsGuard } from '../../common/guards/platform-permissions.guard';
+import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   CreatePlatformStaffDto,
   PlatformStaffListQueryDto,
   ReplacePlatformRolesDto,
   UpdatePlatformStaffDto,
   UpdatePlatformStaffStatusDto,
-} from "./dto/platform-staff.dto";
-import { PlatformStaffService } from "./platform-staff.service";
+} from './dto/platform-staff.dto';
+import { PlatformStaffService } from './platform-staff.service';
 
-@Controller("platform/staff")
+@Controller('platform/staff')
 @UseGuards(JwtAuthGuard, PlatformPermissionsGuard)
 export class PlatformStaffController {
   constructor(private readonly service: PlatformStaffService) {}
@@ -35,9 +35,9 @@ export class PlatformStaffController {
     return this.service.list(query);
   }
 
-  @Get(":id")
+  @Get(':id')
   @RequirePlatformPermissions(PLATFORM_PERMISSIONS.STAFF_READ)
-  getById(@Param("id") id: string) {
+  getById(@Param('id') id: string) {
     return this.service.getById(id);
   }
 
@@ -50,30 +50,30 @@ export class PlatformStaffController {
     return this.service.create(dto, actor);
   }
 
-  @Patch(":id")
+  @Patch(':id')
   @RequirePlatformPermissions(PLATFORM_PERMISSIONS.STAFF_UPDATE)
   update(
-    @Param("id") id: string,
+    @Param('id') id: string,
     @Body() dto: UpdatePlatformStaffDto,
     @CurrentUser() actor: AuthenticatedUser,
   ) {
     return this.service.update(id, dto, actor);
   }
 
-  @Put(":id/roles")
+  @Put(':id/roles')
   @RequirePlatformPermissions(PLATFORM_PERMISSIONS.STAFF_ROLE_ASSIGN)
   replaceRoles(
-    @Param("id") id: string,
+    @Param('id') id: string,
     @Body() dto: ReplacePlatformRolesDto,
     @CurrentUser() actor: AuthenticatedUser,
   ) {
     return this.service.replaceRoles(id, dto, actor);
   }
 
-  @Patch(":id/status")
+  @Patch(':id/status')
   @RequirePlatformPermissions(PLATFORM_PERMISSIONS.STAFF_STATUS)
   updateStatus(
-    @Param("id") id: string,
+    @Param('id') id: string,
     @Body() dto: UpdatePlatformStaffStatusDto,
     @CurrentUser() actor: AuthenticatedUser,
   ) {

@@ -1,11 +1,11 @@
-import { Transform } from "class-transformer";
+import { Transform } from 'class-transformer';
 import {
   IsEmail,
   IsOptional,
   IsString,
   Length,
   MaxLength,
-} from "class-validator";
+} from 'class-validator';
 
 export class LoginDto {
   @Transform(({ value }) => String(value).trim().toLowerCase())

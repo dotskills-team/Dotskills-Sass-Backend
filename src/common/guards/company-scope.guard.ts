@@ -3,14 +3,14 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
-} from "@nestjs/common";
-import { Reflector } from "@nestjs/core";
-import type { Request } from "express";
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import type { Request } from 'express';
 import {
   COMPANY_SCOPE_KEY,
   type RequiredCompanyScope,
-} from "../decorators/require-company-scope.decorator";
-import type { CompanyContext } from "../types/company-context.type";
+} from '../decorators/require-company-scope.decorator';
+import type { CompanyContext } from '../types/company-context.type';
 
 type CompanyRequest = Request & { companyContext: CompanyContext };
 
@@ -26,16 +26,18 @@ export class CompanyScopeGuard implements CanActivate {
     if (!required) return true;
 
     const request = context.switchToHttp().getRequest<CompanyRequest>();
-    const scopeKey = String(request.params[required.param] ?? "");
+    const scopeKey = String(request.params[required.param] ?? '');
     const scopes = request.companyContext?.scopes ?? [];
     const hasCompanyWide = scopes.some(
-      (scope) => scope.type === "COMPANY" && scope.key === "*",
+      (scope) => scope.type === 'COMPANY' && scope.key === '*',
     );
     const hasExact = scopes.some(
       (scope) => scope.type === required.type && scope.key === scopeKey,
     );
     if (!scopeKey || (!hasCompanyWide && !hasExact)) {
-      throw new ForbiddenException("Requested resource is outside the assigned data scope");
+      throw new ForbiddenException(
+        'Requested resource is outside the assigned data scope',
+      );
     }
     return true;
   }

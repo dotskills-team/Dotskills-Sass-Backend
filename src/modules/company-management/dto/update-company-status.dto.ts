@@ -1,8 +1,7 @@
-
-import { IsString } from 'class-validator';
+import { IsEnum } from 'class-validator';
+import { CompanyStatus } from 'src/generated/phase-1-prisma/enums';
 
 export class UpdateCompanyStatusDto {
-  @IsString()
-  status!: string;
+  @IsEnum(CompanyStatus)
+  status!: CompanyStatus;
 }
-

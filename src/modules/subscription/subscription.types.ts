@@ -4,7 +4,11 @@
 //   SubscriptionStatus,
 // } from "../../generated/phase-1-prisma";
 
-import { AuditActorType, BillingCycle, SubscriptionStatus } from "src/generated/phase-1-prisma/enums";
+import {
+  AuditActorType,
+  BillingCycle,
+  SubscriptionStatus,
+} from 'src/generated/phase-1-prisma/enums';
 
 export interface SubscriptionContext {
   userId: string;
@@ -18,7 +22,6 @@ export interface SubscriptionContext {
 //   roles: string[];
 //   actorType: AuditActorType;
 // }
-
 
 // export interface SystemSubscriptionContext {
 //   tenantId: string;
@@ -44,7 +47,7 @@ export interface PriceSnapshot {
 
 export interface TransitionOptions {
   reason: string;
-  source: "API" | "PAYMENT" | "SCHEDULER" | "SYSTEM";
+  source: 'API' | 'PAYMENT' | 'SCHEDULER' | 'SYSTEM';
   idempotencyKey?: string;
   metadata?: Record<string, unknown>;
   patch?: Record<string, unknown>;

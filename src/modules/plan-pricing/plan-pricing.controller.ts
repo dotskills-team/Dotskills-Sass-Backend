@@ -25,141 +25,75 @@ import { RequirePlatformPermissions } from '../../common/decorators/require-plat
 import { PLATFORM_PERMISSIONS } from '../../common/constants/permission.constants';
 
 @Controller('plans/:planId/prices')
-@UseGuards(
-  JwtAuthGuard,
-  PlatformPermissionsGuard,
-)
+@UseGuards(JwtAuthGuard, PlatformPermissionsGuard)
 export class PlanPricingController {
-  constructor(
-    private readonly planPricingService: PlanPricingService,
-  ) {}
+  constructor(private readonly planPricingService: PlanPricingService) {}
 
   @Post()
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.PLAN_PRICING_CREATE,
-  )
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.PLAN_PRICING_CREATE)
   create(
-    @Param(
-      'planId',
-      ParseUUIDPipe,
-    )
+    @Param('planId', ParseUUIDPipe)
     planId: string,
     @Body()
     dto: CreatePlanPriceDto,
   ) {
-    return this.planPricingService.create(
-      planId,
-      dto,
-    );
+    return this.planPricingService.create(planId, dto);
   }
 
   @Get()
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.PLAN_PRICING_READ,
-  )
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.PLAN_PRICING_READ)
   findAll(
-    @Param(
-      'planId',
-      ParseUUIDPipe,
-    )
+    @Param('planId', ParseUUIDPipe)
     planId: string,
     @Query()
     query: PlanPriceQueryDto,
   ) {
-    return this.planPricingService.findAll(
-      planId,
-      query,
-    );
+    return this.planPricingService.findAll(planId, query);
   }
 
   @Get(':priceId')
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.PLAN_PRICING_READ,
-  )
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.PLAN_PRICING_READ)
   findOne(
-    @Param(
-      'planId',
-      ParseUUIDPipe,
-    )
+    @Param('planId', ParseUUIDPipe)
     planId: string,
-    @Param(
-      'priceId',
-      ParseUUIDPipe,
-    )
+    @Param('priceId', ParseUUIDPipe)
     priceId: string,
   ) {
-    return this.planPricingService.findOne(
-      planId,
-      priceId,
-    );
+    return this.planPricingService.findOne(planId, priceId);
   }
 
   @Patch(':priceId')
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.PLAN_PRICING_UPDATE,
-  )
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.PLAN_PRICING_UPDATE)
   update(
-    @Param(
-      'planId',
-      ParseUUIDPipe,
-    )
+    @Param('planId', ParseUUIDPipe)
     planId: string,
-    @Param(
-      'priceId',
-      ParseUUIDPipe,
-    )
+    @Param('priceId', ParseUUIDPipe)
     priceId: string,
     @Body()
     dto: UpdatePlanPriceDto,
   ) {
-    return this.planPricingService.update(
-      planId,
-      priceId,
-      dto,
-    );
+    return this.planPricingService.update(planId, priceId, dto);
   }
 
   @Patch(':priceId/activate')
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.PLAN_PRICING_STATUS,
-  )
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.PLAN_PRICING_STATUS)
   activate(
-    @Param(
-      'planId',
-      ParseUUIDPipe,
-    )
+    @Param('planId', ParseUUIDPipe)
     planId: string,
-    @Param(
-      'priceId',
-      ParseUUIDPipe,
-    )
+    @Param('priceId', ParseUUIDPipe)
     priceId: string,
   ) {
-    return this.planPricingService.activate(
-      planId,
-      priceId,
-    );
+    return this.planPricingService.activate(planId, priceId);
   }
 
   @Patch(':priceId/deactivate')
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.PLAN_PRICING_STATUS,
-  )
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.PLAN_PRICING_STATUS)
   deactivate(
-    @Param(
-      'planId',
-      ParseUUIDPipe,
-    )
+    @Param('planId', ParseUUIDPipe)
     planId: string,
-    @Param(
-      'priceId',
-      ParseUUIDPipe,
-    )
+    @Param('priceId', ParseUUIDPipe)
     priceId: string,
   ) {
-    return this.planPricingService.deactivate(
-      planId,
-      priceId,
-    );
+    return this.planPricingService.deactivate(planId, priceId);
   }
 }

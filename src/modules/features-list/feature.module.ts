@@ -6,17 +6,10 @@ import { FeatureService } from './feature.service';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Module({
-  controllers: [
-    FeatureController,
-  ],
+  controllers: [FeatureController],
 
-  providers: [
-    FeatureService,
-    PrismaService,
-  ],
+  providers: [FeatureService, PrismaService],
 
-  exports: [
-    FeatureService,
-  ],
+  exports: [FeatureService],
 })
 export class FeatureModule {}

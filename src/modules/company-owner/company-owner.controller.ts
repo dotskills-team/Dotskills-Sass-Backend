@@ -21,14 +21,9 @@ import { PlatformPermissionsGuard } from '../../common/guards/platform-permissio
 import { RequirePlatformPermissions } from '../../common/decorators/require-platform-permissions.decorator';
 
 @Controller('platform/companies/:companyId/owner')
-@UseGuards(
-  JwtAuthGuard,
-  PlatformPermissionsGuard,
-)
+@UseGuards(JwtAuthGuard, PlatformPermissionsGuard)
 export class CompanyOwnerController {
-  constructor(
-    private readonly ownerService: CompanyOwnerService,
-  ) {}
+  constructor(private readonly ownerService: CompanyOwnerService) {}
 
   /**
    * Create / assign owner
@@ -37,9 +32,7 @@ export class CompanyOwnerController {
    * /api/v1/platform/companies/:companyId/owner
    */
   @Post()
-  @RequirePlatformPermissions(
-    'platform.company.owner.create',
-  )
+  @RequirePlatformPermissions('platform.company.owner.create')
   create(
     @Param('companyId', ParseUUIDPipe)
     companyId: string,
@@ -54,10 +47,7 @@ export class CompanyOwnerController {
      */
     dto.companyId = companyId;
 
-    return this.ownerService.create(
-      dto,
-      req.user.userId,
-    );
+    return this.ownerService.create(dto, req.user.userId);
   }
 
   /**
@@ -67,9 +57,7 @@ export class CompanyOwnerController {
    * /api/v1/platform/companies/:companyId/owner
    */
   @Get()
-  @RequirePlatformPermissions(
-    'platform.company.owner.read',
-  )
+  @RequirePlatformPermissions('platform.company.owner.read')
   findAll(
     @Param('companyId', ParseUUIDPipe)
     companyId: string,
@@ -84,9 +72,7 @@ export class CompanyOwnerController {
    * /api/v1/platform/companies/:companyId/owner/:ownerMemberId
    */
   @Get(':ownerMemberId')
-  @RequirePlatformPermissions(
-    'platform.company.owner.read',
-  )
+  @RequirePlatformPermissions('platform.company.owner.read')
   findOne(
     @Param('companyId', ParseUUIDPipe)
     companyId: string,
@@ -94,10 +80,7 @@ export class CompanyOwnerController {
     @Param('ownerMemberId', ParseUUIDPipe)
     ownerMemberId: string,
   ) {
-    return this.ownerService.findOne(
-      companyId,
-      ownerMemberId,
-    );
+    return this.ownerService.findOne(companyId, ownerMemberId);
   }
 
   /**
@@ -107,9 +90,7 @@ export class CompanyOwnerController {
    * /api/v1/platform/companies/:companyId/owner/:ownerMemberId
    */
   @Patch(':ownerMemberId')
-  @RequirePlatformPermissions(
-    'platform.company.owner.update',
-  )
+  @RequirePlatformPermissions('platform.company.owner.update')
   update(
     @Param('companyId', ParseUUIDPipe)
     companyId: string,
@@ -136,9 +117,7 @@ export class CompanyOwnerController {
    * /api/v1/platform/companies/:companyId/owner/:ownerMemberId/primary
    */
   @Post(':ownerMemberId/primary')
-  @RequirePlatformPermissions(
-    'platform.company.owner.change',
-  )
+  @RequirePlatformPermissions('platform.company.owner.change')
   changeOwner(
     @Param('companyId', ParseUUIDPipe)
     companyId: string,
@@ -162,9 +141,7 @@ export class CompanyOwnerController {
    * /api/v1/platform/companies/:companyId/owner/:ownerMemberId/status
    */
   @Patch(':ownerMemberId/status')
-  @RequirePlatformPermissions(
-    'platform.company.owner.status',
-  )
+  @RequirePlatformPermissions('platform.company.owner.status')
   updateStatus(
     @Param('companyId', ParseUUIDPipe)
     companyId: string,

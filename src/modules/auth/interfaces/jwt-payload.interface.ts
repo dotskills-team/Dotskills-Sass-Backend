@@ -2,14 +2,14 @@ export interface AccessTokenPayload {
   sub: string;
   sid: string;
   roles: string[];
-  type: "access";
+  type: 'access';
 }
 
 export interface RefreshTokenPayload {
   sub: string;
   sid: string;
   jti: string;
-  type: "refresh";
+  type: 'refresh';
   iat?: number;
   exp?: number;
 }

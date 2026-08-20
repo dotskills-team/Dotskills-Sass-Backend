@@ -2,7 +2,7 @@ import type {
   PrismaClient,
 } from '../../src/generated/phase-1-prisma/client';
 
-import { PERMISSION_CATALOG } from './data/permission-catalog';
+import { PERMISSION_CATALOG } from '../../src/common/constants/permission-catalog';
 
 export async function seedPermissions(
   prisma: PrismaClient,
@@ -19,7 +19,6 @@ export async function seedPermissions(
         resource: permission.resource,
         action: permission.action,
         name: permission.name,
-        description: permission.description,
         isSystem: true,
         status: 'ACTIVE',
       },
@@ -29,7 +28,6 @@ export async function seedPermissions(
         resource: permission.resource,
         action: permission.action,
         name: permission.name,
-        description: permission.description,
         isSystem: true,
         status: 'ACTIVE',
       },

@@ -41,9 +41,7 @@
 //   CANCELLED: [SubscriptionStatus.ACTIVE, SubscriptionStatus.EXPIRED],
 //   EXPIRED: [],
 // };
-import {
-  SubscriptionStatus,
-} from "src/generated/phase-1-prisma/enums";
+import { SubscriptionStatus } from 'src/generated/phase-1-prisma/enums';
 
 /**
  * Subscription lifecycle configuration.

@@ -12,6 +12,7 @@ import {
 import { Request } from 'express';
 
 import { IndustryService } from './industry.service';
+import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 
 import { CreateIndustryDto } from './dto/create-industry.dto';
 import { IndustryQueryDto } from './dto/industry-query.dto';
@@ -26,9 +27,7 @@ import { RequirePlatformPermissions } from 'src/common/decorators/require-platfo
 @Controller('platform/industries')
 @UseGuards(JwtAuthGuard, PlatformPermissionsGuard)
 export class IndustryController {
-  constructor(
-    private readonly industryService: IndustryService,
-  ) {}
+  constructor(private readonly industryService: IndustryService) {}
 
   /**
    * CREATE INDUSTRY
@@ -36,13 +35,8 @@ export class IndustryController {
    * POST /api/v1/platform/industries
    */
   @Post()
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.INDUSTRY_CREATE,
-  )
-  async create(
-    @Body() dto: CreateIndustryDto,
-    @Req() req: Request,
-  ) {
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.INDUSTRY_CREATE)
+  async create(@Body() dto: CreateIndustryDto, @Req() req: Request) {
     return this.industryService.create(
       dto,
       this.getUserId(req),
@@ -66,12 +60,8 @@ export class IndustryController {
    * &sortOrder=asc
    */
   @Get()
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.INDUSTRY_READ,
-  )
-  async findAll(
-    @Query() query: IndustryQueryDto,
-  ) {
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.INDUSTRY_READ)
+  async findAll(@Query() query: IndustryQueryDto) {
     return this.industryService.findAll(query);
   }
 
@@ -81,12 +71,8 @@ export class IndustryController {
    * GET /api/v1/platform/industries/:id
    */
   @Get(':id')
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.INDUSTRY_READ,
-  )
-  async findOne(
-    @Param('id') id: string,
-  ) {
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.INDUSTRY_READ)
+  async findOne(@Param('id') id: string) {
     return this.industryService.findOne(id);
   }
 
@@ -96,9 +82,7 @@ export class IndustryController {
    * PATCH /api/v1/platform/industries/:id
    */
   @Patch(':id')
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.INDUSTRY_UPDATE,
-  )
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.INDUSTRY_UPDATE)
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateIndustryDto,
@@ -120,13 +104,8 @@ export class IndustryController {
    * PATCH /api/v1/platform/industries/:id/activate
    */
   @Patch(':id/activate')
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.INDUSTRY_ACTIVATE,
-  )
-  async activate(
-    @Param('id') id: string,
-    @Req() req: Request,
-  ) {
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.INDUSTRY_ACTIVATE)
+  async activate(@Param('id') id: string, @Req() req: Request) {
     return this.industryService.activate(
       id,
       this.getUserId(req),
@@ -142,13 +121,8 @@ export class IndustryController {
    * PATCH /api/v1/platform/industries/:id/deactivate
    */
   @Patch(':id/deactivate')
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.INDUSTRY_DEACTIVATE,
-  )
-  async deactivate(
-    @Param('id') id: string,
-    @Req() req: Request,
-  ) {
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.INDUSTRY_DEACTIVATE)
+  async deactivate(@Param('id') id: string, @Req() req: Request) {
     return this.industryService.deactivate(
       id,
       this.getUserId(req),
@@ -167,9 +141,7 @@ export class IndustryController {
    * needs controlled status transitions.
    */
   @Patch(':id/status')
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.INDUSTRY_STATUS,
-  )
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.INDUSTRY_STATUS)
   async updateStatus(
     @Param('id') id: string,
     @Body() dto: UpdateIndustryStatusDto,
@@ -191,13 +163,8 @@ export class IndustryController {
    * PATCH /api/v1/platform/industries/:id/archive
    */
   @Patch(':id/archive')
-  @RequirePlatformPermissions(
-    PLATFORM_PERMISSIONS.INDUSTRY_DELETE,
-  )
-  async archive(
-    @Param('id') id: string,
-    @Req() req: Request,
-  ) {
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.INDUSTRY_DELETE)
+  async archive(@Param('id') id: string, @Req() req: Request) {
     return this.industryService.archive(
       id,
       this.getUserId(req),
@@ -213,19 +180,13 @@ export class IndustryController {
    * ================================
    */
 
-  private getUserId(
-    req: Request,
-  ): string | undefined {
-    const user = req.user as
-      | { id?: string }
-      | undefined;
+  private getUserId(req: Request): string | undefined {
+    const user = req.user as AuthenticatedUser | undefined;
 
-    return user?.id;
+    return user?.userId;
   }
 
-  private getRequestId(
-    req: Request,
-  ): string | undefined {
+  private getRequestId(req: Request): string | undefined {
     const requestId = req.headers['x-request-id'];
 
     if (Array.isArray(requestId)) {
@@ -235,15 +196,11 @@ export class IndustryController {
     return requestId;
   }
 
-  private getIpAddress(
-    req: Request,
-  ): string | undefined {
+  private getIpAddress(req: Request): string | undefined {
     return req.ip;
   }
 
-  private getUserAgent(
-    req: Request,
-  ): string | undefined {
+  private getUserAgent(req: Request): string | undefined {
     return req.get('user-agent');
   }
 }

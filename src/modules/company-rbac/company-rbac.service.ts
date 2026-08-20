@@ -4,13 +4,13 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-} from "@nestjs/common";
-import * as argon2 from "argon2";
-import { Prisma } from "../../generated/phase-1-prisma/client";
-import { COMPANY_PERMISSIONS } from "../../common/constants/permission.constants";
-import type { AuthenticatedUser } from "../../common/types/authenticated-user.type";
-import type { CompanyContext } from "../../common/types/company-context.type";
-import { PrismaService } from "../../prisma/prisma.service";
+} from '@nestjs/common';
+import * as argon2 from 'argon2';
+import { Prisma } from '../../generated/phase-1-prisma/client';
+import { COMPANY_PERMISSIONS } from '../../common/constants/permission.constants';
+import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
+import type { CompanyContext } from '../../common/types/company-context.type';
+import { PrismaService } from '../../prisma/prisma.service';
 import type {
   BootstrapCompanyRbacDto,
   CreateCompanyMemberDto,
@@ -20,24 +20,24 @@ import type {
   ReplaceCompanyRolePermissionsDto,
   UpdateCompanyMemberStatusDto,
   UpdateCompanyRoleDto,
-} from "./dto/company-rbac.dto";
+} from './dto/company-rbac.dto';
 
 const COMPANY_PERMISSION_CODES = Object.values(COMPANY_PERMISSIONS);
 
 const DEFAULT_ROLES = [
   {
-    code: "COMPANY_OWNER",
-    name: "Company Owner",
+    code: 'COMPANY_OWNER',
+    name: 'Company Owner',
     permissions: COMPANY_PERMISSION_CODES,
   },
   {
-    code: "COMPANY_ADMIN",
-    name: "Company Admin",
+    code: 'COMPANY_ADMIN',
+    name: 'Company Admin',
     permissions: COMPANY_PERMISSION_CODES,
   },
   {
-    code: "MANAGER",
-    name: "Manager",
+    code: 'MANAGER',
+    name: 'Manager',
     permissions: [
       COMPANY_PERMISSIONS.RBAC_READ,
       COMPANY_PERMISSIONS.MEMBER_READ,
@@ -48,8 +48,8 @@ const DEFAULT_ROLES = [
     ],
   },
   {
-    code: "STAFF",
-    name: "Staff",
+    code: 'STAFF',
+    name: 'Staff',
     permissions: [COMPANY_PERMISSIONS.RBAC_READ],
   },
 ] as const;
@@ -89,10 +89,12 @@ export class CompanyRbacService {
       where: { id: companyId },
       select: { id: true, tenantId: true, status: true },
     });
-    if (!company) throw new NotFoundException("Company was not found");
+    if (!company) throw new NotFoundException('Company was not found');
 
     const permissions = await this.resolvePermissions(COMPANY_PERMISSION_CODES);
-    const permissionByCode = new Map(permissions.map((item) => [item.code, item.id]));
+    const permissionByCode = new Map(
+      permissions.map((item) => [item.code, item.id]),
+    );
     const ownerUser = await this.resolveOptionalOwner(dto);
 
     const result = await this.prisma.$transaction(async (tx) => {
@@ -106,14 +108,14 @@ export class CompanyRbacService {
               code: definition.code,
             },
           },
-          update: { name: definition.name, status: "ACTIVE", isSystem: true },
+          update: { name: definition.name, status: 'ACTIVE', isSystem: true },
           create: {
             tenantId: company.tenantId,
             companyId: company.id,
             code: definition.code,
             name: definition.name,
             isSystem: true,
-            status: "ACTIVE",
+            status: 'ACTIVE',
           },
           select: { id: true },
         });
@@ -125,7 +127,7 @@ export class CompanyRbacService {
           data: definition.permissions.map((code) => ({
             companyRoleId: role.id,
             permissionId: permissionByCode.get(code)!,
-            effect: "ALLOW",
+            effect: 'ALLOW',
             assignedByUserId: actor.userId,
           })),
         });
@@ -141,12 +143,12 @@ export class CompanyRbacService {
               userId: ownerUser.id,
             },
           },
-          update: { status: "ACTIVE", activatedAt: new Date() },
+          update: { status: 'ACTIVE', activatedAt: new Date() },
           create: {
             tenantId: company.tenantId,
             companyId: company.id,
             userId: ownerUser.id,
-            status: "ACTIVE",
+            status: 'ACTIVE',
             invitedAt: new Date(),
             joinedAt: new Date(),
             activatedAt: new Date(),
@@ -158,13 +160,13 @@ export class CompanyRbacService {
           where: {
             companyMemberId_companyRoleId: {
               companyMemberId: member.id,
-              companyRoleId: roleIds.get("COMPANY_OWNER")!,
+              companyRoleId: roleIds.get('COMPANY_OWNER')!,
             },
           },
           update: { expiresAt: null, assignedByUserId: actor.userId },
           create: {
             companyMemberId: member.id,
-            companyRoleId: roleIds.get("COMPANY_OWNER")!,
+            companyRoleId: roleIds.get('COMPANY_OWNER')!,
             assignedByUserId: actor.userId,
           },
         });
@@ -172,8 +174,8 @@ export class CompanyRbacService {
           where: {
             companyMemberId_scopeType_scopeKey: {
               companyMemberId: member.id,
-              scopeType: "COMPANY",
-              scopeKey: "*",
+              scopeType: 'COMPANY',
+              scopeKey: '*',
             },
           },
           update: { validUntil: null, assignedByUserId: actor.userId },
@@ -181,8 +183,8 @@ export class CompanyRbacService {
             tenantId: company.tenantId,
             companyId: company.id,
             companyMemberId: member.id,
-            scopeType: "COMPANY",
-            scopeKey: "*",
+            scopeType: 'COMPANY',
+            scopeKey: '*',
             assignedByUserId: actor.userId,
           },
         });
@@ -213,21 +215,28 @@ export class CompanyRbacService {
           tenantId: company.tenantId,
           companyId: company.id,
           actorUserId: actor.userId,
-          actorType: "PLATFORM_MEMBER",
-          action: "COMPANY_RBAC_BOOTSTRAPPED",
-          entityType: "Company",
+          actorType: 'PLATFORM_MEMBER',
+          action: 'COMPANY_RBAC_BOOTSTRAPPED',
+          entityType: 'Company',
           entityId: company.id,
-          afterData: { defaultRoles: DEFAULT_ROLES.map((role) => role.code), ownerMemberId },
+          afterData: {
+            defaultRoles: DEFAULT_ROLES.map((role) => role.code),
+            ownerMemberId,
+          },
         },
       });
-      return { companyId: company.id, roleCodes: [...roleIds.keys()], ownerMemberId };
+      return {
+        companyId: company.id,
+        roleCodes: [...roleIds.keys()],
+        ownerMemberId,
+      };
     });
     return { success: true, data: result };
   }
 
   async listPermissions() {
     const data = await this.prisma.permission.findMany({
-      where: { code: { in: COMPANY_PERMISSION_CODES }, status: "ACTIVE" },
+      where: { code: { in: COMPANY_PERMISSION_CODES }, status: 'ACTIVE' },
       select: {
         id: true,
         code: true,
@@ -237,7 +246,7 @@ export class CompanyRbacService {
         name: true,
         description: true,
       },
-      orderBy: { code: "asc" },
+      orderBy: { code: 'asc' },
     });
     return { success: true, count: data.length, data };
   }
@@ -247,7 +256,7 @@ export class CompanyRbacService {
       where: {
         tenantId: context.tenantId,
         companyId: context.companyId,
-        status: "ACTIVE",
+        status: 'ACTIVE',
       },
       select: {
         id: true,
@@ -261,10 +270,10 @@ export class CompanyRbacService {
             effect: true,
             permission: { select: { code: true, name: true } },
           },
-          orderBy: { permission: { code: "asc" } },
+          orderBy: { permission: { code: 'asc' } },
         },
       },
-      orderBy: { code: "asc" },
+      orderBy: { code: 'asc' },
     });
     return { success: true, count: data.length, data };
   }
@@ -289,19 +298,31 @@ export class CompanyRbacService {
             permissions: {
               create: permissions.map((permission) => ({
                 permissionId: permission.id,
-                effect: "ALLOW",
+                effect: 'ALLOW',
                 assignedByUserId: actor.userId,
               })),
             },
           },
           select: { id: true, code: true, name: true, description: true },
         });
-        await this.createAudit(tx, context, actor.userId, "COMPANY_ROLE_CREATED", "CompanyRole", created.id, null, created);
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'COMPANY_ROLE_CREATED',
+          'CompanyRole',
+          created.id,
+          null,
+          created,
+        );
         return created;
       });
       return { success: true, data: role };
     } catch (error) {
-      this.throwKnownConflict(error, "Role code already exists in this company");
+      this.throwKnownConflict(
+        error,
+        'Role code already exists in this company',
+      );
       throw error;
     }
   }
@@ -322,9 +343,24 @@ export class CompanyRbacService {
             ? { description: dto.description.trim() || null }
             : {}),
         },
-        select: { id: true, code: true, name: true, description: true, isSystem: true },
+        select: {
+          id: true,
+          code: true,
+          name: true,
+          description: true,
+          isSystem: true,
+        },
       });
-      await this.createAudit(tx, context, actor.userId, "COMPANY_ROLE_UPDATED", "CompanyRole", roleId, current, role);
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'COMPANY_ROLE_UPDATED',
+        'CompanyRole',
+        roleId,
+        current,
+        role,
+      );
       return role;
     });
     return { success: true, data: updated };
@@ -337,23 +373,33 @@ export class CompanyRbacService {
     actor: AuthenticatedUser,
   ) {
     const role = await this.requireRole(context, roleId);
-    const uniqueCodes = [...new Set(dto.permissions.map((item) => item.code.trim()))];
+    const uniqueCodes = [
+      ...new Set(dto.permissions.map((item) => item.code.trim())),
+    ];
     if (uniqueCodes.length !== dto.permissions.length) {
-      throw new BadRequestException("Duplicate permission codes are not allowed");
+      throw new BadRequestException(
+        'Duplicate permission codes are not allowed',
+      );
     }
     const permissions = await this.resolvePermissions(uniqueCodes);
-    const effectByCode = new Map(dto.permissions.map((item) => [item.code.trim(), item.effect]));
-    if (role.code === "COMPANY_OWNER") {
+    const effectByCode = new Map(
+      dto.permissions.map((item) => [item.code.trim(), item.effect]),
+    );
+    if (role.code === 'COMPANY_OWNER') {
       const allAllowed = COMPANY_PERMISSION_CODES.every(
-        (code) => effectByCode.get(code) === "ALLOW",
+        (code) => effectByCode.get(code) === 'ALLOW',
       );
       if (!allAllowed) {
-        throw new BadRequestException("COMPANY_OWNER must retain every company permission");
+        throw new BadRequestException(
+          'COMPANY_OWNER must retain every company permission',
+        );
       }
     }
 
     await this.prisma.$transaction(async (tx) => {
-      await tx.companyRolePermission.deleteMany({ where: { companyRoleId: roleId } });
+      await tx.companyRolePermission.deleteMany({
+        where: { companyRoleId: roleId },
+      });
       await tx.companyRolePermission.createMany({
         data: permissions.map((permission) => ({
           companyRoleId: roleId,
@@ -362,7 +408,16 @@ export class CompanyRbacService {
           assignedByUserId: actor.userId,
         })),
       });
-      await this.createAudit(tx, context, actor.userId, "COMPANY_ROLE_PERMISSIONS_REPLACED", "CompanyRole", roleId, null, dto.permissions);
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'COMPANY_ROLE_PERMISSIONS_REPLACED',
+        'CompanyRole',
+        roleId,
+        null,
+        dto.permissions,
+      );
     });
     return this.listRoles(context);
   }
@@ -371,7 +426,7 @@ export class CompanyRbacService {
     const data = await this.prisma.companyMember.findMany({
       where: { tenantId: context.tenantId, companyId: context.companyId },
       select: MEMBER_SELECT,
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
     return { success: true, count: data.length, data };
   }
@@ -389,10 +444,13 @@ export class CompanyRbacService {
           where: { email },
           select: { id: true, deletedAt: true },
         });
-        if (user?.deletedAt) throw new BadRequestException("User account is unavailable");
+        if (user?.deletedAt)
+          throw new BadRequestException('User account is unavailable');
         if (!user) {
           if (!dto.password) {
-            throw new BadRequestException("Password is required for a new user");
+            throw new BadRequestException(
+              'Password is required for a new user',
+            );
           }
           const passwordHash = await argon2.hash(dto.password, {
             type: argon2.argon2id,
@@ -405,7 +463,7 @@ export class CompanyRbacService {
               email,
               fullName: dto.fullName.trim(),
               passwordHash,
-              status: "ACTIVE",
+              status: 'ACTIVE',
               emailVerifiedAt: new Date(),
               passwordChangedAt: new Date(),
             },
@@ -420,7 +478,7 @@ export class CompanyRbacService {
             userId: user.id,
             employeeCode: dto.employeeCode?.trim() || null,
             designation: dto.designation?.trim() || null,
-            status: "ACTIVE",
+            status: 'ACTIVE',
             invitedAt: new Date(),
             joinedAt: new Date(),
             activatedAt: new Date(),
@@ -434,20 +492,32 @@ export class CompanyRbacService {
               create: {
                 tenantId: context.tenantId,
                 companyId: context.companyId,
-                scopeType: "COMPANY",
-                scopeKey: "*",
+                scopeType: 'COMPANY',
+                scopeKey: '*',
                 assignedByUserId: actor.userId,
               },
             },
           },
           select: MEMBER_SELECT,
         });
-        await this.createAudit(tx, context, actor.userId, "COMPANY_MEMBER_CREATED", "CompanyMember", created.id, null, { email, roleCodes: roles.map((role) => role.code) });
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'COMPANY_MEMBER_CREATED',
+          'CompanyMember',
+          created.id,
+          null,
+          { email, roleCodes: roles.map((role) => role.code) },
+        );
         return created;
       });
       return { success: true, data: member };
     } catch (error) {
-      this.throwKnownConflict(error, "User is already a member or employee code already exists");
+      this.throwKnownConflict(
+        error,
+        'User is already a member or employee code already exists',
+      );
       throw error;
     }
   }
@@ -464,17 +534,24 @@ export class CompanyRbacService {
     const nextCodes = roles.map((role) => role.code);
     if (
       member.id === context.companyMemberId &&
-      currentCodes.includes("COMPANY_OWNER") &&
-      !nextCodes.includes("COMPANY_OWNER")
+      currentCodes.includes('COMPANY_OWNER') &&
+      !nextCodes.includes('COMPANY_OWNER')
     ) {
-      throw new BadRequestException("You cannot remove your own COMPANY_OWNER role");
+      throw new BadRequestException(
+        'You cannot remove your own COMPANY_OWNER role',
+      );
     }
-    if (currentCodes.includes("COMPANY_OWNER") && !nextCodes.includes("COMPANY_OWNER")) {
+    if (
+      currentCodes.includes('COMPANY_OWNER') &&
+      !nextCodes.includes('COMPANY_OWNER')
+    ) {
       await this.assertAnotherOwner(context, memberId);
     }
 
     const updated = await this.prisma.$transaction(async (tx) => {
-      await tx.companyMemberRole.deleteMany({ where: { companyMemberId: memberId } });
+      await tx.companyMemberRole.deleteMany({
+        where: { companyMemberId: memberId },
+      });
       await tx.companyMemberRole.createMany({
         data: roles.map((role) => ({
           companyMemberId: memberId,
@@ -482,8 +559,20 @@ export class CompanyRbacService {
           assignedByUserId: actor.userId,
         })),
       });
-      await this.createAudit(tx, context, actor.userId, "COMPANY_MEMBER_ROLES_REPLACED", "CompanyMember", memberId, { roleCodes: currentCodes }, { roleCodes: nextCodes });
-      return tx.companyMember.findUniqueOrThrow({ where: { id: memberId }, select: MEMBER_SELECT });
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'COMPANY_MEMBER_ROLES_REPLACED',
+        'CompanyMember',
+        memberId,
+        { roleCodes: currentCodes },
+        { roleCodes: nextCodes },
+      );
+      return tx.companyMember.findUniqueOrThrow({
+        where: { id: memberId },
+        select: MEMBER_SELECT,
+      });
     });
     return { success: true, data: updated };
   }
@@ -495,12 +584,12 @@ export class CompanyRbacService {
     actor: AuthenticatedUser,
   ) {
     const member = await this.requireMember(context, memberId);
-    if (member.id === context.companyMemberId && dto.status !== "ACTIVE") {
-      throw new BadRequestException("You cannot suspend or revoke yourself");
+    if (member.id === context.companyMemberId && dto.status !== 'ACTIVE') {
+      throw new BadRequestException('You cannot suspend or revoke yourself');
     }
     if (
-      member.roles.some((item) => item.companyRole.code === "COMPANY_OWNER") &&
-      dto.status !== "ACTIVE"
+      member.roles.some((item) => item.companyRole.code === 'COMPANY_OWNER') &&
+      dto.status !== 'ACTIVE'
     ) {
       await this.assertAnotherOwner(context, memberId);
     }
@@ -509,11 +598,20 @@ export class CompanyRbacService {
         where: { id: memberId },
         data: {
           status: dto.status,
-          ...(dto.status === "ACTIVE" ? { activatedAt: new Date() } : {}),
+          ...(dto.status === 'ACTIVE' ? { activatedAt: new Date() } : {}),
         },
         select: MEMBER_SELECT,
       });
-      await this.createAudit(tx, context, actor.userId, "COMPANY_MEMBER_STATUS_CHANGED", "CompanyMember", memberId, { status: member.status }, { status: dto.status });
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'COMPANY_MEMBER_STATUS_CHANGED',
+        'CompanyMember',
+        memberId,
+        { status: member.status },
+        { status: dto.status },
+      );
       return result;
     });
     return { success: true, data: updated };
@@ -528,16 +626,19 @@ export class CompanyRbacService {
     await this.requireMember(context, memberId);
     const keys = new Set<string>();
     for (const scope of dto.scopes) {
-      if (scope.type === "COMPANY" && scope.key !== "*") {
+      if (scope.type === 'COMPANY' && scope.key !== '*') {
         throw new BadRequestException('COMPANY scope key must be "*"');
       }
       const composite = `${scope.type}:${scope.key}`;
-      if (keys.has(composite)) throw new BadRequestException("Duplicate scopes are not allowed");
+      if (keys.has(composite))
+        throw new BadRequestException('Duplicate scopes are not allowed');
       keys.add(composite);
     }
 
     const updated = await this.prisma.$transaction(async (tx) => {
-      await tx.companyMemberScope.deleteMany({ where: { companyMemberId: memberId } });
+      await tx.companyMemberScope.deleteMany({
+        where: { companyMemberId: memberId },
+      });
       await tx.companyMemberScope.createMany({
         data: dto.scopes.map((scope) => ({
           tenantId: context.tenantId,
@@ -548,8 +649,20 @@ export class CompanyRbacService {
           assignedByUserId: actor.userId,
         })),
       });
-      await this.createAudit(tx, context, actor.userId, "COMPANY_MEMBER_SCOPES_REPLACED", "CompanyMember", memberId, null, dto.scopes);
-      return tx.companyMember.findUniqueOrThrow({ where: { id: memberId }, select: MEMBER_SELECT });
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'COMPANY_MEMBER_SCOPES_REPLACED',
+        'CompanyMember',
+        memberId,
+        null,
+        dto.scopes,
+      );
+      return tx.companyMember.findUniqueOrThrow({
+        where: { id: memberId },
+        select: MEMBER_SELECT,
+      });
     });
     return { success: true, data: updated };
   }
@@ -559,69 +672,94 @@ export class CompanyRbacService {
     const user = await this.prisma.user.findFirst({
       where: {
         ...(dto.ownerUserId ? { id: dto.ownerUserId } : {}),
-        ...(dto.ownerEmail ? { email: dto.ownerEmail.trim().toLowerCase() } : {}),
+        ...(dto.ownerEmail
+          ? { email: dto.ownerEmail.trim().toLowerCase() }
+          : {}),
         deletedAt: null,
-        status: "ACTIVE",
+        status: 'ACTIVE',
       },
       select: { id: true },
     });
-    if (!user) throw new NotFoundException("Owner user was not found or is inactive");
+    if (!user)
+      throw new NotFoundException('Owner user was not found or is inactive');
     return user;
   }
 
   private async resolvePermissions(rawCodes: readonly string[]) {
     const codes = [...new Set(rawCodes.map((code) => code.trim()))];
     const permissions = await this.prisma.permission.findMany({
-      where: { code: { in: codes }, status: "ACTIVE" },
+      where: { code: { in: codes }, status: 'ACTIVE' },
       select: { id: true, code: true },
     });
     if (permissions.length !== codes.length) {
       const found = new Set(permissions.map((permission) => permission.code));
       throw new BadRequestException(
-        `Missing or inactive permission codes: ${codes.filter((code) => !found.has(code)).join(", ")}. Run the access-control seed first.`,
+        `Missing or inactive permission codes: ${codes.filter((code) => !found.has(code)).join(', ')}. Run the access-control seed first.`,
       );
     }
     return permissions;
   }
 
-  private async resolveCompanyRoles(context: CompanyContext, rawCodes: string[]) {
-    const codes = [...new Set(rawCodes.map((code) => this.normalizeRoleCode(code)))];
+  private async resolveCompanyRoles(
+    context: CompanyContext,
+    rawCodes: string[],
+  ) {
+    const codes = [
+      ...new Set(rawCodes.map((code) => this.normalizeRoleCode(code))),
+    ];
     const roles = await this.prisma.companyRole.findMany({
       where: {
         tenantId: context.tenantId,
         companyId: context.companyId,
         code: { in: codes },
-        status: "ACTIVE",
+        status: 'ACTIVE',
       },
       select: { id: true, code: true },
     });
     if (roles.length !== codes.length) {
       const found = new Set(roles.map((role) => role.code));
       throw new BadRequestException(
-        `Invalid company role codes: ${codes.filter((code) => !found.has(code)).join(", ")}`,
+        `Invalid company role codes: ${codes.filter((code) => !found.has(code)).join(', ')}`,
       );
     }
     return roles;
   }
 
   private normalizeRoleCode(code: string) {
-    const normalized = code.trim().toUpperCase().replace(/[^A-Z0-9_]+/g, "_");
-    if (!normalized) throw new BadRequestException("Role code is invalid");
+    const normalized = code
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9_]+/g, '_');
+    if (!normalized) throw new BadRequestException('Role code is invalid');
     return normalized;
   }
 
   private async requireRole(context: CompanyContext, roleId: string) {
     const role = await this.prisma.companyRole.findFirst({
-      where: { id: roleId, tenantId: context.tenantId, companyId: context.companyId },
-      select: { id: true, code: true, name: true, description: true, isSystem: true },
+      where: {
+        id: roleId,
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
+      select: {
+        id: true,
+        code: true,
+        name: true,
+        description: true,
+        isSystem: true,
+      },
     });
-    if (!role) throw new NotFoundException("Company role was not found");
+    if (!role) throw new NotFoundException('Company role was not found');
     return role;
   }
 
   private async requireMember(context: CompanyContext, memberId: string) {
     const member = await this.prisma.companyMember.findFirst({
-      where: { id: memberId, tenantId: context.tenantId, companyId: context.companyId },
+      where: {
+        id: memberId,
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
       select: {
         id: true,
         userId: true,
@@ -629,26 +767,32 @@ export class CompanyRbacService {
         roles: { select: { companyRole: { select: { code: true } } } },
       },
     });
-    if (!member) throw new NotFoundException("Company member was not found");
+    if (!member) throw new NotFoundException('Company member was not found');
     return member;
   }
 
-  private async assertAnotherOwner(context: CompanyContext, excludedMemberId: string) {
+  private async assertAnotherOwner(
+    context: CompanyContext,
+    excludedMemberId: string,
+  ) {
     const count = await this.prisma.companyMember.count({
       where: {
         id: { not: excludedMemberId },
         tenantId: context.tenantId,
         companyId: context.companyId,
-        status: "ACTIVE",
+        status: 'ACTIVE',
         roles: {
           some: {
             OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
-            companyRole: { code: "COMPANY_OWNER", status: "ACTIVE" },
+            companyRole: { code: 'COMPANY_OWNER', status: 'ACTIVE' },
           },
         },
       },
     });
-    if (count < 1) throw new BadRequestException("The last active COMPANY_OWNER is protected");
+    if (count < 1)
+      throw new BadRequestException(
+        'The last active COMPANY_OWNER is protected',
+      );
   }
 
   private createAudit(
@@ -666,18 +810,21 @@ export class CompanyRbacService {
         tenantId: context.tenantId,
         companyId: context.companyId,
         actorUserId,
-        actorType: "COMPANY_MEMBER",
+        actorType: 'COMPANY_MEMBER',
         action,
         entityType,
         entityId,
-        ...(beforeData === null ? {} : { beforeData: beforeData as Prisma.InputJsonValue }),
-        ...(afterData === null ? {} : { afterData: afterData as Prisma.InputJsonValue }),
+        ...(beforeData === null ? {} : { beforeData: beforeData }),
+        ...(afterData === null ? {} : { afterData: afterData }),
       },
     });
   }
 
   private throwKnownConflict(error: unknown, message: string): never | void {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
       throw new ConflictException(message);
     }
   }

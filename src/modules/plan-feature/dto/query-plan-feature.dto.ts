@@ -1,9 +1,4 @@
-import {
-  IsBooleanString,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsBooleanString, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class QueryPlanFeatureDto {
   @IsOptional()

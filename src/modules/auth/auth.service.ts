@@ -1,19 +1,20 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { JwtService } from "@nestjs/jwt";
-import * as argon2 from "argon2";
-import * as bcrypt from "bcrypt";
-import { createHash, randomBytes, randomUUID } from "node:crypto";
-import { PrismaService } from "../../prisma/prisma.service";
-import type { Prisma } from "../../generated/phase-1-prisma/client";
-import type { AuthenticatedUser } from "../../common/types/authenticated-user.type";
-import type { LoginDto } from "./dto/login.dto";
-import type { RefreshTokenDto } from "./dto/refresh-token.dto";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import * as argon2 from 'argon2';
+import * as bcrypt from 'bcrypt';
+import { createHash, randomBytes, randomUUID } from 'node:crypto';
+import { PrismaService } from '../../prisma/prisma.service';
+import { resolvePermissionEffects } from '../../common/utils/resolve-permission-effects';
+import type { Prisma } from '../../generated/phase-1-prisma/client';
+import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
+import type { LoginDto } from './dto/login.dto';
+import type { RefreshTokenDto } from './dto/refresh-token.dto';
 import type {
   AccessTokenPayload,
   RefreshTokenPayload,
   RequestMetadata,
-} from "./interfaces/jwt-payload.interface";
+} from './interfaces/jwt-payload.interface';
 
 type PlatformUser = Prisma.UserGetPayload<{
   include: {
@@ -47,28 +48,26 @@ export class AuthService {
     private readonly jwtService: JwtService,
     configService: ConfigService,
   ) {
-    this.accessSecret = configService.getOrThrow<string>("JWT_ACCESS_SECRET");
-    this.refreshSecret = configService.getOrThrow<string>("JWT_REFRESH_SECRET");
-    this.issuer = configService.get<string>("JWT_ISSUER", "dotskills-api");
-    this.audience = configService.get<string>("JWT_AUDIENCE", "dotskills-web");
+    this.accessSecret = configService.getOrThrow<string>('JWT_ACCESS_SECRET');
+    this.refreshSecret = configService.getOrThrow<string>('JWT_REFRESH_SECRET');
+    this.issuer = configService.get<string>('JWT_ISSUER', 'dotskills-api');
+    this.audience = configService.get<string>('JWT_AUDIENCE', 'dotskills-web');
     this.accessTtlSeconds = Number(
-      configService.getOrThrow<string>("JWT_ACCESS_TTL_SECONDS"),
+      configService.getOrThrow<string>('JWT_ACCESS_TTL_SECONDS'),
     );
     this.refreshTtlSeconds = Number(
-      configService.getOrThrow<string>("JWT_REFRESH_TTL_SECONDS"),
+      configService.getOrThrow<string>('JWT_REFRESH_TTL_SECONDS'),
     );
     this.maxFailedAttempts = Number(
-      configService.getOrThrow<string>("AUTH_MAX_FAILED_ATTEMPTS"),
+      configService.getOrThrow<string>('AUTH_MAX_FAILED_ATTEMPTS'),
     );
     this.lockMinutes = Number(
-      configService.getOrThrow<string>("AUTH_LOCK_MINUTES"),
+      configService.getOrThrow<string>('AUTH_LOCK_MINUTES'),
     );
     this.dummyHashPromise = argon2.hash(randomBytes(32), this.argonOptions());
   }
 
   // async login(dto: LoginDto, metadata: RequestMetadata) {
-
-
 
   async login(dto: LoginDto, metadata: RequestMetadata) {
     return this.authenticate(dto, metadata, false);
@@ -83,8 +82,6 @@ export class AuthService {
     metadata: RequestMetadata,
     requirePlatformStaff: boolean,
   ) {
-
-
     const email = dto.email.trim().toLowerCase();
     let user = await this.findPlatformUserByEmail(email);
     const now = new Date();
@@ -95,14 +92,14 @@ export class AuthService {
         null,
         email,
         false,
-        "INVALID_CREDENTIALS",
+        'INVALID_CREDENTIALS',
         metadata,
       );
       throw this.invalidCredentials();
     }
 
     if (
-      user.status === "LOCKED" &&
+      user.status === 'LOCKED' &&
       user.lockedUntil &&
       user.lockedUntil <= now
     ) {
@@ -114,18 +111,18 @@ export class AuthService {
         user.id,
         email,
         false,
-        "ACCOUNT_LOCKED",
+        'ACCOUNT_LOCKED',
         metadata,
       );
       throw this.invalidCredentials();
     }
 
-    if (user.status !== "ACTIVE" || user.deletedAt) {
+    if (user.status !== 'ACTIVE' || user.deletedAt) {
       await this.recordLoginEvent(
         user.id,
         email,
         false,
-        "ACCOUNT_UNAVAILABLE",
+        'ACCOUNT_UNAVAILABLE',
         metadata,
       );
       throw this.invalidCredentials();
@@ -145,7 +142,7 @@ export class AuthService {
         user.id,
         email,
         false,
-        "PLATFORM_ACCESS_DENIED",
+        'PLATFORM_ACCESS_DENIED',
         metadata,
       );
       throw this.invalidCredentials();
@@ -160,7 +157,7 @@ export class AuthService {
       throw this.invalidCredentials();
     }
 
-    const upgradedPasswordHash = user.passwordHash!.startsWith("$argon2")
+    const upgradedPasswordHash = user.passwordHash!.startsWith('$argon2')
       ? undefined
       : await argon2.hash(dto.password, this.argonOptions());
 
@@ -199,7 +196,7 @@ export class AuthService {
           userId: user.id,
           email,
           success: true,
-          reason: "LOGIN_SUCCESS",
+          reason: 'LOGIN_SUCCESS',
           ipAddress: metadata.ipAddress,
           userAgent: metadata.userAgent,
         },
@@ -213,11 +210,7 @@ export class AuthService {
     //   refreshTokenExpiresIn: this.refreshTtlSeconds,
     //   user: this.toAuthenticatedUser(user, sessionId, roles),
     // };
-    const authenticatedUser = this.toAuthenticatedUser(
-      user,
-      sessionId,
-      roles,
-    );
+    const authenticatedUser = this.toAuthenticatedUser(user, sessionId, roles);
 
     const permissions = requirePlatformStaff
       ? await this.effectivePlatformPermissions(user.id, roles)
@@ -225,15 +218,15 @@ export class AuthService {
 
     return {
       ...tokens,
-      tokenType: "Bearer",
+      tokenType: 'Bearer',
       accessTokenExpiresIn: this.accessTtlSeconds,
       refreshTokenExpiresIn: this.refreshTtlSeconds,
       user: requirePlatformStaff
         ? {
-          ...authenticatedUser,
-          userType: "PLATFORM_STAFF" as const,
-          permissions,
-        }
+            ...authenticatedUser,
+            userType: 'PLATFORM_STAFF' as const,
+            permissions,
+          }
         : authenticatedUser,
     };
   }
@@ -263,34 +256,34 @@ export class AuthService {
       session.id !== payload.sid ||
       session.userId !== payload.sub
     ) {
-      throw new UnauthorizedException("Invalid refresh token");
+      throw new UnauthorizedException('Invalid refresh token');
     }
 
     if (session.revokedAt) {
       if (session.replacedByHash) {
-        await this.revokeAllSessions(session.userId, "REFRESH_TOKEN_REUSE");
+        await this.revokeAllSessions(session.userId, 'REFRESH_TOKEN_REUSE');
       }
-      throw new UnauthorizedException("Refresh token has been revoked");
+      throw new UnauthorizedException('Refresh token has been revoked');
     }
 
     const now = new Date();
     if (session.expiresAt <= now) {
       await this.prisma.authSession.updateMany({
         where: { id: session.id, revokedAt: null },
-        data: { revokedAt: now, revokeReason: "EXPIRED" },
+        data: { revokedAt: now, revokeReason: 'EXPIRED' },
       });
-      throw new UnauthorizedException("Refresh token has expired");
+      throw new UnauthorizedException('Refresh token has expired');
     }
 
     const user = session.user;
     const roles = this.activeRoleCodes(user);
     if (
       user.deletedAt ||
-      user.status !== "ACTIVE" ||
+      user.status !== 'ACTIVE' ||
       !this.hasActiveMembership(user, roles)
     ) {
-      await this.revokeAllSessions(user.id, "ACCOUNT_UNAVAILABLE");
-      throw new UnauthorizedException("Account is unavailable");
+      await this.revokeAllSessions(user.id, 'ACCOUNT_UNAVAILABLE');
+      throw new UnauthorizedException('Account is unavailable');
     }
 
     const newSessionId = randomUUID();
@@ -308,14 +301,14 @@ export class AuthService {
           },
           data: {
             revokedAt: now,
-            revokeReason: "ROTATED",
+            revokeReason: 'ROTATED',
             replacedByHash: newRefreshHash,
             lastSeenAt: now,
           },
         });
 
         if (revoked.count !== 1) {
-          throw new UnauthorizedException("Refresh token was already used");
+          throw new UnauthorizedException('Refresh token was already used');
         }
 
         await transaction.authSession.create({
@@ -336,7 +329,7 @@ export class AuthService {
 
     return {
       ...tokens,
-      tokenType: "Bearer",
+      tokenType: 'Bearer',
       accessTokenExpiresIn: this.accessTtlSeconds,
       refreshTokenExpiresIn: this.refreshTtlSeconds,
     };
@@ -345,18 +338,76 @@ export class AuthService {
   async logout(userId: string, sessionId: string) {
     await this.prisma.authSession.updateMany({
       where: { id: sessionId, userId, revokedAt: null },
-      data: { revokedAt: new Date(), revokeReason: "LOGOUT" },
+      data: { revokedAt: new Date(), revokeReason: 'LOGOUT' },
     });
 
-    return { success: true, message: "Logged out successfully" };
+    return { success: true, message: 'Logged out successfully' };
   }
   async logoutAll(userId: string) {
-    const result = await this.revokeAllSessions(userId, "LOGOUT_ALL");
+    const result = await this.revokeAllSessions(userId, 'LOGOUT_ALL');
     return {
       success: true,
-      message: "Logged out from all devices successfully",
+      message: 'Logged out from all devices successfully',
       revokedSessions: result.count,
     };
+  }
+
+  /**
+   * Frontend company-selector-এর জন্য: logged-in user কোন কোন company-র
+   * active member তা এবং প্রতিটি company-তে তার effective permission
+   * list — এই দুটোই একটামাত্র call-এ দেওয়ার জন্য (আলাদা "my permissions"
+   * endpoint-এর প্রয়োজন এড়াতে)।
+   */
+  async getMyCompanies(userId: string) {
+    const now = new Date();
+
+    const memberships = await this.prisma.companyMember.findMany({
+      where: { userId, status: 'ACTIVE' },
+      select: {
+        id: true,
+        tenantId: true,
+        companyId: true,
+        company: {
+          select: {
+            legalName: true,
+            tradeName: true,
+            status: true,
+            tenant: { select: { status: true } },
+          },
+        },
+        roles: {
+          where: {
+            OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+            companyRole: { status: 'ACTIVE' },
+          },
+          select: {
+            companyRole: {
+              select: {
+                code: true,
+                permissions: {
+                  where: { permission: { status: 'ACTIVE' } },
+                  select: {
+                    effect: true,
+                    permission: { select: { code: true } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return memberships.map((member) => ({
+      companyId: member.companyId,
+      companyMemberId: member.id,
+      tenantId: member.tenantId,
+      companyName: member.company.tradeName || member.company.legalName,
+      companyStatus: member.company.status,
+      tenantStatus: member.company.tenant.status,
+      roleCodes: member.roles.map((role) => role.companyRole.code),
+      permissions: resolvePermissionEffects(member.roles),
+    }));
   }
 
   private findPlatformUserByEmail(email: string) {
@@ -376,7 +427,7 @@ export class AuthService {
   private async unlockAndReloadUser(userId: string, email: string) {
     await this.prisma.user.update({
       where: { id: userId },
-      data: { status: "ACTIVE", failedLoginCount: 0, lockedUntil: null },
+      data: { status: 'ACTIVE', failedLoginCount: 0, lockedUntil: null },
     });
     const user = await this.findPlatformUserByEmail(email);
     if (!user) throw this.invalidCredentials();
@@ -388,7 +439,7 @@ export class AuthService {
       user.platformMember?.roles
         .filter(
           (item: PlatformRoleAssignment) =>
-            item.platformRole.status === "ACTIVE",
+            item.platformRole.status === 'ACTIVE',
         )
         .map((item: PlatformRoleAssignment) => item.platformRole.code) ?? []
     );
@@ -419,77 +470,98 @@ export class AuthService {
   //   );
   //   return hasPlatformMembership || hasCompanyMembership;
   // }
-private hasActiveMembership(
-  user: PlatformUser,
-  roles: string[],
-): boolean {
-  const hasPlatformMembership =
-    this.hasActivePlatformMembership(user, roles);
+  private hasActiveMembership(user: PlatformUser, roles: string[]): boolean {
+    const hasPlatformMembership = this.hasActivePlatformMembership(user, roles);
 
-  const hasCompanyMembership = user.companyMemberships.some(
-    (membership) => membership.status === "ACTIVE",
-  );
+    const hasCompanyMembership = user.companyMemberships.some(
+      (membership) => membership.status === 'ACTIVE',
+    );
 
-  return hasPlatformMembership || hasCompanyMembership;
-}
-
-private hasActivePlatformMembership(
-  user: PlatformUser,
-  roles: string[],
-): boolean {
-  return (
-    user.platformMember?.status === "ACTIVE" &&
-    roles.length > 0
-  );
-}
-
-private async effectivePlatformPermissions(
-  userId: string,
-  roles: string[],
-): Promise<string[]> {
-  if (roles.includes("SUPER_ADMIN")) {
-    const permissions = await this.prisma.permission.findMany({
-      where: {
-        isSystem: true,
-        status: "ACTIVE",
-      },
-      select: {
-        code: true,
-      },
-      orderBy: {
-        code: "asc",
-      },
-    });
-
-    return permissions.map((permission) => permission.code);
+    return hasPlatformMembership || hasCompanyMembership;
   }
 
-  const member = await this.prisma.platformMember.findFirst({
-    where: {
-      userId,
-      status: "ACTIVE",
-    },
-    select: {
-      roles: {
+  private hasActivePlatformMembership(
+    user: PlatformUser,
+    roles: string[],
+  ): boolean {
+    return user.platformMember?.status === 'ACTIVE' && roles.length > 0;
+  }
+
+  /**
+   * `GET /auth/me` (called by the frontend's silent-refresh session
+   * restore on every fresh page load) was returning the bare
+   * `AuthenticatedUser` shape — no `userType`/`permissions` — while
+   * `POST /auth/staff/login` returns the enriched shape. That contract
+   * mismatch made the frontend lose all platform permission info on
+   * every reload (frontend's `isPlatformStaffUser()` check requires
+   * `userType === 'PLATFORM_STAFF'`). This mirrors `staffLogin`'s own
+   * enrichment so both endpoints agree on one user shape.
+   */
+  async getCurrentUser(user: AuthenticatedUser) {
+    if (!user.platformMemberId) {
+      return user;
+    }
+
+    const permissions = await this.effectivePlatformPermissions(
+      user.userId,
+      user.roles,
+    );
+
+    return {
+      ...user,
+      userType: 'PLATFORM_STAFF' as const,
+      permissions,
+    };
+  }
+
+  private async effectivePlatformPermissions(
+    userId: string,
+    roles: string[],
+  ): Promise<string[]> {
+    if (roles.includes('SUPER_ADMIN')) {
+      const permissions = await this.prisma.permission.findMany({
         where: {
-          platformRole: {
-            status: "ACTIVE",
-          },
+          isSystem: true,
+          status: 'ACTIVE',
         },
         select: {
-          platformRole: {
-            select: {
-              permissions: {
-                where: {
-                  permission: {
-                    status: "ACTIVE",
+          code: true,
+        },
+        orderBy: {
+          code: 'asc',
+        },
+      });
+
+      return permissions.map((permission) => permission.code);
+    }
+
+    const member = await this.prisma.platformMember.findFirst({
+      where: {
+        userId,
+        status: 'ACTIVE',
+      },
+      select: {
+        roles: {
+          where: {
+            platformRole: {
+              status: 'ACTIVE',
+            },
+          },
+          select: {
+            platformRole: {
+              select: {
+                permissions: {
+                  where: {
+                    permission: {
+                      status: 'ACTIVE',
+                    },
                   },
-                },
-                select: {
-                  effect: true,
-                  permission: {
-                    select: {
-                      code: true,
+                  select: {
+                    effect: true,
+                    permission: {
+                      select: {
+                        code: true,
+                      },
                     },
                   },
                 },
@@ -498,30 +570,28 @@ private async effectivePlatformPermissions(
           },
         },
       },
-    },
-  });
+    });
 
-  const effects = new Map<string, Set<string>>();
+    const effects = new Map<string, Set<string>>();
 
-  for (const assignment of member?.roles ?? []) {
-    for (const item of assignment.platformRole.permissions) {
-      const permissionEffects =
-        effects.get(item.permission.code) ?? new Set<string>();
+    for (const assignment of member?.roles ?? []) {
+      for (const item of assignment.platformRole.permissions) {
+        const permissionEffects =
+          effects.get(item.permission.code) ?? new Set<string>();
 
-      permissionEffects.add(item.effect);
-      effects.set(item.permission.code, permissionEffects);
+        permissionEffects.add(item.effect);
+        effects.set(item.permission.code, permissionEffects);
+      }
     }
-  }
 
-  return [...effects.entries()]
-    .filter(
-      ([, permissionEffects]) =>
-        permissionEffects.has("ALLOW") &&
-        !permissionEffects.has("DENY"),
-    )
-    .map(([code]) => code)
-    .sort();
-}
+    return [...effects.entries()]
+      .filter(
+        ([, permissionEffects]) =>
+          permissionEffects.has('ALLOW') && !permissionEffects.has('DENY'),
+      )
+      .map(([code]) => code)
+      .sort();
+  }
   private async registerFailedLogin(
     user: PlatformUser,
     email: string,
@@ -538,7 +608,7 @@ private async effectivePlatformPermissions(
         where: { id: user.id },
         data: {
           failedLoginCount,
-          ...(shouldLock ? { status: "LOCKED", lockedUntil } : {}),
+          ...(shouldLock ? { status: 'LOCKED', lockedUntil } : {}),
         },
       }),
       this.prisma.loginEvent.create({
@@ -546,7 +616,7 @@ private async effectivePlatformPermissions(
           userId: user.id,
           email,
           success: false,
-          reason: shouldLock ? "ACCOUNT_LOCKED" : "INVALID_CREDENTIALS",
+          reason: shouldLock ? 'ACCOUNT_LOCKED' : 'INVALID_CREDENTIALS',
           ipAddress: metadata.ipAddress,
           userAgent: metadata.userAgent,
         },
@@ -582,13 +652,13 @@ private async effectivePlatformPermissions(
       sub: userId,
       sid: sessionId,
       roles,
-      type: "access",
+      type: 'access',
     };
     const refreshPayload: RefreshTokenPayload = {
       sub: userId,
       sid: sessionId,
       jti: randomUUID(),
-      type: "refresh",
+      type: 'refresh',
     };
 
     const [accessToken, refreshToken] = await Promise.all([
@@ -622,16 +692,16 @@ private async effectivePlatformPermissions(
         },
       );
       if (
-        payload.type !== "refresh" ||
+        payload.type !== 'refresh' ||
         !payload.sid ||
         !payload.sub ||
         !payload.jti
       ) {
-        throw new Error("Invalid payload");
+        throw new Error('Invalid payload');
       }
       return payload;
     } catch {
-      throw new UnauthorizedException("Invalid or expired refresh token");
+      throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }
 
@@ -640,7 +710,7 @@ private async effectivePlatformPermissions(
     password: string,
   ): Promise<boolean> {
     try {
-      if (hash.startsWith("$argon2"))
+      if (hash.startsWith('$argon2'))
         return await argon2.verify(hash, password);
       if (/^\$2[aby]\$/.test(hash)) return await bcrypt.compare(password, hash);
       return false;
@@ -659,7 +729,7 @@ private async effectivePlatformPermissions(
   }
 
   private hashToken(token: string): string {
-    return createHash("sha256").update(token).digest("hex");
+    return createHash('sha256').update(token).digest('hex');
   }
 
   private revokeAllSessions(userId: string, reason: string) {
@@ -670,6 +740,6 @@ private async effectivePlatformPermissions(
   }
 
   private invalidCredentials() {
-    return new UnauthorizedException("Invalid email or password");
+    return new UnauthorizedException('Invalid email or password');
   }
 }

@@ -122,9 +122,7 @@ export class PlatformRbacService {
     });
 
     if (!role) {
-      throw new NotFoundException(
-        `Platform role "${code}" was not found.`,
-      );
+      throw new NotFoundException(`Platform role "${code}" was not found.`);
     }
 
     const permissions = [...role.permissions].sort((left, right) =>
@@ -180,9 +178,7 @@ export class PlatformRbacService {
     });
 
     if (!user) {
-      throw new NotFoundException(
-        `Super Admin user "${email}" was not found.`,
-      );
+      throw new NotFoundException(`Super Admin user "${email}" was not found.`);
     }
 
     const roleCodes =
@@ -251,17 +247,16 @@ export class PlatformRbacService {
     });
 
     const superAdmin = superAdminResult?.data;
-    const permissionsValid =
-      permissionCount === EXPECTED_PERMISSION_COUNT;
+    const permissionsValid = permissionCount === EXPECTED_PERMISSION_COUNT;
     const rolesValid =
       roles.length === EXPECTED_ROLES.length &&
       roleStatus.every((role) => role.valid);
     const superAdminValid = Boolean(
       superAdmin &&
-        superAdmin.status === 'ACTIVE' &&
-        superAdmin.platformMemberActive &&
-        superAdmin.passwordHashExists &&
-        superAdmin.superAdminRoleAssigned,
+      superAdmin.status === 'ACTIVE' &&
+      superAdmin.platformMemberActive &&
+      superAdmin.passwordHashExists &&
+      superAdmin.superAdminRoleAssigned,
     );
 
     return {
@@ -281,12 +276,9 @@ export class PlatformRbacService {
         superAdmin: {
           exists: Boolean(superAdmin),
           userActive: superAdmin?.status === 'ACTIVE',
-          platformMemberActive:
-            superAdmin?.platformMemberActive ?? false,
-          passwordHashExists:
-            superAdmin?.passwordHashExists ?? false,
-          roleAssigned:
-            superAdmin?.superAdminRoleAssigned ?? false,
+          platformMemberActive: superAdmin?.platformMemberActive ?? false,
+          passwordHashExists: superAdmin?.passwordHashExists ?? false,
+          roleAssigned: superAdmin?.superAdminRoleAssigned ?? false,
           valid: superAdminValid,
         },
         valid: permissionsValid && rolesValid && superAdminValid,

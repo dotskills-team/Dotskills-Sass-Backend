@@ -1,4 +1,3 @@
-
 import {
   IsEmail,
   IsOptional,
@@ -60,5 +59,4 @@ export class CreateCompanyDto {
   @IsString()
   @Length(2, 100)
   timezone?: string;
-
 }

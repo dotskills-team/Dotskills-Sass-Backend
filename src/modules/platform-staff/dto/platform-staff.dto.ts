@@ -8,7 +8,7 @@ import {
   Matches,
   MaxLength,
   MinLength,
-} from "class-validator";
+} from 'class-validator';
 
 export class CreatePlatformStaffDto {
   @IsEmail()
@@ -57,9 +57,9 @@ export class ReplacePlatformRolesDto {
 }
 
 export enum PlatformStaffStatusDtoValue {
-  ACTIVE = "ACTIVE",
-  SUSPENDED = "SUSPENDED",
-  REVOKED = "REVOKED",
+  ACTIVE = 'ACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  REVOKED = 'REVOKED',
 }
 
 export class UpdatePlatformStaffStatusDto {

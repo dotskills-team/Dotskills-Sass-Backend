@@ -1,7 +1,4 @@
-import {
-  IsEnum,
-  IsNotEmpty,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
 
 import { TenantStatus } from 'src/generated/phase-1-prisma/enums';
 

@@ -1,4 +1,4 @@
-// DotSkills SaaS â€” Phase 1: Foundation & Super Admin Management
+// DotSkills SaaS — Phase 1: Access-control completion
 // This schema is intentionally standalone. Run migrations with prisma.phase-1.config.ts.
 
 generator client {
@@ -49,11 +49,37 @@ enum CompanyStatus {
   CLOSED
 }
 
+
+
+
 enum PlanStatus {
   ACTIVE
   INACTIVE
   ARCHIVED
 }
+
+enum FeatureStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum IndustryStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum PermissionStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum RoleStatus {
+  ACTIVE
+  INACTIVE
+}
+
 
 enum BillingCycle {
   MONTHLY
@@ -92,6 +118,13 @@ enum AuditActorType {
 enum PermissionEffect {
   ALLOW
   DENY
+}
+
+enum CompanyScopeType {
+  COMPANY
+  BRANCH
+  WAREHOUSE
+  POS_COUNTER
 }
 
 model User {
@@ -185,7 +218,7 @@ model PlatformRole {
   code        String                   @unique @db.VarChar(60)
   name        String                   @db.VarChar(120)
   description String?                  @db.Text
-  status      PlanStatus               @default(ACTIVE)
+  status      RoleStatus               @default(ACTIVE)
   createdAt   DateTime                 @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime                 @updatedAt @db.Timestamptz(6)
   members     PlatformMemberRole[]
@@ -215,7 +248,8 @@ model Feature {
   name         String        @db.VarChar(120)
   module       String        @db.VarChar(80)
   description  String?       @db.Text
-  status       PlanStatus    @default(ACTIVE)
+  status       FeatureStatus @default(ACTIVE)
+
   createdAt    DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime      @updatedAt @db.Timestamptz(6)
   planFeatures PlanFeature[]
@@ -302,7 +336,9 @@ model Industry {
   code        String     @unique @db.VarChar(50)
   name        String     @db.VarChar(120)
   description String?    @db.Text
-  status      PlanStatus @default(ACTIVE)
+    status IndustryStatus @default(ACTIVE)
+
+
   createdAt   DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime   @updatedAt @db.Timestamptz(6)
   companies   Company[]
@@ -362,6 +398,7 @@ model CompanyMember {
   company      Company                 @relation(fields: [companyId], references: [id], onDelete: Restrict)
   user         User                    @relation(fields: [userId], references: [id], onDelete: Restrict)
   roles        CompanyMemberRole[]
+  scopes       CompanyMemberScope[]
   ownerships   CompanyOwnership[]      @relation("OwnershipMember")
 
   @@unique([tenantId, companyId, userId])
@@ -379,7 +416,8 @@ model CompanyRole {
   name        String              @db.VarChar(120)
   description String?             @db.Text
   isSystem    Boolean             @default(false)
-  status      PlanStatus          @default(ACTIVE)
+  status      RoleStatus          @default(ACTIVE)
+
   createdAt   DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime            @updatedAt @db.Timestamptz(6)
   tenant      Tenant              @relation(fields: [tenantId], references: [id], onDelete: Restrict)
@@ -407,6 +445,25 @@ model CompanyMemberRole {
   @@map("company_member_roles")
 }
 
+model CompanyMemberScope {
+  id               String           @id @default(uuid()) @db.Uuid
+  tenantId         String           @db.Uuid
+  companyId        String           @db.Uuid
+  companyMemberId  String           @db.Uuid
+  scopeType        CompanyScopeType
+  scopeKey         String           @default("*") @db.VarChar(120)
+  conditions       Json?            @db.JsonB
+  validFrom        DateTime         @default(now()) @db.Timestamptz(6)
+  validUntil       DateTime?        @db.Timestamptz(6)
+  assignedByUserId String?          @db.Uuid
+  createdAt        DateTime         @default(now()) @db.Timestamptz(6)
+  companyMember    CompanyMember    @relation(fields: [companyMemberId], references: [id], onDelete: Cascade)
+
+  @@unique([companyMemberId, scopeType, scopeKey])
+  @@index([tenantId, companyId, scopeType, scopeKey, validUntil])
+  @@map("company_member_scopes")
+}
+
 model CompanyOwnership {
   id               String        @id @default(uuid()) @db.Uuid
   tenantId         String        @db.Uuid
@@ -425,6 +482,9 @@ model CompanyOwnership {
   @@index([companyMemberId, endedAt])
   @@map("company_ownerships")
 }
+
+
+
 
 model Subscription {
   id                 String             @id @default(uuid()) @db.Uuid
@@ -447,11 +507,40 @@ model Subscription {
   company            Company?           @relation(fields: [companyId], references: [id], onDelete: Restrict)
   plan               Plan               @relation(fields: [planId], references: [id], onDelete: Restrict)
 
+  suspendedAt        DateTime? @db.Timestamptz(6)
+  pastDueEndsAt       DateTime? @db.Timestamptz(6)
+  suspensionExpiresAt DateTime? @db.Timestamptz(6)
+  events             SubscriptionEvent[]
+
+
   @@index([tenantId, status, currentPeriodEnd])
   @@index([companyId, status, currentPeriodEnd])
   @@map("subscriptions")
-}
 
+  @@index([status, trialEndsAt])
+  @@index([status, pastDueEndsAt])
+  @@index([status, graceEndsAt])
+  @@index([status, suspensionExpiresAt])
+}
+model SubscriptionEvent {
+  id              String              @id @default(uuid()) @db.Uuid
+  subscriptionId  String              @db.Uuid
+  tenantId        String              @db.Uuid
+  companyId       String?             @db.Uuid
+  fromStatus      SubscriptionStatus?
+  toStatus        SubscriptionStatus
+  reason          String              @db.VarChar(160)
+  source          String              @db.VarChar(40)
+  actorUserId     String?             @db.Uuid
+  idempotencyKey  String?             @unique @db.VarChar(200)
+  metadata        Json?               @db.JsonB
+  createdAt       DateTime            @default(now()) @db.Timestamptz(6)
+  subscription    Subscription        @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([subscriptionId, createdAt])
+  @@index([tenantId, companyId, createdAt])
+  @@map("subscription_events")
+}
 model Invitation {
   id            String           @id @default(uuid()) @db.Uuid
   type          InvitationType
@@ -512,7 +601,8 @@ model Permission {
   name        String     @db.VarChar(160)
   description String?    @db.Text
   isSystem    Boolean    @default(true)
-  status      PlanStatus @default(ACTIVE)
+    status      PermissionStatus @default(ACTIVE)
+
   createdAt   DateTime   @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime   @updatedAt @db.Timestamptz(6)
 

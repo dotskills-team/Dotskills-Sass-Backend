@@ -1,4 +1,4 @@
-import { IsJWT, IsOptional, IsString, MaxLength } from "class-validator";
+import { IsJWT, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class RefreshTokenDto {
   @IsJWT()
