@@ -8,8 +8,16 @@ import {
 } from 'class-validator';
 
 export class CreateCompanyOwnerDto {
+  /**
+   * `POST /platform/companies/:companyId/owner` never expects this in the
+   * body — the controller overwrites it from the URL param, which is
+   * authoritative (verified `company-owner.controller.ts`'s `create()`).
+   * Optional here only so the pipe's automatic body validation doesn't
+   * reject a request that correctly omits it; still `@IsUUID()` if present.
+   */
+  @IsOptional()
   @IsUUID()
-  companyId!: string;
+  companyId?: string;
 
   @IsEmail()
   email!: string;

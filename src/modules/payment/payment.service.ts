@@ -3,6 +3,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { randomBytes } from 'crypto';
@@ -51,6 +52,8 @@ const TERMINAL_PAYMENT_STATUSES: PaymentStatus[] = [
 
 @Injectable()
 export class PaymentService {
+  private readonly logger = new Logger(PaymentService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly invoiceService: InvoiceService,
@@ -201,11 +204,27 @@ export class PaymentService {
 
       // Compensating action — Billing was already advanced to PROCESSING
       // above; without this it would be stuck there with no live Payment.
-      await this.billingService.markFailed(
-        billingId,
-        { failureCode: 'GATEWAY_INIT_FAILED', failureMessage: failureReason },
-        actor.userId,
-      );
+      // Its own failure must never replace the real gateway error below —
+      // it's logged and swallowed, not re-thrown, so the caller always
+      // sees the actual reason payment initiation failed.
+      try {
+        await this.billingService.markFailed(
+          billingId,
+          { failureCode: 'GATEWAY_INIT_FAILED', failureMessage: failureReason },
+          actor.userId,
+        );
+      } catch (compensationError) {
+        this.logger.error({
+          event: 'billing_compensation_failed',
+          billingId,
+          paymentId: payment.id,
+          originalError: failureReason,
+          compensationError:
+            compensationError instanceof Error
+              ? compensationError.message
+              : compensationError,
+        });
+      }
 
       throw error;
     }

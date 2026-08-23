@@ -285,6 +285,7 @@ model Feature {
   module       String        @db.VarChar(80)
   description  String?       @db.Text
   status       FeatureStatus @default(ACTIVE)
+  configSchema Json?         @db.JsonB
 
   createdAt    DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime      @updatedAt @db.Timestamptz(6)

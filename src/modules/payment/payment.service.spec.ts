@@ -238,6 +238,42 @@ describe('PaymentService', () => {
         'user-1',
       );
     });
+
+    /**
+     * Regression: if the compensating `billingService.markFailed()` call
+     * itself throws (e.g. an unrelated DB error), that must never replace
+     * the real gateway failure ("network down" here) in the response —
+     * it's logged and swallowed, and the original error is always re-thrown.
+     */
+    it('still surfaces the original gateway error even if billing compensation itself throws', async () => {
+      mockInvoiceService.findOne.mockResolvedValue(baseInvoice);
+      mockPrisma.payment.findFirst.mockResolvedValue(null);
+      mockBillingService.process.mockResolvedValue({ attemptCount: 1 });
+      mockTx.payment.create.mockImplementation(({ data }: any) =>
+        Promise.resolve({
+          id: 'payment-1',
+          providerTransactionId: 'DS123',
+          amount: baseInvoice.totalAmount,
+          currencyCode: 'BDT',
+          provider: 'SSLCOMMERZ',
+          ...data,
+        }),
+      );
+      mockAdapter.initiate.mockRejectedValue(new Error('network down'));
+      mockBillingService.markFailed.mockRejectedValueOnce(
+        new Error('unrelated compensation failure'),
+      );
+
+      await expect(
+        service.create({ invoiceId: 'invoice-1' }, scope, actor),
+      ).rejects.toThrow('network down');
+
+      expect(mockPrisma.payment.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ status: PaymentStatus.FAILED }),
+        }),
+      );
+    });
   });
 
   describe('verifyAndSettle', () => {

@@ -11,6 +11,7 @@ import { CreateFeatureDto } from './dto/create-feature.dto';
 import { UpdateFeatureDto } from './dto/update-feature.dto';
 import { UpdateFeatureStatusDto } from './dto/update-feature-status.dto';
 import { QueryFeatureDto } from './dto/query-feature.dto';
+import { normalizeConfigSchema } from './feature-config.util';
 
 import {
   AuditActorType,
@@ -42,6 +43,8 @@ export class FeatureService {
 
     const description = dto.description?.trim() || null;
 
+    const configSchema = normalizeConfigSchema(dto.configSchema);
+
     const existing = await this.prisma.feature.findUnique({
       where: {
         code,
@@ -64,6 +67,10 @@ export class FeatureService {
           module,
           description,
           status: FeatureStatus.ACTIVE,
+          configSchema:
+            configSchema !== undefined
+              ? (configSchema as unknown as Prisma.InputJsonValue)
+              : Prisma.JsonNull,
         },
 
         select: {
@@ -73,6 +80,7 @@ export class FeatureService {
           module: true,
           description: true,
           status: true,
+          configSchema: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -107,6 +115,7 @@ export class FeatureService {
             module: created.module,
             description: created.description,
             status: created.status,
+            configSchema: created.configSchema,
           },
 
           metadata: {
@@ -194,6 +203,7 @@ export class FeatureService {
         module: true,
         description: true,
         status: true,
+        configSchema: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -226,6 +236,7 @@ export class FeatureService {
         module: true,
         description: true,
         status: true,
+        configSchema: true,
         createdAt: true,
         updatedAt: true,
 
@@ -265,6 +276,7 @@ export class FeatureService {
         module: true,
         description: true,
         status: true,
+        configSchema: true,
       },
     });
 
@@ -280,7 +292,8 @@ export class FeatureService {
       dto.name === undefined &&
       dto.code === undefined &&
       dto.module === undefined &&
-      dto.description === undefined
+      dto.description === undefined &&
+      dto.configSchema === undefined
     ) {
       throw new BadRequestException('No fields provided for update');
     }
@@ -322,6 +335,14 @@ export class FeatureService {
       data.description = dto.description?.trim() || null;
     }
 
+    if (dto.configSchema !== undefined) {
+      const configSchema = normalizeConfigSchema(dto.configSchema);
+      data.configSchema =
+        configSchema && configSchema.length > 0
+          ? (configSchema as unknown as Prisma.InputJsonValue)
+          : Prisma.JsonNull;
+    }
+
     const updated = await this.prisma.$transaction(async (tx) => {
       const feature = await tx.feature.update({
         where: {
@@ -337,6 +358,7 @@ export class FeatureService {
           module: true,
           description: true,
           status: true,
+          configSchema: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -368,6 +390,7 @@ export class FeatureService {
             module: existing.module,
             description: existing.description,
             status: existing.status,
+            configSchema: existing.configSchema,
           },
 
           afterData: {
@@ -376,6 +399,7 @@ export class FeatureService {
             module: feature.module,
             description: feature.description,
             status: feature.status,
+            configSchema: feature.configSchema,
           },
 
           metadata: {

@@ -17,6 +17,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AssignPlanFeatureDto } from './dto/assign-plan-feature.dto';
 import { QueryPlanFeatureDto } from './dto/query-plan-feature.dto';
 import { UpdatePlanFeatureDto } from './dto/update-plan-feature.dto';
+import { FeatureConfigFieldDto } from '../features-list/dto/feature-config-field.dto';
+import { validatePlanFeatureLimits } from '../features-list/feature-config.util';
 import {
   AuditActorType,
   FeatureStatus,
@@ -77,6 +79,7 @@ export class PlanFeatureService {
         module: true,
         description: true,
         status: true,
+        configSchema: true,
       },
     });
 
@@ -122,6 +125,11 @@ export class PlanFeatureService {
       );
     }
 
+    validatePlanFeatureLimits(
+      feature.configSchema as unknown as FeatureConfigFieldDto[] | null,
+      dto.limits,
+    );
+
     const planFeature = await this.prisma.$transaction(async (tx) => {
       const created = await tx.planFeature.create({
         data: {
@@ -149,6 +157,7 @@ export class PlanFeatureService {
               name: true,
               module: true,
               status: true,
+              configSchema: true,
             },
           },
         },
@@ -283,6 +292,7 @@ export class PlanFeatureService {
             module: true,
             description: true,
             status: true,
+            configSchema: true,
           },
         },
       },
@@ -335,6 +345,7 @@ export class PlanFeatureService {
             module: true,
             description: true,
             status: true,
+            configSchema: true,
           },
         },
       },
@@ -382,6 +393,7 @@ export class PlanFeatureService {
             code: true,
             name: true,
             status: true,
+            configSchema: true,
           },
         },
       },
@@ -399,6 +411,15 @@ export class PlanFeatureService {
 
     if (dto.enabled === undefined && dto.limits === undefined) {
       throw new BadRequestException('No fields provided for update');
+    }
+
+    if (dto.limits !== undefined) {
+      validatePlanFeatureLimits(
+        existing.feature.configSchema as unknown as
+          | FeatureConfigFieldDto[]
+          | null,
+        dto.limits,
+      );
     }
 
     const data: Prisma.PlanFeatureUpdateInput = {};
@@ -437,6 +458,7 @@ export class PlanFeatureService {
               name: true,
               module: true,
               status: true,
+              configSchema: true,
             },
           },
         },

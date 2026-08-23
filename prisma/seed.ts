@@ -443,6 +443,7 @@ import { hash } from 'bcrypt';
 import { PrismaPg } from '@prisma/adapter-pg';
 import {
   BillingCycle,
+  Prisma,
   PrismaClient,
 } from '../src/generated/phase-1-prisma/client';
 import { seedPermissions } from './seeds/seed-permissions';
@@ -509,7 +510,27 @@ const industries = [
   },
 ];
 
-const features = [
+interface SeedFeatureConfigField {
+  key: string;
+  label: string;
+  description?: string;
+  type: 'NUMBER' | 'BOOLEAN' | 'STRING' | 'SELECT' | 'MULTI_SELECT';
+  required?: boolean;
+  defaultValue?: unknown;
+  min?: number;
+  max?: number;
+  options?: { value: string; label: string }[];
+}
+
+interface SeedFeature {
+  code: string;
+  name: string;
+  module: string;
+  description: string;
+  configSchema?: SeedFeatureConfigField[];
+}
+
+const features: SeedFeature[] = [
   {
     code: 'DASHBOARD',
     name: 'Dashboard',
@@ -527,6 +548,25 @@ const features = [
     name: 'User Management',
     module: 'IAM',
     description: 'Company users and role management',
+    configSchema: [
+      {
+        key: 'maxUsers',
+        label: 'Maximum Users',
+        description: 'Maximum number of company users allowed on this plan.',
+        type: 'NUMBER',
+        required: true,
+        defaultValue: 5,
+        min: 1,
+        max: 1000,
+      },
+      {
+        key: 'allowImport',
+        label: 'Allow Import',
+        description: 'Let the company bulk-import users from a spreadsheet.',
+        type: 'BOOLEAN',
+        defaultValue: false,
+      },
+    ],
   },
   {
     code: 'INVENTORY',
@@ -657,9 +697,15 @@ async function seedFeatures(): Promise<Map<string, string>> {
         module: feature.module,
         description: feature.description,
         status: 'ACTIVE',
+        configSchema: feature.configSchema
+          ? (feature.configSchema as unknown as Prisma.InputJsonValue)
+          : Prisma.JsonNull,
       },
       create: {
         ...feature,
+        configSchema: feature.configSchema
+          ? (feature.configSchema as unknown as Prisma.InputJsonValue)
+          : Prisma.JsonNull,
         status: 'ACTIVE',
       },
     });

@@ -129,9 +129,43 @@ export class SubscriptionLifecycleService {
         tx,
       );
     }
-    throw new BadRequestException(
-      'Payment failure can only move ACTIVE→PAST_DUE or PAST_DUE→GRACE.',
-    );
+    /**
+     * Grace period exhausted by a further failed payment — mirrors the
+     * exact GRACE→SUSPENDED transition `runDueTransitions()` already
+     * applies when `graceEndsAt` elapses on its own (same patch shape),
+     * so a failure-driven suspension and a time-driven one are identical.
+     */
+    if (subscription.status === SubscriptionStatus.GRACE) {
+      const now = new Date();
+      return this.transition(
+        subscription,
+        SubscriptionStatus.SUSPENDED,
+        context,
+        {
+          reason: 'PAYMENT_GRACE_EXHAUSTED',
+          source: 'PAYMENT',
+          idempotencyKey,
+          patch: {
+            suspendedAt: now,
+            suspensionExpiresAt: this.addDays(
+              now,
+              SUBSCRIPTION_CONSTANTS.DEFAULT_SUSPENSION_DAYS,
+            ),
+          },
+        },
+        tx,
+      );
+    }
+    /**
+     * No further payment-failure-driven degradation exists anywhere in this
+     * codebase for SUSPENDED/CANCELLED/EXPIRED/TRIALING (the scheduler only
+     * ever moves these by time, e.g. suspensionExpiresAt → EXPIRED) —
+     * a failed retry against one of them is a safe no-op, not an error.
+     * Throwing here previously rolled back the caller's Billing/BillingAttempt
+     * bookkeeping (both run in the same transaction) and masked the real
+     * gateway failure reason further up the call chain.
+     */
+    return subscription;
   }
 
   async transition(
