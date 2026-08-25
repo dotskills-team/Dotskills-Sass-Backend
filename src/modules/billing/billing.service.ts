@@ -10,6 +10,7 @@ import {
   SubscriptionStatus,
   BillingAttemptStatus,
   BillingStatus,
+  PaymentStatus,
 } from 'src/generated/phase-1-prisma/enums';
 
 // import { Prisma } from 'src/generated/phase-1-prisma';
@@ -491,6 +492,89 @@ export class BillingService {
   }
 
   // ============================================================
+  // RELEASE ATTEMPT — customer abandoned/cancelled checkout at the
+  // gateway. This is deliberately NOT the same as markFailed(): a
+  // cancellation is not a gateway decline, so it must never trigger
+  // SubscriptionLifecycleService.paymentFailed() (no PAST_DUE/GRACE/
+  // SUSPENDED degradation) and must never be recorded as BillingStatus
+  // FAILED (that label is reserved for real declines) or CANCELLED
+  // (that's the Platform Admin's own deliberate whole-billing-period
+  // cancel() below — a different business event). Billing returns to
+  // PENDING — the same "awaiting a successful attempt" state a brand
+  // new Billing starts in — so the next Pay Now flows through create()'s
+  // existing PENDING → process() branch unchanged. attemptCount is left
+  // untouched, so MAX_ATTEMPTS keeps counting the customer's real
+  // attempts across a cancellation exactly as it does across a failure.
+  // ============================================================
+
+  async releaseCancelledAttempt(
+    id: string,
+    actorUserId?: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const run = async (tx: Prisma.TransactionClient) => {
+      const billing = await tx.billing.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!billing) {
+        throw new NotFoundException('Billing not found');
+      }
+
+      if (billing.status !== BillingStatus.PROCESSING) {
+        throw new BadRequestException(
+          `Billing cannot be released from ${billing.status} state`,
+        );
+      }
+
+      const attempt = await tx.billingAttempt.findFirst({
+        where: {
+          billingId: billing.id,
+          attemptNumber: billing.attemptCount,
+          status: BillingAttemptStatus.STARTED,
+        },
+      });
+
+      if (!attempt) {
+        throw new NotFoundException(
+          'No active billing attempt found to release',
+        );
+      }
+
+      const now = new Date();
+
+      await tx.billingAttempt.update({
+        where: {
+          id: attempt.id,
+        },
+        data: {
+          status: BillingAttemptStatus.CANCELLED,
+          completedAt: now,
+        },
+      });
+
+      return tx.billing.update({
+        where: {
+          id: billing.id,
+        },
+        data: {
+          status: BillingStatus.PENDING,
+          metadata: {
+            ...((billing.metadata as object) ?? {}),
+            lastCancelledBy: actorUserId ?? null,
+            lastCancelledAt: now.toISOString(),
+          },
+        },
+      });
+    };
+
+    if (tx) return run(tx);
+    return this.prisma.$transaction(run);
+  }
+
+  // ============================================================
   // CANCEL
   // ============================================================
 
@@ -791,6 +875,40 @@ export class BillingService {
           failureMessage: dto.failureMessage ?? null,
         },
       });
+
+      /**
+       * Billing FAILED হওয়া দুই path দিয়ে trigger হতে পারে: (ক)
+       * PaymentService.create()-এর compensating action, যেখানে Payment
+       * নিজেই ইতিমধ্যে FAILED হয়ে গেছে (স্বাভাবিক), অথবা (খ) এই
+       * markFailed() সরাসরি Platform Admin-এর "Mark billing failed"
+       * action থেকে call হওয়া — যেটা Payment table স্পর্শই করে না।
+       * (খ)-এর ক্ষেত্রে এই Invoice-এর তখনও-না-settled Payment
+       * (PENDING/PROCESSING) চিরকালের জন্য orphan হয়ে থাকত এবং
+       * PaymentService.create()-এর duplicate-active-payment guard
+       * পরবর্তী প্রতিটা retry-কে স্থায়ীভাবে block করে দিত। এখানে সিঙ্ক
+       * করে দেওয়া হলো — ঠিক যেভাবে বিপরীত দিকে verifyAndSettle()
+       * ইতিমধ্যেই Payment→Billing সিঙ্ক করে (settleSucceeded/
+       * settleFailed), এটা তারই অনুপস্থিত অর্ধেক। no-op যদি Invoice এখনো
+       * তৈরিই না হয়ে থাকে এই Billing থেকে।
+       */
+      const invoice = await tx.invoice.findUnique({
+        where: { billingId: billing.id },
+        select: { id: true },
+      });
+
+      if (invoice) {
+        await tx.payment.updateMany({
+          where: {
+            invoiceId: invoice.id,
+            status: { in: [PaymentStatus.PENDING, PaymentStatus.PROCESSING] },
+          },
+          data: {
+            status: PaymentStatus.FAILED,
+            failedAt: now,
+            failureReason: dto.failureMessage ?? 'Billing settlement failed',
+          },
+        });
+      }
 
       return updated;
     };

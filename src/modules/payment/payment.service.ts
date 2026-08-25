@@ -532,12 +532,34 @@ export class PaymentService {
         data: { status: PaymentStatus.CANCELLED, cancelledAt: new Date() },
       });
 
+      /**
+       * A cancelled checkout is not a gateway decline — it must not be
+       * left behind as a Billing stuck PROCESSING (which would permanently
+       * block every future payment attempt on this invoice via create()'s
+       * own duplicate-settlement guard). Release the Billing/BillingAttempt
+       * back to a payable state in the same transaction. Never call
+       * billingService.markFailed() here — that would incorrectly trigger
+       * subscription degradation for a customer simply abandoning checkout.
+       */
+      const invoiceRow = await tx.invoice.findUniqueOrThrow({
+        where: { id: payment.invoiceId },
+        select: { billingId: true },
+      });
+
+      await this.billingService.releaseCancelledAttempt(
+        invoiceRow.billingId,
+        actorUserId,
+        tx,
+      );
+
       await tx.auditLog.create({
         data: {
           tenantId: updated.tenantId,
           companyId: updated.companyId,
           actorUserId: actorUserId ?? null,
-          actorType: AuditActorType.PLATFORM_MEMBER,
+          actorType: actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
           action: 'PAYMENT_CANCELLED',
           entityType: 'Payment',
           entityId: updated.id,

@@ -23,6 +23,7 @@ describe('PaymentService', () => {
 
   const mockTx = {
     payment: { create: jest.fn(), update: jest.fn(), findUnique: jest.fn() },
+    invoice: { findUniqueOrThrow: jest.fn() },
     auditLog: { create: jest.fn() },
   };
 
@@ -52,6 +53,7 @@ describe('PaymentService', () => {
     retry: jest.fn(),
     markSucceeded: jest.fn(),
     markFailed: jest.fn(),
+    releaseCancelledAttempt: jest.fn(),
   };
 
   const mockAdapter = {
@@ -162,6 +164,57 @@ describe('PaymentService', () => {
 
       expect(result.gatewayPageUrl).toBe(
         'https://sandbox.sslcommerz.com/pay/xyz',
+      );
+    });
+
+    /**
+     * "Pay Again" after a cancelled checkout: releaseCancelledAttempt()
+     * returns Billing to PENDING (never FAILED/CANCELLED), so the next
+     * create() call must flow through the same PENDING → process() branch
+     * a brand-new invoice's first attempt does — proving cancellation
+     * doesn't dead-end the invoice, and doesn't require a special "retry
+     * after cancel" branch of its own.
+     */
+    it('allows a new payment attempt after a prior attempt was cancelled (billing back at PENDING)', async () => {
+      mockInvoiceService.findOne.mockResolvedValue({
+        ...baseInvoice,
+        billing: { id: 'billing-1', status: BillingStatus.PENDING },
+      });
+      mockPrisma.payment.findFirst.mockResolvedValue(null); // prior payment is CANCELLED, not active
+      mockBillingService.process.mockResolvedValue({ attemptCount: 2 });
+      mockTx.payment.create.mockImplementation(({ data }: any) =>
+        Promise.resolve({ id: 'payment-2', ...data }),
+      );
+      mockPrisma.payment.update.mockImplementation(({ data }: any) =>
+        Promise.resolve({
+          id: 'payment-2',
+          tenantId: 'tenant-1',
+          companyId: 'company-1',
+          ...data,
+        }),
+      );
+      mockAdapter.initiate.mockResolvedValue({
+        gatewayPageUrl: 'https://sandbox.sslcommerz.com/pay/attempt2',
+        rawResponse: { status: 'SUCCESS' },
+      });
+
+      const result = await service.create(
+        { invoiceId: 'invoice-1' },
+        scope,
+        actor,
+      );
+
+      expect(mockBillingService.process).toHaveBeenCalledWith(
+        'billing-1',
+        'user-1',
+        mockTx,
+      );
+      const createArgs = mockTx.payment.create.mock.calls[0][0].data;
+      expect(createArgs.idempotencyKey).toBe(
+        'payment:invoice-1:attempt:2',
+      );
+      expect(result.gatewayPageUrl).toBe(
+        'https://sandbox.sslcommerz.com/pay/attempt2',
       );
     });
 
@@ -398,6 +451,98 @@ describe('PaymentService', () => {
       mockTx.payment.findUnique.mockResolvedValue(null);
 
       await expect(service.cancel('missing')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    /**
+     * Regression: cancelling used to only flip Payment → CANCELLED, leaving
+     * the paired Billing stuck PROCESSING forever (identical symptom to the
+     * orphaned-payment incident, but caused by this code path itself). A
+     * cancellation must always release the Billing in the same transaction
+     * — never billingService.markFailed(), which would incorrectly trigger
+     * subscription degradation for a customer simply abandoning checkout.
+     */
+    it('releases the paired billing attempt in the same transaction, never via markFailed', async () => {
+      mockTx.payment.findUnique.mockResolvedValue({
+        id: 'p1',
+        invoiceId: 'invoice-1',
+        tenantId: 'tenant-1',
+        companyId: 'company-1',
+        status: PaymentStatus.PROCESSING,
+      });
+      mockTx.invoice.findUniqueOrThrow.mockResolvedValue({
+        billingId: 'billing-1',
+      });
+      mockTx.payment.update.mockResolvedValue({
+        id: 'p1',
+        tenantId: 'tenant-1',
+        companyId: 'company-1',
+        status: PaymentStatus.CANCELLED,
+      });
+
+      await service.cancel('p1', 'admin-1');
+
+      expect(mockBillingService.releaseCancelledAttempt).toHaveBeenCalledWith(
+        'billing-1',
+        'admin-1',
+        mockTx,
+      );
+      expect(mockBillingService.markFailed).not.toHaveBeenCalled();
+    });
+
+    it('records the actor as PLATFORM_MEMBER for an admin-triggered cancel, SYSTEM for a gateway-triggered one', async () => {
+      mockTx.payment.findUnique.mockResolvedValue({
+        id: 'p1',
+        invoiceId: 'invoice-1',
+        tenantId: 'tenant-1',
+        companyId: 'company-1',
+        status: PaymentStatus.PROCESSING,
+      });
+      mockTx.invoice.findUniqueOrThrow.mockResolvedValue({
+        billingId: 'billing-1',
+      });
+      mockTx.payment.update.mockResolvedValue({
+        id: 'p1',
+        tenantId: 'tenant-1',
+        companyId: 'company-1',
+        status: PaymentStatus.CANCELLED,
+      });
+
+      await service.cancel('p1', 'admin-1');
+      expect(mockTx.auditLog.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ actorType: 'PLATFORM_MEMBER' }),
+        }),
+      );
+
+      await service.cancel('p1');
+      expect(mockTx.auditLog.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ actorType: 'SYSTEM' }),
+        }),
+      );
+    });
+  });
+
+  describe('cancelFromGateway', () => {
+    it('is idempotent — a duplicate cancel callback on an already-terminal payment is a safe no-op', async () => {
+      mockPrisma.payment.findUnique.mockResolvedValue({
+        id: 'p1',
+        status: PaymentStatus.CANCELLED,
+      });
+
+      const result = await service.cancelFromGateway('DS123');
+
+      expect(result.status).toBe(PaymentStatus.CANCELLED);
+      expect(mockTx.payment.update).not.toHaveBeenCalled();
+      expect(mockBillingService.releaseCancelledAttempt).not.toHaveBeenCalled();
+    });
+
+    it('throws when no payment matches the callback tran_id (never accepts an arbitrary id)', async () => {
+      mockPrisma.payment.findUnique.mockResolvedValue(null);
+
+      await expect(service.cancelFromGateway('unknown-tran-id')).rejects.toThrow(
         NotFoundException,
       );
     });

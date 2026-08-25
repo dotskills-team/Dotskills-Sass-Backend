@@ -39,7 +39,6 @@ import { AccessControlSetupModule } from './modules/access-control-setup/access-
 import { PlatformStaffModule } from './modules/platform-staff/platform-staff.module';
 import { PlatformRoleModule } from './modules/platform-role/platform-role.module';
 import { CompanyRbacModule } from './modules/company-rbac/company-rbac.module';
-import { PlatformRbacModule } from './modules/demoplatform-rbac/platform-rbac.module';
 import { CompanyManagementModule } from './modules/company-management/company-management.module';
 import { CompanyOwnerModule } from './modules/company-owner/company-owner.module';
 import { TenantManagementModule } from './modules/tenant-management/tenant-management.module';
@@ -72,7 +71,6 @@ import { PaymentModule } from './modules/payment/payment.module';
 
     PrismaModule,
     AuthModule,
-    PlatformRbacModule,
     AccessControlSetupModule,
     PlatformStaffModule,
     PlatformRoleModule,

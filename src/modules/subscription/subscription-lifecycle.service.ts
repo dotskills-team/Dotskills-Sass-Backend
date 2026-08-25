@@ -43,6 +43,28 @@ export class SubscriptionLifecycleService {
     const replay = await this.findIdempotentResult(id, idempotencyKey);
     if (replay) return replay;
 
+    /**
+     * ACTIVE/TRIALING subscription-এর normal billing cycle payment সফল
+     * হওয়া কোনো "recovery" transition না (PAST_DUE/GRACE/SUSPENDED থেকে
+     * ফেরা না) — এটাই একটা fresh subscription-এর সবচেয়ে সাধারণ, প্রথম
+     * successful-payment case। আগে এই branch না থাকায় এটা সবসময় নিচের
+     * "recoverableStatuses" guard-এ গিয়ে throw করত, এবং যেহেতু এই method
+     * BillingService.markSucceeded()-এর একই transaction-এ চলে, পুরো
+     * settlement (Payment→SUCCEEDED, Billing→SUCCEEDED, Invoice→PAID)
+     * rollback হয়ে যেত — গেটওয়ে সত্যিই টাকা confirm করলেও।
+     * renewInPlace() ইচ্ছাকৃতভাবে transition()/ALLOWED_SUBSCRIPTION_
+     * TRANSITIONS ব্যবহার করে না (ACTIVE→ACTIVE কোনো status-এর নিজের
+     * allowed-list-এ নেই, আর সেই shared map পরিবর্তন করলে transition()-এর
+     * অন্য সব caller-ও প্রভাবিত হতো) — শুধু billing period refresh করে,
+     * status অপরিবর্তিত রাখে, একই audit/event shape বজায় রেখে।
+     */
+    if (
+      subscription.status === SubscriptionStatus.ACTIVE ||
+      subscription.status === SubscriptionStatus.TRIALING
+    ) {
+      return this.renewInPlace(subscription, context, idempotencyKey, tx);
+    }
+
     const recoverableStatuses: readonly SubscriptionStatus[] = [
       SubscriptionStatus.PAST_DUE,
       SubscriptionStatus.GRACE,
@@ -78,6 +100,85 @@ export class SubscriptionLifecycleService {
       },
       tx,
     );
+  }
+
+  private async renewInPlace(
+    subscription: Subscription,
+    context: ActorContext,
+    idempotencyKey: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const run = async (tx: Prisma.TransactionClient) => {
+      const prior = await tx.subscriptionEvent.findUnique({
+        where: { idempotencyKey },
+      });
+      if (prior) {
+        return tx.subscription.findUniqueOrThrow({
+          where: { id: subscription.id },
+        });
+      }
+
+      const now = new Date();
+
+      const changed = await tx.subscription.updateMany({
+        where: { id: subscription.id, status: subscription.status },
+        data: {
+          currentPeriodStart: now,
+          currentPeriodEnd: this.calculatePeriodEnd(
+            now,
+            subscription.billingCycle,
+          ),
+          graceEndsAt: null,
+          pastDueEndsAt: null,
+          suspendedAt: null,
+          suspensionExpiresAt: null,
+          cancelledAt: null,
+        },
+      });
+      if (changed.count !== 1) {
+        throw new BadRequestException(
+          'Subscription changed concurrently; retry the operation.',
+        );
+      }
+
+      await tx.subscriptionEvent.create({
+        data: {
+          subscriptionId: subscription.id,
+          tenantId: subscription.tenantId,
+          companyId: subscription.companyId,
+          fromStatus: subscription.status,
+          toStatus: subscription.status,
+          reason: 'PAYMENT_SUCCEEDED',
+          source: 'PAYMENT',
+          actorUserId: 'userId' in context ? context.userId : null,
+          idempotencyKey,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          tenantId: subscription.tenantId,
+          companyId: subscription.companyId,
+          actorUserId: 'userId' in context ? context.userId : null,
+          actorType: context.actorType ?? AuditActorType.COMPANY_MEMBER,
+          action: `SUBSCRIPTION_${subscription.status}`,
+          entityType: 'Subscription',
+          entityId: subscription.id,
+          beforeData: { status: subscription.status },
+          afterData: {
+            status: subscription.status,
+            reason: 'PAYMENT_SUCCEEDED',
+          },
+        },
+      });
+
+      return tx.subscription.findUniqueOrThrow({
+        where: { id: subscription.id },
+      });
+    };
+
+    if (tx) return run(tx);
+    return this.prisma.$transaction(run);
   }
 
   async paymentFailed(
