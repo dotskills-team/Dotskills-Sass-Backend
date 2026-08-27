@@ -19,6 +19,7 @@ import { RequirePlatformPermissions } from '../../common/decorators/require-plat
 import { CompanyContextGuard } from '../../common/guards/company-context.guard';
 import { CompanyPermissionsGuard } from '../../common/guards/company-permissions.guard';
 import { PlatformPermissionsGuard } from '../../common/guards/platform-permissions.guard';
+import { SubscriptionStatusGuard } from '../../common/guards/subscription-status.guard';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import type { CompanyContext } from '../../common/types/company-context.type';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -51,7 +52,12 @@ export class CompanyRbacBootstrapController {
 }
 
 @Controller('companies/:companyId/rbac')
-@UseGuards(JwtAuthGuard, CompanyContextGuard, CompanyPermissionsGuard)
+@UseGuards(
+  JwtAuthGuard,
+  CompanyContextGuard,
+  SubscriptionStatusGuard,
+  CompanyPermissionsGuard,
+)
 export class CompanyRbacController {
   constructor(private readonly service: CompanyRbacService) {}
 

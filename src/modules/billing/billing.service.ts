@@ -37,150 +37,159 @@ export class BillingService {
   // CREATE BILLING
   // ============================================================
 
-  async create(dto: CreateBillingDto, actorUserId?: string) {
-    const subscription = await this.prisma.subscription.findUnique({
-      where: {
-        id: dto.subscriptionId,
-      },
-      include: {
-        plan: true,
-      },
-    });
-
-    if (!subscription) {
-      throw new NotFoundException('Subscription not found');
-    }
-
-    if (
-      subscription.status === SubscriptionStatus.CANCELLED ||
-      subscription.status === SubscriptionStatus.EXPIRED
-    ) {
-      throw new BadRequestException(
-        'Billing cannot be created for cancelled or expired subscription',
-      );
-    }
-
-    const periodStart = new Date(dto.periodStart);
-    const periodEnd = new Date(dto.periodEnd);
-    const dueAt = new Date(dto.dueAt);
-
-    if (periodStart.getTime() >= periodEnd.getTime()) {
-      throw new BadRequestException('periodStart must be before periodEnd');
-    }
-
-    if (dueAt.getTime() > periodEnd.getTime()) {
-      throw new BadRequestException('dueAt cannot be after periodEnd');
-    }
-
-    /**
-     * Prevent duplicate billing for the same period.
-     */
-    // const existing =
-    //   await this.prisma.billing.findUnique({
-    //     where: {
-    //       subscriptionId_periodStart_periodEnd: {
-    //         subscriptionId:
-    //           subscription.id,
-    //         periodStart,
-    //         periodEnd,
-    //       },
-    //     },
-    //     select: {
-    //       id: true,
-    //       status: true,
-    //     },
-    //   });
-    const existing = await this.prisma.billing.findFirst({
-      where: {
-        subscriptionId: subscription.id,
-        periodStart,
-        periodEnd,
-      },
-      select: {
-        id: true,
-        status: true,
-      },
-    });
-    if (existing) {
-      throw new ConflictException(
-        'Billing already exists for this subscription period',
-      );
-    }
-
-    /**
-     * Subscription priceSnapshot is the source
-     * of truth for historical billing.
-     */
-    // const priceSnapshot =
-    //   subscription.priceSnapshot as Record<
-    //     string,
-    //     unknown
-    //   >;
-    const rawSnapshot = subscription.priceSnapshot;
-
-    if (
-      typeof rawSnapshot !== 'object' ||
-      rawSnapshot === null ||
-      Array.isArray(rawSnapshot)
-    ) {
-      throw new BadRequestException(
-        'Subscription priceSnapshot must be a JSON object',
-      );
-    }
-
-    const priceSnapshot = rawSnapshot as Record<string, unknown>;
-
-    const amount = this.extractAmount(priceSnapshot);
-
-    const currencyCode = this.extractCurrency(priceSnapshot, 'BDT');
-
-    const idempotencyKey = `billing:${subscription.id}:${periodStart.toISOString()}:${periodEnd.toISOString()}`;
-
-    const billing = await this.prisma.billing.create({
-      data: {
-        tenantId: subscription.tenantId,
-
-        companyId: subscription.companyId,
-
-        subscriptionId: subscription.id,
-
-        status: BillingStatus.PENDING,
-
-        billingCycle: subscription.billingCycle,
-
-        currencyCode,
-
-        amount,
-
-        periodStart,
-
-        periodEnd,
-
-        dueAt,
-
-        idempotencyKey,
-
-        priceSnapshot: priceSnapshot as Prisma.InputJsonValue,
-
-        metadata: {
-          source: 'SUBSCRIPTION',
-          actorUserId: actorUserId ?? null,
+  async create(
+    dto: CreateBillingDto,
+    actorUserId?: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const run = async (tx: Prisma.TransactionClient) => {
+      const subscription = await tx.subscription.findUnique({
+        where: {
+          id: dto.subscriptionId,
         },
-      },
-      include: {
-        subscription: {
-          select: {
-            id: true,
-            status: true,
-            billingCycle: true,
-            currentPeriodStart: true,
-            currentPeriodEnd: true,
+        include: {
+          plan: true,
+        },
+      });
+
+      if (!subscription) {
+        throw new NotFoundException('Subscription not found');
+      }
+
+      if (
+        subscription.status === SubscriptionStatus.CANCELLED ||
+        subscription.status === SubscriptionStatus.EXPIRED
+      ) {
+        throw new BadRequestException(
+          'Billing cannot be created for cancelled or expired subscription',
+        );
+      }
+
+      const periodStart = new Date(dto.periodStart);
+      const periodEnd = new Date(dto.periodEnd);
+      const dueAt = new Date(dto.dueAt);
+
+      if (periodStart.getTime() >= periodEnd.getTime()) {
+        throw new BadRequestException('periodStart must be before periodEnd');
+      }
+
+      if (dueAt.getTime() > periodEnd.getTime()) {
+        throw new BadRequestException('dueAt cannot be after periodEnd');
+      }
+
+      /**
+       * Prevent duplicate billing for the same period.
+       */
+      const existing = await tx.billing.findFirst({
+        where: {
+          subscriptionId: subscription.id,
+          periodStart,
+          periodEnd,
+        },
+        select: {
+          id: true,
+          status: true,
+        },
+      });
+      if (existing) {
+        throw new ConflictException(
+          'Billing already exists for this subscription period',
+        );
+      }
+
+      /**
+       * Subscription priceSnapshot is the source
+       * of truth for historical billing.
+       */
+      const rawSnapshot = subscription.priceSnapshot;
+
+      if (
+        typeof rawSnapshot !== 'object' ||
+        rawSnapshot === null ||
+        Array.isArray(rawSnapshot)
+      ) {
+        throw new BadRequestException(
+          'Subscription priceSnapshot must be a JSON object',
+        );
+      }
+
+      const priceSnapshot = rawSnapshot as Record<string, unknown>;
+
+      const amount = this.extractAmount(priceSnapshot);
+
+      const currencyCode = this.extractCurrency(priceSnapshot, 'BDT');
+
+      const idempotencyKey = `billing:${subscription.id}:${periodStart.toISOString()}:${periodEnd.toISOString()}`;
+
+      const created = await tx.billing.create({
+        data: {
+          tenantId: subscription.tenantId,
+
+          companyId: subscription.companyId,
+
+          subscriptionId: subscription.id,
+
+          status: BillingStatus.PENDING,
+
+          billingCycle: subscription.billingCycle,
+
+          currencyCode,
+
+          amount,
+
+          periodStart,
+
+          periodEnd,
+
+          dueAt,
+
+          idempotencyKey,
+
+          priceSnapshot: priceSnapshot as Prisma.InputJsonValue,
+
+          metadata: {
+            source: 'SUBSCRIPTION',
+            actorUserId: actorUserId ?? null,
           },
         },
-      },
-    });
+        include: {
+          subscription: {
+            select: {
+              id: true,
+              status: true,
+              billingCycle: true,
+              currentPeriodStart: true,
+              currentPeriodEnd: true,
+            },
+          },
+        },
+      });
 
-    return billing;
+      await tx.auditLog.create({
+        data: {
+          tenantId: created.tenantId,
+          companyId: created.companyId,
+          actorUserId: actorUserId ?? null,
+          actorType: actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
+          action: 'BILLING_CREATED',
+          entityType: 'Billing',
+          entityId: created.id,
+          afterData: {
+            status: created.status,
+            periodStart: created.periodStart,
+            periodEnd: created.periodEnd,
+            amount: created.amount.toString(),
+          },
+        },
+      });
+
+      return created;
+    };
+
+    if (tx) return run(tx);
+    return this.prisma.$transaction(run);
   }
 
   // ============================================================
@@ -412,6 +421,22 @@ export class BillingService {
         },
       });
 
+      await tx.auditLog.create({
+        data: {
+          tenantId: updated.tenantId,
+          companyId: updated.companyId,
+          actorUserId: actorUserId ?? null,
+          actorType: actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
+          action: 'BILLING_PROCESSING_STARTED',
+          entityType: 'Billing',
+          entityId: updated.id,
+          beforeData: { status: BillingStatus.PENDING },
+          afterData: { status: updated.status, attemptCount: updated.attemptCount },
+        },
+      });
+
       return updated;
     };
 
@@ -481,6 +506,22 @@ export class BillingService {
             actorUserId: actorUserId ?? null,
             retry: true,
           },
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          tenantId: updated.tenantId,
+          companyId: updated.companyId,
+          actorUserId: actorUserId ?? null,
+          actorType: actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
+          action: 'BILLING_RETRY_STARTED',
+          entityType: 'Billing',
+          entityId: updated.id,
+          beforeData: { status: BillingStatus.FAILED },
+          afterData: { status: updated.status, attemptCount: updated.attemptCount },
         },
       });
 
@@ -555,7 +596,7 @@ export class BillingService {
         },
       });
 
-      return tx.billing.update({
+      const updated = await tx.billing.update({
         where: {
           id: billing.id,
         },
@@ -568,6 +609,24 @@ export class BillingService {
           },
         },
       });
+
+      await tx.auditLog.create({
+        data: {
+          tenantId: updated.tenantId,
+          companyId: updated.companyId,
+          actorUserId: actorUserId ?? null,
+          actorType: actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
+          action: 'BILLING_ATTEMPT_RELEASED',
+          entityType: 'Billing',
+          entityId: updated.id,
+          beforeData: { status: BillingStatus.PROCESSING },
+          afterData: { status: updated.status },
+        },
+      });
+
+      return updated;
     };
 
     if (tx) return run(tx);
@@ -637,6 +696,22 @@ export class BillingService {
         },
       });
 
+      await tx.auditLog.create({
+        data: {
+          tenantId: updated.tenantId,
+          companyId: updated.companyId,
+          actorUserId: actorUserId ?? null,
+          actorType: actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
+          action: 'BILLING_CANCELLED',
+          entityType: 'Billing',
+          entityId: updated.id,
+          beforeData: { status: billing.status },
+          afterData: { status: updated.status, reason: dto.reason ?? null },
+        },
+      });
+
       return updated;
     });
   }
@@ -661,7 +736,7 @@ export class BillingService {
         throw new BadRequestException(`Only pending billing can be skipped`);
       }
 
-      return tx.billing.update({
+      const updated = await tx.billing.update({
         where: {
           id,
         },
@@ -676,6 +751,24 @@ export class BillingService {
           },
         },
       });
+
+      await tx.auditLog.create({
+        data: {
+          tenantId: updated.tenantId,
+          companyId: updated.companyId,
+          actorUserId: actorUserId ?? null,
+          actorType: actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
+          action: 'BILLING_SKIPPED',
+          entityType: 'Billing',
+          entityId: updated.id,
+          beforeData: { status: BillingStatus.PENDING },
+          afterData: { status: updated.status },
+        },
+      });
+
+      return updated;
     });
   }
 
@@ -769,6 +862,20 @@ export class BillingService {
           status: BillingAttemptStatus.SUCCEEDED,
 
           completedAt: now,
+        },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          tenantId: updated.tenantId,
+          companyId: updated.companyId,
+          actorUserId: actorUserId,
+          actorType: AuditActorType.SYSTEM,
+          action: 'BILLING_SUCCEEDED',
+          entityType: 'Billing',
+          entityId: updated.id,
+          beforeData: { status: BillingStatus.PROCESSING },
+          afterData: { status: updated.status },
         },
       });
 
@@ -909,6 +1016,24 @@ export class BillingService {
           },
         });
       }
+
+      await tx.auditLog.create({
+        data: {
+          tenantId: updated.tenantId,
+          companyId: updated.companyId,
+          actorUserId: actorUserId,
+          actorType: AuditActorType.SYSTEM,
+          action: 'BILLING_FAILED',
+          entityType: 'Billing',
+          entityId: updated.id,
+          beforeData: { status: BillingStatus.PROCESSING },
+          afterData: {
+            status: updated.status,
+            failureCode: dto.failureCode ?? null,
+            failureMessage: dto.failureMessage ?? null,
+          },
+        },
+      });
 
       return updated;
     };

@@ -261,6 +261,9 @@ export const PLATFORM_PERMISSIONS = {
   // Platform থেকে সব subscription/list/details দেখা
   SUBSCRIPTION_READ: 'subscription:read',
 
+  // Platform override হিসেবে Auto-Renew ON/OFF টগল করা
+  SUBSCRIPTION_AUTO_RENEW: 'subscription:auto-renew',
+
   // Platform থেকে subscription update
   SUBSCRIPTION_UPDATE: 'subscription:update',
 

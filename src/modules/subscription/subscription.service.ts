@@ -101,6 +101,45 @@ export class SubscriptionService {
         'Company already has an open subscription lifecycle.',
       );
 
+    return this.prisma.$transaction((tx) =>
+      this.buildSubscription(tx, {
+        company,
+        plan,
+        billingCycle: dto.billingCycle,
+        price,
+        actorUserId: context.userId,
+        actorType: context.actorType ?? AuditActorType.COMPANY_MEMBER,
+        reason: 'SUBSCRIPTION_CREATED',
+        source: 'API',
+      }),
+    );
+  }
+
+  /**
+   * Shared row-creation core for `create()` (self-service) and
+   * `createTrialForNewCompany()` (auto-trial on Company creation) — same
+   * TRIALING/ACTIVE-by-trialDays logic, same price-snapshot shape, same
+   * SubscriptionEvent/AuditLog pair, just parameterized on who/why. Always
+   * takes an externally-owned `tx` so the caller controls the transaction
+   * boundary (Company creation needs this row created atomically with the
+   * Company row itself).
+   */
+  private async buildSubscription(
+    tx: Prisma.TransactionClient,
+    params: {
+      company: { id: string; tenantId: string };
+      plan: { id: string; code: string; name: string; trialDays: number };
+      billingCycle: BillingCycle;
+      price: { currencyCode: string; amount: Prisma.Decimal };
+      actorUserId?: string;
+      actorType: AuditActorType;
+      reason: string;
+      source: string;
+      isComplimentary?: boolean;
+    },
+  ) {
+    const { company, plan, billingCycle, price, actorUserId, actorType, reason, source } =
+      params;
     const now = new Date();
     const trialEndsAt =
       plan.trialDays > 0 ? this.addDays(now, plan.trialDays) : null;
@@ -109,59 +148,108 @@ export class SubscriptionService {
       planId: plan.id,
       planCode: plan.code,
       planName: plan.name,
-      billingCycle: dto.billingCycle,
+      billingCycle,
       currencyCode: price.currencyCode,
       amount: price.amount.toString(),
       capturedAt: now.toISOString(),
     };
-    return this.prisma.$transaction(async (tx) => {
-      const subscription = await tx.subscription.create({
-        data: {
-          // tenantId: context.tenantId,
-          tenantId: company.tenantId,
-          companyId: company.id,
-          planId: plan.id,
-          status: trialEndsAt
-            ? SubscriptionStatus.TRIALING
-            : SubscriptionStatus.ACTIVE,
-          billingCycle: dto.billingCycle,
-          startsAt: now,
-          trialEndsAt,
-          currentPeriodStart: periodStart,
-          currentPeriodEnd: this.lifecycle.calculatePeriodEnd(
-            periodStart,
-            dto.billingCycle,
-          ),
-          autoRenew: true,
-          priceSnapshot: snapshot as unknown as Prisma.InputJsonValue,
-        },
-      });
-      await tx.subscriptionEvent.create({
-        data: {
-          subscriptionId: subscription.id,
-          tenantId: subscription.tenantId,
-          companyId: subscription.companyId,
-          fromStatus: null,
-          toStatus: subscription.status,
-          reason: 'SUBSCRIPTION_CREATED',
-          source: 'API',
-          actorUserId: context.userId,
-        },
-      });
-      await tx.auditLog.create({
-        data: {
-          // tenantId: context.tenantId,
-          tenantId: company.tenantId,
-          companyId: company.id,
-          actorUserId: context.userId,
-          actorType: context.actorType ?? AuditActorType.COMPANY_MEMBER,
-          action: 'SUBSCRIPTION_CREATED',
-          entityType: 'Subscription',
-          entityId: subscription.id,
-          afterData: { status: subscription.status, planId: plan.id },
-        },
-      });
-      return subscription;
+
+    const subscription = await tx.subscription.create({
+      data: {
+        tenantId: company.tenantId,
+        companyId: company.id,
+        planId: plan.id,
+        status: trialEndsAt
+          ? SubscriptionStatus.TRIALING
+          : SubscriptionStatus.ACTIVE,
+        billingCycle,
+        startsAt: now,
+        trialEndsAt,
+        currentPeriodStart: periodStart,
+        currentPeriodEnd: this.lifecycle.calculatePeriodEnd(
+          periodStart,
+          billingCycle,
+        ),
+        autoRenew: true,
+        isComplimentary: params.isComplimentary ?? false,
+        priceSnapshot: snapshot as unknown as Prisma.InputJsonValue,
+      },
+    });
+    await tx.subscriptionEvent.create({
+      data: {
+        subscriptionId: subscription.id,
+        tenantId: subscription.tenantId,
+        companyId: subscription.companyId,
+        fromStatus: null,
+        toStatus: subscription.status,
+        reason,
+        source,
+        actorUserId: actorUserId ?? null,
+      },
+    });
+    await tx.auditLog.create({
+      data: {
+        tenantId: company.tenantId,
+        companyId: company.id,
+        actorUserId: actorUserId ?? null,
+        actorType,
+        action: 'SUBSCRIPTION_CREATED',
+        entityType: 'Subscription',
+        entityId: subscription.id,
+        afterData: { status: subscription.status, planId: plan.id },
+      },
+    });
+    return subscription;
+  }
+
+  /**
+   * Auto-trial on Company creation. Always uses the Plan currently marked
+   * `isDefaultTrial: true` and a MONTHLY price in the company's currency —
+   * if either is missing, this throws (NotFoundException), and
+   * CompanyManagementService.create() lets that fail the whole Company
+   * creation loudly rather than create a subscription-less company.
+   */
+  async createTrialForNewCompany(
+    company: { id: string; tenantId: string; baseCurrencyCode: string },
+    actorUserId: string,
+    tx: Prisma.TransactionClient,
+  ) {
+    const plan = await tx.plan.findFirst({
+      where: { isDefaultTrial: true, status: PlanStatus.ACTIVE },
+    });
+    if (!plan) {
+      throw new NotFoundException(
+        'No default-trial Plan is configured (Plan.isDefaultTrial) — cannot create a Company without one.',
+      );
+    }
+
+    const now = new Date();
+    const price = await tx.planPrice.findFirst({
+      where: {
+        planId: plan.id,
+        billingCycle: BillingCycle.MONTHLY,
+        currencyCode: company.baseCurrencyCode,
+        isActive: true,
+        effectiveFrom: { lte: now },
+        OR: [{ effectiveTo: null }, { effectiveTo: { gt: now } }],
+      },
+      orderBy: { effectiveFrom: 'desc' },
+    });
+    if (!price) {
+      throw new NotFoundException(
+        `Default-trial Plan "${plan.code}" has no active MONTHLY price in ${company.baseCurrencyCode} — cannot create a Company without one.`,
+      );
+    }
+
+    return this.buildSubscription(tx, {
+      company,
+      plan,
+      billingCycle: BillingCycle.MONTHLY,
+      price,
+      actorUserId,
+      actorType: AuditActorType.SYSTEM,
+      reason: 'AUTO_TRIAL_ON_COMPANY_CREATE',
+      source: 'SYSTEM',
     });
   }
 
@@ -469,6 +557,55 @@ export class SubscriptionService {
         },
       },
     );
+  }
+
+  /**
+   * Platform Admin override — not a `SubscriptionStatus` transition, so this
+   * stays a direct field update (same shape as the company-side
+   * `updateAutoRenew()`), just id-scoped via `findForPlatformAction()`
+   * instead of `scoped()`. Unlike the company-side method, this writes a
+   * real AuditLog entry — every other platform action already does, and
+   * there's no reason this one should be the exception.
+   */
+  async updateAutoRenewForPlatform(
+    id: string,
+    dto: UpdateAutoRenewDto,
+    context: PlatformSubscriptionContext,
+  ) {
+    const subscription = await this.findForPlatformAction(id);
+
+    if (
+      subscription.status === SubscriptionStatus.CANCELLED ||
+      subscription.status === SubscriptionStatus.EXPIRED
+    ) {
+      throw new BadRequestException(
+        'Auto-renew cannot be changed in this state.',
+      );
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await tx.subscription.update({
+        where: { id },
+        data: { autoRenew: dto.autoRenew },
+      });
+
+      await tx.auditLog.create({
+        data: {
+          tenantId: updated.tenantId,
+          companyId: updated.companyId,
+          actorUserId: context.userId,
+          actorType: context.actorType,
+          action: 'SUBSCRIPTION_AUTO_RENEW_UPDATED',
+          entityType: 'Subscription',
+          entityId: updated.id,
+          beforeData: { autoRenew: subscription.autoRenew },
+          afterData: { autoRenew: updated.autoRenew },
+          metadata: { action: 'PLATFORM_AUTO_RENEW_UPDATE' },
+        },
+      });
+
+      return updated;
+    });
   }
 
   async cancelForPlatform(

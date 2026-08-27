@@ -214,6 +214,7 @@ export const PlanScalarFieldEnum = {
   description: 'description',
   trialDays: 'trialDays',
   isPublic: 'isPublic',
+  isDefaultTrial: 'isDefaultTrial',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -396,7 +397,8 @@ export const SubscriptionScalarFieldEnum = {
   updatedAt: 'updatedAt',
   suspendedAt: 'suspendedAt',
   pastDueEndsAt: 'pastDueEndsAt',
-  suspensionExpiresAt: 'suspensionExpiresAt'
+  suspensionExpiresAt: 'suspensionExpiresAt',
+  isComplimentary: 'isComplimentary'
 } as const
 
 export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum]

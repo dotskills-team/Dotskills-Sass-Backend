@@ -4,8 +4,10 @@ import { Injectable } from '@nestjs/common';
 
 import {
   AuditActorType,
+  InvoiceStatus,
   SubscriptionStatus,
 } from 'src/generated/phase-1-prisma/enums';
+import { InvoiceService } from '../invoice/invoice.service';
 
 import {
   LifecycleRunResult,
@@ -29,7 +31,10 @@ type ActorContext =
 export class SubscriptionLifecycleService {
   private readonly logger = new Logger(SubscriptionLifecycleService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly invoiceService: InvoiceService,
+  ) {}
 
   async paymentSucceeded(
     id: string,
@@ -350,6 +355,7 @@ export class SubscriptionLifecycleService {
   async runDueTransitions(now = new Date()): Promise<LifecycleRunResult> {
     const result: LifecycleRunResult = {
       trialsActivated: 0,
+      trialsExpired: 0,
       activeMarkedPastDue: 0,
       pastDueMovedToGrace: 0,
       graceSuspended: 0,
@@ -357,9 +363,27 @@ export class SubscriptionLifecycleService {
       cancelledExpired: 0,
       failures: [],
     };
+    /**
+     * A trial ending is only "graduation to a real subscription" if the
+     * company actually moved off the default-trial Plan during the trial
+     * (via the existing change-plan flow) — otherwise nobody ever chose to
+     * pay, and the subscription must lapse to EXPIRED, not silently become
+     * ACTIVE forever. Known accepted edge case: if Admin re-points
+     * isDefaultTrial to a different Plan mid-flight, an older trial still
+     * on the *old* default-trial Plan will look "upgraded" here and go
+     * ACTIVE instead — not worth a historical-tracking column for this
+     * rare admin action.
+     */
     await this.processDue(
       SubscriptionStatus.TRIALING,
-      { trialEndsAt: { lte: now } },
+      { trialEndsAt: { lte: now }, plan: { isDefaultTrial: true } },
+      SubscriptionStatus.EXPIRED,
+      result,
+      'trialsExpired',
+    );
+    await this.processDue(
+      SubscriptionStatus.TRIALING,
+      { trialEndsAt: { lte: now }, plan: { isDefaultTrial: false } },
       SubscriptionStatus.ACTIVE,
       result,
       'trialsActivated',
@@ -427,6 +451,76 @@ export class SubscriptionLifecycleService {
       result,
       'cancelledExpired',
     );
+    return result;
+  }
+
+  /**
+   * An ISSUED Invoice sitting under a struggling (PAST_DUE/GRACE/SUSPENDED)
+   * Subscription for more than STALE_ISSUED_INVOICE_DAYS (fixed at 30, not
+   * configurable) auto-VOIDs — reuses the existing InvoiceService.void(),
+   * never reimplements it. If the Subscription is still SUSPENDED at that
+   * exact moment, it's moved straight to EXPIRED (via the existing
+   * transition()) instead of waiting out its own independent suspension
+   * timer — there is no longer a payable Invoice for it, so the lifecycle
+   * is over either way, and Owner recovery goes through the self-service
+   * Resubscribe flow with the Plan's *current* price, never the stale one.
+   */
+  async voidStaleIssuedInvoices(now = new Date()) {
+    const result = { invoicesVoided: 0, subscriptionsExpired: 0, failures: [] as Array<{ invoiceId: string; message: string }> };
+
+    const cutoff = new Date(
+      now.getTime() -
+        SUBSCRIPTION_CONSTANTS.STALE_ISSUED_INVOICE_DAYS * 24 * 60 * 60 * 1000,
+    );
+
+    const staleInvoices = await this.prisma.invoice.findMany({
+      where: {
+        status: InvoiceStatus.ISSUED,
+        issuedAt: { lte: cutoff },
+        subscription: {
+          status: {
+            in: [
+              SubscriptionStatus.PAST_DUE,
+              SubscriptionStatus.GRACE,
+              SubscriptionStatus.SUSPENDED,
+            ],
+          },
+        },
+      },
+      include: { subscription: true },
+      take: SUBSCRIPTION_CONSTANTS.LIFECYCLE_BATCH_SIZE,
+      orderBy: { issuedAt: 'asc' },
+    });
+
+    for (const invoice of staleInvoices) {
+      try {
+        await this.invoiceService.void(invoice.id);
+        result.invoicesVoided += 1;
+
+        if (invoice.subscription.status === SubscriptionStatus.SUSPENDED) {
+          await this.transition(
+            invoice.subscription,
+            SubscriptionStatus.EXPIRED,
+            {
+              tenantId: invoice.subscription.tenantId,
+              companyId: invoice.subscription.companyId,
+              actorType: AuditActorType.SYSTEM,
+            },
+            {
+              reason: 'STALE_ISSUED_INVOICE_VOIDED',
+              source: 'SCHEDULER',
+            },
+          );
+          result.subscriptionsExpired += 1;
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Unknown lifecycle error';
+        result.failures.push({ invoiceId: invoice.id, message });
+        this.logger.error({ invoiceId: invoice.id, message });
+      }
+    }
+
     return result;
   }
 
@@ -534,7 +628,7 @@ export class SubscriptionLifecycleService {
     return result;
   }
 
-  private addDays(date: Date, days: number) {
+  addDays(date: Date, days: number) {
     const result = new Date(date);
     result.setUTCDate(result.getUTCDate() + days);
     return result;

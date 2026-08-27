@@ -3,6 +3,7 @@ import { CompanyContextGuard } from '../../common/guards/company-context.guard';
 import { CompanyPermissionsGuard } from '../../common/guards/company-permissions.guard';
 import { CompanyScopeGuard } from '../../common/guards/company-scope.guard';
 import { PlatformPermissionsGuard } from '../../common/guards/platform-permissions.guard';
+import { SubscriptionStatusGuard } from '../../common/guards/subscription-status.guard';
 import { PrismaModule } from '../../prisma/prisma.module';
 import {
   CompanyRbacBootstrapController,
@@ -20,6 +21,7 @@ import { AuthModule } from '../auth/auth.module';
     CompanyPermissionsGuard,
     CompanyScopeGuard,
     PlatformPermissionsGuard,
+    SubscriptionStatusGuard,
   ],
   exports: [CompanyRbacService, CompanyScopeGuard],
 })

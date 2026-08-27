@@ -52,6 +52,8 @@ import { Module } from '@nestjs/common';
 import { CompanyContextGuard } from '../../common/guards/company-context.guard';
 import { CompanyPermissionsGuard } from '../../common/guards/company-permissions.guard';
 import { PlatformPermissionsGuard } from '../../common/guards/platform-permissions.guard';
+import { SubscriptionStatusGuard } from '../../common/guards/subscription-status.guard';
+import { InvoiceModule } from '../invoice/invoice.module';
 
 import { PlatformSubscriptionController } from './platform-subscription.controller';
 import { SubscriptionController } from './subscription.controller';
@@ -60,6 +62,7 @@ import { SubscriptionScheduler } from './subscription.scheduler';
 import { SubscriptionService } from './subscription.service';
 
 @Module({
+  imports: [InvoiceModule],
   controllers: [SubscriptionController, PlatformSubscriptionController],
 
   providers: [
@@ -69,6 +72,7 @@ import { SubscriptionService } from './subscription.service';
     CompanyContextGuard,
     CompanyPermissionsGuard,
     PlatformPermissionsGuard,
+    SubscriptionStatusGuard,
   ],
 
   exports: [SubscriptionService, SubscriptionLifecycleService],

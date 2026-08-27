@@ -296,20 +296,22 @@ model Feature {
 }
 
 model Plan {
-  id            String         @id @default(uuid()) @db.Uuid
-  code          String         @unique @db.VarChar(50)
-  name          String         @db.VarChar(120)
-  description   String?        @db.Text
-  trialDays     Int            @default(0)
-  isPublic      Boolean        @default(true)
-  status        PlanStatus     @default(ACTIVE)
-  createdAt     DateTime       @default(now()) @db.Timestamptz(6)
-  updatedAt     DateTime       @updatedAt @db.Timestamptz(6)
-  prices        PlanPrice[]
-  features      PlanFeature[]
-  subscriptions Subscription[]
+  id             String         @id @default(uuid()) @db.Uuid
+  code           String         @unique @db.VarChar(50)
+  name           String         @db.VarChar(120)
+  description    String?        @db.Text
+  trialDays      Int            @default(0)
+  isPublic       Boolean        @default(true)
+  isDefaultTrial Boolean        @default(false)
+  status         PlanStatus     @default(ACTIVE)
+  createdAt      DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime       @updatedAt @db.Timestamptz(6)
+  prices         PlanPrice[]
+  features       PlanFeature[]
+  subscriptions  Subscription[]
 
   @@index([status, isPublic])
+  @@index([isDefaultTrial])
   @@map("plans")
 }
 
@@ -553,6 +555,7 @@ model Subscription {
   suspendedAt        DateTime? @db.Timestamptz(6)
   pastDueEndsAt       DateTime? @db.Timestamptz(6)
   suspensionExpiresAt DateTime? @db.Timestamptz(6)
+  isComplimentary    Boolean   @default(false)
   events             SubscriptionEvent[]
   billings           Billing[]
   invoices           Invoice[]

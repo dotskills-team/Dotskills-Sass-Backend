@@ -14,5 +14,11 @@ export class SubscriptionScheduler {
   async processLifecycle() {
     const result = await this.lifecycle.runDueTransitions();
     this.logger.log({ event: 'subscription_lifecycle_completed', ...result });
+
+    const staleInvoiceResult = await this.lifecycle.voidStaleIssuedInvoices();
+    this.logger.log({
+      event: 'stale_issued_invoices_completed',
+      ...staleInvoiceResult,
+    });
   }
 }

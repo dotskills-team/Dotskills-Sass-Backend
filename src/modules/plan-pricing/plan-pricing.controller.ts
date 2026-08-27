@@ -2,11 +2,14 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
+  Ip,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 
@@ -36,8 +39,17 @@ export class PlanPricingController {
     planId: string,
     @Body()
     dto: CreatePlanPriceDto,
+    @Req() req: any,
+    @Ip() ipAddress: string,
+    @Headers('user-agent') userAgent?: string,
+    @Headers('x-request-id') requestId?: string,
   ) {
-    return this.planPricingService.create(planId, dto);
+    return this.planPricingService.create(planId, dto, {
+      actorUserId: req.user?.userId,
+      ipAddress,
+      userAgent,
+      requestId,
+    });
   }
 
   @Get()
@@ -71,8 +83,17 @@ export class PlanPricingController {
     priceId: string,
     @Body()
     dto: UpdatePlanPriceDto,
+    @Req() req: any,
+    @Ip() ipAddress: string,
+    @Headers('user-agent') userAgent?: string,
+    @Headers('x-request-id') requestId?: string,
   ) {
-    return this.planPricingService.update(planId, priceId, dto);
+    return this.planPricingService.update(planId, priceId, dto, {
+      actorUserId: req.user?.userId,
+      ipAddress,
+      userAgent,
+      requestId,
+    });
   }
 
   @Patch(':priceId/activate')
@@ -82,8 +103,17 @@ export class PlanPricingController {
     planId: string,
     @Param('priceId', ParseUUIDPipe)
     priceId: string,
+    @Req() req: any,
+    @Ip() ipAddress: string,
+    @Headers('user-agent') userAgent?: string,
+    @Headers('x-request-id') requestId?: string,
   ) {
-    return this.planPricingService.activate(planId, priceId);
+    return this.planPricingService.activate(planId, priceId, {
+      actorUserId: req.user?.userId,
+      ipAddress,
+      userAgent,
+      requestId,
+    });
   }
 
   @Patch(':priceId/deactivate')
@@ -93,7 +123,16 @@ export class PlanPricingController {
     planId: string,
     @Param('priceId', ParseUUIDPipe)
     priceId: string,
+    @Req() req: any,
+    @Ip() ipAddress: string,
+    @Headers('user-agent') userAgent?: string,
+    @Headers('x-request-id') requestId?: string,
   ) {
-    return this.planPricingService.deactivate(planId, priceId);
+    return this.planPricingService.deactivate(planId, priceId, {
+      actorUserId: req.user?.userId,
+      ipAddress,
+      userAgent,
+      requestId,
+    });
   }
 }

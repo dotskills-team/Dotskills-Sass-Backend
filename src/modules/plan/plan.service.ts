@@ -320,6 +320,7 @@ export class PlanService {
         description: true,
         trialDays: true,
         isPublic: true,
+        isDefaultTrial: true,
         status: true,
       },
     });
@@ -373,11 +374,28 @@ export class PlanService {
       data.isPublic = dto.isPublic;
     }
 
+    if (dto.isDefaultTrial !== undefined) {
+      data.isDefaultTrial = dto.isDefaultTrial;
+    }
+
     if (Object.keys(data).length === 0) {
       throw new BadRequestException('No fields provided for update');
     }
 
     const updatedPlan = await this.prisma.$transaction(async (tx) => {
+      /**
+       * Exactly one Plan may be the default-trial Plan at a time (mirrors
+       * CompanyOwnership.isPrimary's existing "only one" pattern) — a new
+       * Company's auto-trial subscription always uses whichever Plan this
+       * flag is currently on, so ambiguity here would be a real business bug.
+       */
+      if (dto.isDefaultTrial === true) {
+        await tx.plan.updateMany({
+          where: { NOT: { id }, isDefaultTrial: true },
+          data: { isDefaultTrial: false },
+        });
+      }
+
       const plan = await tx.plan.update({
         where: {
           id,
@@ -392,6 +410,7 @@ export class PlanService {
           description: true,
           trialDays: true,
           isPublic: true,
+          isDefaultTrial: true,
           status: true,
           createdAt: true,
           updatedAt: true,
@@ -424,6 +443,7 @@ export class PlanService {
             description: existingPlan.description,
             trialDays: existingPlan.trialDays,
             isPublic: existingPlan.isPublic,
+            isDefaultTrial: existingPlan.isDefaultTrial,
             status: existingPlan.status,
           },
 
@@ -433,6 +453,7 @@ export class PlanService {
             description: plan.description,
             trialDays: plan.trialDays,
             isPublic: plan.isPublic,
+            isDefaultTrial: plan.isDefaultTrial,
             status: plan.status,
           },
 

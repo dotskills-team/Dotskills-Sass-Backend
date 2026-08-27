@@ -34,8 +34,12 @@ export class InvoiceService {
   // CREATE
   // ============================================================
 
-  async create(dto: CreateInvoiceDto, actorUserId?: string) {
-    return this.prisma.$transaction(async (tx) => {
+  async create(
+    dto: CreateInvoiceDto,
+    actorUserId?: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const run = async (tx: Prisma.TransactionClient) => {
       const billing = await tx.billing.findUnique({
         where: { id: dto.billingId },
         include: { invoice: true },
@@ -116,7 +120,9 @@ export class InvoiceService {
             tenantId: invoice.tenantId,
             companyId: invoice.companyId,
             actorUserId: actorUserId ?? null,
-            actorType: AuditActorType.PLATFORM_MEMBER,
+            actorType: actorUserId
+              ? AuditActorType.PLATFORM_MEMBER
+              : AuditActorType.SYSTEM,
             action: 'INVOICE_CREATED',
             entityType: 'Invoice',
             entityId: invoice.id,
@@ -141,7 +147,10 @@ export class InvoiceService {
         }
         throw error;
       }
-    });
+    };
+
+    if (tx) return run(tx);
+    return this.prisma.$transaction(run);
   }
 
   // ============================================================
@@ -252,8 +261,12 @@ export class InvoiceService {
   // ISSUE
   // ============================================================
 
-  async issue(id: string, actorUserId?: string) {
-    return this.prisma.$transaction(async (tx) => {
+  async issue(
+    id: string,
+    actorUserId?: string,
+    tx?: Prisma.TransactionClient,
+  ) {
+    const run = async (tx: Prisma.TransactionClient) => {
       const invoice = await tx.invoice.findUnique({ where: { id } });
 
       if (!invoice) {
@@ -278,7 +291,9 @@ export class InvoiceService {
           tenantId: invoice.tenantId,
           companyId: invoice.companyId,
           actorUserId: actorUserId ?? null,
-          actorType: AuditActorType.PLATFORM_MEMBER,
+          actorType: actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
           action: 'INVOICE_ISSUED',
           entityType: 'Invoice',
           entityId: invoice.id,
@@ -288,7 +303,10 @@ export class InvoiceService {
       });
 
       return updated;
-    });
+    };
+
+    if (tx) return run(tx);
+    return this.prisma.$transaction(run);
   }
 
   // ============================================================
@@ -364,7 +382,9 @@ export class InvoiceService {
           tenantId: invoice.tenantId,
           companyId: invoice.companyId,
           actorUserId: actorUserId ?? null,
-          actorType: AuditActorType.PLATFORM_MEMBER,
+          actorType: actorUserId
+            ? AuditActorType.PLATFORM_MEMBER
+            : AuditActorType.SYSTEM,
           action: 'INVOICE_VOIDED',
           entityType: 'Invoice',
           entityId: invoice.id,

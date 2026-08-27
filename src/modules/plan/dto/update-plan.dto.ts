@@ -36,4 +36,8 @@ export class UpdatePlanDto {
   @IsOptional()
   @IsBoolean()
   isPublic?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isDefaultTrial?: boolean;
 }

@@ -191,6 +191,56 @@ describe('InvoiceService', () => {
         BadRequestException,
       );
     });
+
+    /**
+     * void() is now also called by the scheduler (voidStaleIssuedInvoices)
+     * with no actorUserId — the audit trail must correctly attribute that
+     * as a SYSTEM action, not silently record it as a human Platform Admin.
+     */
+    it('records actorType SYSTEM when called with no actorUserId (scheduler-triggered)', async () => {
+      mockTx.invoice.findUnique.mockResolvedValue({
+        ...baseInvoice,
+        status: InvoiceStatus.ISSUED,
+      });
+      mockTx.invoice.update.mockResolvedValue({
+        ...baseInvoice,
+        status: InvoiceStatus.VOID,
+      });
+
+      await service.void('invoice-1');
+
+      expect(mockTx.auditLog.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            actorUserId: null,
+            actorType: 'SYSTEM',
+            action: 'INVOICE_VOIDED',
+          }),
+        }),
+      );
+    });
+
+    it('records actorType PLATFORM_MEMBER when an actorUserId is given (Admin-triggered)', async () => {
+      mockTx.invoice.findUnique.mockResolvedValue({
+        ...baseInvoice,
+        status: InvoiceStatus.ISSUED,
+      });
+      mockTx.invoice.update.mockResolvedValue({
+        ...baseInvoice,
+        status: InvoiceStatus.VOID,
+      });
+
+      await service.void('invoice-1', 'admin-1');
+
+      expect(mockTx.auditLog.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            actorUserId: 'admin-1',
+            actorType: 'PLATFORM_MEMBER',
+          }),
+        }),
+      );
+    });
   });
 
   describe('markPaid', () => {

@@ -61,6 +61,12 @@ export const SUBSCRIPTION_CONSTANTS = {
 
   // Maximum scheduler processing batch
   LIFECYCLE_BATCH_SIZE: 100,
+
+  // ISSUED invoice sitting under a PAST_DUE/GRACE/SUSPENDED subscription
+  // auto-VOIDs after this many days from issuedAt (fixed, not configurable
+  // — a config knob here isn't worth the risk of someone quietly setting
+  // it to something that lets a stale, mispriced invoice stay payable).
+  STALE_ISSUED_INVOICE_DAYS: 30,
 } as const;
 
 /**

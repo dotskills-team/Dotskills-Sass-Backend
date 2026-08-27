@@ -11,12 +11,42 @@ import { CreatePlanPriceDto } from './dto/create-plan-price.dto';
 import { UpdatePlanPriceDto } from './dto/update-plan-price.dto';
 import { PlanPriceQueryDto } from './dto/plan-price-query.dto';
 import { BillingCycle, Prisma } from 'src/generated/phase-1-prisma/client';
+import { AuditActorType } from 'src/generated/phase-1-prisma/enums';
+
+interface AuditContext {
+  actorUserId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  requestId?: string;
+}
 
 @Injectable()
 export class PlanPricingService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(planId: string, dto: CreatePlanPriceDto) {
+  private auditData(
+    context: AuditContext,
+    action: string,
+    entityId: string,
+    extra?: { beforeData?: unknown; afterData?: unknown },
+  ) {
+    return {
+      actorUserId: context.actorUserId ?? null,
+      actorType: context.actorUserId
+        ? AuditActorType.PLATFORM_MEMBER
+        : AuditActorType.SYSTEM,
+      action,
+      entityType: 'PlanPrice',
+      entityId,
+      requestId: context.requestId ?? null,
+      ipAddress: context.ipAddress ?? null,
+      userAgent: context.userAgent ?? null,
+      beforeData: extra?.beforeData as Prisma.InputJsonValue | undefined,
+      afterData: extra?.afterData as Prisma.InputJsonValue | undefined,
+    };
+  }
+
+  async create(planId: string, dto: CreatePlanPriceDto, context: AuditContext = {}) {
     const plan = await this.prisma.plan.findUnique({
       where: {
         id: planId,
@@ -60,17 +90,27 @@ export class PlanPricingService {
     }
 
     try {
-      return await this.prisma.planPrice.create({
-        data: {
-          planId,
-          billingCycle: dto.billingCycle,
-          currencyCode,
-          amount: new Prisma.Decimal(dto.amount),
-          effectiveFrom,
-          effectiveTo,
-          isActive,
-        },
-        select: this.priceSelect(),
+      return await this.prisma.$transaction(async (tx) => {
+        const created = await tx.planPrice.create({
+          data: {
+            planId,
+            billingCycle: dto.billingCycle,
+            currencyCode,
+            amount: new Prisma.Decimal(dto.amount),
+            effectiveFrom,
+            effectiveTo,
+            isActive,
+          },
+          select: this.priceSelect(),
+        });
+
+        await tx.auditLog.create({
+          data: this.auditData(context, 'PLAN_PRICE_CREATED', created.id, {
+            afterData: created,
+          }),
+        });
+
+        return created;
       });
     } catch (error) {
       this.handlePrismaError(error);
@@ -129,7 +169,12 @@ export class PlanPricingService {
     return price;
   }
 
-  async update(planId: string, priceId: string, dto: UpdatePlanPriceDto) {
+  async update(
+    planId: string,
+    priceId: string,
+    dto: UpdatePlanPriceDto,
+    context: AuditContext = {},
+  ) {
     const existing = await this.prisma.planPrice.findFirst({
       where: {
         id: priceId,
@@ -177,43 +222,58 @@ export class PlanPricingService {
     }
 
     try {
-      return await this.prisma.planPrice.update({
-        where: {
-          id: priceId,
-        },
-        data: {
-          ...(dto.amount !== undefined
-            ? {
-                amount: new Prisma.Decimal(dto.amount),
-              }
-            : {}),
+      return await this.prisma.$transaction(async (tx) => {
+        const updated = await tx.planPrice.update({
+          where: {
+            id: priceId,
+          },
+          data: {
+            ...(dto.amount !== undefined
+              ? {
+                  amount: new Prisma.Decimal(dto.amount),
+                }
+              : {}),
 
-          ...(dto.effectiveFrom !== undefined
-            ? {
-                effectiveFrom,
-              }
-            : {}),
+            ...(dto.effectiveFrom !== undefined
+              ? {
+                  effectiveFrom,
+                }
+              : {}),
 
-          ...(dto.effectiveTo !== undefined
-            ? {
-                effectiveTo,
-              }
-            : {}),
+            ...(dto.effectiveTo !== undefined
+              ? {
+                  effectiveTo,
+                }
+              : {}),
 
-          ...(dto.isActive !== undefined
-            ? {
-                isActive: dto.isActive,
-              }
-            : {}),
-        },
-        select: this.priceSelect(),
+            ...(dto.isActive !== undefined
+              ? {
+                  isActive: dto.isActive,
+                }
+              : {}),
+          },
+          select: this.priceSelect(),
+        });
+
+        await tx.auditLog.create({
+          data: this.auditData(context, 'PLAN_PRICE_UPDATED', updated.id, {
+            beforeData: existing,
+            afterData: updated,
+          }),
+        });
+
+        return updated;
       });
     } catch (error) {
       this.handlePrismaError(error);
     }
   }
 
-  async activate(planId: string, priceId: string) {
+  async activate(
+    planId: string,
+    priceId: string,
+    context: AuditContext = {},
+  ) {
     const price = await this.prisma.planPrice.findFirst({
       where: {
         id: priceId,
@@ -246,18 +306,33 @@ export class PlanPricingService {
       excludePriceId: price.id,
     });
 
-    return this.prisma.planPrice.update({
-      where: {
-        id: priceId,
-      },
-      data: {
-        isActive: true,
-      },
-      select: this.priceSelect(),
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await tx.planPrice.update({
+        where: {
+          id: priceId,
+        },
+        data: {
+          isActive: true,
+        },
+        select: this.priceSelect(),
+      });
+
+      await tx.auditLog.create({
+        data: this.auditData(context, 'PLAN_PRICE_ACTIVATED', updated.id, {
+          beforeData: { isActive: false },
+          afterData: { isActive: true },
+        }),
+      });
+
+      return updated;
     });
   }
 
-  async deactivate(planId: string, priceId: string) {
+  async deactivate(
+    planId: string,
+    priceId: string,
+    context: AuditContext = {},
+  ) {
     const price = await this.prisma.planPrice.findFirst({
       where: {
         id: priceId,
@@ -277,14 +352,25 @@ export class PlanPricingService {
       return this.findOne(planId, priceId);
     }
 
-    return this.prisma.planPrice.update({
-      where: {
-        id: priceId,
-      },
-      data: {
-        isActive: false,
-      },
-      select: this.priceSelect(),
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await tx.planPrice.update({
+        where: {
+          id: priceId,
+        },
+        data: {
+          isActive: false,
+        },
+        select: this.priceSelect(),
+      });
+
+      await tx.auditLog.create({
+        data: this.auditData(context, 'PLAN_PRICE_DEACTIVATED', updated.id, {
+          beforeData: { isActive: true },
+          afterData: { isActive: false },
+        }),
+      });
+
+      return updated;
     });
   }
 

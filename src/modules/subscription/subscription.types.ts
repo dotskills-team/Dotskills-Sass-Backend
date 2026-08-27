@@ -55,6 +55,7 @@ export interface TransitionOptions {
 
 export interface LifecycleRunResult {
   trialsActivated: number;
+  trialsExpired: number;
   activeMarkedPastDue: number;
   pastDueMovedToGrace: number;
   graceSuspended: number;

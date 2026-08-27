@@ -9,6 +9,7 @@ import {
   IndustryStatus,
 } from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
+import { SubscriptionService } from '../subscription/subscription.service';
 
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
@@ -17,7 +18,10 @@ import { UpdateCompanyStatusDto } from './dto/update-company-status.dto';
 
 @Injectable()
 export class CompanyManagementService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly subscriptionService: SubscriptionService,
+  ) {}
 
   async create(dto: CreateCompanyDto, createdByUserId: string) {
     const creator = await this.prisma.user.findUnique({
@@ -82,22 +86,40 @@ export class CompanyManagementService {
       );
     }
 
-    return this.prisma.company.create({
-      data: {
-        tenantId: dto.tenantId,
-        industryId: dto.industryId,
-        createdByUserId: creator.id,
+    /**
+     * A Company is never created without a real Subscription behind it —
+     * if no Plan is currently marked isDefaultTrial (or it has no active
+     * MONTHLY price in the company's currency), createTrialForNewCompany()
+     * throws and this whole transaction rolls back, so Company creation
+     * fails loudly with an actionable message instead of silently
+     * producing a subscription-less company.
+     */
+    return this.prisma.$transaction(async (tx) => {
+      const company = await tx.company.create({
+        data: {
+          tenantId: dto.tenantId,
+          industryId: dto.industryId,
+          createdByUserId: creator.id,
 
-        code: dto.code,
-        legalName: dto.legalName,
-        tradeName: dto.tradeName,
-        email: dto.email,
-        phone: dto.phone,
-        taxId: dto.taxId,
-        registrationNo: dto.registrationNo,
-        baseCurrencyCode: dto.baseCurrencyCode,
-        timezone: dto.timezone,
-      },
+          code: dto.code,
+          legalName: dto.legalName,
+          tradeName: dto.tradeName,
+          email: dto.email,
+          phone: dto.phone,
+          taxId: dto.taxId,
+          registrationNo: dto.registrationNo,
+          baseCurrencyCode: dto.baseCurrencyCode,
+          timezone: dto.timezone,
+        },
+      });
+
+      await this.subscriptionService.createTrialForNewCompany(
+        company,
+        createdByUserId,
+        tx,
+      );
+
+      return company;
     });
   }
 

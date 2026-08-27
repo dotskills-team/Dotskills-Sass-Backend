@@ -49,6 +49,7 @@ import { PlanPricingModule } from './modules/plan-pricing/plan-pricing.module';
 // import { SubscriptionModule } from './modules/subscription-management/subscription.module';
 import { FeatureModule } from './modules/features-list/feature.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
+import { SubscriptionRenewalModule } from './modules/subscription/subscription-renewal.module';
 import { BillingModule } from './modules/billing/billing.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { PaymentModule } from './modules/payment/payment.module';
@@ -84,6 +85,7 @@ import { PaymentModule } from './modules/payment/payment.module';
     PlanPricingModule,
     FeatureModule,
     SubscriptionModule,
+    SubscriptionRenewalModule,
     BillingModule,
     InvoiceModule,
     PaymentModule,

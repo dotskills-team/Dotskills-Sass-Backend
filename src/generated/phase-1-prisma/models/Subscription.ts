@@ -43,6 +43,7 @@ export type SubscriptionMinAggregateOutputType = {
   suspendedAt: Date | null
   pastDueEndsAt: Date | null
   suspensionExpiresAt: Date | null
+  isComplimentary: boolean | null
 }
 
 export type SubscriptionMaxAggregateOutputType = {
@@ -64,6 +65,7 @@ export type SubscriptionMaxAggregateOutputType = {
   suspendedAt: Date | null
   pastDueEndsAt: Date | null
   suspensionExpiresAt: Date | null
+  isComplimentary: boolean | null
 }
 
 export type SubscriptionCountAggregateOutputType = {
@@ -86,6 +88,7 @@ export type SubscriptionCountAggregateOutputType = {
   suspendedAt: number
   pastDueEndsAt: number
   suspensionExpiresAt: number
+  isComplimentary: number
   _all: number
 }
 
@@ -109,6 +112,7 @@ export type SubscriptionMinAggregateInputType = {
   suspendedAt?: true
   pastDueEndsAt?: true
   suspensionExpiresAt?: true
+  isComplimentary?: true
 }
 
 export type SubscriptionMaxAggregateInputType = {
@@ -130,6 +134,7 @@ export type SubscriptionMaxAggregateInputType = {
   suspendedAt?: true
   pastDueEndsAt?: true
   suspensionExpiresAt?: true
+  isComplimentary?: true
 }
 
 export type SubscriptionCountAggregateInputType = {
@@ -152,6 +157,7 @@ export type SubscriptionCountAggregateInputType = {
   suspendedAt?: true
   pastDueEndsAt?: true
   suspensionExpiresAt?: true
+  isComplimentary?: true
   _all?: true
 }
 
@@ -247,6 +253,7 @@ export type SubscriptionGroupByOutputType = {
   suspendedAt: Date | null
   pastDueEndsAt: Date | null
   suspensionExpiresAt: Date | null
+  isComplimentary: boolean
   _count: SubscriptionCountAggregateOutputType | null
   _min: SubscriptionMinAggregateOutputType | null
   _max: SubscriptionMaxAggregateOutputType | null
@@ -290,6 +297,7 @@ export type SubscriptionWhereInput = {
   suspendedAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   pastDueEndsAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   suspensionExpiresAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
+  isComplimentary?: Prisma.BoolFilter<"Subscription"> | boolean
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
   company?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
   plan?: Prisma.XOR<Prisma.PlanScalarRelationFilter, Prisma.PlanWhereInput>
@@ -319,6 +327,7 @@ export type SubscriptionOrderByWithRelationInput = {
   suspendedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   pastDueEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   suspensionExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  isComplimentary?: Prisma.SortOrder
   tenant?: Prisma.TenantOrderByWithRelationInput
   company?: Prisma.CompanyOrderByWithRelationInput
   plan?: Prisma.PlanOrderByWithRelationInput
@@ -351,6 +360,7 @@ export type SubscriptionWhereUniqueInput = Prisma.AtLeast<{
   suspendedAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   pastDueEndsAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   suspensionExpiresAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
+  isComplimentary?: Prisma.BoolFilter<"Subscription"> | boolean
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
   company?: Prisma.XOR<Prisma.CompanyNullableScalarRelationFilter, Prisma.CompanyWhereInput> | null
   plan?: Prisma.XOR<Prisma.PlanScalarRelationFilter, Prisma.PlanWhereInput>
@@ -380,6 +390,7 @@ export type SubscriptionOrderByWithAggregationInput = {
   suspendedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   pastDueEndsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   suspensionExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  isComplimentary?: Prisma.SortOrder
   _count?: Prisma.SubscriptionCountOrderByAggregateInput
   _max?: Prisma.SubscriptionMaxOrderByAggregateInput
   _min?: Prisma.SubscriptionMinOrderByAggregateInput
@@ -408,6 +419,7 @@ export type SubscriptionScalarWhereWithAggregatesInput = {
   suspendedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
   pastDueEndsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
   suspensionExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Subscription"> | Date | string | null
+  isComplimentary?: Prisma.BoolWithAggregatesFilter<"Subscription"> | boolean
 }
 
 export type SubscriptionCreateInput = {
@@ -427,6 +439,7 @@ export type SubscriptionCreateInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   tenant: Prisma.TenantCreateNestedOneWithoutSubscriptionsInput
   company?: Prisma.CompanyCreateNestedOneWithoutSubscriptionsInput
   plan: Prisma.PlanCreateNestedOneWithoutSubscriptionsInput
@@ -456,6 +469,7 @@ export type SubscriptionUncheckedCreateInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   events?: Prisma.SubscriptionEventUncheckedCreateNestedManyWithoutSubscriptionInput
   billings?: Prisma.BillingUncheckedCreateNestedManyWithoutSubscriptionInput
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -479,6 +493,7 @@ export type SubscriptionUpdateInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tenant?: Prisma.TenantUpdateOneRequiredWithoutSubscriptionsNestedInput
   company?: Prisma.CompanyUpdateOneWithoutSubscriptionsNestedInput
   plan?: Prisma.PlanUpdateOneRequiredWithoutSubscriptionsNestedInput
@@ -508,6 +523,7 @@ export type SubscriptionUncheckedUpdateInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   events?: Prisma.SubscriptionEventUncheckedUpdateManyWithoutSubscriptionNestedInput
   billings?: Prisma.BillingUncheckedUpdateManyWithoutSubscriptionNestedInput
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -534,6 +550,7 @@ export type SubscriptionCreateManyInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
 }
 
 export type SubscriptionUpdateManyMutationInput = {
@@ -553,6 +570,7 @@ export type SubscriptionUpdateManyMutationInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type SubscriptionUncheckedUpdateManyInput = {
@@ -575,6 +593,7 @@ export type SubscriptionUncheckedUpdateManyInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type SubscriptionListRelationFilter = {
@@ -607,6 +626,7 @@ export type SubscriptionCountOrderByAggregateInput = {
   suspendedAt?: Prisma.SortOrder
   pastDueEndsAt?: Prisma.SortOrder
   suspensionExpiresAt?: Prisma.SortOrder
+  isComplimentary?: Prisma.SortOrder
 }
 
 export type SubscriptionMaxOrderByAggregateInput = {
@@ -628,6 +648,7 @@ export type SubscriptionMaxOrderByAggregateInput = {
   suspendedAt?: Prisma.SortOrder
   pastDueEndsAt?: Prisma.SortOrder
   suspensionExpiresAt?: Prisma.SortOrder
+  isComplimentary?: Prisma.SortOrder
 }
 
 export type SubscriptionMinOrderByAggregateInput = {
@@ -649,6 +670,7 @@ export type SubscriptionMinOrderByAggregateInput = {
   suspendedAt?: Prisma.SortOrder
   pastDueEndsAt?: Prisma.SortOrder
   suspensionExpiresAt?: Prisma.SortOrder
+  isComplimentary?: Prisma.SortOrder
 }
 
 export type SubscriptionScalarRelationFilter = {
@@ -859,6 +881,7 @@ export type SubscriptionCreateWithoutPlanInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   tenant: Prisma.TenantCreateNestedOneWithoutSubscriptionsInput
   company?: Prisma.CompanyCreateNestedOneWithoutSubscriptionsInput
   events?: Prisma.SubscriptionEventCreateNestedManyWithoutSubscriptionInput
@@ -886,6 +909,7 @@ export type SubscriptionUncheckedCreateWithoutPlanInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   events?: Prisma.SubscriptionEventUncheckedCreateNestedManyWithoutSubscriptionInput
   billings?: Prisma.BillingUncheckedCreateNestedManyWithoutSubscriptionInput
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -941,6 +965,7 @@ export type SubscriptionScalarWhereInput = {
   suspendedAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   pastDueEndsAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
   suspensionExpiresAt?: Prisma.DateTimeNullableFilter<"Subscription"> | Date | string | null
+  isComplimentary?: Prisma.BoolFilter<"Subscription"> | boolean
 }
 
 export type SubscriptionCreateWithoutTenantInput = {
@@ -960,6 +985,7 @@ export type SubscriptionCreateWithoutTenantInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   company?: Prisma.CompanyCreateNestedOneWithoutSubscriptionsInput
   plan: Prisma.PlanCreateNestedOneWithoutSubscriptionsInput
   events?: Prisma.SubscriptionEventCreateNestedManyWithoutSubscriptionInput
@@ -987,6 +1013,7 @@ export type SubscriptionUncheckedCreateWithoutTenantInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   events?: Prisma.SubscriptionEventUncheckedCreateNestedManyWithoutSubscriptionInput
   billings?: Prisma.BillingUncheckedCreateNestedManyWithoutSubscriptionInput
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -1036,6 +1063,7 @@ export type SubscriptionCreateWithoutCompanyInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   tenant: Prisma.TenantCreateNestedOneWithoutSubscriptionsInput
   plan: Prisma.PlanCreateNestedOneWithoutSubscriptionsInput
   events?: Prisma.SubscriptionEventCreateNestedManyWithoutSubscriptionInput
@@ -1063,6 +1091,7 @@ export type SubscriptionUncheckedCreateWithoutCompanyInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   events?: Prisma.SubscriptionEventUncheckedCreateNestedManyWithoutSubscriptionInput
   billings?: Prisma.BillingUncheckedCreateNestedManyWithoutSubscriptionInput
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -1112,6 +1141,7 @@ export type SubscriptionCreateWithoutBillingsInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   tenant: Prisma.TenantCreateNestedOneWithoutSubscriptionsInput
   company?: Prisma.CompanyCreateNestedOneWithoutSubscriptionsInput
   plan: Prisma.PlanCreateNestedOneWithoutSubscriptionsInput
@@ -1140,6 +1170,7 @@ export type SubscriptionUncheckedCreateWithoutBillingsInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   events?: Prisma.SubscriptionEventUncheckedCreateNestedManyWithoutSubscriptionInput
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutSubscriptionInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -1178,6 +1209,7 @@ export type SubscriptionUpdateWithoutBillingsInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tenant?: Prisma.TenantUpdateOneRequiredWithoutSubscriptionsNestedInput
   company?: Prisma.CompanyUpdateOneWithoutSubscriptionsNestedInput
   plan?: Prisma.PlanUpdateOneRequiredWithoutSubscriptionsNestedInput
@@ -1206,6 +1238,7 @@ export type SubscriptionUncheckedUpdateWithoutBillingsInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   events?: Prisma.SubscriptionEventUncheckedUpdateManyWithoutSubscriptionNestedInput
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutSubscriptionNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -1228,6 +1261,7 @@ export type SubscriptionCreateWithoutInvoicesInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   tenant: Prisma.TenantCreateNestedOneWithoutSubscriptionsInput
   company?: Prisma.CompanyCreateNestedOneWithoutSubscriptionsInput
   plan: Prisma.PlanCreateNestedOneWithoutSubscriptionsInput
@@ -1256,6 +1290,7 @@ export type SubscriptionUncheckedCreateWithoutInvoicesInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   events?: Prisma.SubscriptionEventUncheckedCreateNestedManyWithoutSubscriptionInput
   billings?: Prisma.BillingUncheckedCreateNestedManyWithoutSubscriptionInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -1294,6 +1329,7 @@ export type SubscriptionUpdateWithoutInvoicesInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tenant?: Prisma.TenantUpdateOneRequiredWithoutSubscriptionsNestedInput
   company?: Prisma.CompanyUpdateOneWithoutSubscriptionsNestedInput
   plan?: Prisma.PlanUpdateOneRequiredWithoutSubscriptionsNestedInput
@@ -1322,6 +1358,7 @@ export type SubscriptionUncheckedUpdateWithoutInvoicesInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   events?: Prisma.SubscriptionEventUncheckedUpdateManyWithoutSubscriptionNestedInput
   billings?: Prisma.BillingUncheckedUpdateManyWithoutSubscriptionNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -1344,6 +1381,7 @@ export type SubscriptionCreateWithoutPaymentsInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   tenant: Prisma.TenantCreateNestedOneWithoutSubscriptionsInput
   company?: Prisma.CompanyCreateNestedOneWithoutSubscriptionsInput
   plan: Prisma.PlanCreateNestedOneWithoutSubscriptionsInput
@@ -1372,6 +1410,7 @@ export type SubscriptionUncheckedCreateWithoutPaymentsInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   events?: Prisma.SubscriptionEventUncheckedCreateNestedManyWithoutSubscriptionInput
   billings?: Prisma.BillingUncheckedCreateNestedManyWithoutSubscriptionInput
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -1410,6 +1449,7 @@ export type SubscriptionUpdateWithoutPaymentsInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tenant?: Prisma.TenantUpdateOneRequiredWithoutSubscriptionsNestedInput
   company?: Prisma.CompanyUpdateOneWithoutSubscriptionsNestedInput
   plan?: Prisma.PlanUpdateOneRequiredWithoutSubscriptionsNestedInput
@@ -1438,6 +1478,7 @@ export type SubscriptionUncheckedUpdateWithoutPaymentsInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   events?: Prisma.SubscriptionEventUncheckedUpdateManyWithoutSubscriptionNestedInput
   billings?: Prisma.BillingUncheckedUpdateManyWithoutSubscriptionNestedInput
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -1460,6 +1501,7 @@ export type SubscriptionCreateWithoutEventsInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   tenant: Prisma.TenantCreateNestedOneWithoutSubscriptionsInput
   company?: Prisma.CompanyCreateNestedOneWithoutSubscriptionsInput
   plan: Prisma.PlanCreateNestedOneWithoutSubscriptionsInput
@@ -1488,6 +1530,7 @@ export type SubscriptionUncheckedCreateWithoutEventsInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
   billings?: Prisma.BillingUncheckedCreateNestedManyWithoutSubscriptionInput
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutSubscriptionInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutSubscriptionInput
@@ -1526,6 +1569,7 @@ export type SubscriptionUpdateWithoutEventsInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tenant?: Prisma.TenantUpdateOneRequiredWithoutSubscriptionsNestedInput
   company?: Prisma.CompanyUpdateOneWithoutSubscriptionsNestedInput
   plan?: Prisma.PlanUpdateOneRequiredWithoutSubscriptionsNestedInput
@@ -1554,6 +1598,7 @@ export type SubscriptionUncheckedUpdateWithoutEventsInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   billings?: Prisma.BillingUncheckedUpdateManyWithoutSubscriptionNestedInput
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutSubscriptionNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -1578,6 +1623,7 @@ export type SubscriptionCreateManyPlanInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
 }
 
 export type SubscriptionUpdateWithoutPlanInput = {
@@ -1597,6 +1643,7 @@ export type SubscriptionUpdateWithoutPlanInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tenant?: Prisma.TenantUpdateOneRequiredWithoutSubscriptionsNestedInput
   company?: Prisma.CompanyUpdateOneWithoutSubscriptionsNestedInput
   events?: Prisma.SubscriptionEventUpdateManyWithoutSubscriptionNestedInput
@@ -1624,6 +1671,7 @@ export type SubscriptionUncheckedUpdateWithoutPlanInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   events?: Prisma.SubscriptionEventUncheckedUpdateManyWithoutSubscriptionNestedInput
   billings?: Prisma.BillingUncheckedUpdateManyWithoutSubscriptionNestedInput
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -1649,6 +1697,7 @@ export type SubscriptionUncheckedUpdateManyWithoutPlanInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type SubscriptionCreateManyTenantInput = {
@@ -1670,6 +1719,7 @@ export type SubscriptionCreateManyTenantInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
 }
 
 export type SubscriptionUpdateWithoutTenantInput = {
@@ -1689,6 +1739,7 @@ export type SubscriptionUpdateWithoutTenantInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   company?: Prisma.CompanyUpdateOneWithoutSubscriptionsNestedInput
   plan?: Prisma.PlanUpdateOneRequiredWithoutSubscriptionsNestedInput
   events?: Prisma.SubscriptionEventUpdateManyWithoutSubscriptionNestedInput
@@ -1716,6 +1767,7 @@ export type SubscriptionUncheckedUpdateWithoutTenantInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   events?: Prisma.SubscriptionEventUncheckedUpdateManyWithoutSubscriptionNestedInput
   billings?: Prisma.BillingUncheckedUpdateManyWithoutSubscriptionNestedInput
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -1741,6 +1793,7 @@ export type SubscriptionUncheckedUpdateManyWithoutTenantInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 export type SubscriptionCreateManyCompanyInput = {
@@ -1762,6 +1815,7 @@ export type SubscriptionCreateManyCompanyInput = {
   suspendedAt?: Date | string | null
   pastDueEndsAt?: Date | string | null
   suspensionExpiresAt?: Date | string | null
+  isComplimentary?: boolean
 }
 
 export type SubscriptionUpdateWithoutCompanyInput = {
@@ -1781,6 +1835,7 @@ export type SubscriptionUpdateWithoutCompanyInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tenant?: Prisma.TenantUpdateOneRequiredWithoutSubscriptionsNestedInput
   plan?: Prisma.PlanUpdateOneRequiredWithoutSubscriptionsNestedInput
   events?: Prisma.SubscriptionEventUpdateManyWithoutSubscriptionNestedInput
@@ -1808,6 +1863,7 @@ export type SubscriptionUncheckedUpdateWithoutCompanyInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
   events?: Prisma.SubscriptionEventUncheckedUpdateManyWithoutSubscriptionNestedInput
   billings?: Prisma.BillingUncheckedUpdateManyWithoutSubscriptionNestedInput
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutSubscriptionNestedInput
@@ -1833,6 +1889,7 @@ export type SubscriptionUncheckedUpdateManyWithoutCompanyInput = {
   suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   pastDueEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   suspensionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isComplimentary?: Prisma.BoolFieldUpdateOperationsInput | boolean
 }
 
 
@@ -1913,6 +1970,7 @@ export type SubscriptionSelect<ExtArgs extends runtime.Types.Extensions.Internal
   suspendedAt?: boolean
   pastDueEndsAt?: boolean
   suspensionExpiresAt?: boolean
+  isComplimentary?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.Subscription$companyArgs<ExtArgs>
   plan?: boolean | Prisma.PlanDefaultArgs<ExtArgs>
@@ -1943,6 +2001,7 @@ export type SubscriptionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   suspendedAt?: boolean
   pastDueEndsAt?: boolean
   suspensionExpiresAt?: boolean
+  isComplimentary?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.Subscription$companyArgs<ExtArgs>
   plan?: boolean | Prisma.PlanDefaultArgs<ExtArgs>
@@ -1968,6 +2027,7 @@ export type SubscriptionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   suspendedAt?: boolean
   pastDueEndsAt?: boolean
   suspensionExpiresAt?: boolean
+  isComplimentary?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.Subscription$companyArgs<ExtArgs>
   plan?: boolean | Prisma.PlanDefaultArgs<ExtArgs>
@@ -1993,9 +2053,10 @@ export type SubscriptionSelectScalar = {
   suspendedAt?: boolean
   pastDueEndsAt?: boolean
   suspensionExpiresAt?: boolean
+  isComplimentary?: boolean
 }
 
-export type SubscriptionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "companyId" | "planId" | "status" | "billingCycle" | "startsAt" | "trialEndsAt" | "currentPeriodStart" | "currentPeriodEnd" | "graceEndsAt" | "cancelledAt" | "autoRenew" | "priceSnapshot" | "createdAt" | "updatedAt" | "suspendedAt" | "pastDueEndsAt" | "suspensionExpiresAt", ExtArgs["result"]["subscription"]>
+export type SubscriptionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "companyId" | "planId" | "status" | "billingCycle" | "startsAt" | "trialEndsAt" | "currentPeriodStart" | "currentPeriodEnd" | "graceEndsAt" | "cancelledAt" | "autoRenew" | "priceSnapshot" | "createdAt" | "updatedAt" | "suspendedAt" | "pastDueEndsAt" | "suspensionExpiresAt" | "isComplimentary", ExtArgs["result"]["subscription"]>
 export type SubscriptionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.Subscription$companyArgs<ExtArgs>
@@ -2048,6 +2109,7 @@ export type $SubscriptionPayload<ExtArgs extends runtime.Types.Extensions.Intern
     suspendedAt: Date | null
     pastDueEndsAt: Date | null
     suspensionExpiresAt: Date | null
+    isComplimentary: boolean
   }, ExtArgs["result"]["subscription"]>
   composites: {}
 }
@@ -2497,6 +2559,7 @@ export interface SubscriptionFieldRefs {
   readonly suspendedAt: Prisma.FieldRef<"Subscription", 'DateTime'>
   readonly pastDueEndsAt: Prisma.FieldRef<"Subscription", 'DateTime'>
   readonly suspensionExpiresAt: Prisma.FieldRef<"Subscription", 'DateTime'>
+  readonly isComplimentary: Prisma.FieldRef<"Subscription", 'Boolean'>
 }
     
 

@@ -41,6 +41,7 @@ export type PlanMinAggregateOutputType = {
   description: string | null
   trialDays: number | null
   isPublic: boolean | null
+  isDefaultTrial: boolean | null
   status: $Enums.PlanStatus | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -53,6 +54,7 @@ export type PlanMaxAggregateOutputType = {
   description: string | null
   trialDays: number | null
   isPublic: boolean | null
+  isDefaultTrial: boolean | null
   status: $Enums.PlanStatus | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -65,6 +67,7 @@ export type PlanCountAggregateOutputType = {
   description: number
   trialDays: number
   isPublic: number
+  isDefaultTrial: number
   status: number
   createdAt: number
   updatedAt: number
@@ -87,6 +90,7 @@ export type PlanMinAggregateInputType = {
   description?: true
   trialDays?: true
   isPublic?: true
+  isDefaultTrial?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -99,6 +103,7 @@ export type PlanMaxAggregateInputType = {
   description?: true
   trialDays?: true
   isPublic?: true
+  isDefaultTrial?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -111,6 +116,7 @@ export type PlanCountAggregateInputType = {
   description?: true
   trialDays?: true
   isPublic?: true
+  isDefaultTrial?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -210,6 +216,7 @@ export type PlanGroupByOutputType = {
   description: string | null
   trialDays: number
   isPublic: boolean
+  isDefaultTrial: boolean
   status: $Enums.PlanStatus
   createdAt: Date
   updatedAt: Date
@@ -245,6 +252,7 @@ export type PlanWhereInput = {
   description?: Prisma.StringNullableFilter<"Plan"> | string | null
   trialDays?: Prisma.IntFilter<"Plan"> | number
   isPublic?: Prisma.BoolFilter<"Plan"> | boolean
+  isDefaultTrial?: Prisma.BoolFilter<"Plan"> | boolean
   status?: Prisma.EnumPlanStatusFilter<"Plan"> | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeFilter<"Plan"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Plan"> | Date | string
@@ -260,6 +268,7 @@ export type PlanOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   trialDays?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  isDefaultTrial?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -278,6 +287,7 @@ export type PlanWhereUniqueInput = Prisma.AtLeast<{
   description?: Prisma.StringNullableFilter<"Plan"> | string | null
   trialDays?: Prisma.IntFilter<"Plan"> | number
   isPublic?: Prisma.BoolFilter<"Plan"> | boolean
+  isDefaultTrial?: Prisma.BoolFilter<"Plan"> | boolean
   status?: Prisma.EnumPlanStatusFilter<"Plan"> | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeFilter<"Plan"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Plan"> | Date | string
@@ -293,6 +303,7 @@ export type PlanOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   trialDays?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  isDefaultTrial?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -313,6 +324,7 @@ export type PlanScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"Plan"> | string | null
   trialDays?: Prisma.IntWithAggregatesFilter<"Plan"> | number
   isPublic?: Prisma.BoolWithAggregatesFilter<"Plan"> | boolean
+  isDefaultTrial?: Prisma.BoolWithAggregatesFilter<"Plan"> | boolean
   status?: Prisma.EnumPlanStatusWithAggregatesFilter<"Plan"> | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Plan"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Plan"> | Date | string
@@ -325,6 +337,7 @@ export type PlanCreateInput = {
   description?: string | null
   trialDays?: number
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: $Enums.PlanStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -340,6 +353,7 @@ export type PlanUncheckedCreateInput = {
   description?: string | null
   trialDays?: number
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: $Enums.PlanStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -355,6 +369,7 @@ export type PlanUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trialDays?: Prisma.IntFieldUpdateOperationsInput | number
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefaultTrial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -370,6 +385,7 @@ export type PlanUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trialDays?: Prisma.IntFieldUpdateOperationsInput | number
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefaultTrial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -385,6 +401,7 @@ export type PlanCreateManyInput = {
   description?: string | null
   trialDays?: number
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: $Enums.PlanStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -397,6 +414,7 @@ export type PlanUpdateManyMutationInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trialDays?: Prisma.IntFieldUpdateOperationsInput | number
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefaultTrial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -409,6 +427,7 @@ export type PlanUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trialDays?: Prisma.IntFieldUpdateOperationsInput | number
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefaultTrial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -421,6 +440,7 @@ export type PlanCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   trialDays?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  isDefaultTrial?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -437,6 +457,7 @@ export type PlanMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   trialDays?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  isDefaultTrial?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -449,6 +470,7 @@ export type PlanMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   trialDays?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
+  isDefaultTrial?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -516,6 +538,7 @@ export type PlanCreateWithoutPricesInput = {
   description?: string | null
   trialDays?: number
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: $Enums.PlanStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -530,6 +553,7 @@ export type PlanUncheckedCreateWithoutPricesInput = {
   description?: string | null
   trialDays?: number
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: $Enums.PlanStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -560,6 +584,7 @@ export type PlanUpdateWithoutPricesInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trialDays?: Prisma.IntFieldUpdateOperationsInput | number
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefaultTrial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -574,6 +599,7 @@ export type PlanUncheckedUpdateWithoutPricesInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trialDays?: Prisma.IntFieldUpdateOperationsInput | number
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefaultTrial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -588,6 +614,7 @@ export type PlanCreateWithoutFeaturesInput = {
   description?: string | null
   trialDays?: number
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: $Enums.PlanStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -602,6 +629,7 @@ export type PlanUncheckedCreateWithoutFeaturesInput = {
   description?: string | null
   trialDays?: number
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: $Enums.PlanStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -632,6 +660,7 @@ export type PlanUpdateWithoutFeaturesInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trialDays?: Prisma.IntFieldUpdateOperationsInput | number
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefaultTrial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -646,6 +675,7 @@ export type PlanUncheckedUpdateWithoutFeaturesInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trialDays?: Prisma.IntFieldUpdateOperationsInput | number
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefaultTrial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -660,6 +690,7 @@ export type PlanCreateWithoutSubscriptionsInput = {
   description?: string | null
   trialDays?: number
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: $Enums.PlanStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -674,6 +705,7 @@ export type PlanUncheckedCreateWithoutSubscriptionsInput = {
   description?: string | null
   trialDays?: number
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: $Enums.PlanStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -704,6 +736,7 @@ export type PlanUpdateWithoutSubscriptionsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trialDays?: Prisma.IntFieldUpdateOperationsInput | number
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefaultTrial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -718,6 +751,7 @@ export type PlanUncheckedUpdateWithoutSubscriptionsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   trialDays?: Prisma.IntFieldUpdateOperationsInput | number
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDefaultTrial?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlanStatusFieldUpdateOperationsInput | $Enums.PlanStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -781,6 +815,7 @@ export type PlanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   description?: boolean
   trialDays?: boolean
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -797,6 +832,7 @@ export type PlanSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   description?: boolean
   trialDays?: boolean
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -809,6 +845,7 @@ export type PlanSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   description?: boolean
   trialDays?: boolean
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -821,12 +858,13 @@ export type PlanSelectScalar = {
   description?: boolean
   trialDays?: boolean
   isPublic?: boolean
+  isDefaultTrial?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "description" | "trialDays" | "isPublic" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["plan"]>
+export type PlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "description" | "trialDays" | "isPublic" | "isDefaultTrial" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["plan"]>
 export type PlanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   prices?: boolean | Prisma.Plan$pricesArgs<ExtArgs>
   features?: boolean | Prisma.Plan$featuresArgs<ExtArgs>
@@ -850,6 +888,7 @@ export type $PlanPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     description: string | null
     trialDays: number
     isPublic: boolean
+    isDefaultTrial: boolean
     status: $Enums.PlanStatus
     createdAt: Date
     updatedAt: Date
@@ -1285,6 +1324,7 @@ export interface PlanFieldRefs {
   readonly description: Prisma.FieldRef<"Plan", 'String'>
   readonly trialDays: Prisma.FieldRef<"Plan", 'Int'>
   readonly isPublic: Prisma.FieldRef<"Plan", 'Boolean'>
+  readonly isDefaultTrial: Prisma.FieldRef<"Plan", 'Boolean'>
   readonly status: Prisma.FieldRef<"Plan", 'PlanStatus'>
   readonly createdAt: Prisma.FieldRef<"Plan", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Plan", 'DateTime'>

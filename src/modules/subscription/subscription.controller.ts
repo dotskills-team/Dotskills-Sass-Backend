@@ -31,6 +31,7 @@ import { SubscriptionService } from './subscription.service';
 
 import { CompanyContextGuard } from '../../common/guards/company-context.guard';
 import { CompanyPermissionsGuard } from '../../common/guards/company-permissions.guard';
+import { SubscriptionStatusGuard } from '../../common/guards/subscription-status.guard';
 import { RequireCompanyPermissions } from '../../common/decorators/require-company-permissions.decorator';
 import { COMPANY_PERMISSIONS } from '../../common/constants/permission.constants';
 import type { CompanyContext } from '../../common/types/company-context.type';
@@ -94,7 +95,16 @@ export class SubscriptionController {
   ) {
     return this.service.findOne(id, this.context(req));
   }
+  /**
+   * SubscriptionStatusGuard applied only here and on `plan` — never on
+   * `cancel`/`reactivate`/reads below. Cancel/reactivate ARE the self-
+   * service recovery path (reactivate() undoes a still-in-period
+   * cancellation for free — see subscription.service.ts), so gating them
+   * on subscription health would block the exact routes a struggling
+   * company needs most. Same exemption principle as Payment/Invoice.
+   */
   @Patch(':id/auto-renew')
+  @UseGuards(SubscriptionStatusGuard)
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.SUBSCRIPTION_AUTO_RENEW)
   autoRenew(
     @Param('id', ParseUUIDPipe) id: string,
@@ -104,6 +114,7 @@ export class SubscriptionController {
     return this.service.updateAutoRenew(id, dto, this.context(req));
   }
   @Patch(':id/plan')
+  @UseGuards(SubscriptionStatusGuard)
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.SUBSCRIPTION_CHANGE_PLAN)
   plan(
     @Param('id', ParseUUIDPipe) id: string,

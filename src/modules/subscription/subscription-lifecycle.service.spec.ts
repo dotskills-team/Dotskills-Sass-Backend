@@ -3,7 +3,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuditActorType, SubscriptionStatus } from '../../generated/phase-1-prisma/enums';
 
 import { PrismaService } from '../../prisma/prisma.service';
+import { InvoiceService } from '../invoice/invoice.service';
 import { SubscriptionLifecycleService } from './subscription-lifecycle.service';
+
+const mockInvoiceService = { void: jest.fn() };
 
 describe('SubscriptionLifecycleService.paymentFailed', () => {
   let service: SubscriptionLifecycleService;
@@ -46,6 +49,7 @@ describe('SubscriptionLifecycleService.paymentFailed', () => {
       providers: [
         SubscriptionLifecycleService,
         { provide: PrismaService, useValue: mockPrisma },
+        { provide: InvoiceService, useValue: mockInvoiceService },
       ],
     }).compile();
 
@@ -192,6 +196,7 @@ describe('SubscriptionLifecycleService.paymentSucceeded', () => {
       providers: [
         SubscriptionLifecycleService,
         { provide: PrismaService, useValue: mockPrisma },
+        { provide: InvoiceService, useValue: mockInvoiceService },
       ],
     }).compile();
 
@@ -283,4 +288,223 @@ describe('SubscriptionLifecycleService.paymentSucceeded', () => {
       expect(mockTx.subscription.updateMany).not.toHaveBeenCalled();
     },
   );
+});
+
+describe('SubscriptionLifecycleService.runDueTransitions — TRIALING fork', () => {
+  let service: SubscriptionLifecycleService;
+
+  const mockPrisma = {
+    subscription: { findMany: jest.fn() },
+  };
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    mockPrisma.subscription.findMany.mockResolvedValue([]);
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        SubscriptionLifecycleService,
+        { provide: PrismaService, useValue: mockPrisma },
+        { provide: InvoiceService, useValue: mockInvoiceService },
+      ],
+    }).compile();
+
+    service = module.get(SubscriptionLifecycleService);
+    jest.spyOn(service, 'transition').mockResolvedValue({} as any);
+  });
+
+  /**
+   * Regression: runDueTransitions() used to move every TRIALING
+   * subscription whose trialEndsAt had passed straight to ACTIVE, with no
+   * check on which Plan it was on — so a trial that was never upgraded to
+   * a paid Plan became a free ACTIVE subscription forever. Now it forks:
+   * still on the isDefaultTrial Plan -> EXPIRED; already moved to a
+   * different (paid) Plan during the trial -> today's existing ACTIVE
+   * behavior, unchanged.
+   */
+  it('moves a still-on-default-trial-Plan subscription to EXPIRED, not ACTIVE', async () => {
+    const stillOnTrialPlan = {
+      id: 'sub-1',
+      companyId: 'company-1',
+      status: SubscriptionStatus.TRIALING,
+    };
+
+    mockPrisma.subscription.findMany.mockImplementation(({ where }: any) => {
+      if (where.plan?.isDefaultTrial === true) {
+        return Promise.resolve([stillOnTrialPlan]);
+      }
+      return Promise.resolve([]);
+    });
+
+    const result = await service.runDueTransitions();
+
+    expect(service.transition).toHaveBeenCalledWith(
+      stillOnTrialPlan,
+      SubscriptionStatus.EXPIRED,
+      expect.any(Object),
+      expect.objectContaining({ reason: 'SCHEDULED_LIFECYCLE', source: 'SCHEDULER' }),
+    );
+    expect(result.trialsExpired).toBe(1);
+    expect(result.trialsActivated).toBe(0);
+  });
+
+  it('still moves a subscription already upgraded off the default-trial Plan to ACTIVE (existing behavior, unchanged)', async () => {
+    const upgradedToRealPlan = {
+      id: 'sub-2',
+      companyId: 'company-2',
+      status: SubscriptionStatus.TRIALING,
+    };
+
+    mockPrisma.subscription.findMany.mockImplementation(({ where }: any) => {
+      if (where.plan?.isDefaultTrial === false) {
+        return Promise.resolve([upgradedToRealPlan]);
+      }
+      return Promise.resolve([]);
+    });
+
+    const result = await service.runDueTransitions();
+
+    expect(service.transition).toHaveBeenCalledWith(
+      upgradedToRealPlan,
+      SubscriptionStatus.ACTIVE,
+      expect.any(Object),
+      expect.any(Object),
+    );
+    expect(result.trialsActivated).toBe(1);
+    expect(result.trialsExpired).toBe(0);
+  });
+});
+
+describe('SubscriptionLifecycleService.voidStaleIssuedInvoices', () => {
+  let service: SubscriptionLifecycleService;
+
+  const mockPrisma = {
+    invoice: { findMany: jest.fn() },
+  };
+
+  const mockInvoice = { void: jest.fn() };
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    mockPrisma.invoice.findMany.mockResolvedValue([]);
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        SubscriptionLifecycleService,
+        { provide: PrismaService, useValue: mockPrisma },
+        { provide: InvoiceService, useValue: mockInvoice },
+      ],
+    }).compile();
+
+    service = module.get(SubscriptionLifecycleService);
+    jest.spyOn(service, 'transition').mockResolvedValue({} as any);
+  });
+
+  it('queries only ISSUED invoices under a struggling subscription, past the fixed 30-day cutoff', async () => {
+    await service.voidStaleIssuedInvoices(new Date('2026-09-01T00:00:00Z'));
+
+    expect(mockPrisma.invoice.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          status: 'ISSUED',
+          issuedAt: { lte: new Date('2026-08-02T00:00:00Z') }, // 30 days back
+          subscription: {
+            status: { in: ['PAST_DUE', 'GRACE', 'SUSPENDED'] },
+          },
+        }),
+      }),
+    );
+  });
+
+  it('voids the stale invoice via the existing InvoiceService.void(), never reimplementing it', async () => {
+    mockPrisma.invoice.findMany.mockResolvedValue([
+      {
+        id: 'invoice-1',
+        subscription: {
+          id: 'sub-1',
+          tenantId: 'tenant-1',
+          companyId: 'company-1',
+          status: SubscriptionStatus.PAST_DUE,
+        },
+      },
+    ]);
+
+    const result = await service.voidStaleIssuedInvoices();
+
+    expect(mockInvoice.void).toHaveBeenCalledWith('invoice-1');
+    expect(result.invoicesVoided).toBe(1);
+    expect(service.transition).not.toHaveBeenCalled();
+    expect(result.subscriptionsExpired).toBe(0);
+  });
+
+  /**
+   * Confirmed decision: if the subscription is still SUSPENDED at the
+   * exact moment its stale invoice voids, it moves straight to EXPIRED —
+   * it never waits out its own independent suspension timer, since there
+   * is no longer any payable invoice keeping it alive either way.
+   */
+  it('also expires the subscription immediately when it is still SUSPENDED at void time', async () => {
+    const subscription = {
+      id: 'sub-1',
+      tenantId: 'tenant-1',
+      companyId: 'company-1',
+      status: SubscriptionStatus.SUSPENDED,
+    };
+    mockPrisma.invoice.findMany.mockResolvedValue([
+      { id: 'invoice-1', subscription },
+    ]);
+
+    const result = await service.voidStaleIssuedInvoices();
+
+    expect(mockInvoice.void).toHaveBeenCalledWith('invoice-1');
+    expect(service.transition).toHaveBeenCalledWith(
+      subscription,
+      SubscriptionStatus.EXPIRED,
+      expect.objectContaining({ actorType: AuditActorType.SYSTEM }),
+      expect.objectContaining({ reason: 'STALE_ISSUED_INVOICE_VOIDED' }),
+    );
+    expect(result.subscriptionsExpired).toBe(1);
+  });
+
+  it('does not expire the subscription when it is only PAST_DUE or GRACE (not SUSPENDED) at void time', async () => {
+    mockPrisma.invoice.findMany.mockResolvedValue([
+      {
+        id: 'invoice-1',
+        subscription: {
+          id: 'sub-1',
+          tenantId: 'tenant-1',
+          companyId: 'company-1',
+          status: SubscriptionStatus.GRACE,
+        },
+      },
+    ]);
+
+    const result = await service.voidStaleIssuedInvoices();
+
+    expect(service.transition).not.toHaveBeenCalled();
+    expect(result.subscriptionsExpired).toBe(0);
+  });
+
+  it('records a per-invoice failure and continues, never letting one bad row block the batch', async () => {
+    mockPrisma.invoice.findMany.mockResolvedValue([
+      {
+        id: 'invoice-1',
+        subscription: { id: 'sub-1', tenantId: 't', companyId: 'c', status: SubscriptionStatus.GRACE },
+      },
+      {
+        id: 'invoice-2',
+        subscription: { id: 'sub-2', tenantId: 't', companyId: 'c', status: SubscriptionStatus.GRACE },
+      },
+    ]);
+    mockInvoice.void
+      .mockRejectedValueOnce(new Error('already voided'))
+      .mockResolvedValueOnce({});
+
+    const result = await service.voidStaleIssuedInvoices();
+
+    expect(result.invoicesVoided).toBe(1);
+    expect(result.failures).toEqual([
+      { invoiceId: 'invoice-1', message: 'already voided' },
+    ]);
+  });
 });

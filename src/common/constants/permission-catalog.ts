@@ -603,6 +603,13 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
     name: 'Read platform subscriptions',
   },
   {
+    code: PLATFORM_PERMISSIONS.SUBSCRIPTION_AUTO_RENEW,
+    moduleCode: 'subscription_management',
+    resource: 'subscription',
+    action: 'auto_renew',
+    name: 'Toggle platform subscription auto-renew',
+  },
+  {
     code: PLATFORM_PERMISSIONS.SUBSCRIPTION_UPDATE,
     moduleCode: 'subscription_management',
     resource: 'subscription',

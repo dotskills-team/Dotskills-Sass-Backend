@@ -19,6 +19,7 @@ describe('BillingService.markFailed', () => {
     billingAttempt: { findFirst: jest.fn(), update: jest.fn() },
     invoice: { findUnique: jest.fn() },
     payment: { updateMany: jest.fn() },
+    auditLog: { create: jest.fn() },
   };
 
   const mockPrisma = {
@@ -124,6 +125,14 @@ describe('BillingService.markFailed', () => {
         }),
       }),
     );
+    expect(mockTx.auditLog.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'BILLING_FAILED',
+          entityType: 'Billing',
+        }),
+      }),
+    );
   });
 
   /**
@@ -221,6 +230,7 @@ describe('BillingService.releaseCancelledAttempt', () => {
   const mockTx = {
     billing: { findUnique: jest.fn(), update: jest.fn() },
     billingAttempt: { findFirst: jest.fn(), update: jest.fn() },
+    auditLog: { create: jest.fn() },
   };
 
   const mockPrisma = {
@@ -339,5 +349,14 @@ describe('BillingService.releaseCancelledAttempt', () => {
 
     expect(mockSubscriptionLifecycleService.paymentFailed).not.toHaveBeenCalled();
     expect(mockSubscriptionLifecycleService.paymentSucceeded).not.toHaveBeenCalled();
+
+    expect(mockTx.auditLog.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'BILLING_ATTEMPT_RELEASED',
+          entityType: 'Billing',
+        }),
+      }),
+    );
   });
 });

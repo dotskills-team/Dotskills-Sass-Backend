@@ -6,6 +6,7 @@ import {
   Headers,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   Req,
   UnauthorizedException,
@@ -19,6 +20,7 @@ import { PlatformPermissionsGuard } from '../../common/guards/platform-permissio
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminSubscriptionActionDto } from './dto/admin-subscription-action.dto';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
+import { UpdateAutoRenewDto } from './dto/update-auto-renew.dto';
 import { SubscriptionService } from './subscription.service';
 // import {
 //   PlatformSubscriptionContext,
@@ -90,6 +92,16 @@ export class PlatformSubscriptionController {
   @RequirePlatformPermissions(PLATFORM_PERMISSIONS.SUBSCRIPTION_READ)
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.service.findOneForPlatform(id);
+  }
+
+  @Patch(':id/auto-renew')
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.SUBSCRIPTION_AUTO_RENEW)
+  async autoRenew(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateAutoRenewDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.service.updateAutoRenewForPlatform(id, dto, this.actor(req));
   }
 
   @Post(':id/suspend')
