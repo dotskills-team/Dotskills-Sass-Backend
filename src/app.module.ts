@@ -53,6 +53,21 @@ import { SubscriptionRenewalModule } from './modules/subscription/subscription-r
 import { BillingModule } from './modules/billing/billing.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { LocationModule } from './modules/master-data/location/location.module';
+import { CategoryModule } from './modules/master-data/category/category.module';
+import { UnitModule } from './modules/master-data/unit/unit.module';
+import { ProductModule } from './modules/master-data/product/product.module';
+import { CustomerModule } from './modules/master-data/customer/customer.module';
+import { SupplierModule } from './modules/master-data/supplier/supplier.module';
+import { CompanySettingsModule } from './modules/master-data/company-settings/company-settings.module';
+import { InventoryModule } from './modules/master-data/inventory/inventory.module';
+import { PurchaseOrderModule } from './modules/purchase/purchase-order/purchase-order.module';
+import { StockTransferModule } from './modules/purchase/stock-transfer/stock-transfer.module';
+import { SupplierPaymentModule } from './modules/purchase/supplier-payment/supplier-payment.module';
+import { SaleModule } from './modules/sales/sale/sale.module';
+import { CustomerPaymentModule } from './modules/sales/customer-payment/customer-payment.module';
+import { CashDrawerSessionModule } from './modules/sales/cash-drawer/cash-drawer.module';
+import { ReportingModule } from './modules/reporting/reporting.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -89,6 +104,21 @@ import { PaymentModule } from './modules/payment/payment.module';
     BillingModule,
     InvoiceModule,
     PaymentModule,
+    LocationModule,
+    CategoryModule,
+    UnitModule,
+    ProductModule,
+    CustomerModule,
+    SupplierModule,
+    CompanySettingsModule,
+    InventoryModule,
+    PurchaseOrderModule,
+    StockTransferModule,
+    SupplierPaymentModule,
+    SaleModule,
+    CustomerPaymentModule,
+    CashDrawerSessionModule,
+    ReportingModule,
   ],
   controllers: [AppController],
   providers: [

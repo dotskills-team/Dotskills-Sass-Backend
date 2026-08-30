@@ -232,6 +232,24 @@ export type TenantWhereInput = {
   payments?: Prisma.PaymentListRelationFilter
   invitations?: Prisma.InvitationListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  locations?: Prisma.LocationListRelationFilter
+  categories?: Prisma.CategoryListRelationFilter
+  units?: Prisma.UnitListRelationFilter
+  products?: Prisma.ProductListRelationFilter
+  customers?: Prisma.CustomerListRelationFilter
+  suppliers?: Prisma.SupplierListRelationFilter
+  companySettings?: Prisma.CompanySettingsListRelationFilter
+  inventoryBalances?: Prisma.InventoryListRelationFilter
+  stockMovements?: Prisma.StockMovementListRelationFilter
+  purchaseOrders?: Prisma.PurchaseOrderListRelationFilter
+  goodsReceipts?: Prisma.GoodsReceiptListRelationFilter
+  purchaseReturns?: Prisma.PurchaseReturnListRelationFilter
+  stockTransfers?: Prisma.StockTransferListRelationFilter
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerListRelationFilter
+  sales?: Prisma.SaleListRelationFilter
+  saleReturns?: Prisma.SaleReturnListRelationFilter
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerListRelationFilter
+  cashDrawerSessions?: Prisma.CashDrawerSessionListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -255,6 +273,24 @@ export type TenantOrderByWithRelationInput = {
   payments?: Prisma.PaymentOrderByRelationAggregateInput
   invitations?: Prisma.InvitationOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
+  locations?: Prisma.LocationOrderByRelationAggregateInput
+  categories?: Prisma.CategoryOrderByRelationAggregateInput
+  units?: Prisma.UnitOrderByRelationAggregateInput
+  products?: Prisma.ProductOrderByRelationAggregateInput
+  customers?: Prisma.CustomerOrderByRelationAggregateInput
+  suppliers?: Prisma.SupplierOrderByRelationAggregateInput
+  companySettings?: Prisma.CompanySettingsOrderByRelationAggregateInput
+  inventoryBalances?: Prisma.InventoryOrderByRelationAggregateInput
+  stockMovements?: Prisma.StockMovementOrderByRelationAggregateInput
+  purchaseOrders?: Prisma.PurchaseOrderOrderByRelationAggregateInput
+  goodsReceipts?: Prisma.GoodsReceiptOrderByRelationAggregateInput
+  purchaseReturns?: Prisma.PurchaseReturnOrderByRelationAggregateInput
+  stockTransfers?: Prisma.StockTransferOrderByRelationAggregateInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerOrderByRelationAggregateInput
+  sales?: Prisma.SaleOrderByRelationAggregateInput
+  saleReturns?: Prisma.SaleReturnOrderByRelationAggregateInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerOrderByRelationAggregateInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
@@ -281,6 +317,24 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   payments?: Prisma.PaymentListRelationFilter
   invitations?: Prisma.InvitationListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  locations?: Prisma.LocationListRelationFilter
+  categories?: Prisma.CategoryListRelationFilter
+  units?: Prisma.UnitListRelationFilter
+  products?: Prisma.ProductListRelationFilter
+  customers?: Prisma.CustomerListRelationFilter
+  suppliers?: Prisma.SupplierListRelationFilter
+  companySettings?: Prisma.CompanySettingsListRelationFilter
+  inventoryBalances?: Prisma.InventoryListRelationFilter
+  stockMovements?: Prisma.StockMovementListRelationFilter
+  purchaseOrders?: Prisma.PurchaseOrderListRelationFilter
+  goodsReceipts?: Prisma.GoodsReceiptListRelationFilter
+  purchaseReturns?: Prisma.PurchaseReturnListRelationFilter
+  stockTransfers?: Prisma.StockTransferListRelationFilter
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerListRelationFilter
+  sales?: Prisma.SaleListRelationFilter
+  saleReturns?: Prisma.SaleReturnListRelationFilter
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerListRelationFilter
+  cashDrawerSessions?: Prisma.CashDrawerSessionListRelationFilter
 }, "id" | "code" | "slug">
 
 export type TenantOrderByWithAggregationInput = {
@@ -336,6 +390,24 @@ export type TenantCreateInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -359,6 +431,24 @@ export type TenantUncheckedCreateInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -382,6 +472,24 @@ export type TenantUpdateInput = {
   payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -405,6 +513,24 @@ export type TenantUncheckedUpdateInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -511,6 +637,258 @@ export type TenantUpdateOneRequiredWithoutCompaniesNestedInput = {
   upsert?: Prisma.TenantUpsertWithoutCompaniesInput
   connect?: Prisma.TenantWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutCompaniesInput, Prisma.TenantUpdateWithoutCompaniesInput>, Prisma.TenantUncheckedUpdateWithoutCompaniesInput>
+}
+
+export type TenantCreateNestedOneWithoutLocationsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutLocationsInput, Prisma.TenantUncheckedCreateWithoutLocationsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutLocationsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutLocationsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutLocationsInput, Prisma.TenantUncheckedCreateWithoutLocationsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutLocationsInput
+  upsert?: Prisma.TenantUpsertWithoutLocationsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutLocationsInput, Prisma.TenantUpdateWithoutLocationsInput>, Prisma.TenantUncheckedUpdateWithoutLocationsInput>
+}
+
+export type TenantCreateNestedOneWithoutCategoriesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCategoriesInput, Prisma.TenantUncheckedCreateWithoutCategoriesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCategoriesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutCategoriesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCategoriesInput, Prisma.TenantUncheckedCreateWithoutCategoriesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCategoriesInput
+  upsert?: Prisma.TenantUpsertWithoutCategoriesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutCategoriesInput, Prisma.TenantUpdateWithoutCategoriesInput>, Prisma.TenantUncheckedUpdateWithoutCategoriesInput>
+}
+
+export type TenantCreateNestedOneWithoutUnitsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutUnitsInput, Prisma.TenantUncheckedCreateWithoutUnitsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutUnitsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutUnitsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutUnitsInput, Prisma.TenantUncheckedCreateWithoutUnitsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutUnitsInput
+  upsert?: Prisma.TenantUpsertWithoutUnitsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutUnitsInput, Prisma.TenantUpdateWithoutUnitsInput>, Prisma.TenantUncheckedUpdateWithoutUnitsInput>
+}
+
+export type TenantCreateNestedOneWithoutProductsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutProductsInput, Prisma.TenantUncheckedCreateWithoutProductsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutProductsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutProductsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutProductsInput, Prisma.TenantUncheckedCreateWithoutProductsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutProductsInput
+  upsert?: Prisma.TenantUpsertWithoutProductsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutProductsInput, Prisma.TenantUpdateWithoutProductsInput>, Prisma.TenantUncheckedUpdateWithoutProductsInput>
+}
+
+export type TenantCreateNestedOneWithoutCustomersInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCustomersInput, Prisma.TenantUncheckedCreateWithoutCustomersInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCustomersInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutCustomersNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCustomersInput, Prisma.TenantUncheckedCreateWithoutCustomersInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCustomersInput
+  upsert?: Prisma.TenantUpsertWithoutCustomersInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutCustomersInput, Prisma.TenantUpdateWithoutCustomersInput>, Prisma.TenantUncheckedUpdateWithoutCustomersInput>
+}
+
+export type TenantCreateNestedOneWithoutSuppliersInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSuppliersInput, Prisma.TenantUncheckedCreateWithoutSuppliersInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSuppliersInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutSuppliersNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSuppliersInput, Prisma.TenantUncheckedCreateWithoutSuppliersInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSuppliersInput
+  upsert?: Prisma.TenantUpsertWithoutSuppliersInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutSuppliersInput, Prisma.TenantUpdateWithoutSuppliersInput>, Prisma.TenantUncheckedUpdateWithoutSuppliersInput>
+}
+
+export type TenantCreateNestedOneWithoutInventoryBalancesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutInventoryBalancesInput, Prisma.TenantUncheckedCreateWithoutInventoryBalancesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutInventoryBalancesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutInventoryBalancesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutInventoryBalancesInput, Prisma.TenantUncheckedCreateWithoutInventoryBalancesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutInventoryBalancesInput
+  upsert?: Prisma.TenantUpsertWithoutInventoryBalancesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutInventoryBalancesInput, Prisma.TenantUpdateWithoutInventoryBalancesInput>, Prisma.TenantUncheckedUpdateWithoutInventoryBalancesInput>
+}
+
+export type TenantCreateNestedOneWithoutStockMovementsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutStockMovementsInput, Prisma.TenantUncheckedCreateWithoutStockMovementsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutStockMovementsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutStockMovementsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutStockMovementsInput, Prisma.TenantUncheckedCreateWithoutStockMovementsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutStockMovementsInput
+  upsert?: Prisma.TenantUpsertWithoutStockMovementsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutStockMovementsInput, Prisma.TenantUpdateWithoutStockMovementsInput>, Prisma.TenantUncheckedUpdateWithoutStockMovementsInput>
+}
+
+export type TenantCreateNestedOneWithoutPurchaseOrdersInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutPurchaseOrdersInput, Prisma.TenantUncheckedCreateWithoutPurchaseOrdersInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutPurchaseOrdersInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutPurchaseOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutPurchaseOrdersInput, Prisma.TenantUncheckedCreateWithoutPurchaseOrdersInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutPurchaseOrdersInput
+  upsert?: Prisma.TenantUpsertWithoutPurchaseOrdersInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutPurchaseOrdersInput, Prisma.TenantUpdateWithoutPurchaseOrdersInput>, Prisma.TenantUncheckedUpdateWithoutPurchaseOrdersInput>
+}
+
+export type TenantCreateNestedOneWithoutGoodsReceiptsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutGoodsReceiptsInput, Prisma.TenantUncheckedCreateWithoutGoodsReceiptsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutGoodsReceiptsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutGoodsReceiptsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutGoodsReceiptsInput, Prisma.TenantUncheckedCreateWithoutGoodsReceiptsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutGoodsReceiptsInput
+  upsert?: Prisma.TenantUpsertWithoutGoodsReceiptsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutGoodsReceiptsInput, Prisma.TenantUpdateWithoutGoodsReceiptsInput>, Prisma.TenantUncheckedUpdateWithoutGoodsReceiptsInput>
+}
+
+export type TenantCreateNestedOneWithoutPurchaseReturnsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutPurchaseReturnsInput, Prisma.TenantUncheckedCreateWithoutPurchaseReturnsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutPurchaseReturnsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutPurchaseReturnsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutPurchaseReturnsInput, Prisma.TenantUncheckedCreateWithoutPurchaseReturnsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutPurchaseReturnsInput
+  upsert?: Prisma.TenantUpsertWithoutPurchaseReturnsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutPurchaseReturnsInput, Prisma.TenantUpdateWithoutPurchaseReturnsInput>, Prisma.TenantUncheckedUpdateWithoutPurchaseReturnsInput>
+}
+
+export type TenantCreateNestedOneWithoutStockTransfersInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutStockTransfersInput, Prisma.TenantUncheckedCreateWithoutStockTransfersInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutStockTransfersInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutStockTransfersNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutStockTransfersInput, Prisma.TenantUncheckedCreateWithoutStockTransfersInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutStockTransfersInput
+  upsert?: Prisma.TenantUpsertWithoutStockTransfersInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutStockTransfersInput, Prisma.TenantUpdateWithoutStockTransfersInput>, Prisma.TenantUncheckedUpdateWithoutStockTransfersInput>
+}
+
+export type TenantCreateNestedOneWithoutSupplierPayableLedgerEntriesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSupplierPayableLedgerEntriesInput, Prisma.TenantUncheckedCreateWithoutSupplierPayableLedgerEntriesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSupplierPayableLedgerEntriesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutSupplierPayableLedgerEntriesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSupplierPayableLedgerEntriesInput, Prisma.TenantUncheckedCreateWithoutSupplierPayableLedgerEntriesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSupplierPayableLedgerEntriesInput
+  upsert?: Prisma.TenantUpsertWithoutSupplierPayableLedgerEntriesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutSupplierPayableLedgerEntriesInput, Prisma.TenantUpdateWithoutSupplierPayableLedgerEntriesInput>, Prisma.TenantUncheckedUpdateWithoutSupplierPayableLedgerEntriesInput>
+}
+
+export type TenantCreateNestedOneWithoutSalesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSalesInput, Prisma.TenantUncheckedCreateWithoutSalesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSalesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutSalesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSalesInput, Prisma.TenantUncheckedCreateWithoutSalesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSalesInput
+  upsert?: Prisma.TenantUpsertWithoutSalesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutSalesInput, Prisma.TenantUpdateWithoutSalesInput>, Prisma.TenantUncheckedUpdateWithoutSalesInput>
+}
+
+export type TenantCreateNestedOneWithoutSaleReturnsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSaleReturnsInput, Prisma.TenantUncheckedCreateWithoutSaleReturnsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSaleReturnsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutSaleReturnsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSaleReturnsInput, Prisma.TenantUncheckedCreateWithoutSaleReturnsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSaleReturnsInput
+  upsert?: Prisma.TenantUpsertWithoutSaleReturnsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutSaleReturnsInput, Prisma.TenantUpdateWithoutSaleReturnsInput>, Prisma.TenantUncheckedUpdateWithoutSaleReturnsInput>
+}
+
+export type TenantCreateNestedOneWithoutCustomerDueLedgerEntriesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCustomerDueLedgerEntriesInput, Prisma.TenantUncheckedCreateWithoutCustomerDueLedgerEntriesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCustomerDueLedgerEntriesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutCustomerDueLedgerEntriesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCustomerDueLedgerEntriesInput, Prisma.TenantUncheckedCreateWithoutCustomerDueLedgerEntriesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCustomerDueLedgerEntriesInput
+  upsert?: Prisma.TenantUpsertWithoutCustomerDueLedgerEntriesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutCustomerDueLedgerEntriesInput, Prisma.TenantUpdateWithoutCustomerDueLedgerEntriesInput>, Prisma.TenantUncheckedUpdateWithoutCustomerDueLedgerEntriesInput>
+}
+
+export type TenantCreateNestedOneWithoutCashDrawerSessionsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCashDrawerSessionsInput, Prisma.TenantUncheckedCreateWithoutCashDrawerSessionsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCashDrawerSessionsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutCashDrawerSessionsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCashDrawerSessionsInput, Prisma.TenantUncheckedCreateWithoutCashDrawerSessionsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCashDrawerSessionsInput
+  upsert?: Prisma.TenantUpsertWithoutCashDrawerSessionsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutCashDrawerSessionsInput, Prisma.TenantUpdateWithoutCashDrawerSessionsInput>, Prisma.TenantUncheckedUpdateWithoutCashDrawerSessionsInput>
+}
+
+export type TenantCreateNestedOneWithoutCompanySettingsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCompanySettingsInput, Prisma.TenantUncheckedCreateWithoutCompanySettingsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCompanySettingsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutCompanySettingsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCompanySettingsInput, Prisma.TenantUncheckedCreateWithoutCompanySettingsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCompanySettingsInput
+  upsert?: Prisma.TenantUpsertWithoutCompanySettingsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutCompanySettingsInput, Prisma.TenantUpdateWithoutCompanySettingsInput>, Prisma.TenantUncheckedUpdateWithoutCompanySettingsInput>
 }
 
 export type TenantCreateNestedOneWithoutMembersInput = {
@@ -663,6 +1041,24 @@ export type TenantCreateWithoutCompaniesInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutCompaniesInput = {
@@ -685,6 +1081,24 @@ export type TenantUncheckedCreateWithoutCompaniesInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutCompaniesInput = {
@@ -723,6 +1137,24 @@ export type TenantUpdateWithoutCompaniesInput = {
   payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutCompaniesInput = {
@@ -745,6 +1177,3192 @@ export type TenantUncheckedUpdateWithoutCompaniesInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutLocationsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutLocationsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutLocationsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutLocationsInput, Prisma.TenantUncheckedCreateWithoutLocationsInput>
+}
+
+export type TenantUpsertWithoutLocationsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutLocationsInput, Prisma.TenantUncheckedUpdateWithoutLocationsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutLocationsInput, Prisma.TenantUncheckedCreateWithoutLocationsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutLocationsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutLocationsInput, Prisma.TenantUncheckedUpdateWithoutLocationsInput>
+}
+
+export type TenantUpdateWithoutLocationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutLocationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutCategoriesInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutCategoriesInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutCategoriesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCategoriesInput, Prisma.TenantUncheckedCreateWithoutCategoriesInput>
+}
+
+export type TenantUpsertWithoutCategoriesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutCategoriesInput, Prisma.TenantUncheckedUpdateWithoutCategoriesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCategoriesInput, Prisma.TenantUncheckedCreateWithoutCategoriesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutCategoriesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutCategoriesInput, Prisma.TenantUncheckedUpdateWithoutCategoriesInput>
+}
+
+export type TenantUpdateWithoutCategoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutCategoriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutUnitsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutUnitsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutUnitsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutUnitsInput, Prisma.TenantUncheckedCreateWithoutUnitsInput>
+}
+
+export type TenantUpsertWithoutUnitsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutUnitsInput, Prisma.TenantUncheckedUpdateWithoutUnitsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutUnitsInput, Prisma.TenantUncheckedCreateWithoutUnitsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutUnitsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutUnitsInput, Prisma.TenantUncheckedUpdateWithoutUnitsInput>
+}
+
+export type TenantUpdateWithoutUnitsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutUnitsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutProductsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutProductsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutProductsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutProductsInput, Prisma.TenantUncheckedCreateWithoutProductsInput>
+}
+
+export type TenantUpsertWithoutProductsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutProductsInput, Prisma.TenantUncheckedUpdateWithoutProductsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutProductsInput, Prisma.TenantUncheckedCreateWithoutProductsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutProductsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutProductsInput, Prisma.TenantUncheckedUpdateWithoutProductsInput>
+}
+
+export type TenantUpdateWithoutProductsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutProductsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutCustomersInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutCustomersInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutCustomersInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCustomersInput, Prisma.TenantUncheckedCreateWithoutCustomersInput>
+}
+
+export type TenantUpsertWithoutCustomersInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutCustomersInput, Prisma.TenantUncheckedUpdateWithoutCustomersInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCustomersInput, Prisma.TenantUncheckedCreateWithoutCustomersInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutCustomersInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutCustomersInput, Prisma.TenantUncheckedUpdateWithoutCustomersInput>
+}
+
+export type TenantUpdateWithoutCustomersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutCustomersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutSuppliersInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutSuppliersInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutSuppliersInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSuppliersInput, Prisma.TenantUncheckedCreateWithoutSuppliersInput>
+}
+
+export type TenantUpsertWithoutSuppliersInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutSuppliersInput, Prisma.TenantUncheckedUpdateWithoutSuppliersInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSuppliersInput, Prisma.TenantUncheckedCreateWithoutSuppliersInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutSuppliersInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutSuppliersInput, Prisma.TenantUncheckedUpdateWithoutSuppliersInput>
+}
+
+export type TenantUpdateWithoutSuppliersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutSuppliersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutInventoryBalancesInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutInventoryBalancesInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutInventoryBalancesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutInventoryBalancesInput, Prisma.TenantUncheckedCreateWithoutInventoryBalancesInput>
+}
+
+export type TenantUpsertWithoutInventoryBalancesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutInventoryBalancesInput, Prisma.TenantUncheckedUpdateWithoutInventoryBalancesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutInventoryBalancesInput, Prisma.TenantUncheckedCreateWithoutInventoryBalancesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutInventoryBalancesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutInventoryBalancesInput, Prisma.TenantUncheckedUpdateWithoutInventoryBalancesInput>
+}
+
+export type TenantUpdateWithoutInventoryBalancesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutInventoryBalancesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutStockMovementsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutStockMovementsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutStockMovementsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutStockMovementsInput, Prisma.TenantUncheckedCreateWithoutStockMovementsInput>
+}
+
+export type TenantUpsertWithoutStockMovementsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutStockMovementsInput, Prisma.TenantUncheckedUpdateWithoutStockMovementsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutStockMovementsInput, Prisma.TenantUncheckedCreateWithoutStockMovementsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutStockMovementsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutStockMovementsInput, Prisma.TenantUncheckedUpdateWithoutStockMovementsInput>
+}
+
+export type TenantUpdateWithoutStockMovementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutStockMovementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutPurchaseOrdersInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutPurchaseOrdersInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutPurchaseOrdersInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutPurchaseOrdersInput, Prisma.TenantUncheckedCreateWithoutPurchaseOrdersInput>
+}
+
+export type TenantUpsertWithoutPurchaseOrdersInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutPurchaseOrdersInput, Prisma.TenantUncheckedUpdateWithoutPurchaseOrdersInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutPurchaseOrdersInput, Prisma.TenantUncheckedCreateWithoutPurchaseOrdersInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutPurchaseOrdersInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutPurchaseOrdersInput, Prisma.TenantUncheckedUpdateWithoutPurchaseOrdersInput>
+}
+
+export type TenantUpdateWithoutPurchaseOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutPurchaseOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutGoodsReceiptsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutGoodsReceiptsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutGoodsReceiptsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutGoodsReceiptsInput, Prisma.TenantUncheckedCreateWithoutGoodsReceiptsInput>
+}
+
+export type TenantUpsertWithoutGoodsReceiptsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutGoodsReceiptsInput, Prisma.TenantUncheckedUpdateWithoutGoodsReceiptsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutGoodsReceiptsInput, Prisma.TenantUncheckedCreateWithoutGoodsReceiptsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutGoodsReceiptsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutGoodsReceiptsInput, Prisma.TenantUncheckedUpdateWithoutGoodsReceiptsInput>
+}
+
+export type TenantUpdateWithoutGoodsReceiptsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutGoodsReceiptsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutPurchaseReturnsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutPurchaseReturnsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutPurchaseReturnsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutPurchaseReturnsInput, Prisma.TenantUncheckedCreateWithoutPurchaseReturnsInput>
+}
+
+export type TenantUpsertWithoutPurchaseReturnsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutPurchaseReturnsInput, Prisma.TenantUncheckedUpdateWithoutPurchaseReturnsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutPurchaseReturnsInput, Prisma.TenantUncheckedCreateWithoutPurchaseReturnsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutPurchaseReturnsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutPurchaseReturnsInput, Prisma.TenantUncheckedUpdateWithoutPurchaseReturnsInput>
+}
+
+export type TenantUpdateWithoutPurchaseReturnsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutPurchaseReturnsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutStockTransfersInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutStockTransfersInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutStockTransfersInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutStockTransfersInput, Prisma.TenantUncheckedCreateWithoutStockTransfersInput>
+}
+
+export type TenantUpsertWithoutStockTransfersInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutStockTransfersInput, Prisma.TenantUncheckedUpdateWithoutStockTransfersInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutStockTransfersInput, Prisma.TenantUncheckedCreateWithoutStockTransfersInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutStockTransfersInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutStockTransfersInput, Prisma.TenantUncheckedUpdateWithoutStockTransfersInput>
+}
+
+export type TenantUpdateWithoutStockTransfersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutStockTransfersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutSupplierPayableLedgerEntriesInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutSupplierPayableLedgerEntriesInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutSupplierPayableLedgerEntriesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSupplierPayableLedgerEntriesInput, Prisma.TenantUncheckedCreateWithoutSupplierPayableLedgerEntriesInput>
+}
+
+export type TenantUpsertWithoutSupplierPayableLedgerEntriesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutSupplierPayableLedgerEntriesInput, Prisma.TenantUncheckedUpdateWithoutSupplierPayableLedgerEntriesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSupplierPayableLedgerEntriesInput, Prisma.TenantUncheckedCreateWithoutSupplierPayableLedgerEntriesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutSupplierPayableLedgerEntriesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutSupplierPayableLedgerEntriesInput, Prisma.TenantUncheckedUpdateWithoutSupplierPayableLedgerEntriesInput>
+}
+
+export type TenantUpdateWithoutSupplierPayableLedgerEntriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutSupplierPayableLedgerEntriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutSalesInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutSalesInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutSalesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSalesInput, Prisma.TenantUncheckedCreateWithoutSalesInput>
+}
+
+export type TenantUpsertWithoutSalesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutSalesInput, Prisma.TenantUncheckedUpdateWithoutSalesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSalesInput, Prisma.TenantUncheckedCreateWithoutSalesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutSalesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutSalesInput, Prisma.TenantUncheckedUpdateWithoutSalesInput>
+}
+
+export type TenantUpdateWithoutSalesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutSalesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutSaleReturnsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutSaleReturnsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutSaleReturnsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSaleReturnsInput, Prisma.TenantUncheckedCreateWithoutSaleReturnsInput>
+}
+
+export type TenantUpsertWithoutSaleReturnsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutSaleReturnsInput, Prisma.TenantUncheckedUpdateWithoutSaleReturnsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSaleReturnsInput, Prisma.TenantUncheckedCreateWithoutSaleReturnsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutSaleReturnsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutSaleReturnsInput, Prisma.TenantUncheckedUpdateWithoutSaleReturnsInput>
+}
+
+export type TenantUpdateWithoutSaleReturnsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutSaleReturnsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutCustomerDueLedgerEntriesInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutCustomerDueLedgerEntriesInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutCustomerDueLedgerEntriesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCustomerDueLedgerEntriesInput, Prisma.TenantUncheckedCreateWithoutCustomerDueLedgerEntriesInput>
+}
+
+export type TenantUpsertWithoutCustomerDueLedgerEntriesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutCustomerDueLedgerEntriesInput, Prisma.TenantUncheckedUpdateWithoutCustomerDueLedgerEntriesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCustomerDueLedgerEntriesInput, Prisma.TenantUncheckedCreateWithoutCustomerDueLedgerEntriesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutCustomerDueLedgerEntriesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutCustomerDueLedgerEntriesInput, Prisma.TenantUncheckedUpdateWithoutCustomerDueLedgerEntriesInput>
+}
+
+export type TenantUpdateWithoutCustomerDueLedgerEntriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutCustomerDueLedgerEntriesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutCashDrawerSessionsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutCashDrawerSessionsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutCashDrawerSessionsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCashDrawerSessionsInput, Prisma.TenantUncheckedCreateWithoutCashDrawerSessionsInput>
+}
+
+export type TenantUpsertWithoutCashDrawerSessionsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutCashDrawerSessionsInput, Prisma.TenantUncheckedUpdateWithoutCashDrawerSessionsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCashDrawerSessionsInput, Prisma.TenantUncheckedCreateWithoutCashDrawerSessionsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutCashDrawerSessionsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutCashDrawerSessionsInput, Prisma.TenantUncheckedUpdateWithoutCashDrawerSessionsInput>
+}
+
+export type TenantUpdateWithoutCashDrawerSessionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutCashDrawerSessionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutCompanySettingsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutCompanySettingsInput = {
+  id?: string
+  code: string
+  name: string
+  slug: string
+  status?: $Enums.TenantStatus
+  trialEndsAt?: Date | string | null
+  activatedAt?: Date | string | null
+  suspendedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  companies?: Prisma.CompanyUncheckedCreateNestedManyWithoutTenantInput
+  members?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutTenantInput
+  companyRoles?: Prisma.CompanyRoleUncheckedCreateNestedManyWithoutTenantInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutTenantInput
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutTenantInput
+  billings?: Prisma.BillingUncheckedCreateNestedManyWithoutTenantInput
+  invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
+  invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutCompanySettingsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCompanySettingsInput, Prisma.TenantUncheckedCreateWithoutCompanySettingsInput>
+}
+
+export type TenantUpsertWithoutCompanySettingsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutCompanySettingsInput, Prisma.TenantUncheckedUpdateWithoutCompanySettingsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCompanySettingsInput, Prisma.TenantUncheckedCreateWithoutCompanySettingsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutCompanySettingsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutCompanySettingsInput, Prisma.TenantUncheckedUpdateWithoutCompanySettingsInput>
+}
+
+export type TenantUpdateWithoutCompanySettingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutCompanySettingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumTenantStatusFieldUpdateOperationsInput | $Enums.TenantStatus
+  trialEndsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  activatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  suspendedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  companies?: Prisma.CompanyUncheckedUpdateManyWithoutTenantNestedInput
+  members?: Prisma.CompanyMemberUncheckedUpdateManyWithoutTenantNestedInput
+  companyRoles?: Prisma.CompanyRoleUncheckedUpdateManyWithoutTenantNestedInput
+  ownerships?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutTenantNestedInput
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutTenantNestedInput
+  billings?: Prisma.BillingUncheckedUpdateManyWithoutTenantNestedInput
+  invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
+  invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutMembersInput = {
@@ -767,6 +4385,24 @@ export type TenantCreateWithoutMembersInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutMembersInput = {
@@ -789,6 +4425,24 @@ export type TenantUncheckedCreateWithoutMembersInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutMembersInput = {
@@ -827,6 +4481,24 @@ export type TenantUpdateWithoutMembersInput = {
   payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutMembersInput = {
@@ -849,6 +4521,24 @@ export type TenantUncheckedUpdateWithoutMembersInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutCompanyRolesInput = {
@@ -871,6 +4561,24 @@ export type TenantCreateWithoutCompanyRolesInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutCompanyRolesInput = {
@@ -893,6 +4601,24 @@ export type TenantUncheckedCreateWithoutCompanyRolesInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutCompanyRolesInput = {
@@ -931,6 +4657,24 @@ export type TenantUpdateWithoutCompanyRolesInput = {
   payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutCompanyRolesInput = {
@@ -953,6 +4697,24 @@ export type TenantUncheckedUpdateWithoutCompanyRolesInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutOwnershipsInput = {
@@ -975,6 +4737,24 @@ export type TenantCreateWithoutOwnershipsInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutOwnershipsInput = {
@@ -997,6 +4777,24 @@ export type TenantUncheckedCreateWithoutOwnershipsInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutOwnershipsInput = {
@@ -1035,6 +4833,24 @@ export type TenantUpdateWithoutOwnershipsInput = {
   payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutOwnershipsInput = {
@@ -1057,6 +4873,24 @@ export type TenantUncheckedUpdateWithoutOwnershipsInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutSubscriptionsInput = {
@@ -1079,6 +4913,24 @@ export type TenantCreateWithoutSubscriptionsInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSubscriptionsInput = {
@@ -1101,6 +4953,24 @@ export type TenantUncheckedCreateWithoutSubscriptionsInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSubscriptionsInput = {
@@ -1139,6 +5009,24 @@ export type TenantUpdateWithoutSubscriptionsInput = {
   payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSubscriptionsInput = {
@@ -1161,6 +5049,24 @@ export type TenantUncheckedUpdateWithoutSubscriptionsInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutBillingsInput = {
@@ -1183,6 +5089,24 @@ export type TenantCreateWithoutBillingsInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutBillingsInput = {
@@ -1205,6 +5129,24 @@ export type TenantUncheckedCreateWithoutBillingsInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutBillingsInput = {
@@ -1243,6 +5185,24 @@ export type TenantUpdateWithoutBillingsInput = {
   payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutBillingsInput = {
@@ -1265,6 +5225,24 @@ export type TenantUncheckedUpdateWithoutBillingsInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutInvoicesInput = {
@@ -1287,6 +5265,24 @@ export type TenantCreateWithoutInvoicesInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutInvoicesInput = {
@@ -1309,6 +5305,24 @@ export type TenantUncheckedCreateWithoutInvoicesInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutInvoicesInput = {
@@ -1347,6 +5361,24 @@ export type TenantUpdateWithoutInvoicesInput = {
   payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutInvoicesInput = {
@@ -1369,6 +5401,24 @@ export type TenantUncheckedUpdateWithoutInvoicesInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutPaymentsInput = {
@@ -1391,6 +5441,24 @@ export type TenantCreateWithoutPaymentsInput = {
   invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutPaymentsInput = {
@@ -1413,6 +5481,24 @@ export type TenantUncheckedCreateWithoutPaymentsInput = {
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutPaymentsInput = {
@@ -1451,6 +5537,24 @@ export type TenantUpdateWithoutPaymentsInput = {
   invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutPaymentsInput = {
@@ -1473,6 +5577,24 @@ export type TenantUncheckedUpdateWithoutPaymentsInput = {
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutInvitationsInput = {
@@ -1495,6 +5617,24 @@ export type TenantCreateWithoutInvitationsInput = {
   invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
   payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutInvitationsInput = {
@@ -1517,6 +5657,24 @@ export type TenantUncheckedCreateWithoutInvitationsInput = {
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutInvitationsInput = {
@@ -1555,6 +5713,24 @@ export type TenantUpdateWithoutInvitationsInput = {
   invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutInvitationsInput = {
@@ -1577,6 +5753,24 @@ export type TenantUncheckedUpdateWithoutInvitationsInput = {
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAuditLogsInput = {
@@ -1599,6 +5793,24 @@ export type TenantCreateWithoutAuditLogsInput = {
   invoices?: Prisma.InvoiceCreateNestedManyWithoutTenantInput
   payments?: Prisma.PaymentCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAuditLogsInput = {
@@ -1621,6 +5833,24 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   invoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutTenantInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutTenantInput
   invitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutTenantInput
+  locations?: Prisma.LocationUncheckedCreateNestedManyWithoutTenantInput
+  categories?: Prisma.CategoryUncheckedCreateNestedManyWithoutTenantInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutTenantInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutTenantInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutTenantInput
+  suppliers?: Prisma.SupplierUncheckedCreateNestedManyWithoutTenantInput
+  companySettings?: Prisma.CompanySettingsUncheckedCreateNestedManyWithoutTenantInput
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutTenantInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutTenantInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutTenantInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedCreateNestedManyWithoutTenantInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedCreateNestedManyWithoutTenantInput
+  stockTransfers?: Prisma.StockTransferUncheckedCreateNestedManyWithoutTenantInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedCreateNestedManyWithoutTenantInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutTenantInput
+  saleReturns?: Prisma.SaleReturnUncheckedCreateNestedManyWithoutTenantInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedCreateNestedManyWithoutTenantInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAuditLogsInput = {
@@ -1659,6 +5889,24 @@ export type TenantUpdateWithoutAuditLogsInput = {
   invoices?: Prisma.InvoiceUpdateManyWithoutTenantNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAuditLogsInput = {
@@ -1681,6 +5929,24 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   invoices?: Prisma.InvoiceUncheckedUpdateManyWithoutTenantNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutTenantNestedInput
   invitations?: Prisma.InvitationUncheckedUpdateManyWithoutTenantNestedInput
+  locations?: Prisma.LocationUncheckedUpdateManyWithoutTenantNestedInput
+  categories?: Prisma.CategoryUncheckedUpdateManyWithoutTenantNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutTenantNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutTenantNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutTenantNestedInput
+  suppliers?: Prisma.SupplierUncheckedUpdateManyWithoutTenantNestedInput
+  companySettings?: Prisma.CompanySettingsUncheckedUpdateManyWithoutTenantNestedInput
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutTenantNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutTenantNestedInput
+  goodsReceipts?: Prisma.GoodsReceiptUncheckedUpdateManyWithoutTenantNestedInput
+  purchaseReturns?: Prisma.PurchaseReturnUncheckedUpdateManyWithoutTenantNestedInput
+  stockTransfers?: Prisma.StockTransferUncheckedUpdateManyWithoutTenantNestedInput
+  supplierPayableLedgerEntries?: Prisma.SupplierPayableLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutTenantNestedInput
+  saleReturns?: Prisma.SaleReturnUncheckedUpdateManyWithoutTenantNestedInput
+  customerDueLedgerEntries?: Prisma.CustomerDueLedgerUncheckedUpdateManyWithoutTenantNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 
@@ -1699,6 +5965,24 @@ export type TenantCountOutputType = {
   payments: number
   invitations: number
   auditLogs: number
+  locations: number
+  categories: number
+  units: number
+  products: number
+  customers: number
+  suppliers: number
+  companySettings: number
+  inventoryBalances: number
+  stockMovements: number
+  purchaseOrders: number
+  goodsReceipts: number
+  purchaseReturns: number
+  stockTransfers: number
+  supplierPayableLedgerEntries: number
+  sales: number
+  saleReturns: number
+  customerDueLedgerEntries: number
+  cashDrawerSessions: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1712,6 +5996,24 @@ export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   payments?: boolean | TenantCountOutputTypeCountPaymentsArgs
   invitations?: boolean | TenantCountOutputTypeCountInvitationsArgs
   auditLogs?: boolean | TenantCountOutputTypeCountAuditLogsArgs
+  locations?: boolean | TenantCountOutputTypeCountLocationsArgs
+  categories?: boolean | TenantCountOutputTypeCountCategoriesArgs
+  units?: boolean | TenantCountOutputTypeCountUnitsArgs
+  products?: boolean | TenantCountOutputTypeCountProductsArgs
+  customers?: boolean | TenantCountOutputTypeCountCustomersArgs
+  suppliers?: boolean | TenantCountOutputTypeCountSuppliersArgs
+  companySettings?: boolean | TenantCountOutputTypeCountCompanySettingsArgs
+  inventoryBalances?: boolean | TenantCountOutputTypeCountInventoryBalancesArgs
+  stockMovements?: boolean | TenantCountOutputTypeCountStockMovementsArgs
+  purchaseOrders?: boolean | TenantCountOutputTypeCountPurchaseOrdersArgs
+  goodsReceipts?: boolean | TenantCountOutputTypeCountGoodsReceiptsArgs
+  purchaseReturns?: boolean | TenantCountOutputTypeCountPurchaseReturnsArgs
+  stockTransfers?: boolean | TenantCountOutputTypeCountStockTransfersArgs
+  supplierPayableLedgerEntries?: boolean | TenantCountOutputTypeCountSupplierPayableLedgerEntriesArgs
+  sales?: boolean | TenantCountOutputTypeCountSalesArgs
+  saleReturns?: boolean | TenantCountOutputTypeCountSaleReturnsArgs
+  customerDueLedgerEntries?: boolean | TenantCountOutputTypeCountCustomerDueLedgerEntriesArgs
+  cashDrawerSessions?: boolean | TenantCountOutputTypeCountCashDrawerSessionsArgs
 }
 
 /**
@@ -1794,6 +6096,132 @@ export type TenantCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Type
   where?: Prisma.AuditLogWhereInput
 }
 
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountLocationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LocationWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountCategoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CategoryWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountUnitsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UnitWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountProductsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ProductWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountCustomersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CustomerWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountSuppliersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupplierWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountCompanySettingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CompanySettingsWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountInventoryBalancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InventoryWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountStockMovementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StockMovementWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountPurchaseOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PurchaseOrderWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountGoodsReceiptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GoodsReceiptWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountPurchaseReturnsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PurchaseReturnWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountStockTransfersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.StockTransferWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountSupplierPayableLedgerEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SupplierPayableLedgerWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountSalesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SaleWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountSaleReturnsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SaleReturnWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountCustomerDueLedgerEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CustomerDueLedgerWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountCashDrawerSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CashDrawerSessionWhereInput
+}
+
 
 export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1816,6 +6244,24 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   payments?: boolean | Prisma.Tenant$paymentsArgs<ExtArgs>
   invitations?: boolean | Prisma.Tenant$invitationsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.Tenant$auditLogsArgs<ExtArgs>
+  locations?: boolean | Prisma.Tenant$locationsArgs<ExtArgs>
+  categories?: boolean | Prisma.Tenant$categoriesArgs<ExtArgs>
+  units?: boolean | Prisma.Tenant$unitsArgs<ExtArgs>
+  products?: boolean | Prisma.Tenant$productsArgs<ExtArgs>
+  customers?: boolean | Prisma.Tenant$customersArgs<ExtArgs>
+  suppliers?: boolean | Prisma.Tenant$suppliersArgs<ExtArgs>
+  companySettings?: boolean | Prisma.Tenant$companySettingsArgs<ExtArgs>
+  inventoryBalances?: boolean | Prisma.Tenant$inventoryBalancesArgs<ExtArgs>
+  stockMovements?: boolean | Prisma.Tenant$stockMovementsArgs<ExtArgs>
+  purchaseOrders?: boolean | Prisma.Tenant$purchaseOrdersArgs<ExtArgs>
+  goodsReceipts?: boolean | Prisma.Tenant$goodsReceiptsArgs<ExtArgs>
+  purchaseReturns?: boolean | Prisma.Tenant$purchaseReturnsArgs<ExtArgs>
+  stockTransfers?: boolean | Prisma.Tenant$stockTransfersArgs<ExtArgs>
+  supplierPayableLedgerEntries?: boolean | Prisma.Tenant$supplierPayableLedgerEntriesArgs<ExtArgs>
+  sales?: boolean | Prisma.Tenant$salesArgs<ExtArgs>
+  saleReturns?: boolean | Prisma.Tenant$saleReturnsArgs<ExtArgs>
+  customerDueLedgerEntries?: boolean | Prisma.Tenant$customerDueLedgerEntriesArgs<ExtArgs>
+  cashDrawerSessions?: boolean | Prisma.Tenant$cashDrawerSessionsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -1870,6 +6316,24 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   payments?: boolean | Prisma.Tenant$paymentsArgs<ExtArgs>
   invitations?: boolean | Prisma.Tenant$invitationsArgs<ExtArgs>
   auditLogs?: boolean | Prisma.Tenant$auditLogsArgs<ExtArgs>
+  locations?: boolean | Prisma.Tenant$locationsArgs<ExtArgs>
+  categories?: boolean | Prisma.Tenant$categoriesArgs<ExtArgs>
+  units?: boolean | Prisma.Tenant$unitsArgs<ExtArgs>
+  products?: boolean | Prisma.Tenant$productsArgs<ExtArgs>
+  customers?: boolean | Prisma.Tenant$customersArgs<ExtArgs>
+  suppliers?: boolean | Prisma.Tenant$suppliersArgs<ExtArgs>
+  companySettings?: boolean | Prisma.Tenant$companySettingsArgs<ExtArgs>
+  inventoryBalances?: boolean | Prisma.Tenant$inventoryBalancesArgs<ExtArgs>
+  stockMovements?: boolean | Prisma.Tenant$stockMovementsArgs<ExtArgs>
+  purchaseOrders?: boolean | Prisma.Tenant$purchaseOrdersArgs<ExtArgs>
+  goodsReceipts?: boolean | Prisma.Tenant$goodsReceiptsArgs<ExtArgs>
+  purchaseReturns?: boolean | Prisma.Tenant$purchaseReturnsArgs<ExtArgs>
+  stockTransfers?: boolean | Prisma.Tenant$stockTransfersArgs<ExtArgs>
+  supplierPayableLedgerEntries?: boolean | Prisma.Tenant$supplierPayableLedgerEntriesArgs<ExtArgs>
+  sales?: boolean | Prisma.Tenant$salesArgs<ExtArgs>
+  saleReturns?: boolean | Prisma.Tenant$saleReturnsArgs<ExtArgs>
+  customerDueLedgerEntries?: boolean | Prisma.Tenant$customerDueLedgerEntriesArgs<ExtArgs>
+  cashDrawerSessions?: boolean | Prisma.Tenant$cashDrawerSessionsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1888,6 +6352,24 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     payments: Prisma.$PaymentPayload<ExtArgs>[]
     invitations: Prisma.$InvitationPayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+    locations: Prisma.$LocationPayload<ExtArgs>[]
+    categories: Prisma.$CategoryPayload<ExtArgs>[]
+    units: Prisma.$UnitPayload<ExtArgs>[]
+    products: Prisma.$ProductPayload<ExtArgs>[]
+    customers: Prisma.$CustomerPayload<ExtArgs>[]
+    suppliers: Prisma.$SupplierPayload<ExtArgs>[]
+    companySettings: Prisma.$CompanySettingsPayload<ExtArgs>[]
+    inventoryBalances: Prisma.$InventoryPayload<ExtArgs>[]
+    stockMovements: Prisma.$StockMovementPayload<ExtArgs>[]
+    purchaseOrders: Prisma.$PurchaseOrderPayload<ExtArgs>[]
+    goodsReceipts: Prisma.$GoodsReceiptPayload<ExtArgs>[]
+    purchaseReturns: Prisma.$PurchaseReturnPayload<ExtArgs>[]
+    stockTransfers: Prisma.$StockTransferPayload<ExtArgs>[]
+    supplierPayableLedgerEntries: Prisma.$SupplierPayableLedgerPayload<ExtArgs>[]
+    sales: Prisma.$SalePayload<ExtArgs>[]
+    saleReturns: Prisma.$SaleReturnPayload<ExtArgs>[]
+    customerDueLedgerEntries: Prisma.$CustomerDueLedgerPayload<ExtArgs>[]
+    cashDrawerSessions: Prisma.$CashDrawerSessionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2304,6 +6786,24 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   payments<T extends Prisma.Tenant$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   invitations<T extends Prisma.Tenant$invitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$invitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.Tenant$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  locations<T extends Prisma.Tenant$locationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$locationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  categories<T extends Prisma.Tenant$categoriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$categoriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  units<T extends Prisma.Tenant$unitsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$unitsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UnitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  products<T extends Prisma.Tenant$productsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$productsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  customers<T extends Prisma.Tenant$customersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$customersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  suppliers<T extends Prisma.Tenant$suppliersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$suppliersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupplierPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  companySettings<T extends Prisma.Tenant$companySettingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$companySettingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanySettingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  inventoryBalances<T extends Prisma.Tenant$inventoryBalancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$inventoryBalancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  stockMovements<T extends Prisma.Tenant$stockMovementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$stockMovementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockMovementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  purchaseOrders<T extends Prisma.Tenant$purchaseOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$purchaseOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PurchaseOrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  goodsReceipts<T extends Prisma.Tenant$goodsReceiptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$goodsReceiptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GoodsReceiptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  purchaseReturns<T extends Prisma.Tenant$purchaseReturnsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$purchaseReturnsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PurchaseReturnPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  stockTransfers<T extends Prisma.Tenant$stockTransfersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$stockTransfersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StockTransferPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  supplierPayableLedgerEntries<T extends Prisma.Tenant$supplierPayableLedgerEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$supplierPayableLedgerEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SupplierPayableLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sales<T extends Prisma.Tenant$salesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$salesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SalePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  saleReturns<T extends Prisma.Tenant$saleReturnsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$saleReturnsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SaleReturnPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  customerDueLedgerEntries<T extends Prisma.Tenant$customerDueLedgerEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$customerDueLedgerEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomerDueLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  cashDrawerSessions<T extends Prisma.Tenant$cashDrawerSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$cashDrawerSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CashDrawerSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2973,6 +7473,438 @@ export type Tenant$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+}
+
+/**
+ * Tenant.locations
+ */
+export type Tenant$locationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Location
+   */
+  select?: Prisma.LocationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Location
+   */
+  omit?: Prisma.LocationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LocationInclude<ExtArgs> | null
+  where?: Prisma.LocationWhereInput
+  orderBy?: Prisma.LocationOrderByWithRelationInput | Prisma.LocationOrderByWithRelationInput[]
+  cursor?: Prisma.LocationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LocationScalarFieldEnum | Prisma.LocationScalarFieldEnum[]
+}
+
+/**
+ * Tenant.categories
+ */
+export type Tenant$categoriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Category
+   */
+  select?: Prisma.CategorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Category
+   */
+  omit?: Prisma.CategoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CategoryInclude<ExtArgs> | null
+  where?: Prisma.CategoryWhereInput
+  orderBy?: Prisma.CategoryOrderByWithRelationInput | Prisma.CategoryOrderByWithRelationInput[]
+  cursor?: Prisma.CategoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CategoryScalarFieldEnum | Prisma.CategoryScalarFieldEnum[]
+}
+
+/**
+ * Tenant.units
+ */
+export type Tenant$unitsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Unit
+   */
+  select?: Prisma.UnitSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Unit
+   */
+  omit?: Prisma.UnitOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UnitInclude<ExtArgs> | null
+  where?: Prisma.UnitWhereInput
+  orderBy?: Prisma.UnitOrderByWithRelationInput | Prisma.UnitOrderByWithRelationInput[]
+  cursor?: Prisma.UnitWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UnitScalarFieldEnum | Prisma.UnitScalarFieldEnum[]
+}
+
+/**
+ * Tenant.products
+ */
+export type Tenant$productsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Product
+   */
+  select?: Prisma.ProductSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Product
+   */
+  omit?: Prisma.ProductOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductInclude<ExtArgs> | null
+  where?: Prisma.ProductWhereInput
+  orderBy?: Prisma.ProductOrderByWithRelationInput | Prisma.ProductOrderByWithRelationInput[]
+  cursor?: Prisma.ProductWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ProductScalarFieldEnum | Prisma.ProductScalarFieldEnum[]
+}
+
+/**
+ * Tenant.customers
+ */
+export type Tenant$customersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Customer
+   */
+  select?: Prisma.CustomerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Customer
+   */
+  omit?: Prisma.CustomerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CustomerInclude<ExtArgs> | null
+  where?: Prisma.CustomerWhereInput
+  orderBy?: Prisma.CustomerOrderByWithRelationInput | Prisma.CustomerOrderByWithRelationInput[]
+  cursor?: Prisma.CustomerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CustomerScalarFieldEnum | Prisma.CustomerScalarFieldEnum[]
+}
+
+/**
+ * Tenant.suppliers
+ */
+export type Tenant$suppliersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Supplier
+   */
+  select?: Prisma.SupplierSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Supplier
+   */
+  omit?: Prisma.SupplierOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupplierInclude<ExtArgs> | null
+  where?: Prisma.SupplierWhereInput
+  orderBy?: Prisma.SupplierOrderByWithRelationInput | Prisma.SupplierOrderByWithRelationInput[]
+  cursor?: Prisma.SupplierWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupplierScalarFieldEnum | Prisma.SupplierScalarFieldEnum[]
+}
+
+/**
+ * Tenant.companySettings
+ */
+export type Tenant$companySettingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CompanySettings
+   */
+  select?: Prisma.CompanySettingsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CompanySettings
+   */
+  omit?: Prisma.CompanySettingsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CompanySettingsInclude<ExtArgs> | null
+  where?: Prisma.CompanySettingsWhereInput
+  orderBy?: Prisma.CompanySettingsOrderByWithRelationInput | Prisma.CompanySettingsOrderByWithRelationInput[]
+  cursor?: Prisma.CompanySettingsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CompanySettingsScalarFieldEnum | Prisma.CompanySettingsScalarFieldEnum[]
+}
+
+/**
+ * Tenant.inventoryBalances
+ */
+export type Tenant$inventoryBalancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Inventory
+   */
+  select?: Prisma.InventorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Inventory
+   */
+  omit?: Prisma.InventoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InventoryInclude<ExtArgs> | null
+  where?: Prisma.InventoryWhereInput
+  orderBy?: Prisma.InventoryOrderByWithRelationInput | Prisma.InventoryOrderByWithRelationInput[]
+  cursor?: Prisma.InventoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InventoryScalarFieldEnum | Prisma.InventoryScalarFieldEnum[]
+}
+
+/**
+ * Tenant.stockMovements
+ */
+export type Tenant$stockMovementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StockMovement
+   */
+  select?: Prisma.StockMovementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StockMovement
+   */
+  omit?: Prisma.StockMovementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockMovementInclude<ExtArgs> | null
+  where?: Prisma.StockMovementWhereInput
+  orderBy?: Prisma.StockMovementOrderByWithRelationInput | Prisma.StockMovementOrderByWithRelationInput[]
+  cursor?: Prisma.StockMovementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StockMovementScalarFieldEnum | Prisma.StockMovementScalarFieldEnum[]
+}
+
+/**
+ * Tenant.purchaseOrders
+ */
+export type Tenant$purchaseOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PurchaseOrder
+   */
+  select?: Prisma.PurchaseOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PurchaseOrder
+   */
+  omit?: Prisma.PurchaseOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PurchaseOrderInclude<ExtArgs> | null
+  where?: Prisma.PurchaseOrderWhereInput
+  orderBy?: Prisma.PurchaseOrderOrderByWithRelationInput | Prisma.PurchaseOrderOrderByWithRelationInput[]
+  cursor?: Prisma.PurchaseOrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PurchaseOrderScalarFieldEnum | Prisma.PurchaseOrderScalarFieldEnum[]
+}
+
+/**
+ * Tenant.goodsReceipts
+ */
+export type Tenant$goodsReceiptsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GoodsReceipt
+   */
+  select?: Prisma.GoodsReceiptSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GoodsReceipt
+   */
+  omit?: Prisma.GoodsReceiptOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GoodsReceiptInclude<ExtArgs> | null
+  where?: Prisma.GoodsReceiptWhereInput
+  orderBy?: Prisma.GoodsReceiptOrderByWithRelationInput | Prisma.GoodsReceiptOrderByWithRelationInput[]
+  cursor?: Prisma.GoodsReceiptWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GoodsReceiptScalarFieldEnum | Prisma.GoodsReceiptScalarFieldEnum[]
+}
+
+/**
+ * Tenant.purchaseReturns
+ */
+export type Tenant$purchaseReturnsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PurchaseReturn
+   */
+  select?: Prisma.PurchaseReturnSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PurchaseReturn
+   */
+  omit?: Prisma.PurchaseReturnOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PurchaseReturnInclude<ExtArgs> | null
+  where?: Prisma.PurchaseReturnWhereInput
+  orderBy?: Prisma.PurchaseReturnOrderByWithRelationInput | Prisma.PurchaseReturnOrderByWithRelationInput[]
+  cursor?: Prisma.PurchaseReturnWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PurchaseReturnScalarFieldEnum | Prisma.PurchaseReturnScalarFieldEnum[]
+}
+
+/**
+ * Tenant.stockTransfers
+ */
+export type Tenant$stockTransfersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the StockTransfer
+   */
+  select?: Prisma.StockTransferSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the StockTransfer
+   */
+  omit?: Prisma.StockTransferOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockTransferInclude<ExtArgs> | null
+  where?: Prisma.StockTransferWhereInput
+  orderBy?: Prisma.StockTransferOrderByWithRelationInput | Prisma.StockTransferOrderByWithRelationInput[]
+  cursor?: Prisma.StockTransferWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.StockTransferScalarFieldEnum | Prisma.StockTransferScalarFieldEnum[]
+}
+
+/**
+ * Tenant.supplierPayableLedgerEntries
+ */
+export type Tenant$supplierPayableLedgerEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SupplierPayableLedger
+   */
+  select?: Prisma.SupplierPayableLedgerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SupplierPayableLedger
+   */
+  omit?: Prisma.SupplierPayableLedgerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SupplierPayableLedgerInclude<ExtArgs> | null
+  where?: Prisma.SupplierPayableLedgerWhereInput
+  orderBy?: Prisma.SupplierPayableLedgerOrderByWithRelationInput | Prisma.SupplierPayableLedgerOrderByWithRelationInput[]
+  cursor?: Prisma.SupplierPayableLedgerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SupplierPayableLedgerScalarFieldEnum | Prisma.SupplierPayableLedgerScalarFieldEnum[]
+}
+
+/**
+ * Tenant.sales
+ */
+export type Tenant$salesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Sale
+   */
+  select?: Prisma.SaleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Sale
+   */
+  omit?: Prisma.SaleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SaleInclude<ExtArgs> | null
+  where?: Prisma.SaleWhereInput
+  orderBy?: Prisma.SaleOrderByWithRelationInput | Prisma.SaleOrderByWithRelationInput[]
+  cursor?: Prisma.SaleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SaleScalarFieldEnum | Prisma.SaleScalarFieldEnum[]
+}
+
+/**
+ * Tenant.saleReturns
+ */
+export type Tenant$saleReturnsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SaleReturn
+   */
+  select?: Prisma.SaleReturnSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SaleReturn
+   */
+  omit?: Prisma.SaleReturnOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SaleReturnInclude<ExtArgs> | null
+  where?: Prisma.SaleReturnWhereInput
+  orderBy?: Prisma.SaleReturnOrderByWithRelationInput | Prisma.SaleReturnOrderByWithRelationInput[]
+  cursor?: Prisma.SaleReturnWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SaleReturnScalarFieldEnum | Prisma.SaleReturnScalarFieldEnum[]
+}
+
+/**
+ * Tenant.customerDueLedgerEntries
+ */
+export type Tenant$customerDueLedgerEntriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CustomerDueLedger
+   */
+  select?: Prisma.CustomerDueLedgerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CustomerDueLedger
+   */
+  omit?: Prisma.CustomerDueLedgerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CustomerDueLedgerInclude<ExtArgs> | null
+  where?: Prisma.CustomerDueLedgerWhereInput
+  orderBy?: Prisma.CustomerDueLedgerOrderByWithRelationInput | Prisma.CustomerDueLedgerOrderByWithRelationInput[]
+  cursor?: Prisma.CustomerDueLedgerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CustomerDueLedgerScalarFieldEnum | Prisma.CustomerDueLedgerScalarFieldEnum[]
+}
+
+/**
+ * Tenant.cashDrawerSessions
+ */
+export type Tenant$cashDrawerSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CashDrawerSession
+   */
+  select?: Prisma.CashDrawerSessionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CashDrawerSession
+   */
+  omit?: Prisma.CashDrawerSessionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CashDrawerSessionInclude<ExtArgs> | null
+  where?: Prisma.CashDrawerSessionWhereInput
+  orderBy?: Prisma.CashDrawerSessionOrderByWithRelationInput | Prisma.CashDrawerSessionOrderByWithRelationInput[]
+  cursor?: Prisma.CashDrawerSessionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CashDrawerSessionScalarFieldEnum | Prisma.CashDrawerSessionScalarFieldEnum[]
 }
 
 /**

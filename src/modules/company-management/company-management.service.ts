@@ -119,6 +119,22 @@ export class CompanyManagementService {
         tx,
       );
 
+      /**
+       * Business Ops module reads this row from day one (defaults chosen
+       * to match the design document's worked examples — most small shops
+       * want multi-unit/customer-due/barcode on, variant/combo/multi-
+       * location/tax/negative-stock off until the Owner explicitly turns
+       * them on). No Owner input needed here — Location creation stays a
+       * separate, manual Setup Wizard step (confirmed), but this row must
+       * always exist so later guards/services never have to null-check it.
+       */
+      await tx.companySettings.create({
+        data: {
+          tenantId: company.tenantId,
+          companyId: company.id,
+        },
+      });
+
       return company;
     });
   }

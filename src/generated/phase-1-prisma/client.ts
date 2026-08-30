@@ -105,6 +105,136 @@ export type Industry = Prisma.IndustryModel
  */
 export type Company = Prisma.CompanyModel
 /**
+ * Model Location
+ * 
+ */
+export type Location = Prisma.LocationModel
+/**
+ * Model Category
+ * 
+ */
+export type Category = Prisma.CategoryModel
+/**
+ * Model Unit
+ * 
+ */
+export type Unit = Prisma.UnitModel
+/**
+ * Model Product
+ * 
+ */
+export type Product = Prisma.ProductModel
+/**
+ * Model Customer
+ * 
+ */
+export type Customer = Prisma.CustomerModel
+/**
+ * Model Supplier
+ * 
+ */
+export type Supplier = Prisma.SupplierModel
+/**
+ * Model Inventory
+ * 
+ */
+export type Inventory = Prisma.InventoryModel
+/**
+ * Model StockMovement
+ * 
+ */
+export type StockMovement = Prisma.StockMovementModel
+/**
+ * Model PurchaseOrderSequence
+ * *
+ *  * Company-scoped order-number sequence — deliberately NOT a global counter
+ *  * like InvoiceSequence. The design document's own Section 9.1 explicitly
+ *  * flags a shared global sequence as a multi-tenant leak (Company A's order
+ *  * volume becomes inferable from Company B's numbers) — Invoice is a
+ *  * platform-billing document where that risk doesn't apply the same way,
+ *  * but PurchaseOrder is company-owned business data, so it gets its own
+ *  * per-(tenant,company) sequence instead.
+ */
+export type PurchaseOrderSequence = Prisma.PurchaseOrderSequenceModel
+/**
+ * Model PurchaseOrder
+ * 
+ */
+export type PurchaseOrder = Prisma.PurchaseOrderModel
+/**
+ * Model PurchaseOrderItem
+ * 
+ */
+export type PurchaseOrderItem = Prisma.PurchaseOrderItemModel
+/**
+ * Model GoodsReceipt
+ * 
+ */
+export type GoodsReceipt = Prisma.GoodsReceiptModel
+/**
+ * Model PurchaseReturn
+ * 
+ */
+export type PurchaseReturn = Prisma.PurchaseReturnModel
+/**
+ * Model StockTransfer
+ * 
+ */
+export type StockTransfer = Prisma.StockTransferModel
+/**
+ * Model SupplierPayableLedger
+ * 
+ */
+export type SupplierPayableLedger = Prisma.SupplierPayableLedgerModel
+/**
+ * Model SaleSequence
+ * * Company-scoped, mirrors PurchaseOrderSequence exactly (see its own comment for why this is per-company, not global like InvoiceSequence).
+ */
+export type SaleSequence = Prisma.SaleSequenceModel
+/**
+ * Model Sale
+ * 
+ */
+export type Sale = Prisma.SaleModel
+/**
+ * Model SaleItem
+ * 
+ */
+export type SaleItem = Prisma.SaleItemModel
+/**
+ * Model SalePayment
+ * 
+ */
+export type SalePayment = Prisma.SalePaymentModel
+/**
+ * Model SaleReturn
+ * 
+ */
+export type SaleReturn = Prisma.SaleReturnModel
+/**
+ * Model CustomerDueLedger
+ * 
+ */
+export type CustomerDueLedger = Prisma.CustomerDueLedgerModel
+/**
+ * Model CashDrawerSession
+ * *
+ *  * One row per cashier shift at one Location. `cashierId` is a plain field
+ *  * (no @relation), matching StockMovement.actorUserId's existing convention.
+ *  * The @@unique below becomes a PARTIAL unique index (WHERE status = 'OPEN')
+ *  * via a hand-edited migration.sql — Prisma's schema DSL cannot express a
+ *  * conditional unique constraint directly. This is what makes "one cashier,
+ *  * one open session at a time" (regardless of Location) atomic and race-safe
+ *  * at the database level, the correct analogue of Phase 2/4's atomic
+ *  * conditional-update pattern applied to a create instead of an update.
+ */
+export type CashDrawerSession = Prisma.CashDrawerSessionModel
+/**
+ * Model CompanySettings
+ * 
+ */
+export type CompanySettings = Prisma.CompanySettingsModel
+/**
  * Model CompanyMember
  * 
  */

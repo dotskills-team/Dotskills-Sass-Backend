@@ -221,3 +221,144 @@ export const PaymentStatus = {
 } as const
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const LocationType = {
+  BRANCH: 'BRANCH',
+  WAREHOUSE: 'WAREHOUSE'
+} as const
+
+export type LocationType = (typeof LocationType)[keyof typeof LocationType]
+
+
+export const LocationStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type LocationStatus = (typeof LocationStatus)[keyof typeof LocationStatus]
+
+
+export const CategoryStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type CategoryStatus = (typeof CategoryStatus)[keyof typeof CategoryStatus]
+
+
+export const UnitStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type UnitStatus = (typeof UnitStatus)[keyof typeof UnitStatus]
+
+
+export const ProductStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type ProductStatus = (typeof ProductStatus)[keyof typeof ProductStatus]
+
+
+export const CustomerType = {
+  RETAIL: 'RETAIL',
+  WHOLESALE: 'WHOLESALE'
+} as const
+
+export type CustomerType = (typeof CustomerType)[keyof typeof CustomerType]
+
+
+export const CustomerStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type CustomerStatus = (typeof CustomerStatus)[keyof typeof CustomerStatus]
+
+
+export const SupplierStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE'
+} as const
+
+export type SupplierStatus = (typeof SupplierStatus)[keyof typeof SupplierStatus]
+
+
+export const StockMovementType = {
+  PURCHASE: 'PURCHASE',
+  SALE: 'SALE',
+  TRANSFER_IN: 'TRANSFER_IN',
+  TRANSFER_OUT: 'TRANSFER_OUT',
+  ADJUSTMENT: 'ADJUSTMENT',
+  SALE_RETURN_IN: 'SALE_RETURN_IN',
+  PURCHASE_RETURN_OUT: 'PURCHASE_RETURN_OUT',
+  SALE_VOID_IN: 'SALE_VOID_IN'
+} as const
+
+export type StockMovementType = (typeof StockMovementType)[keyof typeof StockMovementType]
+
+
+export const PurchaseOrderStatus = {
+  DRAFT: 'DRAFT',
+  PARTIALLY_RECEIVED: 'PARTIALLY_RECEIVED',
+  FULLY_RECEIVED: 'FULLY_RECEIVED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type PurchaseOrderStatus = (typeof PurchaseOrderStatus)[keyof typeof PurchaseOrderStatus]
+
+
+export const StockTransferStatus = {
+  PENDING: 'PENDING',
+  IN_TRANSIT: 'IN_TRANSIT',
+  RECEIVED: 'RECEIVED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type StockTransferStatus = (typeof StockTransferStatus)[keyof typeof StockTransferStatus]
+
+
+export const SupplierLedgerEntryType = {
+  PAYABLE: 'PAYABLE',
+  PAYMENT: 'PAYMENT'
+} as const
+
+export type SupplierLedgerEntryType = (typeof SupplierLedgerEntryType)[keyof typeof SupplierLedgerEntryType]
+
+
+export const SaleStatus = {
+  COMPLETED: 'COMPLETED',
+  VOIDED: 'VOIDED'
+} as const
+
+export type SaleStatus = (typeof SaleStatus)[keyof typeof SaleStatus]
+
+
+export const SalePaymentMethod = {
+  CASH: 'CASH',
+  CARD: 'CARD',
+  BKASH: 'BKASH',
+  NAGAD: 'NAGAD',
+  DUE: 'DUE'
+} as const
+
+export type SalePaymentMethod = (typeof SalePaymentMethod)[keyof typeof SalePaymentMethod]
+
+
+export const CustomerLedgerEntryType = {
+  DUE: 'DUE',
+  PAYMENT: 'PAYMENT'
+} as const
+
+export type CustomerLedgerEntryType = (typeof CustomerLedgerEntryType)[keyof typeof CustomerLedgerEntryType]
+
+
+export const CashDrawerSessionStatus = {
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED'
+} as const
+
+export type CashDrawerSessionStatus = (typeof CashDrawerSessionStatus)[keyof typeof CashDrawerSessionStatus]

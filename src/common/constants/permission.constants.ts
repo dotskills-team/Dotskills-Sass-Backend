@@ -511,6 +511,102 @@ export const COMPANY_PERMISSIONS = {
   PAYMENT_CREATE: 'company.payment.create',
 
   PAYMENT_READ: 'company.payment.read',
+
+  /**
+   * ----------------------------------------------------------
+   * COMPANY BUSINESS OPS — MASTER DATA
+   * ----------------------------------------------------------
+   *
+   * Business Operations module (Sales/Purchase/Inventory)-এর ভিত্তি —
+   * Location, Category, Unit, Product, Customer, Supplier, এবং
+   * প্রতিটা Company-র নিজস্ব Settings/configuration toggle।
+   */
+  LOCATION_READ: 'company.location.read',
+  LOCATION_CREATE: 'company.location.create',
+  LOCATION_UPDATE: 'company.location.update',
+
+  CATEGORY_READ: 'company.category.read',
+  CATEGORY_CREATE: 'company.category.create',
+  CATEGORY_UPDATE: 'company.category.update',
+
+  UNIT_READ: 'company.unit.read',
+  UNIT_CREATE: 'company.unit.create',
+  UNIT_UPDATE: 'company.unit.update',
+
+  PRODUCT_READ: 'company.product.read',
+  PRODUCT_CREATE: 'company.product.create',
+  PRODUCT_UPDATE: 'company.product.update',
+
+  CUSTOMER_READ: 'company.customer.read',
+  CUSTOMER_CREATE: 'company.customer.create',
+  CUSTOMER_UPDATE: 'company.customer.update',
+
+  SUPPLIER_READ: 'company.supplier.read',
+  SUPPLIER_CREATE: 'company.supplier.create',
+  SUPPLIER_UPDATE: 'company.supplier.update',
+
+  SETTINGS_READ: 'company.settings.read',
+  SETTINGS_UPDATE: 'company.settings.update',
+
+  /**
+   * ----------------------------------------------------------
+   * COMPANY BUSINESS OPS — PURCHASE + STOCK TRANSFER
+   * ----------------------------------------------------------
+   */
+  PURCHASE_ORDER_READ: 'company.purchase-order.read',
+  PURCHASE_ORDER_CREATE: 'company.purchase-order.create',
+  PURCHASE_ORDER_UPDATE: 'company.purchase-order.update',
+  PURCHASE_ORDER_CANCEL: 'company.purchase-order.cancel',
+  PURCHASE_ORDER_RECEIVE: 'company.purchase-order.receive',
+
+  PURCHASE_RETURN_READ: 'company.purchase-return.read',
+  PURCHASE_RETURN_CREATE: 'company.purchase-return.create',
+
+  STOCK_TRANSFER_READ: 'company.stock-transfer.read',
+  STOCK_TRANSFER_CREATE: 'company.stock-transfer.create',
+  STOCK_TRANSFER_DISPATCH: 'company.stock-transfer.dispatch',
+  STOCK_TRANSFER_RECEIVE: 'company.stock-transfer.receive',
+
+  SUPPLIER_PAYMENT_READ: 'company.supplier-payment.read',
+  SUPPLIER_PAYMENT_CREATE: 'company.supplier-payment.create',
+
+  /**
+   * ----------------------------------------------------------
+   * COMPANY BUSINESS OPS — SALES / POS
+   * ----------------------------------------------------------
+   *
+   * VOID/RETURN ইচ্ছাকৃতভাবে SALE_CREATE থেকে আলাদা permission —
+   * শুধু Owner/Manager-এর হাতে থাকবে (document Section ৫.৫,
+   * decision #2), Cashier শুধু নতুন Sale করতে পারবে।
+   */
+  SALE_READ: 'company.sale.read',
+  SALE_CREATE: 'company.sale.create',
+  SALE_VOID: 'company.sale.void',
+
+  SALE_RETURN_READ: 'company.sale-return.read',
+  SALE_RETURN_CREATE: 'company.sale-return.create',
+
+  CUSTOMER_PAYMENT_READ: 'company.customer-payment.read',
+  CUSTOMER_PAYMENT_CREATE: 'company.customer-payment.create',
+
+  /**
+   * Cash Drawer / Day-Close (Phase 5). OPEN/CLOSE kept separate from each
+   * other (not just READ vs write) since they're distinct real-world
+   * actions performed at different moments of a shift — same trust-tier
+   * reasoning as SALE_VOID being separate from SALE_CREATE.
+   */
+  CASH_DRAWER_SESSION_READ: 'company.cash-drawer-session.read',
+  CASH_DRAWER_SESSION_OPEN: 'company.cash-drawer-session.open',
+  CASH_DRAWER_SESSION_CLOSE: 'company.cash-drawer-session.close',
+
+  /**
+   * Reporting (Phase 6). PROFIT_REPORT_READ is kept separate from
+   * REPORT_READ — margin/profit visibility is a classic case an Owner
+   * wants hidden from a Branch Manager even while everything else in
+   * REPORT_READ stays visible to them.
+   */
+  REPORT_READ: 'company.report.read',
+  PROFIT_REPORT_READ: 'company.profit-report.read',
 } as const;
 
 /**

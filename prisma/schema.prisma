@@ -368,6 +368,24 @@ model Tenant {
   payments      Payment[]
   invitations   Invitation[]
   auditLogs     AuditLog[]
+  locations       Location[]
+  categories      Category[]
+  units           Unit[]
+  products        Product[]
+  customers       Customer[]
+  suppliers       Supplier[]
+  companySettings CompanySettings[]
+  inventoryBalances Inventory[]
+  stockMovements    StockMovement[]
+  purchaseOrders    PurchaseOrder[]
+  goodsReceipts     GoodsReceipt[]
+  purchaseReturns   PurchaseReturn[]
+  stockTransfers    StockTransfer[]
+  supplierPayableLedgerEntries SupplierPayableLedger[]
+  sales             Sale[]
+  saleReturns       SaleReturn[]
+  customerDueLedgerEntries CustomerDueLedger[]
+  cashDrawerSessions CashDrawerSession[]
 
   @@index([status, trialEndsAt])
   @@map("tenants")
@@ -418,12 +436,637 @@ model Company {
   payments         Payment[]
   invitations      Invitation[]
   auditLogs        AuditLog[]
+  locations        Location[]
+  categories       Category[]
+  units            Unit[]
+  products         Product[]
+  customers        Customer[]
+  suppliers        Supplier[]
+  companySettings  CompanySettings?
+  inventoryBalances Inventory[]
+  stockMovements    StockMovement[]
+  purchaseOrders    PurchaseOrder[]
+  goodsReceipts     GoodsReceipt[]
+  purchaseReturns   PurchaseReturn[]
+  stockTransfers    StockTransfer[]
+  supplierPayableLedgerEntries SupplierPayableLedger[]
+  sales             Sale[]
+  saleReturns       SaleReturn[]
+  customerDueLedgerEntries CustomerDueLedger[]
+  cashDrawerSessions CashDrawerSession[]
 
   @@unique([tenantId, code])
   @@unique([tenantId, id])
   @@index([tenantId, status])
   @@index([industryId, status])
   @@map("companies")
+}
+
+// ============================================================
+// BUSINESS OPERATIONS — MASTER DATA (Phase 1)
+// ============================================================
+
+enum LocationType {
+  BRANCH
+  WAREHOUSE
+}
+
+enum LocationStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Location {
+  id             String         @id @default(uuid()) @db.Uuid
+  tenantId       String         @db.Uuid
+  companyId      String         @db.Uuid
+  name           String         @db.VarChar(120)
+  locationType   LocationType
+  address        String?        @db.Text
+  isSalesEnabled Boolean        @default(true)
+  status         LocationStatus @default(ACTIVE)
+  createdAt      DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime       @updatedAt @db.Timestamptz(6)
+  tenant         Tenant         @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company        Company        @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  inventoryBalances Inventory[]
+  stockMovements    StockMovement[]
+  purchaseOrders    PurchaseOrder[]
+  transfersFrom     StockTransfer[] @relation("TransferFromLocation")
+  transfersTo       StockTransfer[] @relation("TransferToLocation")
+  sales             Sale[]
+  cashDrawerSessions CashDrawerSession[]
+
+  @@unique([tenantId, companyId, name])
+  @@index([tenantId, companyId, status])
+  @@map("locations")
+}
+
+enum CategoryStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Category {
+  id               String         @id @default(uuid()) @db.Uuid
+  tenantId         String         @db.Uuid
+  companyId        String         @db.Uuid
+  parentCategoryId String?        @db.Uuid
+  name             String         @db.VarChar(120)
+  status           CategoryStatus @default(ACTIVE)
+  createdAt        DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime       @updatedAt @db.Timestamptz(6)
+  tenant           Tenant         @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company          Company        @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  parentCategory   Category?      @relation("CategoryParent", fields: [parentCategoryId], references: [id], onDelete: Restrict)
+  childCategories  Category[]     @relation("CategoryParent")
+  products         Product[]
+
+  @@unique([tenantId, companyId, name])
+  @@index([tenantId, companyId, status])
+  @@map("categories")
+}
+
+enum UnitStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Unit {
+  id               String     @id @default(uuid()) @db.Uuid
+  tenantId         String     @db.Uuid
+  companyId        String     @db.Uuid
+  baseUnitId       String?    @db.Uuid
+  name             String     @db.VarChar(60)
+  code             String     @db.VarChar(20)
+  conversionFactor Decimal    @default(1) @db.Decimal(14, 4)
+  status           UnitStatus @default(ACTIVE)
+  createdAt        DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime   @updatedAt @db.Timestamptz(6)
+  tenant           Tenant     @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company          Company    @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  baseUnit         Unit?      @relation("UnitConversion", fields: [baseUnitId], references: [id], onDelete: Restrict)
+  derivedUnits     Unit[]     @relation("UnitConversion")
+  products         Product[]
+
+  @@unique([tenantId, companyId, code])
+  @@index([tenantId, companyId, status])
+  @@map("units")
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Product {
+  id           String        @id @default(uuid()) @db.Uuid
+  tenantId     String        @db.Uuid
+  companyId    String        @db.Uuid
+  categoryId   String?       @db.Uuid
+  baseUnitId   String        @db.Uuid
+  sku          String        @db.VarChar(60)
+  barcode      String?       @db.VarChar(64)
+  name         String        @db.VarChar(200)
+  costPrice    Decimal       @default(0) @db.Decimal(20, 4)
+  salePrice    Decimal       @default(0) @db.Decimal(20, 4)
+  reorderLevel Decimal       @default(0) @db.Decimal(14, 4)
+  sellByWeight Boolean       @default(false)
+  status       ProductStatus @default(ACTIVE)
+  createdAt    DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime      @updatedAt @db.Timestamptz(6)
+  tenant       Tenant        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  category     Category?     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  baseUnit     Unit          @relation(fields: [baseUnitId], references: [id], onDelete: Restrict)
+  inventoryBalances Inventory[]
+  stockMovements    StockMovement[]
+  purchaseOrderItems PurchaseOrderItem[]
+  stockTransfers     StockTransfer[]
+  saleItems          SaleItem[]
+
+  @@unique([tenantId, companyId, sku])
+  @@unique([tenantId, companyId, barcode])
+  @@index([tenantId, companyId, status])
+  @@index([categoryId])
+  @@map("products")
+}
+
+enum CustomerType {
+  RETAIL
+  WHOLESALE
+}
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Customer {
+  id           String         @id @default(uuid()) @db.Uuid
+  tenantId     String         @db.Uuid
+  companyId    String         @db.Uuid
+  name         String         @db.VarChar(160)
+  phone        String?        @db.VarChar(32)
+  email        String?        @db.VarChar(200)
+  address      String?        @db.Text
+  customerType CustomerType   @default(RETAIL)
+  dueBalance   Decimal        @default(0) @db.Decimal(20, 4)
+  status       CustomerStatus @default(ACTIVE)
+  createdAt    DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime       @updatedAt @db.Timestamptz(6)
+  tenant       Tenant         @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company      Company        @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  sales                  Sale[]
+  customerDueLedgerEntries CustomerDueLedger[]
+
+  @@unique([tenantId, companyId, phone])
+  @@index([tenantId, companyId, status])
+  @@map("customers")
+}
+
+enum SupplierStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Supplier {
+  id             String         @id @default(uuid()) @db.Uuid
+  tenantId       String         @db.Uuid
+  companyId      String         @db.Uuid
+  name           String         @db.VarChar(160)
+  phone          String?        @db.VarChar(32)
+  email          String?        @db.VarChar(200)
+  address        String?        @db.Text
+  payableBalance Decimal        @default(0) @db.Decimal(20, 4)
+  status         SupplierStatus @default(ACTIVE)
+  createdAt      DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime       @updatedAt @db.Timestamptz(6)
+  tenant         Tenant         @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company        Company        @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  purchaseOrders       PurchaseOrder[]
+  payableLedgerEntries SupplierPayableLedger[]
+
+  @@unique([tenantId, companyId, phone])
+  @@index([tenantId, companyId, status])
+  @@map("suppliers")
+}
+
+// ============================================================
+// BUSINESS OPERATIONS — INVENTORY LEDGER (Phase 2)
+// ============================================================
+
+model Inventory {
+  id         String   @id @default(uuid()) @db.Uuid
+  tenantId   String   @db.Uuid
+  companyId  String   @db.Uuid
+  productId  String   @db.Uuid
+  locationId String   @db.Uuid
+  quantity   Decimal  @default(0) @db.Decimal(14, 4)
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
+  @@unique([tenantId, companyId, locationId, productId])
+  @@index([tenantId, companyId, productId])
+  @@map("inventory")
+}
+
+enum StockMovementType {
+  PURCHASE
+  SALE
+  TRANSFER_IN
+  TRANSFER_OUT
+  ADJUSTMENT
+  SALE_RETURN_IN
+  PURCHASE_RETURN_OUT
+  SALE_VOID_IN
+}
+
+model StockMovement {
+  id            String            @id @default(uuid()) @db.Uuid
+  tenantId      String            @db.Uuid
+  companyId     String            @db.Uuid
+  productId     String            @db.Uuid
+  locationId    String            @db.Uuid
+  movementType  StockMovementType
+  changeQty     Decimal           @db.Decimal(14, 4)
+  balanceAfter  Decimal           @db.Decimal(14, 4)
+  unitCost      Decimal?          @db.Decimal(20, 4)
+  referenceId   String?           @db.Uuid
+  actorUserId   String?           @db.Uuid
+  note          String?           @db.Text
+  createdAt     DateTime          @default(now()) @db.Timestamptz(6)
+  tenant        Tenant            @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company       Company           @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  product       Product           @relation(fields: [productId], references: [id], onDelete: Restrict)
+  location      Location          @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, companyId, productId, locationId, createdAt])
+  @@map("stock_movements")
+}
+
+// ============================================================
+// BUSINESS OPERATIONS — PURCHASE + STOCK TRANSFER (Phase 3)
+// ============================================================
+
+enum PurchaseOrderStatus {
+  DRAFT
+  PARTIALLY_RECEIVED
+  FULLY_RECEIVED
+  CANCELLED
+}
+
+/**
+ * Company-scoped order-number sequence — deliberately NOT a global counter
+ * like InvoiceSequence. The design document's own Section 9.1 explicitly
+ * flags a shared global sequence as a multi-tenant leak (Company A's order
+ * volume becomes inferable from Company B's numbers) — Invoice is a
+ * platform-billing document where that risk doesn't apply the same way,
+ * but PurchaseOrder is company-owned business data, so it gets its own
+ * per-(tenant,company) sequence instead.
+ */
+model PurchaseOrderSequence {
+  tenantId   String @db.Uuid
+  companyId  String @db.Uuid
+  yearKey    String @db.VarChar(4)
+  lastNumber Int    @default(0)
+
+  @@id([tenantId, companyId, yearKey])
+  @@map("purchase_order_sequences")
+}
+
+model PurchaseOrder {
+  id          String              @id @default(uuid()) @db.Uuid
+  tenantId    String              @db.Uuid
+  companyId   String              @db.Uuid
+  supplierId  String              @db.Uuid
+  locationId  String              @db.Uuid
+  orderNumber String              @db.VarChar(40)
+  status      PurchaseOrderStatus @default(DRAFT)
+  orderDate   DateTime            @default(now()) @db.Timestamptz(6)
+  totalAmount Decimal             @default(0) @db.Decimal(20, 4)
+  note        String?             @db.Text
+  createdAt   DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime            @updatedAt @db.Timestamptz(6)
+  tenant      Tenant              @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company     Company             @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  supplier    Supplier            @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+  location    Location            @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  items       PurchaseOrderItem[]
+  receipts    GoodsReceipt[]
+  returns     PurchaseReturn[]
+
+  @@unique([tenantId, companyId, orderNumber])
+  @@index([tenantId, companyId, status, orderDate])
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id              String        @id @default(uuid()) @db.Uuid
+  purchaseOrderId String        @db.Uuid
+  productId       String        @db.Uuid
+  orderedQty      Decimal       @db.Decimal(14, 4)
+  receivedQty     Decimal       @default(0) @db.Decimal(14, 4)
+  unitCost        Decimal       @db.Decimal(20, 4)
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  product         Product       @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([purchaseOrderId])
+  @@map("purchase_order_items")
+}
+
+model GoodsReceipt {
+  id              String        @id @default(uuid()) @db.Uuid
+  tenantId        String        @db.Uuid
+  companyId       String        @db.Uuid
+  purchaseOrderId String        @db.Uuid
+  receivedDate    DateTime      @default(now()) @db.Timestamptz(6)
+  billImageUrl    String?       @db.Text
+  actorUserId     String?       @db.Uuid
+  createdAt       DateTime      @default(now()) @db.Timestamptz(6)
+  tenant          Tenant        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company         Company       @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, companyId, purchaseOrderId])
+  @@map("goods_receipts")
+}
+
+model PurchaseReturn {
+  id              String        @id @default(uuid()) @db.Uuid
+  tenantId        String        @db.Uuid
+  companyId       String        @db.Uuid
+  purchaseOrderId String        @db.Uuid
+  reason          String        @db.Text
+  refundAmount    Decimal       @default(0) @db.Decimal(20, 4)
+  returnDate      DateTime      @default(now()) @db.Timestamptz(6)
+  actorUserId     String?       @db.Uuid
+  createdAt       DateTime      @default(now()) @db.Timestamptz(6)
+  tenant          Tenant        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company         Company       @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, companyId, purchaseOrderId])
+  @@map("purchase_returns")
+}
+
+enum StockTransferStatus {
+  PENDING
+  IN_TRANSIT
+  RECEIVED
+  CANCELLED
+}
+
+model StockTransfer {
+  id             String               @id @default(uuid()) @db.Uuid
+  tenantId       String               @db.Uuid
+  companyId      String               @db.Uuid
+  fromLocationId String               @db.Uuid
+  toLocationId   String               @db.Uuid
+  productId      String               @db.Uuid
+  quantity       Decimal              @db.Decimal(14, 4)
+  status         StockTransferStatus  @default(PENDING)
+  dispatchedAt   DateTime?            @db.Timestamptz(6)
+  receivedAt     DateTime?            @db.Timestamptz(6)
+  actorUserId    String?              @db.Uuid
+  createdAt      DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime             @updatedAt @db.Timestamptz(6)
+  tenant         Tenant               @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company        Company              @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  fromLocation   Location             @relation("TransferFromLocation", fields: [fromLocationId], references: [id], onDelete: Restrict)
+  toLocation     Location             @relation("TransferToLocation", fields: [toLocationId], references: [id], onDelete: Restrict)
+  product        Product              @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, companyId, status])
+  @@map("stock_transfers")
+}
+
+enum SupplierLedgerEntryType {
+  PAYABLE
+  PAYMENT
+}
+
+model SupplierPayableLedger {
+  id          String                  @id @default(uuid()) @db.Uuid
+  tenantId    String                  @db.Uuid
+  companyId   String                  @db.Uuid
+  supplierId  String                  @db.Uuid
+  entryType   SupplierLedgerEntryType
+  amount      Decimal                 @db.Decimal(20, 4)
+  referenceId String?                 @db.Uuid
+  note        String?                 @db.Text
+  actorUserId String?                 @db.Uuid
+  createdAt   DateTime                @default(now()) @db.Timestamptz(6)
+  tenant      Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company     Company                 @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  supplier    Supplier                @relation(fields: [supplierId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, companyId, supplierId, createdAt])
+  @@map("supplier_payable_ledger")
+}
+
+// ============================================================
+// BUSINESS OPERATIONS — SALES / POS (Phase 4)
+// ============================================================
+
+/** Company-scoped, mirrors PurchaseOrderSequence exactly (see its own comment for why this is per-company, not global like InvoiceSequence). */
+model SaleSequence {
+  tenantId   String @db.Uuid
+  companyId  String @db.Uuid
+  yearKey    String @db.VarChar(4)
+  lastNumber Int    @default(0)
+
+  @@id([tenantId, companyId, yearKey])
+  @@map("sale_sequences")
+}
+
+enum SaleStatus {
+  COMPLETED
+  VOIDED
+}
+
+model Sale {
+  id                 String     @id @default(uuid()) @db.Uuid
+  tenantId           String     @db.Uuid
+  companyId          String     @db.Uuid
+  locationId         String     @db.Uuid
+  customerId         String?    @db.Uuid
+  processedByUserId  String     @db.Uuid
+  cashDrawerSessionId String?   @db.Uuid
+  saleNumber         String     @db.VarChar(40)
+  status             SaleStatus @default(COMPLETED)
+  saleDate           DateTime   @default(now()) @db.Timestamptz(6)
+  subtotal           Decimal    @db.Decimal(20, 4)
+  itemDiscountTotal  Decimal    @default(0) @db.Decimal(20, 4)
+  saleDiscountAmount Decimal    @default(0) @db.Decimal(20, 4)
+  taxAmount          Decimal    @default(0) @db.Decimal(20, 4)
+  totalAmount        Decimal    @db.Decimal(20, 4)
+  voidedAt           DateTime?  @db.Timestamptz(6)
+  voidReason         String?    @db.Text
+  voidedByUserId     String?    @db.Uuid
+  note               String?    @db.Text
+  createdAt          DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime   @updatedAt @db.Timestamptz(6)
+  tenant             Tenant     @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company            Company    @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  location           Location   @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  customer           Customer?  @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  cashDrawerSession  CashDrawerSession? @relation(fields: [cashDrawerSessionId], references: [id], onDelete: Restrict)
+  items              SaleItem[]
+  payments           SalePayment[]
+  returns            SaleReturn[]
+
+  @@unique([tenantId, companyId, saleNumber])
+  @@index([tenantId, companyId, status, saleDate])
+  @@index([cashDrawerSessionId])
+  @@map("sales")
+}
+
+model SaleItem {
+  id             String  @id @default(uuid()) @db.Uuid
+  saleId         String  @db.Uuid
+  productId      String  @db.Uuid
+  productName    String  @db.VarChar(200)
+  quantity       Decimal @db.Decimal(14, 4)
+  unitPrice      Decimal @db.Decimal(20, 4)
+  unitCost       Decimal @db.Decimal(20, 4)
+  discountAmount Decimal @default(0) @db.Decimal(20, 4)
+  subtotal       Decimal @db.Decimal(20, 4)
+  sale           Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product        Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@index([saleId])
+  @@map("sale_items")
+}
+
+enum SalePaymentMethod {
+  CASH
+  CARD
+  BKASH
+  NAGAD
+  DUE
+}
+
+model SalePayment {
+  id        String            @id @default(uuid()) @db.Uuid
+  saleId    String            @db.Uuid
+  method    SalePaymentMethod
+  amount    Decimal           @db.Decimal(20, 4)
+  createdAt DateTime          @default(now()) @db.Timestamptz(6)
+  sale      Sale              @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([saleId])
+  @@map("sale_payments")
+}
+
+model SaleReturn {
+  id           String   @id @default(uuid()) @db.Uuid
+  tenantId     String   @db.Uuid
+  companyId    String   @db.Uuid
+  saleId       String   @db.Uuid
+  reason       String   @db.Text
+  refundAmount Decimal  @default(0) @db.Decimal(20, 4)
+  returnDate   DateTime @default(now()) @db.Timestamptz(6)
+  actorUserId  String?  @db.Uuid
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  sale         Sale     @relation(fields: [saleId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, companyId, saleId])
+  @@map("sale_returns")
+}
+
+enum CustomerLedgerEntryType {
+  DUE
+  PAYMENT
+}
+
+model CustomerDueLedger {
+  id          String                  @id @default(uuid()) @db.Uuid
+  tenantId    String                  @db.Uuid
+  companyId   String                  @db.Uuid
+  customerId  String                  @db.Uuid
+  entryType   CustomerLedgerEntryType
+  amount      Decimal                 @db.Decimal(20, 4)
+  referenceId String?                 @db.Uuid
+  note        String?                 @db.Text
+  actorUserId String?                 @db.Uuid
+  createdAt   DateTime                @default(now()) @db.Timestamptz(6)
+  tenant      Tenant                  @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company     Company                 @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  customer    Customer                @relation(fields: [customerId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, companyId, customerId, createdAt])
+  @@map("customer_due_ledger")
+}
+
+enum CashDrawerSessionStatus {
+  OPEN
+  CLOSED
+}
+
+/**
+ * One row per cashier shift at one Location. `cashierId` is a plain field
+ * (no @relation), matching StockMovement.actorUserId's existing convention.
+ * The @@unique below becomes a PARTIAL unique index (WHERE status = 'OPEN')
+ * via a hand-edited migration.sql — Prisma's schema DSL cannot express a
+ * conditional unique constraint directly. This is what makes "one cashier,
+ * one open session at a time" (regardless of Location) atomic and race-safe
+ * at the database level, the correct analogue of Phase 2/4's atomic
+ * conditional-update pattern applied to a create instead of an update.
+ */
+model CashDrawerSession {
+  id                     String                   @id @default(uuid()) @db.Uuid
+  tenantId               String                   @db.Uuid
+  companyId              String                   @db.Uuid
+  locationId             String                   @db.Uuid
+  cashierId              String                   @db.Uuid
+  status                 CashDrawerSessionStatus  @default(OPEN)
+  shiftStart             DateTime                 @default(now()) @db.Timestamptz(6)
+  shiftEnd               DateTime?                @db.Timestamptz(6)
+  openingBalance         Decimal                  @db.Decimal(20, 4)
+  expectedClosingBalance Decimal?                 @db.Decimal(20, 4)
+  actualClosingBalance   Decimal?                 @db.Decimal(20, 4)
+  variance               Decimal?                 @db.Decimal(20, 4)
+  note                   String?                  @db.Text
+  createdAt              DateTime                 @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime                 @updatedAt @db.Timestamptz(6)
+  tenant                 Tenant                   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company                Company                  @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  location               Location                 @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  sales                  Sale[]
+
+  @@unique([tenantId, companyId, cashierId], map: "cash_drawer_sessions_one_open_per_cashier")
+  @@index([tenantId, companyId, locationId, status])
+  @@map("cash_drawer_sessions")
+}
+
+model CompanySettings {
+  id                   String   @id @default(uuid()) @db.Uuid
+  tenantId             String   @db.Uuid
+  companyId            String   @unique @db.Uuid
+  enableMultiUnit      Boolean  @default(true)
+  enableCustomerDue    Boolean  @default(true)
+  enableBarcode        Boolean  @default(true)
+  enableProductVariant Boolean  @default(false)
+  enableComboOffer     Boolean  @default(false)
+  enableMultiLocation  Boolean  @default(false)
+  allowNegativeStock   Boolean  @default(false)
+  maxCustomerDueLimit  Decimal? @db.Decimal(20, 4)
+  enableTax            Boolean  @default(false)
+  defaultTaxRate       Decimal  @default(0) @db.Decimal(6, 3)
+  createdAt            DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime @updatedAt @db.Timestamptz(6)
+  tenant               Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company              Company  @relation(fields: [companyId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, companyId])
+  @@map("company_settings")
 }
 
 model CompanyMember {

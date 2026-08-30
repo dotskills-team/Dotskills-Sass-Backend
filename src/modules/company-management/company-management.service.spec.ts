@@ -11,6 +11,7 @@ describe('CompanyManagementService.create', () => {
 
   const mockTx = {
     company: { create: jest.fn() },
+    companySettings: { create: jest.fn() },
   };
 
   const mockPrisma = {
@@ -98,6 +99,9 @@ describe('CompanyManagementService.create', () => {
       'creator-1',
       mockTx,
     );
+    expect(mockTx.companySettings.create).toHaveBeenCalledWith({
+      data: { tenantId: createdCompany.tenantId, companyId: createdCompany.id },
+    });
     expect(result).toBe(createdCompany);
   });
 });
