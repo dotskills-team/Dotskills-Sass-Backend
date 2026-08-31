@@ -177,7 +177,9 @@ describe('SubscriptionRenewalScheduler.autoRenewDue', () => {
     mockPrisma.subscription.findMany.mockResolvedValue([dueSubscription]);
     mockPrisma.billing.findUnique.mockResolvedValue(null);
     mockRenewalService.renewSubscription.mockRejectedValue(new Error('boom'));
-    mockLifecycle.transition.mockRejectedValueOnce(new Error('transition also failed'));
+    mockLifecycle.transition.mockRejectedValueOnce(
+      new Error('transition also failed'),
+    );
 
     await expect(scheduler.autoRenewDue()).resolves.toBeDefined();
   });

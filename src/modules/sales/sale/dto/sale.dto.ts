@@ -12,23 +12,40 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { SalePaymentMethod } from 'src/generated/phase-1-prisma/enums';
+import { PaginationQueryDto } from '../../../../common/dto/pagination-query.dto';
+
+/** A shop can realistically record thousands of Sales over its lifetime — same reasoning as Purchase Order/Stock Transfer's pagination. */
+export class ListSalesQueryDto extends PaginationQueryDto {
+  @IsOptional()
+  @IsUUID()
+  locationId?: string;
+}
 
 export class SaleItemInputDto {
   @IsUUID()
   productId!: string;
 
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'quantity must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'quantity must have maximum 4 decimal places' },
+  )
   @Min(0.0001, { message: 'quantity must be greater than 0' })
   quantity!: number;
 
   /** Optional override — defaults to the Product's current salePrice when omitted. */
   @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'unitPrice must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'unitPrice must have maximum 4 decimal places' },
+  )
   @Min(0, { message: 'unitPrice cannot be negative' })
   unitPrice?: number;
 
   @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'discountAmount must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'discountAmount must have maximum 4 decimal places' },
+  )
   @Min(0, { message: 'discountAmount cannot be negative' })
   discountAmount?: number;
 }
@@ -37,7 +54,10 @@ export class SalePaymentInputDto {
   @IsEnum(SalePaymentMethod)
   method!: SalePaymentMethod;
 
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'amount must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'amount must have maximum 4 decimal places' },
+  )
   @Min(0.0001, { message: 'amount must be greater than 0' })
   amount!: number;
 }
@@ -57,7 +77,10 @@ export class CreateSaleDto {
   items!: SaleItemInputDto[];
 
   @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'saleDiscountAmount must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'saleDiscountAmount must have maximum 4 decimal places' },
+  )
   @Min(0, { message: 'saleDiscountAmount cannot be negative' })
   saleDiscountAmount?: number;
 
@@ -83,7 +106,10 @@ export class SaleReturnItemInputDto {
   @IsUUID()
   productId!: string;
 
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'quantity must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'quantity must have maximum 4 decimal places' },
+  )
   @Min(0.0001, { message: 'quantity must be greater than 0' })
   quantity!: number;
 }
@@ -94,7 +120,10 @@ export class CreateSaleReturnDto {
   reason!: string;
 
   @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'refundAmount must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'refundAmount must have maximum 4 decimal places' },
+  )
   @Min(0, { message: 'refundAmount cannot be negative' })
   refundAmount?: number;
 

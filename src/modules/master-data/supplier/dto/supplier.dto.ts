@@ -1,4 +1,11 @@
-import { IsEmail, IsEnum, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { SupplierStatus } from 'src/generated/phase-1-prisma/enums';
 
 export class CreateSupplierDto {

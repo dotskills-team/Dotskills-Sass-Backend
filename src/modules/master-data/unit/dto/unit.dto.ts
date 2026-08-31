@@ -1,4 +1,13 @@
-import { IsEnum, IsNumber, IsOptional, IsString, IsUUID, MaxLength, Min, MinLength } from 'class-validator';
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  Min,
+  MinLength,
+} from 'class-validator';
 import { UnitStatus } from 'src/generated/phase-1-prisma/enums';
 
 export class CreateUnitDto {
@@ -17,7 +26,10 @@ export class CreateUnitDto {
   baseUnitId?: string;
 
   @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'conversionFactor must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'conversionFactor must have maximum 4 decimal places' },
+  )
   @Min(0.0001, { message: 'conversionFactor must be greater than 0' })
   conversionFactor?: number;
 }
@@ -34,7 +46,10 @@ export class UpdateUnitDto {
   baseUnitId?: string;
 
   @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'conversionFactor must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'conversionFactor must have maximum 4 decimal places' },
+  )
   @Min(0.0001, { message: 'conversionFactor must be greater than 0' })
   conversionFactor?: number;
 

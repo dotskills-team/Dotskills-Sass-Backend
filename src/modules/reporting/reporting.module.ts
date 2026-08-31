@@ -9,6 +9,12 @@ import { LedgerSummaryService } from './ledger-summary.service';
 
 @Module({
   controllers: [ReportingController],
-  providers: [SaleRegisterService, PurchaseRegisterService, ProfitReportService, StockReportService, LedgerSummaryService],
+  providers: [
+    SaleRegisterService,
+    PurchaseRegisterService,
+    ProfitReportService,
+    StockReportService,
+    LedgerSummaryService,
+  ],
 })
 export class ReportingModule {}

@@ -29,24 +29,48 @@ describe('ProductCostingService.applyPurchaseCost', () => {
   });
 
   it('sums Inventory quantity across all locations for the product, not just one', async () => {
-    mockTx.product.findUniqueOrThrow.mockResolvedValue({ costPrice: new Prisma.Decimal(100) });
-    mockTx.inventory.aggregate.mockResolvedValue({ _sum: { quantity: new Prisma.Decimal(10) } });
+    mockTx.product.findUniqueOrThrow.mockResolvedValue({
+      costPrice: new Prisma.Decimal(100),
+    });
+    mockTx.inventory.aggregate.mockResolvedValue({
+      _sum: { quantity: new Prisma.Decimal(10) },
+    });
     mockTx.product.update.mockResolvedValue({});
 
-    await service.applyPurchaseCost(mockTx as any, context, 'product-1', 10, 200);
+    await service.applyPurchaseCost(
+      mockTx as any,
+      context,
+      'product-1',
+      10,
+      200,
+    );
 
     expect(mockTx.inventory.aggregate).toHaveBeenCalledWith({
-      where: { tenantId: 'tenant-1', companyId: 'company-1', productId: 'product-1' },
+      where: {
+        tenantId: 'tenant-1',
+        companyId: 'company-1',
+        productId: 'product-1',
+      },
       _sum: { quantity: true },
     });
   });
 
   it('updates Product.costPrice to the computed weighted average and returns it', async () => {
-    mockTx.product.findUniqueOrThrow.mockResolvedValue({ costPrice: new Prisma.Decimal(100) });
-    mockTx.inventory.aggregate.mockResolvedValue({ _sum: { quantity: new Prisma.Decimal(10) } });
+    mockTx.product.findUniqueOrThrow.mockResolvedValue({
+      costPrice: new Prisma.Decimal(100),
+    });
+    mockTx.inventory.aggregate.mockResolvedValue({
+      _sum: { quantity: new Prisma.Decimal(10) },
+    });
     mockTx.product.update.mockResolvedValue({});
 
-    const result = await service.applyPurchaseCost(mockTx as any, context, 'product-1', 10, 200);
+    const result = await service.applyPurchaseCost(
+      mockTx as any,
+      context,
+      'product-1',
+      10,
+      200,
+    );
 
     expect(result.toString()).toBe('150');
     const updateCall = mockTx.product.update.mock.calls[0][0];
@@ -55,11 +79,19 @@ describe('ProductCostingService.applyPurchaseCost', () => {
   });
 
   it('treats a product with no Inventory rows anywhere as zero existing quantity, not an error', async () => {
-    mockTx.product.findUniqueOrThrow.mockResolvedValue({ costPrice: new Prisma.Decimal(0) });
+    mockTx.product.findUniqueOrThrow.mockResolvedValue({
+      costPrice: new Prisma.Decimal(0),
+    });
     mockTx.inventory.aggregate.mockResolvedValue({ _sum: { quantity: null } });
     mockTx.product.update.mockResolvedValue({});
 
-    const result = await service.applyPurchaseCost(mockTx as any, context, 'product-1', 5, 40);
+    const result = await service.applyPurchaseCost(
+      mockTx as any,
+      context,
+      'product-1',
+      5,
+      40,
+    );
 
     expect(result.toString()).toBe('40');
   });

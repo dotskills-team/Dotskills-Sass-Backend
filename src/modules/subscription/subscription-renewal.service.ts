@@ -4,7 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { InvoiceStatus, SubscriptionStatus } from 'src/generated/phase-1-prisma/enums';
+import {
+  InvoiceStatus,
+  SubscriptionStatus,
+} from 'src/generated/phase-1-prisma/enums';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { BillingService } from '../billing/billing.service';

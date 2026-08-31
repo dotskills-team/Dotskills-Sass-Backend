@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { Prisma } from 'src/generated/phase-1-prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
@@ -35,7 +40,11 @@ export class UnitService {
     return { success: true, data: unit };
   }
 
-  async create(context: CompanyContext, dto: CreateUnitDto, actor: AuthenticatedUser) {
+  async create(
+    context: CompanyContext,
+    dto: CreateUnitDto,
+    actor: AuthenticatedUser,
+  ) {
     if (dto.baseUnitId) await this.requireUnit(context, dto.baseUnitId);
 
     try {
@@ -51,17 +60,33 @@ export class UnitService {
           },
           select: UNIT_SELECT,
         });
-        await this.createAudit(tx, context, actor.userId, 'UNIT_CREATED', created.id, null, created);
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'UNIT_CREATED',
+          created.id,
+          null,
+          created,
+        );
         return created;
       });
       return { success: true, data: unit };
     } catch (error) {
-      this.throwKnownConflict(error, 'A unit with this code already exists in this company');
+      this.throwKnownConflict(
+        error,
+        'A unit with this code already exists in this company',
+      );
       throw error;
     }
   }
 
-  async update(context: CompanyContext, id: string, dto: UpdateUnitDto, actor: AuthenticatedUser) {
+  async update(
+    context: CompanyContext,
+    id: string,
+    dto: UpdateUnitDto,
+    actor: AuthenticatedUser,
+  ) {
     const before = await this.requireUnit(context, id);
 
     if (dto.baseUnitId !== undefined) {
@@ -77,18 +102,33 @@ export class UnitService {
           where: { id },
           data: {
             ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
-            ...(dto.baseUnitId !== undefined ? { baseUnitId: dto.baseUnitId || null } : {}),
-            ...(dto.conversionFactor !== undefined ? { conversionFactor: dto.conversionFactor } : {}),
+            ...(dto.baseUnitId !== undefined
+              ? { baseUnitId: dto.baseUnitId || null }
+              : {}),
+            ...(dto.conversionFactor !== undefined
+              ? { conversionFactor: dto.conversionFactor }
+              : {}),
             ...(dto.status !== undefined ? { status: dto.status } : {}),
           },
           select: UNIT_SELECT,
         });
-        await this.createAudit(tx, context, actor.userId, 'UNIT_UPDATED', updated.id, before, updated);
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'UNIT_UPDATED',
+          updated.id,
+          before,
+          updated,
+        );
         return updated;
       });
       return { success: true, data: unit };
     } catch (error) {
-      this.throwKnownConflict(error, 'A unit with this code already exists in this company');
+      this.throwKnownConflict(
+        error,
+        'A unit with this code already exists in this company',
+      );
       throw error;
     }
   }
@@ -120,14 +160,17 @@ export class UnitService {
         action,
         entityType: 'Unit',
         entityId,
-        ...(beforeData === null ? {} : { beforeData: beforeData as Prisma.InputJsonValue }),
-        ...(afterData === null ? {} : { afterData: afterData as Prisma.InputJsonValue }),
+        ...(beforeData === null ? {} : { beforeData: beforeData }),
+        ...(afterData === null ? {} : { afterData: afterData }),
       },
     });
   }
 
   private throwKnownConflict(error: unknown, message: string): never | void {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
       throw new ConflictException(message);
     }
   }

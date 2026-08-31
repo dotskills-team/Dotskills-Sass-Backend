@@ -34,7 +34,10 @@ const SALE_REGISTER_SELECT = {
 export class SaleRegisterService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private buildWhere(context: CompanyContext, query: Pick<DateRangeReportQueryDto, 'dateFrom' | 'dateTo' | 'locationId'>): Prisma.SaleWhereInput {
+  private buildWhere(
+    context: CompanyContext,
+    query: Pick<DateRangeReportQueryDto, 'dateFrom' | 'dateTo' | 'locationId'>,
+  ): Prisma.SaleWhereInput {
     const { from, to } = parseReportDateRange(query.dateFrom, query.dateTo);
     return {
       tenantId: context.tenantId,
@@ -44,21 +47,42 @@ export class SaleRegisterService {
     };
   }
 
-  async getSaleRegister(context: CompanyContext, query: DateRangeReportQueryDto) {
+  async getSaleRegister(
+    context: CompanyContext,
+    query: DateRangeReportQueryDto,
+  ) {
     const where = this.buildWhere(context, query);
     const page = query.page ?? 1;
     const limit = query.limit ?? 50;
     const skip = (page - 1) * limit;
 
     const [items, total] = await this.prisma.$transaction([
-      this.prisma.sale.findMany({ where, select: SALE_REGISTER_SELECT, orderBy: { saleDate: 'asc' }, skip, take: limit }),
+      this.prisma.sale.findMany({
+        where,
+        select: SALE_REGISTER_SELECT,
+        orderBy: { saleDate: 'asc' },
+        skip,
+        take: limit,
+      }),
       this.prisma.sale.count({ where }),
     ]);
 
-    const completedWhere: Prisma.SaleWhereInput = { ...where, status: SaleStatus.COMPLETED };
+    const completedWhere: Prisma.SaleWhereInput = {
+      ...where,
+      status: SaleStatus.COMPLETED,
+    };
     const [aggregate, paymentBreakdown] = await this.prisma.$transaction([
-      this.prisma.sale.aggregate({ where: completedWhere, _sum: { totalAmount: true }, _count: true }),
-      this.prisma.salePayment.groupBy({ by: ['method'], where: { sale: completedWhere }, _sum: { amount: true }, orderBy: { method: 'asc' } }),
+      this.prisma.sale.aggregate({
+        where: completedWhere,
+        _sum: { totalAmount: true },
+        _count: true,
+      }),
+      this.prisma.salePayment.groupBy({
+        by: ['method'],
+        where: { sale: completedWhere },
+        _sum: { amount: true },
+        orderBy: { method: 'asc' },
+      }),
     ]);
 
     return {
@@ -68,13 +92,19 @@ export class SaleRegisterService {
       summary: {
         completedSalesCount: aggregate._count,
         totalRevenue: aggregate._sum.totalAmount ?? new Prisma.Decimal(0),
-        paymentBreakdown: paymentBreakdown.map((p) => ({ method: p.method, amount: p._sum?.amount ?? new Prisma.Decimal(0) })),
+        paymentBreakdown: paymentBreakdown.map((p) => ({
+          method: p.method,
+          amount: p._sum?.amount ?? new Prisma.Decimal(0),
+        })),
       },
     };
   }
 
   /** Streams the full date-range result (every status, matching the on-screen listing) — never paginated, never buffered in full. */
-  streamSaleRegisterCsv(context: CompanyContext, query: DateRangeReportQueryDto) {
+  streamSaleRegisterCsv(
+    context: CompanyContext,
+    query: DateRangeReportQueryDto,
+  ) {
     const where = this.buildWhere(context, query);
     return createCsvStream(
       [
@@ -84,12 +114,25 @@ export class SaleRegisterService {
         { header: 'Customer Id', value: (r: any) => r.customerId ?? '' },
         { header: 'Status', value: (r: any) => r.status },
         { header: 'Subtotal', value: (r: any) => r.subtotal.toString() },
-        { header: 'Item Discount', value: (r: any) => r.itemDiscountTotal.toString() },
-        { header: 'Sale Discount', value: (r: any) => r.saleDiscountAmount.toString() },
+        {
+          header: 'Item Discount',
+          value: (r: any) => r.itemDiscountTotal.toString(),
+        },
+        {
+          header: 'Sale Discount',
+          value: (r: any) => r.saleDiscountAmount.toString(),
+        },
         { header: 'Tax', value: (r: any) => r.taxAmount.toString() },
         { header: 'Total', value: (r: any) => r.totalAmount.toString() },
       ],
-      (skip, take) => this.prisma.sale.findMany({ where, select: SALE_REGISTER_SELECT, orderBy: { saleDate: 'asc' }, skip, take }),
+      (skip, take) =>
+        this.prisma.sale.findMany({
+          where,
+          select: SALE_REGISTER_SELECT,
+          orderBy: { saleDate: 'asc' },
+          skip,
+          take,
+        }),
     );
   }
 }

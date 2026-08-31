@@ -536,6 +536,8 @@ export const COMPANY_PERMISSIONS = {
   PRODUCT_READ: 'company.product.read',
   PRODUCT_CREATE: 'company.product.create',
   PRODUCT_UPDATE: 'company.product.update',
+  /** Kept separate from PRODUCT_CREATE — a bulk import can create/update hundreds of rows at once, a much higher blast radius than a single create. */
+  PRODUCT_BULK_IMPORT: 'company.product.bulk-import',
 
   CUSTOMER_READ: 'company.customer.read',
   CUSTOMER_CREATE: 'company.customer.create',

@@ -1,5 +1,15 @@
-import { IsBoolean, IsEnum, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import { LocationStatus, LocationType } from 'src/generated/phase-1-prisma/enums';
+import {
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
+import {
+  LocationStatus,
+  LocationType,
+} from 'src/generated/phase-1-prisma/enums';
 
 export class CreateLocationDto {
   @IsString()

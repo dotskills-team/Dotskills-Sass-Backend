@@ -18,7 +18,10 @@ describe('LedgerSummaryService', () => {
     jest.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [LedgerSummaryService, { provide: PrismaService, useValue: mockPrisma }],
+      providers: [
+        LedgerSummaryService,
+        { provide: PrismaService, useValue: mockPrisma },
+      ],
     }).compile();
 
     service = module.get(LedgerSummaryService);
@@ -30,28 +33,52 @@ describe('LedgerSummaryService', () => {
   });
 
   it('customer due summary filters to nonzero dueBalance only, scoped by tenant/company, sorted desc', async () => {
-    await service.getCustomerDueSummary(context, {} as any);
+    await service.getCustomerDueSummary(context, {});
 
     const call = mockPrisma.customer.findMany.mock.calls[0][0];
-    expect(call.where).toEqual({ tenantId: 'tenant-1', companyId: 'company-1', dueBalance: { not: 0 } });
+    expect(call.where).toEqual({
+      tenantId: 'tenant-1',
+      companyId: 'company-1',
+      dueBalance: { not: 0 },
+    });
     expect(call.orderBy).toEqual({ dueBalance: 'desc' });
   });
 
   it('supplier payable summary filters to nonzero payableBalance only, scoped by tenant/company, sorted desc', async () => {
-    await service.getSupplierPayableSummary(context, {} as any);
+    await service.getSupplierPayableSummary(context, {});
 
     const call = mockPrisma.supplier.findMany.mock.calls[0][0];
-    expect(call.where).toEqual({ tenantId: 'tenant-1', companyId: 'company-1', payableBalance: { not: 0 } });
+    expect(call.where).toEqual({
+      tenantId: 'tenant-1',
+      companyId: 'company-1',
+      payableBalance: { not: 0 },
+    });
     expect(call.orderBy).toEqual({ payableBalance: 'desc' });
   });
 
   it('returns pagination metadata for both summaries', async () => {
     mockPrisma.customer.count.mockResolvedValue(42);
-    const customerResult = await service.getCustomerDueSummary(context, { page: 1, limit: 20 } as any);
-    expect(customerResult.pagination).toEqual({ page: 1, limit: 20, total: 42, totalPages: 3 });
+    const customerResult = await service.getCustomerDueSummary(context, {
+      page: 1,
+      limit: 20,
+    });
+    expect(customerResult.pagination).toEqual({
+      page: 1,
+      limit: 20,
+      total: 42,
+      totalPages: 3,
+    });
 
     mockPrisma.supplier.count.mockResolvedValue(9);
-    const supplierResult = await service.getSupplierPayableSummary(context, { page: 1, limit: 20 } as any);
-    expect(supplierResult.pagination).toEqual({ page: 1, limit: 20, total: 9, totalPages: 1 });
+    const supplierResult = await service.getSupplierPayableSummary(context, {
+      page: 1,
+      limit: 20,
+    });
+    expect(supplierResult.pagination).toEqual({
+      page: 1,
+      limit: 20,
+      total: 9,
+      totalPages: 1,
+    });
   });
 });

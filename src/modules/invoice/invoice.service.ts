@@ -261,11 +261,7 @@ export class InvoiceService {
   // ISSUE
   // ============================================================
 
-  async issue(
-    id: string,
-    actorUserId?: string,
-    tx?: Prisma.TransactionClient,
-  ) {
+  async issue(id: string, actorUserId?: string, tx?: Prisma.TransactionClient) {
     const run = async (tx: Prisma.TransactionClient) => {
       const invoice = await tx.invoice.findUnique({ where: { id } });
 

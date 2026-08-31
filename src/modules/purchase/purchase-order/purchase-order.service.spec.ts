@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException } from '@nestjs/common';
 
-import { PurchaseOrderStatus, StockMovementType, SupplierLedgerEntryType } from '../../../generated/phase-1-prisma/enums';
+import {
+  PurchaseOrderStatus,
+  StockMovementType,
+  SupplierLedgerEntryType,
+} from '../../../generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
 import { ProductCostingService } from '../../master-data/product/product-costing.service';
@@ -12,7 +16,11 @@ describe('PurchaseOrderService', () => {
 
   const mockTx = {
     purchaseOrder: { create: jest.fn(), update: jest.fn() },
-    purchaseOrderItem: { deleteMany: jest.fn(), update: jest.fn(), findMany: jest.fn() },
+    purchaseOrderItem: {
+      deleteMany: jest.fn(),
+      update: jest.fn(),
+      findMany: jest.fn(),
+    },
     goodsReceipt: { create: jest.fn() },
     purchaseReturn: { create: jest.fn() },
     supplierPayableLedger: { create: jest.fn() },
@@ -24,10 +32,15 @@ describe('PurchaseOrderService', () => {
   const mockPrisma = {
     purchaseOrder: { findFirst: jest.fn(), findMany: jest.fn() },
     purchaseReturn: { findMany: jest.fn() },
-    $transaction: jest.fn((arg: any) => (typeof arg === 'function' ? arg(mockTx) : Promise.all(arg))),
+    $transaction: jest.fn((arg: any) =>
+      typeof arg === 'function' ? arg(mockTx) : Promise.all(arg),
+    ),
   };
 
-  const mockInventoryService = { increaseStock: jest.fn(), decreaseStock: jest.fn() };
+  const mockInventoryService = {
+    increaseStock: jest.fn(),
+    decreaseStock: jest.fn(),
+  };
   const mockCostingService = { applyPurchaseCost: jest.fn() };
 
   const context = { tenantId: 'tenant-1', companyId: 'company-1' } as any;
@@ -56,7 +69,9 @@ describe('PurchaseOrderService', () => {
         items: [],
       });
 
-      await expect(service.update(context, 'po-1', { note: 'x' } as any, actor)).rejects.toThrow(BadRequestException);
+      await expect(
+        service.update(context, 'po-1', { note: 'x' } as any, actor),
+      ).rejects.toThrow(BadRequestException);
       expect(mockTx.purchaseOrder.update).not.toHaveBeenCalled();
     });
 
@@ -67,7 +82,9 @@ describe('PurchaseOrderService', () => {
         items: [],
       });
 
-      await expect(service.cancel(context, 'po-1', actor)).rejects.toThrow(BadRequestException);
+      await expect(service.cancel(context, 'po-1', actor)).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 
@@ -77,14 +94,29 @@ describe('PurchaseOrderService', () => {
       locationId: 'location-1',
       supplierId: 'supplier-1',
       status: PurchaseOrderStatus.DRAFT,
-      items: [{ id: 'item-1', productId: 'product-1', orderedQty: 10, receivedQty: 0, unitCost: 50 }],
+      items: [
+        {
+          id: 'item-1',
+          productId: 'product-1',
+          orderedQty: 10,
+          receivedQty: 0,
+          unitCost: 50,
+        },
+      ],
     };
 
     it('rejects receiving more than was ordered for a line item', async () => {
       mockPrisma.purchaseOrder.findFirst.mockResolvedValue(draftOrder);
 
       await expect(
-        service.receive(context, 'po-1', { items: [{ purchaseOrderItemId: 'item-1', receivedQty: 15 }] } as any, actor),
+        service.receive(
+          context,
+          'po-1',
+          {
+            items: [{ purchaseOrderItemId: 'item-1', receivedQty: 15 }],
+          } as any,
+          actor,
+        ),
       ).rejects.toThrow(BadRequestException);
       expect(mockTx.goodsReceipt.create).not.toHaveBeenCalled();
     });
@@ -93,7 +125,14 @@ describe('PurchaseOrderService', () => {
       mockPrisma.purchaseOrder.findFirst.mockResolvedValue(draftOrder);
 
       await expect(
-        service.receive(context, 'po-1', { items: [{ purchaseOrderItemId: 'not-mine', receivedQty: 1 }] } as any, actor),
+        service.receive(
+          context,
+          'po-1',
+          {
+            items: [{ purchaseOrderItemId: 'not-mine', receivedQty: 1 }],
+          } as any,
+          actor,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -103,12 +142,28 @@ describe('PurchaseOrderService', () => {
       mockCostingService.applyPurchaseCost.mockResolvedValue(50);
       mockInventoryService.increaseStock.mockResolvedValue({});
       mockTx.purchaseOrderItem.update.mockResolvedValue({});
-      mockTx.purchaseOrderItem.findMany.mockResolvedValue([{ orderedQty: 10, receivedQty: 4 }]);
-      mockTx.purchaseOrder.update.mockResolvedValue({ id: 'po-1', status: PurchaseOrderStatus.PARTIALLY_RECEIVED });
+      mockTx.purchaseOrderItem.findMany.mockResolvedValue([
+        { orderedQty: 10, receivedQty: 4 },
+      ]);
+      mockTx.purchaseOrder.update.mockResolvedValue({
+        id: 'po-1',
+        status: PurchaseOrderStatus.PARTIALLY_RECEIVED,
+      });
 
-      await service.receive(context, 'po-1', { items: [{ purchaseOrderItemId: 'item-1', receivedQty: 4 }] } as any, actor);
+      await service.receive(
+        context,
+        'po-1',
+        { items: [{ purchaseOrderItemId: 'item-1', receivedQty: 4 }] },
+        actor,
+      );
 
-      expect(mockCostingService.applyPurchaseCost).toHaveBeenCalledWith(mockTx, context, 'product-1', 4, 50);
+      expect(mockCostingService.applyPurchaseCost).toHaveBeenCalledWith(
+        mockTx,
+        context,
+        'product-1',
+        4,
+        50,
+      );
       expect(mockInventoryService.increaseStock).toHaveBeenCalledWith(
         mockTx,
         expect.objectContaining({
@@ -120,7 +175,9 @@ describe('PurchaseOrderService', () => {
         }),
       );
       expect(mockTx.purchaseOrder.update).toHaveBeenCalledWith(
-        expect.objectContaining({ data: { status: PurchaseOrderStatus.PARTIALLY_RECEIVED } }),
+        expect.objectContaining({
+          data: { status: PurchaseOrderStatus.PARTIALLY_RECEIVED },
+        }),
       );
     });
 
@@ -130,13 +187,25 @@ describe('PurchaseOrderService', () => {
       mockCostingService.applyPurchaseCost.mockResolvedValue(50);
       mockInventoryService.increaseStock.mockResolvedValue({});
       mockTx.purchaseOrderItem.update.mockResolvedValue({});
-      mockTx.purchaseOrderItem.findMany.mockResolvedValue([{ orderedQty: 10, receivedQty: 10 }]);
-      mockTx.purchaseOrder.update.mockResolvedValue({ id: 'po-1', status: PurchaseOrderStatus.FULLY_RECEIVED });
+      mockTx.purchaseOrderItem.findMany.mockResolvedValue([
+        { orderedQty: 10, receivedQty: 10 },
+      ]);
+      mockTx.purchaseOrder.update.mockResolvedValue({
+        id: 'po-1',
+        status: PurchaseOrderStatus.FULLY_RECEIVED,
+      });
 
-      await service.receive(context, 'po-1', { items: [{ purchaseOrderItemId: 'item-1', receivedQty: 10 }] } as any, actor);
+      await service.receive(
+        context,
+        'po-1',
+        { items: [{ purchaseOrderItemId: 'item-1', receivedQty: 10 }] },
+        actor,
+      );
 
       expect(mockTx.purchaseOrder.update).toHaveBeenCalledWith(
-        expect.objectContaining({ data: { status: PurchaseOrderStatus.FULLY_RECEIVED } }),
+        expect.objectContaining({
+          data: { status: PurchaseOrderStatus.FULLY_RECEIVED },
+        }),
       );
     });
 
@@ -146,14 +215,25 @@ describe('PurchaseOrderService', () => {
       mockCostingService.applyPurchaseCost.mockResolvedValue(50);
       mockInventoryService.increaseStock.mockResolvedValue({});
       mockTx.purchaseOrderItem.update.mockResolvedValue({});
-      mockTx.purchaseOrderItem.findMany.mockResolvedValue([{ orderedQty: 10, receivedQty: 4 }]);
+      mockTx.purchaseOrderItem.findMany.mockResolvedValue([
+        { orderedQty: 10, receivedQty: 4 },
+      ]);
       mockTx.purchaseOrder.update.mockResolvedValue({ id: 'po-1' });
 
-      await service.receive(context, 'po-1', { items: [{ purchaseOrderItemId: 'item-1', receivedQty: 4 }] } as any, actor);
+      await service.receive(
+        context,
+        'po-1',
+        { items: [{ purchaseOrderItemId: 'item-1', receivedQty: 4 }] },
+        actor,
+      );
 
       expect(mockTx.supplierPayableLedger.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({ entryType: SupplierLedgerEntryType.PAYABLE, amount: 200, supplierId: 'supplier-1' }),
+          data: expect.objectContaining({
+            entryType: SupplierLedgerEntryType.PAYABLE,
+            amount: 200,
+            supplierId: 'supplier-1',
+          }),
         }),
       );
       expect(mockTx.supplier.update).toHaveBeenCalledWith({
@@ -173,10 +253,21 @@ describe('PurchaseOrderService', () => {
     };
 
     it('rejects a return against a DRAFT order (nothing has ever been received)', async () => {
-      mockPrisma.purchaseOrder.findFirst.mockResolvedValue({ ...receivedOrder, status: PurchaseOrderStatus.DRAFT });
+      mockPrisma.purchaseOrder.findFirst.mockResolvedValue({
+        ...receivedOrder,
+        status: PurchaseOrderStatus.DRAFT,
+      });
 
       await expect(
-        service.createReturn(context, 'po-1', { reason: 'damaged', items: [{ productId: 'product-1', quantity: 1 }] } as any, actor),
+        service.createReturn(
+          context,
+          'po-1',
+          {
+            reason: 'damaged',
+            items: [{ productId: 'product-1', quantity: 1 }],
+          } as any,
+          actor,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -185,7 +276,15 @@ describe('PurchaseOrderService', () => {
       mockTx.purchaseReturn.create.mockResolvedValue({ id: 'return-1' });
       mockInventoryService.decreaseStock.mockResolvedValue({});
 
-      await service.createReturn(context, 'po-1', { reason: 'damaged', items: [{ productId: 'product-1', quantity: 2 }] } as any, actor);
+      await service.createReturn(
+        context,
+        'po-1',
+        {
+          reason: 'damaged',
+          items: [{ productId: 'product-1', quantity: 2 }],
+        },
+        actor,
+      );
 
       expect(mockInventoryService.decreaseStock).toHaveBeenCalledWith(
         mockTx,

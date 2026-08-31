@@ -46,7 +46,11 @@ export class PlanPricingService {
     };
   }
 
-  async create(planId: string, dto: CreatePlanPriceDto, context: AuditContext = {}) {
+  async create(
+    planId: string,
+    dto: CreatePlanPriceDto,
+    context: AuditContext = {},
+  ) {
     const plan = await this.prisma.plan.findUnique({
       where: {
         id: planId,
@@ -269,11 +273,7 @@ export class PlanPricingService {
     }
   }
 
-  async activate(
-    planId: string,
-    priceId: string,
-    context: AuditContext = {},
-  ) {
+  async activate(planId: string, priceId: string, context: AuditContext = {}) {
     const price = await this.prisma.planPrice.findFirst({
       where: {
         id: priceId,

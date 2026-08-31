@@ -210,9 +210,7 @@ describe('PaymentService', () => {
         mockTx,
       );
       const createArgs = mockTx.payment.create.mock.calls[0][0].data;
-      expect(createArgs.idempotencyKey).toBe(
-        'payment:invoice-1:attempt:2',
-      );
+      expect(createArgs.idempotencyKey).toBe('payment:invoice-1:attempt:2');
       expect(result.gatewayPageUrl).toBe(
         'https://sandbox.sslcommerz.com/pay/attempt2',
       );
@@ -542,9 +540,9 @@ describe('PaymentService', () => {
     it('throws when no payment matches the callback tran_id (never accepts an arbitrary id)', async () => {
       mockPrisma.payment.findUnique.mockResolvedValue(null);
 
-      await expect(service.cancelFromGateway('unknown-tran-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.cancelFromGateway('unknown-tran-id'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

@@ -38,10 +38,28 @@ export class InventoryService {
    * the conditional-update primitive `decreaseStock` uses.
    */
   async increaseStock(tx: Prisma.TransactionClient, input: StockMoveInput) {
-    const { tenantId, companyId, productId, locationId, quantity, movementType, referenceId, actorUserId, unitCost, note } = input;
+    const {
+      tenantId,
+      companyId,
+      productId,
+      locationId,
+      quantity,
+      movementType,
+      referenceId,
+      actorUserId,
+      unitCost,
+      note,
+    } = input;
 
     const balance = await tx.inventory.upsert({
-      where: { tenantId_companyId_locationId_productId: { tenantId, companyId, locationId, productId } },
+      where: {
+        tenantId_companyId_locationId_productId: {
+          tenantId,
+          companyId,
+          locationId,
+          productId,
+        },
+      },
       create: { tenantId, companyId, productId, locationId, quantity },
       update: { quantity: { increment: quantity } },
       select: { quantity: true },
@@ -75,7 +93,19 @@ export class InventoryService {
    * `updateMany({where:{id,status:oldStatus}})` + count-check pattern.
    */
   async decreaseStock(tx: Prisma.TransactionClient, input: DecreaseStockInput) {
-    const { tenantId, companyId, productId, locationId, quantity, movementType, referenceId, actorUserId, unitCost, note, allowNegative } = input;
+    const {
+      tenantId,
+      companyId,
+      productId,
+      locationId,
+      quantity,
+      movementType,
+      referenceId,
+      actorUserId,
+      unitCost,
+      note,
+      allowNegative,
+    } = input;
 
     const result = await tx.inventory.updateMany({
       where: {
@@ -93,7 +123,14 @@ export class InventoryService {
     }
 
     const balance = await tx.inventory.findUniqueOrThrow({
-      where: { tenantId_companyId_locationId_productId: { tenantId, companyId, locationId, productId } },
+      where: {
+        tenantId_companyId_locationId_productId: {
+          tenantId,
+          companyId,
+          locationId,
+          productId,
+        },
+      },
       select: { quantity: true },
     });
 
@@ -114,7 +151,11 @@ export class InventoryService {
     });
   }
 
-  async getBalance(context: CompanyContext, productId: string, locationId: string) {
+  async getBalance(
+    context: CompanyContext,
+    productId: string,
+    locationId: string,
+  ) {
     const balance = await this.prisma.inventory.findUnique({
       where: {
         tenantId_companyId_locationId_productId: {
@@ -124,12 +165,29 @@ export class InventoryService {
           productId,
         },
       },
-      select: { productId: true, locationId: true, quantity: true, updatedAt: true },
+      select: {
+        productId: true,
+        locationId: true,
+        quantity: true,
+        updatedAt: true,
+      },
     });
-    return { success: true, data: balance ?? { productId, locationId, quantity: new Prisma.Decimal(0), updatedAt: null } };
+    return {
+      success: true,
+      data: balance ?? {
+        productId,
+        locationId,
+        quantity: new Prisma.Decimal(0),
+        updatedAt: null,
+      },
+    };
   }
 
-  async listMovements(context: CompanyContext, productId: string, locationId?: string) {
+  async listMovements(
+    context: CompanyContext,
+    productId: string,
+    locationId?: string,
+  ) {
     const movements = await this.prisma.stockMovement.findMany({
       where: {
         tenantId: context.tenantId,

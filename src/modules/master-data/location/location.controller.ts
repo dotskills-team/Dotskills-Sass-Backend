@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 
 import { COMPANY_PERMISSIONS } from '../../../common/constants/permission.constants';
 import { CurrentCompany } from '../../../common/decorators/current-company.decorator';
@@ -14,7 +23,12 @@ import { LocationService } from './location.service';
 import { CreateLocationDto, UpdateLocationDto } from './dto/location.dto';
 
 @Controller('companies/:companyId/locations')
-@UseGuards(JwtAuthGuard, CompanyContextGuard, SubscriptionStatusGuard, CompanyPermissionsGuard)
+@UseGuards(
+  JwtAuthGuard,
+  CompanyContextGuard,
+  SubscriptionStatusGuard,
+  CompanyPermissionsGuard,
+)
 export class LocationController {
   constructor(private readonly service: LocationService) {}
 
@@ -26,7 +40,10 @@ export class LocationController {
 
   @Get(':id')
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.LOCATION_READ)
-  findOne(@CurrentCompany() context: CompanyContext, @Param('id', ParseUUIDPipe) id: string) {
+  findOne(
+    @CurrentCompany() context: CompanyContext,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return this.service.findOne(context, id);
   }
 

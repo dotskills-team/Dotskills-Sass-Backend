@@ -1,10 +1,20 @@
-import { IsNumber, IsOptional, IsString, IsUUID, MaxLength, Min } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class RecordSupplierPaymentDto {
   @IsUUID()
   supplierId!: string;
 
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'amount must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'amount must have maximum 4 decimal places' },
+  )
   @Min(0.0001, { message: 'amount must be greater than 0' })
   amount!: number;
 

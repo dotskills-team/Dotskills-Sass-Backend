@@ -416,8 +416,7 @@ export class PlanFeatureService {
     if (dto.limits !== undefined) {
       validatePlanFeatureLimits(
         existing.feature.configSchema as unknown as
-          | FeatureConfigFieldDto[]
-          | null,
+          FeatureConfigFieldDto[] | null,
         dto.limits,
       );
     }

@@ -1,4 +1,11 @@
-import { IsEnum, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import {
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { CategoryStatus } from 'src/generated/phase-1-prisma/enums';
 
 export class CreateCategoryDto {

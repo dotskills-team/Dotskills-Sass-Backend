@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { Prisma } from 'src/generated/phase-1-prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
@@ -36,7 +40,11 @@ export class SupplierService {
     return { success: true, data: supplier };
   }
 
-  async create(context: CompanyContext, dto: CreateSupplierDto, actor: AuthenticatedUser) {
+  async create(
+    context: CompanyContext,
+    dto: CreateSupplierDto,
+    actor: AuthenticatedUser,
+  ) {
     try {
       const supplier = await this.prisma.$transaction(async (tx) => {
         const created = await tx.supplier.create({
@@ -50,17 +58,33 @@ export class SupplierService {
           },
           select: SUPPLIER_SELECT,
         });
-        await this.createAudit(tx, context, actor.userId, 'SUPPLIER_CREATED', created.id, null, created);
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'SUPPLIER_CREATED',
+          created.id,
+          null,
+          created,
+        );
         return created;
       });
       return { success: true, data: supplier };
     } catch (error) {
-      this.throwKnownConflict(error, 'A supplier with this phone number already exists in this company');
+      this.throwKnownConflict(
+        error,
+        'A supplier with this phone number already exists in this company',
+      );
       throw error;
     }
   }
 
-  async update(context: CompanyContext, id: string, dto: UpdateSupplierDto, actor: AuthenticatedUser) {
+  async update(
+    context: CompanyContext,
+    id: string,
+    dto: UpdateSupplierDto,
+    actor: AuthenticatedUser,
+  ) {
     const before = await this.requireSupplier(context, id);
     try {
       const supplier = await this.prisma.$transaction(async (tx) => {
@@ -68,19 +92,36 @@ export class SupplierService {
           where: { id },
           data: {
             ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
-            ...(dto.phone !== undefined ? { phone: dto.phone.trim() || null } : {}),
-            ...(dto.email !== undefined ? { email: dto.email.trim() || null } : {}),
-            ...(dto.address !== undefined ? { address: dto.address.trim() || null } : {}),
+            ...(dto.phone !== undefined
+              ? { phone: dto.phone.trim() || null }
+              : {}),
+            ...(dto.email !== undefined
+              ? { email: dto.email.trim() || null }
+              : {}),
+            ...(dto.address !== undefined
+              ? { address: dto.address.trim() || null }
+              : {}),
             ...(dto.status !== undefined ? { status: dto.status } : {}),
           },
           select: SUPPLIER_SELECT,
         });
-        await this.createAudit(tx, context, actor.userId, 'SUPPLIER_UPDATED', updated.id, before, updated);
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'SUPPLIER_UPDATED',
+          updated.id,
+          before,
+          updated,
+        );
         return updated;
       });
       return { success: true, data: supplier };
     } catch (error) {
-      this.throwKnownConflict(error, 'A supplier with this phone number already exists in this company');
+      this.throwKnownConflict(
+        error,
+        'A supplier with this phone number already exists in this company',
+      );
       throw error;
     }
   }
@@ -112,14 +153,17 @@ export class SupplierService {
         action,
         entityType: 'Supplier',
         entityId,
-        ...(beforeData === null ? {} : { beforeData: beforeData as Prisma.InputJsonValue }),
-        ...(afterData === null ? {} : { afterData: afterData as Prisma.InputJsonValue }),
+        ...(beforeData === null ? {} : { beforeData: beforeData }),
+        ...(afterData === null ? {} : { afterData: afterData }),
       },
     });
   }
 
   private throwKnownConflict(error: unknown, message: string): never | void {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
       throw new ConflictException(message);
     }
   }

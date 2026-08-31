@@ -16,12 +16,19 @@ import { createCsvStream } from './csv-stream.util';
 export class LedgerSummaryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getCustomerDueSummary(context: CompanyContext, query: PaginationQueryDto) {
+  async getCustomerDueSummary(
+    context: CompanyContext,
+    query: PaginationQueryDto,
+  ) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 50;
     const skip = (page - 1) * limit;
 
-    const where = { tenantId: context.tenantId, companyId: context.companyId, dueBalance: { not: 0 } };
+    const where = {
+      tenantId: context.tenantId,
+      companyId: context.companyId,
+      dueBalance: { not: 0 },
+    };
 
     const [items, total] = await this.prisma.$transaction([
       this.prisma.customer.findMany({
@@ -34,11 +41,19 @@ export class LedgerSummaryService {
       this.prisma.customer.count({ where }),
     ]);
 
-    return { success: true, data: items, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+    return {
+      success: true,
+      data: items,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   streamCustomerDueSummaryCsv(context: CompanyContext) {
-    const where = { tenantId: context.tenantId, companyId: context.companyId, dueBalance: { not: 0 } };
+    const where = {
+      tenantId: context.tenantId,
+      companyId: context.companyId,
+      dueBalance: { not: 0 },
+    };
     return createCsvStream(
       [
         { header: 'Customer Name', value: (r: any) => r.name },
@@ -46,16 +61,29 @@ export class LedgerSummaryService {
         { header: 'Due Balance', value: (r: any) => r.dueBalance.toString() },
       ],
       (skip, take) =>
-        this.prisma.customer.findMany({ where, select: { name: true, phone: true, dueBalance: true }, orderBy: { dueBalance: 'desc' }, skip, take }),
+        this.prisma.customer.findMany({
+          where,
+          select: { name: true, phone: true, dueBalance: true },
+          orderBy: { dueBalance: 'desc' },
+          skip,
+          take,
+        }),
     );
   }
 
-  async getSupplierPayableSummary(context: CompanyContext, query: PaginationQueryDto) {
+  async getSupplierPayableSummary(
+    context: CompanyContext,
+    query: PaginationQueryDto,
+  ) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 50;
     const skip = (page - 1) * limit;
 
-    const where = { tenantId: context.tenantId, companyId: context.companyId, payableBalance: { not: 0 } };
+    const where = {
+      tenantId: context.tenantId,
+      companyId: context.companyId,
+      payableBalance: { not: 0 },
+    };
 
     const [items, total] = await this.prisma.$transaction([
       this.prisma.supplier.findMany({
@@ -68,19 +96,36 @@ export class LedgerSummaryService {
       this.prisma.supplier.count({ where }),
     ]);
 
-    return { success: true, data: items, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+    return {
+      success: true,
+      data: items,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   streamSupplierPayableSummaryCsv(context: CompanyContext) {
-    const where = { tenantId: context.tenantId, companyId: context.companyId, payableBalance: { not: 0 } };
+    const where = {
+      tenantId: context.tenantId,
+      companyId: context.companyId,
+      payableBalance: { not: 0 },
+    };
     return createCsvStream(
       [
         { header: 'Supplier Name', value: (r: any) => r.name },
         { header: 'Phone', value: (r: any) => r.phone ?? '' },
-        { header: 'Payable Balance', value: (r: any) => r.payableBalance.toString() },
+        {
+          header: 'Payable Balance',
+          value: (r: any) => r.payableBalance.toString(),
+        },
       ],
       (skip, take) =>
-        this.prisma.supplier.findMany({ where, select: { name: true, phone: true, payableBalance: true }, orderBy: { payableBalance: 'desc' }, skip, take }),
+        this.prisma.supplier.findMany({
+          where,
+          select: { name: true, phone: true, payableBalance: true },
+          orderBy: { payableBalance: 'desc' },
+          skip,
+          take,
+        }),
     );
   }
 }

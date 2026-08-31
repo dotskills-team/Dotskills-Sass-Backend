@@ -1,7 +1,16 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { Prisma } from 'src/generated/phase-1-prisma/client';
-import { PurchaseOrderStatus, StockMovementType, SupplierLedgerEntryType } from 'src/generated/phase-1-prisma/enums';
+import {
+  PurchaseOrderStatus,
+  StockMovementType,
+  SupplierLedgerEntryType,
+} from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
@@ -9,6 +18,7 @@ import { InventoryService } from '../../master-data/inventory/inventory.service'
 import { ProductCostingService } from '../../master-data/product/product-costing.service';
 import {
   CreatePurchaseOrderDto,
+  ListPurchaseOrdersQueryDto,
   ReceiveGoodsDto,
   ReturnGoodsDto,
   UpdatePurchaseOrderDto,
@@ -26,7 +36,13 @@ const PO_SELECT = {
   createdAt: true,
   updatedAt: true,
   items: {
-    select: { id: true, productId: true, orderedQty: true, receivedQty: true, unitCost: true },
+    select: {
+      id: true,
+      productId: true,
+      orderedQty: true,
+      receivedQty: true,
+      unitCost: true,
+    },
   },
 } satisfies Prisma.PurchaseOrderSelect;
 
@@ -38,13 +54,31 @@ export class PurchaseOrderService {
     private readonly costingService: ProductCostingService,
   ) {}
 
-  async list(context: CompanyContext) {
-    const orders = await this.prisma.purchaseOrder.findMany({
-      where: { tenantId: context.tenantId, companyId: context.companyId },
-      select: PO_SELECT,
-      orderBy: { createdAt: 'desc' },
-    });
-    return { success: true, count: orders.length, data: orders };
+  async list(context: CompanyContext, query: ListPurchaseOrdersQueryDto = {}) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 50;
+    const skip = (page - 1) * limit;
+    const where: Prisma.PurchaseOrderWhereInput = {
+      tenantId: context.tenantId,
+      companyId: context.companyId,
+    };
+
+    const [orders, total] = await this.prisma.$transaction([
+      this.prisma.purchaseOrder.findMany({
+        where,
+        select: PO_SELECT,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.purchaseOrder.count({ where }),
+    ]);
+
+    return {
+      success: true,
+      data: orders,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async findOne(context: CompanyContext, id: string) {
@@ -52,8 +86,15 @@ export class PurchaseOrderService {
     return { success: true, data: order };
   }
 
-  async create(context: CompanyContext, dto: CreatePurchaseOrderDto, actor: AuthenticatedUser) {
-    const totalAmount = dto.items.reduce((sum, item) => sum + item.orderedQty * item.unitCost, 0);
+  async create(
+    context: CompanyContext,
+    dto: CreatePurchaseOrderDto,
+    actor: AuthenticatedUser,
+  ) {
+    const totalAmount = dto.items.reduce(
+      (sum, item) => sum + item.orderedQty * item.unitCost,
+      0,
+    );
 
     const order = await this.prisma.$transaction(async (tx) => {
       const orderNumber = await this.reserveOrderNumber(tx, context);
@@ -79,33 +120,57 @@ export class PurchaseOrderService {
         select: PO_SELECT,
       });
 
-      await this.createAudit(tx, context, actor.userId, 'PURCHASE_ORDER_CREATED', created.id, null, created);
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'PURCHASE_ORDER_CREATED',
+        created.id,
+        null,
+        created,
+      );
       return created;
     });
 
     return { success: true, data: order };
   }
 
-  async update(context: CompanyContext, id: string, dto: UpdatePurchaseOrderDto, actor: AuthenticatedUser) {
+  async update(
+    context: CompanyContext,
+    id: string,
+    dto: UpdatePurchaseOrderDto,
+    actor: AuthenticatedUser,
+  ) {
     const before = await this.requireOrder(context, id);
     if (before.status !== PurchaseOrderStatus.DRAFT) {
-      throw new BadRequestException('Only a DRAFT purchase order can be edited — once any goods have been received it is immutable, correct it with a Purchase Return instead');
+      throw new BadRequestException(
+        'Only a DRAFT purchase order can be edited — once any goods have been received it is immutable, correct it with a Purchase Return instead',
+      );
     }
 
     const totalAmount = dto.items
-      ? dto.items.reduce((sum, item) => sum + item.orderedQty * item.unitCost, 0)
+      ? dto.items.reduce(
+          (sum, item) => sum + item.orderedQty * item.unitCost,
+          0,
+        )
       : undefined;
 
     const order = await this.prisma.$transaction(async (tx) => {
       if (dto.items) {
-        await tx.purchaseOrderItem.deleteMany({ where: { purchaseOrderId: id } });
+        await tx.purchaseOrderItem.deleteMany({
+          where: { purchaseOrderId: id },
+        });
       }
 
       const updated = await tx.purchaseOrder.update({
         where: { id },
         data: {
-          ...(dto.locationId !== undefined ? { locationId: dto.locationId } : {}),
-          ...(dto.orderDate !== undefined ? { orderDate: new Date(dto.orderDate) } : {}),
+          ...(dto.locationId !== undefined
+            ? { locationId: dto.locationId }
+            : {}),
+          ...(dto.orderDate !== undefined
+            ? { orderDate: new Date(dto.orderDate) }
+            : {}),
           ...(dto.note !== undefined ? { note: dto.note.trim() || null } : {}),
           ...(totalAmount !== undefined ? { totalAmount } : {}),
           ...(dto.items
@@ -123,7 +188,15 @@ export class PurchaseOrderService {
         select: PO_SELECT,
       });
 
-      await this.createAudit(tx, context, actor.userId, 'PURCHASE_ORDER_UPDATED', updated.id, before, updated);
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'PURCHASE_ORDER_UPDATED',
+        updated.id,
+        before,
+        updated,
+      );
       return updated;
     });
 
@@ -133,7 +206,9 @@ export class PurchaseOrderService {
   async cancel(context: CompanyContext, id: string, actor: AuthenticatedUser) {
     const before = await this.requireOrder(context, id);
     if (before.status !== PurchaseOrderStatus.DRAFT) {
-      throw new BadRequestException('Only a DRAFT purchase order can be cancelled — once any goods have been received it cannot be undone');
+      throw new BadRequestException(
+        'Only a DRAFT purchase order can be cancelled — once any goods have been received it cannot be undone',
+      );
     }
 
     const order = await this.prisma.$transaction(async (tx) => {
@@ -142,7 +217,15 @@ export class PurchaseOrderService {
         data: { status: PurchaseOrderStatus.CANCELLED },
         select: PO_SELECT,
       });
-      await this.createAudit(tx, context, actor.userId, 'PURCHASE_ORDER_CANCELLED', updated.id, before, updated);
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'PURCHASE_ORDER_CANCELLED',
+        updated.id,
+        before,
+        updated,
+      );
       return updated;
     });
 
@@ -156,21 +239,32 @@ export class PurchaseOrderService {
    * so Inventory/StockMovement/Product.costPrice/PurchaseOrderItem.receivedQty/
    * Supplier.payableBalance never drift apart from each other.
    */
-  async receive(context: CompanyContext, id: string, dto: ReceiveGoodsDto, actor: AuthenticatedUser) {
+  async receive(
+    context: CompanyContext,
+    id: string,
+    dto: ReceiveGoodsDto,
+    actor: AuthenticatedUser,
+  ) {
     const order = await this.requireOrder(context, id);
     if (order.status === PurchaseOrderStatus.CANCELLED) {
-      throw new BadRequestException('Cannot receive goods against a cancelled purchase order');
+      throw new BadRequestException(
+        'Cannot receive goods against a cancelled purchase order',
+      );
     }
 
     const itemsById = new Map(order.items.map((item) => [item.id, item]));
     for (const line of dto.items) {
       const orderItem = itemsById.get(line.purchaseOrderItemId);
       if (!orderItem) {
-        throw new BadRequestException(`purchaseOrderItemId ${line.purchaseOrderItemId} does not belong to this purchase order`);
+        throw new BadRequestException(
+          `purchaseOrderItemId ${line.purchaseOrderItemId} does not belong to this purchase order`,
+        );
       }
       const wouldBeReceived = Number(orderItem.receivedQty) + line.receivedQty;
       if (wouldBeReceived > Number(orderItem.orderedQty) + 1e-9) {
-        throw new BadRequestException(`Cannot receive more than ordered for product ${orderItem.productId} (ordered ${orderItem.orderedQty}, already received ${orderItem.receivedQty})`);
+        throw new BadRequestException(
+          `Cannot receive more than ordered for product ${orderItem.productId} (ordered ${orderItem.orderedQty}, already received ${orderItem.receivedQty})`,
+        );
       }
     }
 
@@ -185,7 +279,9 @@ export class PurchaseOrderService {
           tenantId: context.tenantId,
           companyId: context.companyId,
           purchaseOrderId: id,
-          receivedDate: dto.receivedDate ? new Date(dto.receivedDate) : undefined,
+          receivedDate: dto.receivedDate
+            ? new Date(dto.receivedDate)
+            : undefined,
           billImageUrl: dto.billImageUrl,
           actorUserId: actor.userId,
         },
@@ -194,7 +290,13 @@ export class PurchaseOrderService {
       for (const line of dto.items) {
         const orderItem = itemsById.get(line.purchaseOrderItemId)!;
 
-        await this.costingService.applyPurchaseCost(tx, context, orderItem.productId, line.receivedQty, orderItem.unitCost);
+        await this.costingService.applyPurchaseCost(
+          tx,
+          context,
+          orderItem.productId,
+          line.receivedQty,
+          orderItem.unitCost,
+        );
 
         await this.inventoryService.increaseStock(tx, {
           tenantId: context.tenantId,
@@ -236,15 +338,29 @@ export class PurchaseOrderService {
         where: { purchaseOrderId: id },
         select: { orderedQty: true, receivedQty: true },
       });
-      const fullyReceived = refreshedItems.every((item) => Number(item.receivedQty) >= Number(item.orderedQty) - 1e-9);
+      const fullyReceived = refreshedItems.every(
+        (item) => Number(item.receivedQty) >= Number(item.orderedQty) - 1e-9,
+      );
 
       const updatedOrder = await tx.purchaseOrder.update({
         where: { id },
-        data: { status: fullyReceived ? PurchaseOrderStatus.FULLY_RECEIVED : PurchaseOrderStatus.PARTIALLY_RECEIVED },
+        data: {
+          status: fullyReceived
+            ? PurchaseOrderStatus.FULLY_RECEIVED
+            : PurchaseOrderStatus.PARTIALLY_RECEIVED,
+        },
         select: PO_SELECT,
       });
 
-      await this.createAudit(tx, context, actor.userId, 'PURCHASE_ORDER_RECEIVED', receipt.id, null, { receiptId: receipt.id, purchaseOrderId: id, items: dto.items });
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'PURCHASE_ORDER_RECEIVED',
+        receipt.id,
+        null,
+        { receiptId: receipt.id, purchaseOrderId: id, items: dto.items },
+      );
 
       return { order: updatedOrder, receipt };
     });
@@ -260,10 +376,20 @@ export class PurchaseOrderService {
    * weighted-average calculation backward — matches standard accounting
    * practice of not "un-averaging" a cost after the fact.
    */
-  async createReturn(context: CompanyContext, id: string, dto: ReturnGoodsDto, actor: AuthenticatedUser) {
+  async createReturn(
+    context: CompanyContext,
+    id: string,
+    dto: ReturnGoodsDto,
+    actor: AuthenticatedUser,
+  ) {
     const order = await this.requireOrder(context, id);
-    if (order.status === PurchaseOrderStatus.DRAFT || order.status === PurchaseOrderStatus.CANCELLED) {
-      throw new BadRequestException('Cannot return goods for a purchase order that has never been received');
+    if (
+      order.status === PurchaseOrderStatus.DRAFT ||
+      order.status === PurchaseOrderStatus.CANCELLED
+    ) {
+      throw new BadRequestException(
+        'Cannot return goods for a purchase order that has never been received',
+      );
     }
 
     const result = await this.prisma.$transaction(async (tx) => {
@@ -293,7 +419,9 @@ export class PurchaseOrderService {
           });
         } catch (error) {
           if (error instanceof ConflictException) {
-            throw new BadRequestException(`INSUFFICIENT_STOCK: not enough stock of product ${line.productId} at this location to return`);
+            throw new BadRequestException(
+              `INSUFFICIENT_STOCK: not enough stock of product ${line.productId} at this location to return`,
+            );
           }
           throw error;
         }
@@ -319,7 +447,15 @@ export class PurchaseOrderService {
         });
       }
 
-      await this.createAudit(tx, context, actor.userId, 'PURCHASE_RETURN_CREATED', purchaseReturn.id, null, purchaseReturn);
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'PURCHASE_RETURN_CREATED',
+        purchaseReturn.id,
+        null,
+        purchaseReturn,
+      );
       return purchaseReturn;
     });
 
@@ -351,7 +487,10 @@ export class PurchaseOrderService {
    * Company-scoped sequence — see PurchaseOrderSequence's own schema
    * comment for why this isn't the global InvoiceSequence pattern.
    */
-  private async reserveOrderNumber(tx: Prisma.TransactionClient, context: CompanyContext): Promise<string> {
+  private async reserveOrderNumber(
+    tx: Prisma.TransactionClient,
+    context: CompanyContext,
+  ): Promise<string> {
     const yearKey = String(new Date().getFullYear());
 
     const rows = await tx.$queryRaw<{ lastNumber: number }[]>`
@@ -388,8 +527,8 @@ export class PurchaseOrderService {
         action,
         entityType: 'PurchaseOrder',
         entityId,
-        ...(beforeData === null ? {} : { beforeData: beforeData as Prisma.InputJsonValue }),
-        ...(afterData === null ? {} : { afterData: afterData as Prisma.InputJsonValue }),
+        ...(beforeData === null ? {} : { beforeData: beforeData }),
+        ...(afterData === null ? {} : { afterData: afterData }),
       },
     });
   }

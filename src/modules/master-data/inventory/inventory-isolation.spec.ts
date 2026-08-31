@@ -49,7 +49,9 @@ describe('Business Ops Inventory Ledger — multi-tenant isolation (integration)
   };
 
   beforeAll(async () => {
-    moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
 
     prisma = moduleRef.get(PrismaService);
     companyManagementService = moduleRef.get(CompanyManagementService);
@@ -59,22 +61,56 @@ describe('Business Ops Inventory Ledger — multi-tenant isolation (integration)
     inventoryService = moduleRef.get(InventoryService);
 
     const companyA = await companyManagementService.create(
-      { tenantId: TENANT_1, industryId: INDUSTRY_ID, code: 'INVISOA', legalName: 'Inventory Isolation A (disposable)', baseCurrencyCode: 'BDT' } as any,
+      {
+        tenantId: TENANT_1,
+        industryId: INDUSTRY_ID,
+        code: 'INVISOA',
+        legalName: 'Inventory Isolation A (disposable)',
+        baseCurrencyCode: 'BDT',
+      },
       CREATOR_USER_ID,
     );
     const companyB = await companyManagementService.create(
-      { tenantId: TENANT_2, industryId: INDUSTRY_ID, code: 'INVISOB', legalName: 'Inventory Isolation B (disposable)', baseCurrencyCode: 'BDT' } as any,
+      {
+        tenantId: TENANT_2,
+        industryId: INDUSTRY_ID,
+        code: 'INVISOB',
+        legalName: 'Inventory Isolation B (disposable)',
+        baseCurrencyCode: 'BDT',
+      },
       CREATOR_USER_ID,
     );
 
     companyAId = companyA.id;
     companyBId = companyB.id;
-    contextA = { tenantId: TENANT_1, companyId: companyAId, companyMemberId: 'n/a', companyStatus: 'DRAFT', tenantStatus: 'ACTIVE', scopes: [] };
-    contextB = { tenantId: TENANT_2, companyId: companyBId, companyMemberId: 'n/a', companyStatus: 'DRAFT', tenantStatus: 'ACTIVE', scopes: [] };
+    contextA = {
+      tenantId: TENANT_1,
+      companyId: companyAId,
+      companyMemberId: 'n/a',
+      companyStatus: 'DRAFT',
+      tenantStatus: 'ACTIVE',
+      scopes: [],
+    };
+    contextB = {
+      tenantId: TENANT_2,
+      companyId: companyBId,
+      companyMemberId: 'n/a',
+      companyStatus: 'DRAFT',
+      tenantStatus: 'ACTIVE',
+      scopes: [],
+    };
 
     const [locationA, locationB] = await Promise.all([
-      locationService.create(contextA, { name: 'Main', locationType: 'BRANCH' as any }, actor),
-      locationService.create(contextB, { name: 'Main', locationType: 'BRANCH' as any }, actor),
+      locationService.create(
+        contextA,
+        { name: 'Main', locationType: 'BRANCH' as any },
+        actor,
+      ),
+      locationService.create(
+        contextB,
+        { name: 'Main', locationType: 'BRANCH' as any },
+        actor,
+      ),
     ]);
     locA = locationA.data.id;
     locB = locationB.data.id;
@@ -85,8 +121,24 @@ describe('Business Ops Inventory Ledger — multi-tenant isolation (integration)
     ]);
 
     const [productA, productB] = await Promise.all([
-      productService.create(contextA, { sku: 'SHARED-SKU', name: 'Shared SKU Product', baseUnitId: unitA.data.id }, actor),
-      productService.create(contextB, { sku: 'SHARED-SKU', name: 'Shared SKU Product', baseUnitId: unitB.data.id }, actor),
+      productService.create(
+        contextA,
+        {
+          sku: 'SHARED-SKU',
+          name: 'Shared SKU Product',
+          baseUnitId: unitA.data.id,
+        },
+        actor,
+      ),
+      productService.create(
+        contextB,
+        {
+          sku: 'SHARED-SKU',
+          name: 'Shared SKU Product',
+          baseUnitId: unitB.data.id,
+        },
+        actor,
+      ),
     ]);
     prodA = productA.data.id;
     prodB = productB.data.id;
@@ -107,11 +159,15 @@ describe('Business Ops Inventory Ledger — multi-tenant isolation (integration)
     await moduleRef.close();
   }, 30000);
 
-  it('increaseStock for Company A never affects Company B\'s balance, even with the identical SKU/location name', async () => {
+  it("increaseStock for Company A never affects Company B's balance, even with the identical SKU/location name", async () => {
     await prisma.$transaction((tx) =>
       inventoryService.increaseStock(tx, {
-        tenantId: TENANT_1, companyId: companyAId, productId: prodA, locationId: locA,
-        quantity: 50, movementType: StockMovementType.PURCHASE,
+        tenantId: TENANT_1,
+        companyId: companyAId,
+        productId: prodA,
+        locationId: locA,
+        quantity: 50,
+        movementType: StockMovementType.PURCHASE,
       }),
     );
 
@@ -126,8 +182,12 @@ describe('Business Ops Inventory Ledger — multi-tenant isolation (integration)
     // Give Company B plenty of stock — must have zero influence on Company A's check.
     await prisma.$transaction((tx) =>
       inventoryService.increaseStock(tx, {
-        tenantId: TENANT_2, companyId: companyBId, productId: prodB, locationId: locB,
-        quantity: 1000, movementType: StockMovementType.PURCHASE,
+        tenantId: TENANT_2,
+        companyId: companyBId,
+        productId: prodB,
+        locationId: locB,
+        quantity: 1000,
+        movementType: StockMovementType.PURCHASE,
       }),
     );
 
@@ -135,8 +195,13 @@ describe('Business Ops Inventory Ledger — multi-tenant isolation (integration)
     await expect(
       prisma.$transaction((tx) =>
         inventoryService.decreaseStock(tx, {
-          tenantId: TENANT_1, companyId: companyAId, productId: prodA, locationId: locA,
-          quantity: 100, movementType: StockMovementType.SALE, allowNegative: false,
+          tenantId: TENANT_1,
+          companyId: companyAId,
+          productId: prodA,
+          locationId: locA,
+          quantity: 100,
+          movementType: StockMovementType.SALE,
+          allowNegative: false,
         }),
       ),
     ).rejects.toThrow(ConflictException);
@@ -148,8 +213,13 @@ describe('Business Ops Inventory Ledger — multi-tenant isolation (integration)
   it("Company A's StockMovement history never includes any of Company B's movements", async () => {
     await prisma.$transaction((tx) =>
       inventoryService.decreaseStock(tx, {
-        tenantId: TENANT_1, companyId: companyAId, productId: prodA, locationId: locA,
-        quantity: 5, movementType: StockMovementType.SALE, allowNegative: false,
+        tenantId: TENANT_1,
+        companyId: companyAId,
+        productId: prodA,
+        locationId: locA,
+        quantity: 5,
+        movementType: StockMovementType.SALE,
+        allowNegative: false,
       }),
     );
 

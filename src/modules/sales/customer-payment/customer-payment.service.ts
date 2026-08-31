@@ -24,9 +24,17 @@ export class CustomerPaymentService {
     return { success: true, count: entries.length, data: entries };
   }
 
-  async recordPayment(context: CompanyContext, dto: RecordCustomerPaymentDto, actor: AuthenticatedUser) {
+  async recordPayment(
+    context: CompanyContext,
+    dto: RecordCustomerPaymentDto,
+    actor: AuthenticatedUser,
+  ) {
     const customer = await this.prisma.customer.findFirst({
-      where: { id: dto.customerId, tenantId: context.tenantId, companyId: context.companyId },
+      where: {
+        id: dto.customerId,
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
       select: { id: true },
     });
     if (!customer) throw new NotFoundException('Customer was not found');
@@ -58,7 +66,7 @@ export class CustomerPaymentService {
           action: 'CUSTOMER_PAYMENT_RECORDED',
           entityType: 'CustomerDueLedger',
           entityId: created.id,
-          afterData: created as unknown as Prisma.InputJsonValue,
+          afterData: created,
         },
       });
 

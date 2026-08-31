@@ -55,7 +55,9 @@ export class StockReportService {
           productId: true,
           locationId: true,
           quantity: true,
-          product: { select: { name: true, sku: true, reorderLevel: true, status: true } },
+          product: {
+            select: { name: true, sku: true, reorderLevel: true, status: true },
+          },
           location: { select: { name: true } },
         },
         orderBy: { updatedAt: 'desc' },
@@ -69,7 +71,7 @@ export class StockReportService {
       success: true,
       data: items.map((row) => ({
         ...row,
-        belowReorderLevel: (row.quantity as Prisma.Decimal).lessThan(row.product.reorderLevel),
+        belowReorderLevel: row.quantity.lessThan(row.product.reorderLevel),
       })),
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     };
@@ -82,7 +84,9 @@ export class StockReportService {
     limit: number,
     skip: number,
   ) {
-    const locationFilter = query.locationId ? Prisma.sql`AND i."locationId" = ${query.locationId}::uuid` : Prisma.empty;
+    const locationFilter = query.locationId
+      ? Prisma.sql`AND i."locationId" = ${query.locationId}::uuid`
+      : Prisma.empty;
     const baseWhere = Prisma.sql`
       i."tenantId" = ${context.tenantId}::uuid
       AND i."companyId" = ${context.companyId}::uuid
@@ -126,7 +130,11 @@ export class StockReportService {
         productId: row.productId,
         locationId: row.locationId,
         quantity: new Prisma.Decimal(String(row.quantity)),
-        product: { name: row.productName, sku: row.sku, reorderLevel: new Prisma.Decimal(String(row.reorderLevel)) },
+        product: {
+          name: row.productName,
+          sku: row.sku,
+          reorderLevel: new Prisma.Decimal(String(row.reorderLevel)),
+        },
         location: { name: row.locationName },
         belowReorderLevel: true,
       })),
@@ -136,16 +144,31 @@ export class StockReportService {
 
   streamStockReportCsv(context: CompanyContext, query: StockReportQueryDto) {
     const columns = [
-      { header: 'Product Name', value: (r: any) => r.product?.name ?? r.productName },
+      {
+        header: 'Product Name',
+        value: (r: any) => r.product?.name ?? r.productName,
+      },
       { header: 'SKU', value: (r: any) => r.product?.sku ?? r.sku },
-      { header: 'Location', value: (r: any) => r.location?.name ?? r.locationName },
+      {
+        header: 'Location',
+        value: (r: any) => r.location?.name ?? r.locationName,
+      },
       { header: 'Quantity', value: (r: any) => r.quantity.toString() },
-      { header: 'Reorder Level', value: (r: any) => (r.product?.reorderLevel ?? r.reorderLevel).toString() },
-      { header: 'Below Reorder Level', value: (r: any) => (r.belowReorderLevel ? 'YES' : 'NO') },
+      {
+        header: 'Reorder Level',
+        value: (r: any) =>
+          (r.product?.reorderLevel ?? r.reorderLevel).toString(),
+      },
+      {
+        header: 'Below Reorder Level',
+        value: (r: any) => (r.belowReorderLevel ? 'YES' : 'NO'),
+      },
     ];
 
     if (query.belowReorderOnly) {
-      const locationFilter = query.locationId ? Prisma.sql`AND i."locationId" = ${query.locationId}::uuid` : Prisma.empty;
+      const locationFilter = query.locationId
+        ? Prisma.sql`AND i."locationId" = ${query.locationId}::uuid`
+        : Prisma.empty;
       const baseWhere = Prisma.sql`
         i."tenantId" = ${context.tenantId}::uuid
         AND i."companyId" = ${context.companyId}::uuid
@@ -154,7 +177,9 @@ export class StockReportService {
         ${locationFilter}
       `;
       return createCsvStream(columns, (skip, take) =>
-        this.prisma.$queryRaw<BelowReorderRow[]>(Prisma.sql`
+        this.prisma
+          .$queryRaw<BelowReorderRow[]>(
+            Prisma.sql`
           SELECT i.id AS id, i."productId" AS "productId", i."locationId" AS "locationId", i.quantity AS quantity,
                  p.name AS "productName", p.sku AS sku, p."reorderLevel" AS "reorderLevel", l.name AS "locationName"
           FROM inventory i
@@ -163,9 +188,15 @@ export class StockReportService {
           WHERE ${baseWhere}
           ORDER BY i."updatedAt" DESC
           LIMIT ${take} OFFSET ${skip}
-        `).then((rows) =>
-          rows.map((row) => ({ ...row, quantity: new Prisma.Decimal(String(row.quantity)), belowReorderLevel: true })),
-        ),
+        `,
+          )
+          .then((rows) =>
+            rows.map((row) => ({
+              ...row,
+              quantity: new Prisma.Decimal(String(row.quantity)),
+              belowReorderLevel: true,
+            })),
+          ),
       );
     }
 
@@ -188,7 +219,10 @@ export class StockReportService {
           take,
         })
         .then((rows) =>
-          rows.map((row) => ({ ...row, belowReorderLevel: (row.quantity as Prisma.Decimal).lessThan(row.product.reorderLevel) })),
+          rows.map((row) => ({
+            ...row,
+            belowReorderLevel: row.quantity.lessThan(row.product.reorderLevel),
+          })),
         ),
     );
   }

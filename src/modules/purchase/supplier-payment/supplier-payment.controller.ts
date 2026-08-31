@@ -14,13 +14,21 @@ import { SupplierPaymentService } from './supplier-payment.service';
 import { RecordSupplierPaymentDto } from './dto/supplier-payment.dto';
 
 @Controller('companies/:companyId/supplier-payments')
-@UseGuards(JwtAuthGuard, CompanyContextGuard, SubscriptionStatusGuard, CompanyPermissionsGuard)
+@UseGuards(
+  JwtAuthGuard,
+  CompanyContextGuard,
+  SubscriptionStatusGuard,
+  CompanyPermissionsGuard,
+)
 export class SupplierPaymentController {
   constructor(private readonly service: SupplierPaymentService) {}
 
   @Get()
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.SUPPLIER_PAYMENT_READ)
-  list(@CurrentCompany() context: CompanyContext, @Query('supplierId') supplierId?: string) {
+  list(
+    @CurrentCompany() context: CompanyContext,
+    @Query('supplierId') supplierId?: string,
+  ) {
     return this.service.list(context, supplierId);
   }
 

@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, ConflictException } from '@nestjs/common';
 
-import { SalePaymentMethod, SaleStatus, StockMovementType } from '../../../generated/phase-1-prisma/enums';
+import {
+  SalePaymentMethod,
+  SaleStatus,
+  StockMovementType,
+} from '../../../generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
 import { SaleService } from './sale.service';
@@ -24,10 +28,15 @@ describe('SaleService', () => {
     customer: { findFirst: jest.fn() },
     sale: { findFirst: jest.fn(), findMany: jest.fn() },
     saleReturn: { findMany: jest.fn() },
-    $transaction: jest.fn((arg: any) => (typeof arg === 'function' ? arg(mockTx) : Promise.all(arg))),
+    $transaction: jest.fn((arg: any) =>
+      typeof arg === 'function' ? arg(mockTx) : Promise.all(arg),
+    ),
   };
 
-  const mockInventoryService = { increaseStock: jest.fn(), decreaseStock: jest.fn() };
+  const mockInventoryService = {
+    increaseStock: jest.fn(),
+    decreaseStock: jest.fn(),
+  };
 
   const context = { tenantId: 'tenant-1', companyId: 'company-1' } as any;
   const actor = { userId: 'user-1' } as any;
@@ -55,7 +64,9 @@ describe('SaleService', () => {
       { id: 'product-1', name: 'Rice', salePrice: 100, costPrice: 60 },
     ]);
     mockTx.$queryRaw.mockResolvedValue([{ lastNumber: 1 }]);
-    mockTx.sale.create.mockImplementation(({ data }: any) => Promise.resolve({ id: 'sale-1', ...data, items: [], payments: [] }));
+    mockTx.sale.create.mockImplementation(({ data }: any) =>
+      Promise.resolve({ id: 'sale-1', ...data, items: [], payments: [] }),
+    );
     mockInventoryService.decreaseStock.mockResolvedValue({});
     mockTx.cashDrawerSession.findFirst.mockResolvedValue(null);
   });
@@ -66,13 +77,21 @@ describe('SaleService', () => {
 
       await service.create(
         context,
-        { locationId: 'loc-1', items: [{ productId: 'product-1', quantity: 1 }], payments: [{ method: 'CASH', amount: 100 }] } as any,
+        {
+          locationId: 'loc-1',
+          items: [{ productId: 'product-1', quantity: 1 }],
+          payments: [{ method: 'CASH', amount: 100 }],
+        } as any,
         actor,
       );
 
       expect(mockTx.cashDrawerSession.findFirst).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: expect.objectContaining({ locationId: 'loc-1', cashierId: 'user-1', status: 'OPEN' }),
+          where: expect.objectContaining({
+            locationId: 'loc-1',
+            cashierId: 'user-1',
+            status: 'OPEN',
+          }),
         }),
       );
       const createCall = mockTx.sale.create.mock.calls[0][0];
@@ -82,7 +101,11 @@ describe('SaleService', () => {
     it('leaves cashDrawerSessionId null (sale still succeeds) when no session is open for this cashier/location', async () => {
       const result = await service.create(
         context,
-        { locationId: 'loc-1', items: [{ productId: 'product-1', quantity: 1 }], payments: [{ method: 'CASH', amount: 100 }] } as any,
+        {
+          locationId: 'loc-1',
+          items: [{ productId: 'product-1', quantity: 1 }],
+          payments: [{ method: 'CASH', amount: 100 }],
+        } as any,
         actor,
       );
 
@@ -109,7 +132,7 @@ describe('SaleService', () => {
           items: [{ productId: 'product-1', quantity: 2, discountAmount: 20 }],
           saleDiscountAmount: 10,
           payments: [{ method: SalePaymentMethod.CASH, amount: 187 }],
-        } as any,
+        },
         actor,
       );
 
@@ -143,7 +166,7 @@ describe('SaleService', () => {
           locationId: 'loc-1',
           items: [{ productId: 'product-1', quantity: 1 }],
           payments: [{ method: SalePaymentMethod.CASH, amount: 100 }],
-        } as any,
+        },
         actor,
       );
 
@@ -160,7 +183,7 @@ describe('SaleService', () => {
           locationId: 'loc-1',
           items: [{ productId: 'product-1', quantity: 1 }],
           payments: [{ method: SalePaymentMethod.CASH, amount: 100 }],
-        } as any,
+        },
         actor,
       );
 
@@ -177,12 +200,18 @@ describe('SaleService', () => {
     });
 
     it('translates an INSUFFICIENT_STOCK ConflictException from decreaseStock into a BadRequestException', async () => {
-      mockInventoryService.decreaseStock.mockRejectedValue(new ConflictException('INSUFFICIENT_STOCK'));
+      mockInventoryService.decreaseStock.mockRejectedValue(
+        new ConflictException('INSUFFICIENT_STOCK'),
+      );
 
       await expect(
         service.create(
           context,
-          { locationId: 'loc-1', items: [{ productId: 'product-1', quantity: 1 }], payments: [{ method: SalePaymentMethod.CASH, amount: 100 }] } as any,
+          {
+            locationId: 'loc-1',
+            items: [{ productId: 'product-1', quantity: 1 }],
+            payments: [{ method: SalePaymentMethod.CASH, amount: 100 }],
+          } as any,
           actor,
         ),
       ).rejects.toThrow(BadRequestException);
@@ -192,14 +221,21 @@ describe('SaleService', () => {
       await expect(
         service.create(
           context,
-          { locationId: 'loc-1', items: [{ productId: 'product-1', quantity: 1 }], payments: [{ method: SalePaymentMethod.DUE, amount: 100 }] } as any,
+          {
+            locationId: 'loc-1',
+            items: [{ productId: 'product-1', quantity: 1 }],
+            payments: [{ method: SalePaymentMethod.DUE, amount: 100 }],
+          } as any,
           actor,
         ),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('writes a CustomerDueLedger DUE entry and increments Customer.dueBalance for the DUE portion', async () => {
-      mockPrisma.customer.findFirst.mockResolvedValue({ id: 'customer-1', dueBalance: 0 });
+      mockPrisma.customer.findFirst.mockResolvedValue({
+        id: 'customer-1',
+        dueBalance: 0,
+      });
 
       await service.create(
         context,
@@ -208,21 +244,36 @@ describe('SaleService', () => {
           customerId: 'customer-1',
           items: [{ productId: 'product-1', quantity: 1 }],
           payments: [{ method: SalePaymentMethod.DUE, amount: 100 }],
-        } as any,
+        },
         actor,
       );
 
       expect(mockTx.customerDueLedger.create).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.objectContaining({ entryType: 'DUE', amount: 100, customerId: 'customer-1' }) }),
+        expect.objectContaining({
+          data: expect.objectContaining({
+            entryType: 'DUE',
+            amount: 100,
+            customerId: 'customer-1',
+          }),
+        }),
       );
-      expect(mockTx.customer.update).toHaveBeenCalledWith({ where: { id: 'customer-1' }, data: { dueBalance: { increment: 100 } } });
+      expect(mockTx.customer.update).toHaveBeenCalledWith({
+        where: { id: 'customer-1' },
+        data: { dueBalance: { increment: 100 } },
+      });
     });
 
     it('does NOT block the sale when the due limit is exceeded — returns a non-blocking warning instead (decision #5)', async () => {
       mockPrisma.companySettings.findUniqueOrThrow.mockResolvedValue({
-        allowNegativeStock: false, enableTax: false, defaultTaxRate: 0, maxCustomerDueLimit: 50,
+        allowNegativeStock: false,
+        enableTax: false,
+        defaultTaxRate: 0,
+        maxCustomerDueLimit: 50,
       });
-      mockPrisma.customer.findFirst.mockResolvedValue({ id: 'customer-1', dueBalance: 0 });
+      mockPrisma.customer.findFirst.mockResolvedValue({
+        id: 'customer-1',
+        dueBalance: 0,
+      });
 
       const result = await service.create(
         context,
@@ -231,7 +282,7 @@ describe('SaleService', () => {
           customerId: 'customer-1',
           items: [{ productId: 'product-1', quantity: 1 }],
           payments: [{ method: SalePaymentMethod.DUE, amount: 100 }], // exceeds the 50 limit
-        } as any,
+        },
         actor,
       );
 
@@ -252,30 +303,58 @@ describe('SaleService', () => {
     };
 
     it('rejects voiding a sale that is not COMPLETED', async () => {
-      mockPrisma.sale.findFirst.mockResolvedValue({ ...completedSale, status: SaleStatus.VOIDED });
+      mockPrisma.sale.findFirst.mockResolvedValue({
+        ...completedSale,
+        status: SaleStatus.VOIDED,
+      });
 
-      await expect(service.void(context, 'sale-1', { reason: 'x' } as any, actor)).rejects.toThrow(BadRequestException);
+      await expect(
+        service.void(context, 'sale-1', { reason: 'x' } as any, actor),
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('restores stock via SALE_VOID_IN (a distinct type from SALE_RETURN_IN) for every line item', async () => {
       mockPrisma.sale.findFirst.mockResolvedValue(completedSale);
-      mockTx.sale.update.mockResolvedValue({ id: 'sale-1', status: SaleStatus.VOIDED });
+      mockTx.sale.update.mockResolvedValue({
+        id: 'sale-1',
+        status: SaleStatus.VOIDED,
+      });
 
-      await service.void(context, 'sale-1', { reason: 'wrong quantity entered' } as any, actor);
+      await service.void(
+        context,
+        'sale-1',
+        { reason: 'wrong quantity entered' },
+        actor,
+      );
 
       expect(mockInventoryService.increaseStock).toHaveBeenCalledWith(
         mockTx,
-        expect.objectContaining({ productId: 'product-1', quantity: 2, movementType: StockMovementType.SALE_VOID_IN }),
+        expect.objectContaining({
+          productId: 'product-1',
+          quantity: 2,
+          movementType: StockMovementType.SALE_VOID_IN,
+        }),
       );
     });
 
     it('reverses the DUE portion of Customer.dueBalance', async () => {
       mockPrisma.sale.findFirst.mockResolvedValue(completedSale);
-      mockTx.sale.update.mockResolvedValue({ id: 'sale-1', status: SaleStatus.VOIDED });
+      mockTx.sale.update.mockResolvedValue({
+        id: 'sale-1',
+        status: SaleStatus.VOIDED,
+      });
 
-      await service.void(context, 'sale-1', { reason: 'wrong quantity entered' } as any, actor);
+      await service.void(
+        context,
+        'sale-1',
+        { reason: 'wrong quantity entered' },
+        actor,
+      );
 
-      expect(mockTx.customer.update).toHaveBeenCalledWith({ where: { id: 'customer-1' }, data: { dueBalance: { decrement: 200 } } });
+      expect(mockTx.customer.update).toHaveBeenCalledWith({
+        where: { id: 'customer-1' },
+        data: { dueBalance: { decrement: 200 } },
+      });
     });
   });
 
@@ -290,23 +369,48 @@ describe('SaleService', () => {
     };
 
     it('rejects returning items against a sale that is not COMPLETED', async () => {
-      mockPrisma.sale.findFirst.mockResolvedValue({ ...completedSale, status: SaleStatus.VOIDED });
+      mockPrisma.sale.findFirst.mockResolvedValue({
+        ...completedSale,
+        status: SaleStatus.VOIDED,
+      });
 
       await expect(
-        service.createReturn(context, 'sale-1', { reason: 'damaged', items: [{ productId: 'product-1', quantity: 1 }] } as any, actor),
+        service.createReturn(
+          context,
+          'sale-1',
+          {
+            reason: 'damaged',
+            items: [{ productId: 'product-1', quantity: 1 }],
+          } as any,
+          actor,
+        ),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('restores stock via SALE_RETURN_IN', async () => {
       mockPrisma.sale.findFirst.mockResolvedValue(completedSale);
       mockTx.sale.create = mockTx.sale.create; // no-op, saleReturn uses a separate model
-      (mockTx as any).saleReturn = { create: jest.fn().mockResolvedValue({ id: 'return-1' }) };
+      (mockTx as any).saleReturn = {
+        create: jest.fn().mockResolvedValue({ id: 'return-1' }),
+      };
 
-      await service.createReturn(context, 'sale-1', { reason: 'damaged', items: [{ productId: 'product-1', quantity: 1 }] } as any, actor);
+      await service.createReturn(
+        context,
+        'sale-1',
+        {
+          reason: 'damaged',
+          items: [{ productId: 'product-1', quantity: 1 }],
+        },
+        actor,
+      );
 
       expect(mockInventoryService.increaseStock).toHaveBeenCalledWith(
         mockTx,
-        expect.objectContaining({ productId: 'product-1', quantity: 1, movementType: StockMovementType.SALE_RETURN_IN }),
+        expect.objectContaining({
+          productId: 'product-1',
+          quantity: 1,
+          movementType: StockMovementType.SALE_RETURN_IN,
+        }),
       );
     });
   });

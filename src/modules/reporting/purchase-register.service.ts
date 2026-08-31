@@ -28,7 +28,10 @@ const PURCHASE_REGISTER_SELECT = {
 export class PurchaseRegisterService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private buildWhere(context: CompanyContext, query: Pick<DateRangeReportQueryDto, 'dateFrom' | 'dateTo' | 'locationId'>): Prisma.PurchaseOrderWhereInput {
+  private buildWhere(
+    context: CompanyContext,
+    query: Pick<DateRangeReportQueryDto, 'dateFrom' | 'dateTo' | 'locationId'>,
+  ): Prisma.PurchaseOrderWhereInput {
     const { from, to } = parseReportDateRange(query.dateFrom, query.dateTo);
     return {
       tenantId: context.tenantId,
@@ -38,19 +41,35 @@ export class PurchaseRegisterService {
     };
   }
 
-  async getPurchaseRegister(context: CompanyContext, query: DateRangeReportQueryDto) {
+  async getPurchaseRegister(
+    context: CompanyContext,
+    query: DateRangeReportQueryDto,
+  ) {
     const where = this.buildWhere(context, query);
     const page = query.page ?? 1;
     const limit = query.limit ?? 50;
     const skip = (page - 1) * limit;
 
     const [items, total] = await this.prisma.$transaction([
-      this.prisma.purchaseOrder.findMany({ where, select: PURCHASE_REGISTER_SELECT, orderBy: { orderDate: 'asc' }, skip, take: limit }),
+      this.prisma.purchaseOrder.findMany({
+        where,
+        select: PURCHASE_REGISTER_SELECT,
+        orderBy: { orderDate: 'asc' },
+        skip,
+        take: limit,
+      }),
       this.prisma.purchaseOrder.count({ where }),
     ]);
 
-    const notCancelledWhere: Prisma.PurchaseOrderWhereInput = { ...where, status: { not: PurchaseOrderStatus.CANCELLED } };
-    const aggregate = await this.prisma.purchaseOrder.aggregate({ where: notCancelledWhere, _sum: { totalAmount: true }, _count: true });
+    const notCancelledWhere: Prisma.PurchaseOrderWhereInput = {
+      ...where,
+      status: { not: PurchaseOrderStatus.CANCELLED },
+    };
+    const aggregate = await this.prisma.purchaseOrder.aggregate({
+      where: notCancelledWhere,
+      _sum: { totalAmount: true },
+      _count: true,
+    });
 
     return {
       success: true,
@@ -63,7 +82,10 @@ export class PurchaseRegisterService {
     };
   }
 
-  streamPurchaseRegisterCsv(context: CompanyContext, query: DateRangeReportQueryDto) {
+  streamPurchaseRegisterCsv(
+    context: CompanyContext,
+    query: DateRangeReportQueryDto,
+  ) {
     const where = this.buildWhere(context, query);
     return createCsvStream(
       [
@@ -76,7 +98,14 @@ export class PurchaseRegisterService {
         { header: 'Receipts', value: (r: any) => r._count.receipts },
         { header: 'Returns', value: (r: any) => r._count.returns },
       ],
-      (skip, take) => this.prisma.purchaseOrder.findMany({ where, select: PURCHASE_REGISTER_SELECT, orderBy: { orderDate: 'asc' }, skip, take }),
+      (skip, take) =>
+        this.prisma.purchaseOrder.findMany({
+          where,
+          select: PURCHASE_REGISTER_SELECT,
+          orderBy: { orderDate: 'asc' },
+          skip,
+          take,
+        }),
     );
   }
 }

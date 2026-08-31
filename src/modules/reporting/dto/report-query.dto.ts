@@ -1,5 +1,13 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsDateString, IsInt, IsOptional, IsUUID, Max, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsDateString,
+  IsInt,
+  IsOptional,
+  IsUUID,
+  Max,
+  Min,
+} from 'class-validator';
 
 /** Sale Register / Purchase Register / Profit Report — date range is mandatory (see Phase 6 plan). */
 export class DateRangeReportQueryDto {

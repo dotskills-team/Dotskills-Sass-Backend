@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AuditActorType, SubscriptionStatus } from '../../generated/phase-1-prisma/enums';
+import {
+  AuditActorType,
+  SubscriptionStatus,
+} from '../../generated/phase-1-prisma/enums';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { InvoiceService } from '../invoice/invoice.service';
@@ -237,7 +240,9 @@ describe('SubscriptionLifecycleService.paymentSucceeded', () => {
         }),
       );
       // status itself is never part of the update — this is a renewal, not a transition
-      expect(mockTx.subscription.updateMany.mock.calls[0][0].data.status).toBeUndefined();
+      expect(
+        mockTx.subscription.updateMany.mock.calls[0][0].data.status,
+      ).toBeUndefined();
       expect(mockTx.subscriptionEvent.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
@@ -254,25 +259,28 @@ describe('SubscriptionLifecycleService.paymentSucceeded', () => {
     SubscriptionStatus.PAST_DUE,
     SubscriptionStatus.GRACE,
     SubscriptionStatus.SUSPENDED,
-  ])('recovers %s → ACTIVE on successful payment (existing behavior, unchanged)', async (status) => {
-    const subscription = subscriptionWith(status);
-    mockPrisma.subscription.findUnique.mockResolvedValue(subscription);
-    mockTx.subscription.updateMany.mockResolvedValue({ count: 1 });
-    mockTx.subscription.findUniqueOrThrow.mockResolvedValue({
-      ...subscription,
-      status: SubscriptionStatus.ACTIVE,
-    });
+  ])(
+    'recovers %s → ACTIVE on successful payment (existing behavior, unchanged)',
+    async (status) => {
+      const subscription = subscriptionWith(status);
+      mockPrisma.subscription.findUnique.mockResolvedValue(subscription);
+      mockTx.subscription.updateMany.mockResolvedValue({ count: 1 });
+      mockTx.subscription.findUniqueOrThrow.mockResolvedValue({
+        ...subscription,
+        status: SubscriptionStatus.ACTIVE,
+      });
 
-    const result = await service.paymentSucceeded('sub-1', context, 'key-2');
+      const result = await service.paymentSucceeded('sub-1', context, 'key-2');
 
-    expect(result.status).toBe(SubscriptionStatus.ACTIVE);
-    expect(mockTx.subscription.updateMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { id: 'sub-1', status },
-        data: expect.objectContaining({ status: SubscriptionStatus.ACTIVE }),
-      }),
-    );
-  });
+      expect(result.status).toBe(SubscriptionStatus.ACTIVE);
+      expect(mockTx.subscription.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'sub-1', status },
+          data: expect.objectContaining({ status: SubscriptionStatus.ACTIVE }),
+        }),
+      );
+    },
+  );
 
   it.each([SubscriptionStatus.CANCELLED, SubscriptionStatus.EXPIRED])(
     'still rejects payment success while %s (not recoverable, not renewable)',
@@ -342,7 +350,10 @@ describe('SubscriptionLifecycleService.runDueTransitions — TRIALING fork', () 
       stillOnTrialPlan,
       SubscriptionStatus.EXPIRED,
       expect.any(Object),
-      expect.objectContaining({ reason: 'SCHEDULED_LIFECYCLE', source: 'SCHEDULER' }),
+      expect.objectContaining({
+        reason: 'SCHEDULED_LIFECYCLE',
+        source: 'SCHEDULER',
+      }),
     );
     expect(result.trialsExpired).toBe(1);
     expect(result.trialsActivated).toBe(0);
@@ -489,11 +500,21 @@ describe('SubscriptionLifecycleService.voidStaleIssuedInvoices', () => {
     mockPrisma.invoice.findMany.mockResolvedValue([
       {
         id: 'invoice-1',
-        subscription: { id: 'sub-1', tenantId: 't', companyId: 'c', status: SubscriptionStatus.GRACE },
+        subscription: {
+          id: 'sub-1',
+          tenantId: 't',
+          companyId: 'c',
+          status: SubscriptionStatus.GRACE,
+        },
       },
       {
         id: 'invoice-2',
-        subscription: { id: 'sub-2', tenantId: 't', companyId: 'c', status: SubscriptionStatus.GRACE },
+        subscription: {
+          id: 'sub-2',
+          tenantId: 't',
+          companyId: 'c',
+          status: SubscriptionStatus.GRACE,
+        },
       },
     ]);
     mockInvoice.void

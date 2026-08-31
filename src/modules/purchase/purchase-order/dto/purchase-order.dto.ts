@@ -12,15 +12,26 @@ import {
   ValidateNested,
 } from 'class-validator';
 
+import { PaginationQueryDto } from '../../../../common/dto/pagination-query.dto';
+
+/** A shop can realistically place hundreds of Purchase Orders over its lifetime — same reasoning as Product's Frontend Phase 1 pagination fix. */
+export class ListPurchaseOrdersQueryDto extends PaginationQueryDto {}
+
 export class PurchaseOrderItemInputDto {
   @IsUUID()
   productId!: string;
 
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'orderedQty must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'orderedQty must have maximum 4 decimal places' },
+  )
   @Min(0.0001, { message: 'orderedQty must be greater than 0' })
   orderedQty!: number;
 
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'unitCost must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'unitCost must have maximum 4 decimal places' },
+  )
   @Min(0, { message: 'unitCost cannot be negative' })
   unitCost!: number;
 }
@@ -74,7 +85,10 @@ export class ReceiveGoodsItemDto {
   @IsUUID()
   purchaseOrderItemId!: string;
 
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'receivedQty must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'receivedQty must have maximum 4 decimal places' },
+  )
   @Min(0.0001, { message: 'receivedQty must be greater than 0' })
   receivedQty!: number;
 }
@@ -100,7 +114,10 @@ export class ReturnGoodsItemDto {
   @IsUUID()
   productId!: string;
 
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'quantity must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'quantity must have maximum 4 decimal places' },
+  )
   @Min(0.0001, { message: 'quantity must be greater than 0' })
   quantity!: number;
 }
@@ -111,7 +128,10 @@ export class ReturnGoodsDto {
   reason!: string;
 
   @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'refundAmount must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'refundAmount must have maximum 4 decimal places' },
+  )
   @Min(0, { message: 'refundAmount cannot be negative' })
   refundAmount?: number;
 

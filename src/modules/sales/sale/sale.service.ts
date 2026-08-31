@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { Prisma } from 'src/generated/phase-1-prisma/client';
 import {
@@ -12,7 +17,12 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
-import { CreateSaleDto, CreateSaleReturnDto, VoidSaleDto } from './dto/sale.dto';
+import {
+  CreateSaleDto,
+  CreateSaleReturnDto,
+  ListSalesQueryDto,
+  VoidSaleDto,
+} from './dto/sale.dto';
 
 const SALE_SELECT = {
   id: true,
@@ -32,7 +42,16 @@ const SALE_SELECT = {
   note: true,
   createdAt: true,
   items: {
-    select: { id: true, productId: true, productName: true, quantity: true, unitPrice: true, unitCost: true, discountAmount: true, subtotal: true },
+    select: {
+      id: true,
+      productId: true,
+      productName: true,
+      quantity: true,
+      unitPrice: true,
+      unitCost: true,
+      discountAmount: true,
+      subtotal: true,
+    },
   },
   payments: {
     select: { id: true, method: true, amount: true },
@@ -50,13 +69,32 @@ export class SaleService {
     private readonly inventoryService: InventoryService,
   ) {}
 
-  async list(context: CompanyContext) {
-    const sales = await this.prisma.sale.findMany({
-      where: { tenantId: context.tenantId, companyId: context.companyId },
-      select: SALE_SELECT,
-      orderBy: { createdAt: 'desc' },
-    });
-    return { success: true, count: sales.length, data: sales };
+  async list(context: CompanyContext, query: ListSalesQueryDto = {}) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 50;
+    const skip = (page - 1) * limit;
+    const where: Prisma.SaleWhereInput = {
+      tenantId: context.tenantId,
+      companyId: context.companyId,
+      ...(query.locationId ? { locationId: query.locationId } : {}),
+    };
+
+    const [sales, total] = await this.prisma.$transaction([
+      this.prisma.sale.findMany({
+        where,
+        select: SALE_SELECT,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.sale.count({ where }),
+    ]);
+
+    return {
+      success: true,
+      data: sales,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async findOne(context: CompanyContext, id: string) {
@@ -71,35 +109,61 @@ export class SaleService {
    * `allowNegative` read from CompanySettings — this, not a hardcoded
    * false, is the one place that setting is actually meant to apply.
    */
-  async create(context: CompanyContext, dto: CreateSaleDto, actor: AuthenticatedUser) {
+  async create(
+    context: CompanyContext,
+    dto: CreateSaleDto,
+    actor: AuthenticatedUser,
+  ) {
     const settings = await this.prisma.companySettings.findUniqueOrThrow({
       where: { companyId: context.companyId },
-      select: { allowNegativeStock: true, enableTax: true, defaultTaxRate: true, maxCustomerDueLimit: true },
+      select: {
+        allowNegativeStock: true,
+        enableTax: true,
+        defaultTaxRate: true,
+        maxCustomerDueLimit: true,
+      },
     });
 
     const productIds = [...new Set(dto.items.map((item) => item.productId))];
     const products = await this.prisma.product.findMany({
-      where: { id: { in: productIds }, tenantId: context.tenantId, companyId: context.companyId },
+      where: {
+        id: { in: productIds },
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
       select: { id: true, name: true, salePrice: true, costPrice: true },
     });
     const productsById = new Map(products.map((p) => [p.id, p]));
     for (const item of dto.items) {
       if (!productsById.has(item.productId)) {
-        throw new BadRequestException(`productId ${item.productId} does not belong to this company`);
+        throw new BadRequestException(
+          `productId ${item.productId} does not belong to this company`,
+        );
       }
     }
 
-    const duePayments = dto.payments.filter((p) => p.method === SalePaymentMethod.DUE);
+    const duePayments = dto.payments.filter(
+      (p) => p.method === SalePaymentMethod.DUE,
+    );
     if (duePayments.length > 0 && !dto.customerId) {
-      throw new BadRequestException('A customerId is required when any payment uses the DUE method');
+      throw new BadRequestException(
+        'A customerId is required when any payment uses the DUE method',
+      );
     }
     let customer: { id: string; dueBalance: Prisma.Decimal } | null = null;
     if (dto.customerId) {
       const found = await this.prisma.customer.findFirst({
-        where: { id: dto.customerId, tenantId: context.tenantId, companyId: context.companyId },
+        where: {
+          id: dto.customerId,
+          tenantId: context.tenantId,
+          companyId: context.companyId,
+        },
         select: { id: true, dueBalance: true },
       });
-      if (!found) throw new BadRequestException('customerId does not belong to this company');
+      if (!found)
+        throw new BadRequestException(
+          'customerId does not belong to this company',
+        );
       customer = found;
     }
 
@@ -112,22 +176,36 @@ export class SaleService {
       return { item, product, unitPrice, discountAmount, lineSubtotal };
     });
 
-    const subtotal = lineItems.reduce((sum, l) => sum + l.item.quantity * l.unitPrice, 0);
-    const itemDiscountTotal = lineItems.reduce((sum, l) => sum + l.discountAmount, 0);
+    const subtotal = lineItems.reduce(
+      (sum, l) => sum + l.item.quantity * l.unitPrice,
+      0,
+    );
+    const itemDiscountTotal = lineItems.reduce(
+      (sum, l) => sum + l.discountAmount,
+      0,
+    );
     const afterItemDiscounts = subtotal - itemDiscountTotal;
     const saleDiscountAmount = dto.saleDiscountAmount ?? 0;
     const afterSaleDiscount = afterItemDiscounts - saleDiscountAmount;
-    const taxAmount = settings.enableTax ? afterSaleDiscount * (Number(settings.defaultTaxRate) / 100) : 0;
+    const taxAmount = settings.enableTax
+      ? afterSaleDiscount * (Number(settings.defaultTaxRate) / 100)
+      : 0;
     const totalAmount = roundToNearestUnit(afterSaleDiscount + taxAmount);
 
     const paymentsTotal = dto.payments.reduce((sum, p) => sum + p.amount, 0);
     if (Math.abs(paymentsTotal - totalAmount) > 0.01) {
-      throw new BadRequestException(`Sum of payments (${paymentsTotal}) must equal the computed total (${totalAmount})`);
+      throw new BadRequestException(
+        `Sum of payments (${paymentsTotal}) must equal the computed total (${totalAmount})`,
+      );
     }
 
     const dueAmountThisSale = duePayments.reduce((sum, p) => sum + p.amount, 0);
     const warnings: string[] = [];
-    if (customer && settings.maxCustomerDueLimit != null && dueAmountThisSale > 0) {
+    if (
+      customer &&
+      settings.maxCustomerDueLimit != null &&
+      dueAmountThisSale > 0
+    ) {
       const projectedDue = Number(customer.dueBalance) + dueAmountThisSale;
       if (projectedDue > Number(settings.maxCustomerDueLimit)) {
         warnings.push('DUE_LIMIT_EXCEEDED');
@@ -182,7 +260,10 @@ export class SaleService {
               })),
             },
             payments: {
-              create: dto.payments.map((p) => ({ method: p.method, amount: p.amount })),
+              create: dto.payments.map((p) => ({
+                method: p.method,
+                amount: p.amount,
+              })),
             },
           },
           select: SALE_SELECT,
@@ -221,12 +302,22 @@ export class SaleService {
           });
         }
 
-        await this.createAudit(tx, context, actor.userId, 'SALE_CREATED', created.id, null, created);
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'SALE_CREATED',
+          created.id,
+          null,
+          created,
+        );
         return created;
       });
     } catch (error) {
       if (error instanceof ConflictException) {
-        throw new BadRequestException('INSUFFICIENT_STOCK: not enough stock for one or more items in this sale');
+        throw new BadRequestException(
+          'INSUFFICIENT_STOCK: not enough stock for one or more items in this sale',
+        );
       }
       throw error;
     }
@@ -242,10 +333,17 @@ export class SaleService {
    * model an explicit cash-refund transaction — that belongs to the
    * Cash Drawer phase.
    */
-  async void(context: CompanyContext, id: string, dto: VoidSaleDto, actor: AuthenticatedUser) {
+  async void(
+    context: CompanyContext,
+    id: string,
+    dto: VoidSaleDto,
+    actor: AuthenticatedUser,
+  ) {
     const before = await this.requireSale(context, id);
     if (before.status !== SaleStatus.COMPLETED) {
-      throw new BadRequestException(`Sale cannot be voided from ${before.status} state`);
+      throw new BadRequestException(
+        `Sale cannot be voided from ${before.status} state`,
+      );
     }
 
     const dueAmount = before.payments
@@ -297,7 +395,15 @@ export class SaleService {
         select: SALE_SELECT,
       });
 
-      await this.createAudit(tx, context, actor.userId, 'SALE_VOIDED', updated.id, before, updated);
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'SALE_VOIDED',
+        updated.id,
+        before,
+        updated,
+      );
       return updated;
     });
 
@@ -311,13 +417,22 @@ export class SaleService {
    * Purchase Returns on cash purchases — a walk-in cash sale's return
    * doesn't touch any ledger).
    */
-  async createReturn(context: CompanyContext, id: string, dto: CreateSaleReturnDto, actor: AuthenticatedUser) {
+  async createReturn(
+    context: CompanyContext,
+    id: string,
+    dto: CreateSaleReturnDto,
+    actor: AuthenticatedUser,
+  ) {
     const sale = await this.requireSale(context, id);
     if (sale.status !== SaleStatus.COMPLETED) {
-      throw new BadRequestException(`Cannot return items for a sale in ${sale.status} state`);
+      throw new BadRequestException(
+        `Cannot return items for a sale in ${sale.status} state`,
+      );
     }
 
-    const itemsByProductId = new Map(sale.items.map((item) => [item.productId, item]));
+    const itemsByProductId = new Map(
+      sale.items.map((item) => [item.productId, item]),
+    );
 
     const result = await this.prisma.$transaction(async (tx) => {
       const saleReturn = await tx.saleReturn.create({
@@ -334,7 +449,9 @@ export class SaleService {
       for (const line of dto.items) {
         const saleItem = itemsByProductId.get(line.productId);
         if (!saleItem) {
-          throw new BadRequestException(`productId ${line.productId} was not part of this sale`);
+          throw new BadRequestException(
+            `productId ${line.productId} was not part of this sale`,
+          );
         }
         await this.inventoryService.increaseStock(tx, {
           tenantId: context.tenantId,
@@ -369,7 +486,15 @@ export class SaleService {
         });
       }
 
-      await this.createAudit(tx, context, actor.userId, 'SALE_RETURN_CREATED', saleReturn.id, null, saleReturn);
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'SALE_RETURN_CREATED',
+        saleReturn.id,
+        null,
+        saleReturn,
+      );
       return saleReturn;
     });
 
@@ -378,7 +503,11 @@ export class SaleService {
 
   async listReturns(context: CompanyContext, saleId?: string) {
     const returns = await this.prisma.saleReturn.findMany({
-      where: { tenantId: context.tenantId, companyId: context.companyId, ...(saleId ? { saleId } : {}) },
+      where: {
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+        ...(saleId ? { saleId } : {}),
+      },
       orderBy: { createdAt: 'desc' },
     });
     return { success: true, count: returns.length, data: returns };
@@ -394,7 +523,10 @@ export class SaleService {
   }
 
   /** Company-scoped sequence, mirrors PurchaseOrderService.reserveOrderNumber() exactly. */
-  private async reserveSaleNumber(tx: Prisma.TransactionClient, context: CompanyContext): Promise<string> {
+  private async reserveSaleNumber(
+    tx: Prisma.TransactionClient,
+    context: CompanyContext,
+  ): Promise<string> {
     const yearKey = String(new Date().getFullYear());
 
     const rows = await tx.$queryRaw<{ lastNumber: number }[]>`
@@ -431,8 +563,8 @@ export class SaleService {
         action,
         entityType: 'Sale',
         entityId,
-        ...(beforeData === null ? {} : { beforeData: beforeData as Prisma.InputJsonValue }),
-        ...(afterData === null ? {} : { afterData: afterData as Prisma.InputJsonValue }),
+        ...(beforeData === null ? {} : { beforeData: beforeData }),
+        ...(afterData === null ? {} : { afterData: afterData }),
       },
     });
   }

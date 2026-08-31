@@ -51,7 +51,9 @@ describe('Business Ops Purchase + Stock Transfer — multi-tenant isolation (int
   };
 
   beforeAll(async () => {
-    moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
 
     prisma = moduleRef.get(PrismaService);
     companyManagementService = moduleRef.get(CompanyManagementService);
@@ -63,18 +65,44 @@ describe('Business Ops Purchase + Stock Transfer — multi-tenant isolation (int
     stockTransferService = moduleRef.get(StockTransferService);
 
     const companyA = await companyManagementService.create(
-      { tenantId: TENANT_1, industryId: INDUSTRY_ID, code: 'PURISOA', legalName: 'Purchase Isolation A (disposable)', baseCurrencyCode: 'BDT' } as any,
+      {
+        tenantId: TENANT_1,
+        industryId: INDUSTRY_ID,
+        code: 'PURISOA',
+        legalName: 'Purchase Isolation A (disposable)',
+        baseCurrencyCode: 'BDT',
+      },
       CREATOR_USER_ID,
     );
     const companyB = await companyManagementService.create(
-      { tenantId: TENANT_2, industryId: INDUSTRY_ID, code: 'PURISOB', legalName: 'Purchase Isolation B (disposable)', baseCurrencyCode: 'BDT' } as any,
+      {
+        tenantId: TENANT_2,
+        industryId: INDUSTRY_ID,
+        code: 'PURISOB',
+        legalName: 'Purchase Isolation B (disposable)',
+        baseCurrencyCode: 'BDT',
+      },
       CREATOR_USER_ID,
     );
 
     companyAId = companyA.id;
     companyBId = companyB.id;
-    contextA = { tenantId: TENANT_1, companyId: companyAId, companyMemberId: 'n/a', companyStatus: 'DRAFT', tenantStatus: 'ACTIVE', scopes: [] };
-    contextB = { tenantId: TENANT_2, companyId: companyBId, companyMemberId: 'n/a', companyStatus: 'DRAFT', tenantStatus: 'ACTIVE', scopes: [] };
+    contextA = {
+      tenantId: TENANT_1,
+      companyId: companyAId,
+      companyMemberId: 'n/a',
+      companyStatus: 'DRAFT',
+      tenantStatus: 'ACTIVE',
+      scopes: [],
+    };
+    contextB = {
+      tenantId: TENANT_2,
+      companyId: companyBId,
+      companyMemberId: 'n/a',
+      companyStatus: 'DRAFT',
+      tenantStatus: 'ACTIVE',
+      scopes: [],
+    };
   }, 30000);
 
   afterAll(async () => {
@@ -84,7 +112,9 @@ describe('Business Ops Purchase + Stock Transfer — multi-tenant isolation (int
       await prisma.supplierPayableLedger.deleteMany({ where: { companyId } });
       await prisma.purchaseReturn.deleteMany({ where: { companyId } });
       await prisma.goodsReceipt.deleteMany({ where: { companyId } });
-      await prisma.purchaseOrderItem.deleteMany({ where: { purchaseOrder: { companyId } } });
+      await prisma.purchaseOrderItem.deleteMany({
+        where: { purchaseOrder: { companyId } },
+      });
       await prisma.purchaseOrder.deleteMany({ where: { companyId } });
       await prisma.purchaseOrderSequence.deleteMany({ where: { companyId } });
       await prisma.stockMovement.deleteMany({ where: { companyId } });
@@ -102,27 +132,51 @@ describe('Business Ops Purchase + Stock Transfer — multi-tenant isolation (int
 
   it('gives both companies their own independent order-number sequence, starting at PO-<year>-000001 each, despite sharing a tenant-agnostic year key', async () => {
     const [locA, unitA, supA] = await Promise.all([
-      locationService.create(contextA, { name: 'Main', locationType: 'WAREHOUSE' as any }, actor),
+      locationService.create(
+        contextA,
+        { name: 'Main', locationType: 'WAREHOUSE' as any },
+        actor,
+      ),
       unitService.create(contextA, { name: 'Piece', code: 'PCS' }, actor),
       supplierService.create(contextA, { name: 'Supplier A' }, actor),
     ]);
-    const productA = await productService.create(contextA, { sku: 'SHARED', name: 'Shared SKU', baseUnitId: unitA.data.id }, actor);
+    const productA = await productService.create(
+      contextA,
+      { sku: 'SHARED', name: 'Shared SKU', baseUnitId: unitA.data.id },
+      actor,
+    );
 
     const [locB, unitB, supB] = await Promise.all([
-      locationService.create(contextB, { name: 'Main', locationType: 'WAREHOUSE' as any }, actor),
+      locationService.create(
+        contextB,
+        { name: 'Main', locationType: 'WAREHOUSE' as any },
+        actor,
+      ),
       unitService.create(contextB, { name: 'Piece', code: 'PCS' }, actor),
       supplierService.create(contextB, { name: 'Supplier A' }, actor),
     ]);
-    const productB = await productService.create(contextB, { sku: 'SHARED', name: 'Shared SKU', baseUnitId: unitB.data.id }, actor);
+    const productB = await productService.create(
+      contextB,
+      { sku: 'SHARED', name: 'Shared SKU', baseUnitId: unitB.data.id },
+      actor,
+    );
 
     const poA = await purchaseOrderService.create(
       contextA,
-      { supplierId: supA.data.id, locationId: locA.data.id, items: [{ productId: productA.data.id, orderedQty: 10, unitCost: 5 }] } as any,
+      {
+        supplierId: supA.data.id,
+        locationId: locA.data.id,
+        items: [{ productId: productA.data.id, orderedQty: 10, unitCost: 5 }],
+      },
       actor,
     );
     const poB = await purchaseOrderService.create(
       contextB,
-      { supplierId: supB.data.id, locationId: locB.data.id, items: [{ productId: productB.data.id, orderedQty: 10, unitCost: 5 }] } as any,
+      {
+        supplierId: supB.data.id,
+        locationId: locB.data.id,
+        items: [{ productId: productB.data.id, orderedQty: 10, unitCost: 5 }],
+      },
       actor,
     );
 
@@ -132,19 +186,54 @@ describe('Business Ops Purchase + Stock Transfer — multi-tenant isolation (int
   }, 30000);
 
   it("Company A cannot read or receive against Company B's PurchaseOrder by id", async () => {
-    const locB = await locationService.create(contextB, { name: 'Cross-Read-Target', locationType: 'WAREHOUSE' as any }, actor);
-    const unitB = await unitService.create(contextB, { name: 'Box', code: 'BOX' }, actor);
-    const productB = await productService.create(contextB, { sku: 'CROSS-READ', name: 'Cross Read Product', baseUnitId: unitB.data.id }, actor);
-    const supB = await supplierService.create(contextB, { name: 'Cross Read Supplier' }, actor);
+    const locB = await locationService.create(
+      contextB,
+      { name: 'Cross-Read-Target', locationType: 'WAREHOUSE' },
+      actor,
+    );
+    const unitB = await unitService.create(
+      contextB,
+      { name: 'Box', code: 'BOX' },
+      actor,
+    );
+    const productB = await productService.create(
+      contextB,
+      {
+        sku: 'CROSS-READ',
+        name: 'Cross Read Product',
+        baseUnitId: unitB.data.id,
+      },
+      actor,
+    );
+    const supB = await supplierService.create(
+      contextB,
+      { name: 'Cross Read Supplier' },
+      actor,
+    );
     const poB = await purchaseOrderService.create(
       contextB,
-      { supplierId: supB.data.id, locationId: locB.data.id, items: [{ productId: productB.data.id, orderedQty: 5, unitCost: 10 }] } as any,
+      {
+        supplierId: supB.data.id,
+        locationId: locB.data.id,
+        items: [{ productId: productB.data.id, orderedQty: 5, unitCost: 10 }],
+      },
       actor,
     );
 
-    await expect(purchaseOrderService.findOne(contextA, poB.data.id)).rejects.toThrow(NotFoundException);
     await expect(
-      purchaseOrderService.receive(contextA, poB.data.id, { items: [{ purchaseOrderItemId: poB.data.items[0].id, receivedQty: 1 }] } as any, actor),
+      purchaseOrderService.findOne(contextA, poB.data.id),
+    ).rejects.toThrow(NotFoundException);
+    await expect(
+      purchaseOrderService.receive(
+        contextA,
+        poB.data.id,
+        {
+          items: [
+            { purchaseOrderItemId: poB.data.items[0].id, receivedQty: 1 },
+          ],
+        } as any,
+        actor,
+      ),
     ).rejects.toThrow(NotFoundException);
 
     // Confirm Company B's order is untouched by the rejected cross-tenant attempt.
@@ -153,10 +242,30 @@ describe('Business Ops Purchase + Stock Transfer — multi-tenant isolation (int
   }, 30000);
 
   it("Company A's StockTransfer cannot reference or affect Company B's Location/Inventory even by id", async () => {
-    const locA1 = await locationService.create(contextA, { name: 'A-From', locationType: 'WAREHOUSE' as any }, actor);
-    const locB1 = await locationService.create(contextB, { name: 'B-Isolated-Target', locationType: 'BRANCH' as any }, actor);
-    const unitA = await unitService.create(contextA, { name: 'Unit-X', code: 'UX' }, actor);
-    const productA = await productService.create(contextA, { sku: 'TRANSFER-ISO', name: 'Transfer Iso Product', baseUnitId: unitA.data.id }, actor);
+    const locA1 = await locationService.create(
+      contextA,
+      { name: 'A-From', locationType: 'WAREHOUSE' },
+      actor,
+    );
+    const locB1 = await locationService.create(
+      contextB,
+      { name: 'B-Isolated-Target', locationType: 'BRANCH' },
+      actor,
+    );
+    const unitA = await unitService.create(
+      contextA,
+      { name: 'Unit-X', code: 'UX' },
+      actor,
+    );
+    const productA = await productService.create(
+      contextA,
+      {
+        sku: 'TRANSFER-ISO',
+        name: 'Transfer Iso Product',
+        baseUnitId: unitA.data.id,
+      },
+      actor,
+    );
 
     // Attempting to create a transfer for Company A that targets Company B's Location by id.
     // Nothing in the service layer cross-checks fromLocationId/toLocationId ownership at
@@ -165,7 +274,12 @@ describe('Business Ops Purchase + Stock Transfer — multi-tenant isolation (int
     // never succeeds using Company A's context, and Company B's Inventory stays untouched.
     const transfer = await stockTransferService.create(
       contextA,
-      { fromLocationId: locA1.data.id, toLocationId: locB1.data.id, productId: productA.data.id, quantity: 1 } as any,
+      {
+        fromLocationId: locA1.data.id,
+        toLocationId: locB1.data.id,
+        productId: productA.data.id,
+        quantity: 1,
+      },
       actor,
     );
 
@@ -173,11 +287,15 @@ describe('Business Ops Purchase + Stock Transfer — multi-tenant isolation (int
     // and the row belongs to A), but the resulting TRANSFER_OUT movement is written under
     // Company A's tenantId/companyId only — prove Company B's Inventory for its own Location
     // is never created/touched as a side effect.
-    await expect(stockTransferService.dispatch(contextA, transfer.data.id, actor)).rejects.toThrow();
+    await expect(
+      stockTransferService.dispatch(contextA, transfer.data.id, actor),
+    ).rejects.toThrow();
     // (fromLocation has 0 stock, so this correctly fails as insufficient stock — the isolation
     // proof is the assertion below, not this rejection itself.)
 
-    const bInventoryForThatLocation = await prisma.inventory.findMany({ where: { companyId: companyBId, locationId: locB1.data.id } });
+    const bInventoryForThatLocation = await prisma.inventory.findMany({
+      where: { companyId: companyBId, locationId: locB1.data.id },
+    });
     expect(bInventoryForThatLocation.length).toBe(0);
   }, 30000);
 });

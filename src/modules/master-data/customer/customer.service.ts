@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { Prisma } from 'src/generated/phase-1-prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
@@ -37,7 +41,11 @@ export class CustomerService {
     return { success: true, data: customer };
   }
 
-  async create(context: CompanyContext, dto: CreateCustomerDto, actor: AuthenticatedUser) {
+  async create(
+    context: CompanyContext,
+    dto: CreateCustomerDto,
+    actor: AuthenticatedUser,
+  ) {
     try {
       const customer = await this.prisma.$transaction(async (tx) => {
         const created = await tx.customer.create({
@@ -52,17 +60,33 @@ export class CustomerService {
           },
           select: CUSTOMER_SELECT,
         });
-        await this.createAudit(tx, context, actor.userId, 'CUSTOMER_CREATED', created.id, null, created);
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'CUSTOMER_CREATED',
+          created.id,
+          null,
+          created,
+        );
         return created;
       });
       return { success: true, data: customer };
     } catch (error) {
-      this.throwKnownConflict(error, 'A customer with this phone number already exists in this company');
+      this.throwKnownConflict(
+        error,
+        'A customer with this phone number already exists in this company',
+      );
       throw error;
     }
   }
 
-  async update(context: CompanyContext, id: string, dto: UpdateCustomerDto, actor: AuthenticatedUser) {
+  async update(
+    context: CompanyContext,
+    id: string,
+    dto: UpdateCustomerDto,
+    actor: AuthenticatedUser,
+  ) {
     const before = await this.requireCustomer(context, id);
     try {
       const customer = await this.prisma.$transaction(async (tx) => {
@@ -70,20 +94,39 @@ export class CustomerService {
           where: { id },
           data: {
             ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
-            ...(dto.phone !== undefined ? { phone: dto.phone.trim() || null } : {}),
-            ...(dto.email !== undefined ? { email: dto.email.trim() || null } : {}),
-            ...(dto.address !== undefined ? { address: dto.address.trim() || null } : {}),
-            ...(dto.customerType !== undefined ? { customerType: dto.customerType } : {}),
+            ...(dto.phone !== undefined
+              ? { phone: dto.phone.trim() || null }
+              : {}),
+            ...(dto.email !== undefined
+              ? { email: dto.email.trim() || null }
+              : {}),
+            ...(dto.address !== undefined
+              ? { address: dto.address.trim() || null }
+              : {}),
+            ...(dto.customerType !== undefined
+              ? { customerType: dto.customerType }
+              : {}),
             ...(dto.status !== undefined ? { status: dto.status } : {}),
           },
           select: CUSTOMER_SELECT,
         });
-        await this.createAudit(tx, context, actor.userId, 'CUSTOMER_UPDATED', updated.id, before, updated);
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'CUSTOMER_UPDATED',
+          updated.id,
+          before,
+          updated,
+        );
         return updated;
       });
       return { success: true, data: customer };
     } catch (error) {
-      this.throwKnownConflict(error, 'A customer with this phone number already exists in this company');
+      this.throwKnownConflict(
+        error,
+        'A customer with this phone number already exists in this company',
+      );
       throw error;
     }
   }
@@ -115,14 +158,17 @@ export class CustomerService {
         action,
         entityType: 'Customer',
         entityId,
-        ...(beforeData === null ? {} : { beforeData: beforeData as Prisma.InputJsonValue }),
-        ...(afterData === null ? {} : { afterData: afterData as Prisma.InputJsonValue }),
+        ...(beforeData === null ? {} : { beforeData: beforeData }),
+        ...(afterData === null ? {} : { afterData: afterData }),
       },
     });
   }
 
   private throwKnownConflict(error: unknown, message: string): never | void {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
       throw new ConflictException(message);
     }
   }

@@ -50,9 +50,14 @@ interface ProfitReportCsvRow {
 export class ProfitReportService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private buildBaseWhere(context: CompanyContext, query: Pick<DateRangeReportQueryDto, 'dateFrom' | 'dateTo' | 'locationId'>) {
+  private buildBaseWhere(
+    context: CompanyContext,
+    query: Pick<DateRangeReportQueryDto, 'dateFrom' | 'dateTo' | 'locationId'>,
+  ) {
     const { from, to } = parseReportDateRange(query.dateFrom, query.dateTo);
-    const locationFilter = query.locationId ? Prisma.sql`AND s."locationId" = ${query.locationId}::uuid` : Prisma.empty;
+    const locationFilter = query.locationId
+      ? Prisma.sql`AND s."locationId" = ${query.locationId}::uuid`
+      : Prisma.empty;
     return Prisma.sql`
       s."tenantId" = ${context.tenantId}::uuid
       AND s."companyId" = ${context.companyId}::uuid
@@ -63,7 +68,10 @@ export class ProfitReportService {
     `;
   }
 
-  async getProfitReport(context: CompanyContext, query: DateRangeReportQueryDto) {
+  async getProfitReport(
+    context: CompanyContext,
+    query: DateRangeReportQueryDto,
+  ) {
     const baseWhere = this.buildBaseWhere(context, query);
     const page = query.page ?? 1;
     const limit = query.limit ?? 50;
@@ -138,7 +146,10 @@ export class ProfitReportService {
   }
 
   /** All day-buckets for the range in one query — inherently small (at most a few thousand rows even across years), so no batching is needed beyond the util's own single-shot contract. */
-  streamProfitReportCsv(context: CompanyContext, query: DateRangeReportQueryDto) {
+  streamProfitReportCsv(
+    context: CompanyContext,
+    query: DateRangeReportQueryDto,
+  ) {
     const baseWhere = this.buildBaseWhere(context, query);
     let served = false;
 
@@ -173,7 +184,13 @@ export class ProfitReportService {
         return rows.map((row) => {
           const revenue = toDecimal(row.revenue);
           const cogs = toDecimal(row.cogs);
-          return { date: row.day.toISOString().slice(0, 10), saleCount: row.sale_count, revenue, cogs, grossProfit: revenue.minus(cogs) };
+          return {
+            date: row.day.toISOString().slice(0, 10),
+            saleCount: row.sale_count,
+            revenue,
+            cogs,
+            grossProfit: revenue.minus(cogs),
+          };
         });
       },
     );

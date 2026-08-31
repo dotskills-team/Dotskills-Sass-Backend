@@ -1,4 +1,11 @@
-import { IsNumber, IsOptional, IsString, IsUUID, MaxLength, Min } from 'class-validator';
+import {
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class OpenCashDrawerSessionDto {
   @IsUUID()
@@ -10,13 +17,19 @@ export class OpenCashDrawerSessionDto {
    * actualClosingBalance whenever one exists, ignoring this field.
    */
   @IsOptional()
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'openingBalance must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'openingBalance must have maximum 4 decimal places' },
+  )
   @Min(0, { message: 'openingBalance cannot be negative' })
   openingBalance?: number;
 }
 
 export class CloseCashDrawerSessionDto {
-  @IsNumber({ maxDecimalPlaces: 4 }, { message: 'actualClosingBalance must have maximum 4 decimal places' })
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'actualClosingBalance must have maximum 4 decimal places' },
+  )
   @Min(0, { message: 'actualClosingBalance cannot be negative' })
   actualClosingBalance!: number;
 

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 
 import { COMPANY_PERMISSIONS } from '../../../common/constants/permission.constants';
 import { CurrentCompany } from '../../../common/decorators/current-company.decorator';
@@ -11,10 +19,18 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import { CashDrawerSessionService } from './cash-drawer.service';
-import { CloseCashDrawerSessionDto, OpenCashDrawerSessionDto } from './dto/cash-drawer.dto';
+import {
+  CloseCashDrawerSessionDto,
+  OpenCashDrawerSessionDto,
+} from './dto/cash-drawer.dto';
 
 @Controller('companies/:companyId/cash-drawer-sessions')
-@UseGuards(JwtAuthGuard, CompanyContextGuard, SubscriptionStatusGuard, CompanyPermissionsGuard)
+@UseGuards(
+  JwtAuthGuard,
+  CompanyContextGuard,
+  SubscriptionStatusGuard,
+  CompanyPermissionsGuard,
+)
 export class CashDrawerSessionController {
   constructor(private readonly service: CashDrawerSessionService) {}
 

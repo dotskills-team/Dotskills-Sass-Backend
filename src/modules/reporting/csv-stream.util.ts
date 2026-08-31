@@ -36,7 +36,11 @@ export function createCsvStream<T>(
       try {
         if (!headerWritten) {
           headerWritten = true;
-          this.push('﻿' + columns.map((c) => escapeCsvField(c.header)).join(',') + '\r\n');
+          this.push(
+            '﻿' +
+              columns.map((c) => escapeCsvField(c.header)).join(',') +
+              '\r\n',
+          );
           return;
         }
         const batch = await fetchPage(skip, batchSize);
@@ -46,7 +50,11 @@ export function createCsvStream<T>(
           return;
         }
         skip += batch.length;
-        const lines = batch.map((row) => columns.map((c) => escapeCsvField(c.value(row))).join(',')).join('\r\n');
+        const lines = batch
+          .map((row) =>
+            columns.map((c) => escapeCsvField(c.value(row))).join(','),
+          )
+          .join('\r\n');
         this.push(lines + '\r\n');
         if (batch.length < batchSize) {
           done = true;

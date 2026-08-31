@@ -115,7 +115,9 @@ describe('SubscriptionService.createTrialForNewCompany', () => {
     );
     expect(mockTx.subscriptionEvent.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ reason: 'AUTO_TRIAL_ON_COMPANY_CREATE' }),
+        data: expect.objectContaining({
+          reason: 'AUTO_TRIAL_ON_COMPANY_CREATE',
+        }),
       }),
     );
     expect(result.status).toBe(SubscriptionStatus.TRIALING);
@@ -173,7 +175,11 @@ describe('SubscriptionService.updateAutoRenewForPlatform', () => {
     mockPrisma.subscription.findUnique.mockResolvedValue(null);
 
     await expect(
-      service.updateAutoRenewForPlatform('missing-id', { autoRenew: false }, context as any),
+      service.updateAutoRenewForPlatform(
+        'missing-id',
+        { autoRenew: false },
+        context as any,
+      ),
     ).rejects.toThrow(NotFoundException);
 
     expect(mockTx.subscription.update).not.toHaveBeenCalled();
@@ -182,10 +188,17 @@ describe('SubscriptionService.updateAutoRenewForPlatform', () => {
   it.each([SubscriptionStatus.CANCELLED, SubscriptionStatus.EXPIRED])(
     'rejects when the subscription is %s',
     async (status) => {
-      mockPrisma.subscription.findUnique.mockResolvedValue({ ...activeSubscription, status });
+      mockPrisma.subscription.findUnique.mockResolvedValue({
+        ...activeSubscription,
+        status,
+      });
 
       await expect(
-        service.updateAutoRenewForPlatform('sub-1', { autoRenew: false }, context as any),
+        service.updateAutoRenewForPlatform(
+          'sub-1',
+          { autoRenew: false },
+          context as any,
+        ),
       ).rejects.toThrow(BadRequestException);
 
       expect(mockTx.subscription.update).not.toHaveBeenCalled();
@@ -196,7 +209,7 @@ describe('SubscriptionService.updateAutoRenewForPlatform', () => {
     const result = await service.updateAutoRenewForPlatform(
       'sub-1',
       { autoRenew: false },
-      context as any,
+      context,
     );
 
     expect(mockTx.subscription.update).toHaveBeenCalledWith({

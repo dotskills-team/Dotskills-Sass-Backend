@@ -36,23 +36,45 @@ export class CompanySettingsService {
    * itself, see CompanyManagementService.create()) — there is deliberately
    * no create endpoint here, only read + update.
    */
-  async update(context: CompanyContext, dto: UpdateCompanySettingsDto, actor: AuthenticatedUser) {
+  async update(
+    context: CompanyContext,
+    dto: UpdateCompanySettingsDto,
+    actor: AuthenticatedUser,
+  ) {
     const before = await this.requireSettings(context);
 
     const settings = await this.prisma.$transaction(async (tx) => {
       const updated = await tx.companySettings.update({
         where: { companyId: context.companyId },
         data: {
-          ...(dto.enableMultiUnit !== undefined ? { enableMultiUnit: dto.enableMultiUnit } : {}),
-          ...(dto.enableCustomerDue !== undefined ? { enableCustomerDue: dto.enableCustomerDue } : {}),
-          ...(dto.enableBarcode !== undefined ? { enableBarcode: dto.enableBarcode } : {}),
-          ...(dto.enableProductVariant !== undefined ? { enableProductVariant: dto.enableProductVariant } : {}),
-          ...(dto.enableComboOffer !== undefined ? { enableComboOffer: dto.enableComboOffer } : {}),
-          ...(dto.enableMultiLocation !== undefined ? { enableMultiLocation: dto.enableMultiLocation } : {}),
-          ...(dto.allowNegativeStock !== undefined ? { allowNegativeStock: dto.allowNegativeStock } : {}),
-          ...(dto.maxCustomerDueLimit !== undefined ? { maxCustomerDueLimit: dto.maxCustomerDueLimit } : {}),
+          ...(dto.enableMultiUnit !== undefined
+            ? { enableMultiUnit: dto.enableMultiUnit }
+            : {}),
+          ...(dto.enableCustomerDue !== undefined
+            ? { enableCustomerDue: dto.enableCustomerDue }
+            : {}),
+          ...(dto.enableBarcode !== undefined
+            ? { enableBarcode: dto.enableBarcode }
+            : {}),
+          ...(dto.enableProductVariant !== undefined
+            ? { enableProductVariant: dto.enableProductVariant }
+            : {}),
+          ...(dto.enableComboOffer !== undefined
+            ? { enableComboOffer: dto.enableComboOffer }
+            : {}),
+          ...(dto.enableMultiLocation !== undefined
+            ? { enableMultiLocation: dto.enableMultiLocation }
+            : {}),
+          ...(dto.allowNegativeStock !== undefined
+            ? { allowNegativeStock: dto.allowNegativeStock }
+            : {}),
+          ...(dto.maxCustomerDueLimit !== undefined
+            ? { maxCustomerDueLimit: dto.maxCustomerDueLimit }
+            : {}),
           ...(dto.enableTax !== undefined ? { enableTax: dto.enableTax } : {}),
-          ...(dto.defaultTaxRate !== undefined ? { defaultTaxRate: dto.defaultTaxRate } : {}),
+          ...(dto.defaultTaxRate !== undefined
+            ? { defaultTaxRate: dto.defaultTaxRate }
+            : {}),
         },
         select: SETTINGS_SELECT,
       });
@@ -65,8 +87,8 @@ export class CompanySettingsService {
           action: 'COMPANY_SETTINGS_UPDATED',
           entityType: 'CompanySettings',
           entityId: updated.id,
-          beforeData: before as unknown as Prisma.InputJsonValue,
-          afterData: updated as unknown as Prisma.InputJsonValue,
+          beforeData: before,
+          afterData: updated,
         },
       });
       return updated;
@@ -80,7 +102,8 @@ export class CompanySettingsService {
       where: { tenantId: context.tenantId, companyId: context.companyId },
       select: SETTINGS_SELECT,
     });
-    if (!settings) throw new NotFoundException('Company settings were not found');
+    if (!settings)
+      throw new NotFoundException('Company settings were not found');
     return settings;
   }
 }

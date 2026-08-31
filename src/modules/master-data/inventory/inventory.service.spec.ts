@@ -37,7 +37,10 @@ describe('InventoryService', () => {
     jest.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [InventoryService, { provide: PrismaService, useValue: mockPrisma }],
+      providers: [
+        InventoryService,
+        { provide: PrismaService, useValue: mockPrisma },
+      ],
     }).compile();
 
     service = module.get(InventoryService);
@@ -179,11 +182,20 @@ describe('InventoryService', () => {
     it('scopes the query by tenantId + companyId + productId, optionally locationId', async () => {
       mockPrisma.stockMovement.findMany.mockResolvedValue([]);
 
-      await service.listMovements({ tenantId: 'tenant-1', companyId: 'company-1' } as any, 'product-1', 'location-1');
+      await service.listMovements(
+        { tenantId: 'tenant-1', companyId: 'company-1' } as any,
+        'product-1',
+        'location-1',
+      );
 
       expect(mockPrisma.stockMovement.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { tenantId: 'tenant-1', companyId: 'company-1', productId: 'product-1', locationId: 'location-1' },
+          where: {
+            tenantId: 'tenant-1',
+            companyId: 'company-1',
+            productId: 'product-1',
+            locationId: 'location-1',
+          },
         }),
       );
     });

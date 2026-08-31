@@ -43,7 +43,8 @@ export class FeatureConfigFieldDto {
   @IsNotEmpty()
   @MaxLength(60)
   @Matches(/^[a-zA-Z][a-zA-Z0-9_]*$/, {
-    message: 'key must start with a letter and contain only letters, numbers, and underscores',
+    message:
+      'key must start with a letter and contain only letters, numbers, and underscores',
   })
   key!: string;
 

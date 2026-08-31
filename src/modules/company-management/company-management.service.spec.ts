@@ -34,7 +34,7 @@ describe('CompanyManagementService.create', () => {
     industryId: 'industry-1',
     code: 'ACME',
     legalName: 'Acme Ltd',
-  } as CreateCompanyDto;
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -94,11 +94,9 @@ describe('CompanyManagementService.create', () => {
 
     const result = await service.create(dto, 'creator-1');
 
-    expect(mockSubscriptionService.createTrialForNewCompany).toHaveBeenCalledWith(
-      createdCompany,
-      'creator-1',
-      mockTx,
-    );
+    expect(
+      mockSubscriptionService.createTrialForNewCompany,
+    ).toHaveBeenCalledWith(createdCompany, 'creator-1', mockTx);
     expect(mockTx.companySettings.create).toHaveBeenCalledWith({
       data: { tenantId: createdCompany.tenantId, companyId: createdCompany.id },
     });

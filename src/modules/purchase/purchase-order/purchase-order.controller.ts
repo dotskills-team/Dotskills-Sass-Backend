@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 
 import { COMPANY_PERMISSIONS } from '../../../common/constants/permission.constants';
 import { CurrentCompany } from '../../../common/decorators/current-company.decorator';
@@ -13,31 +23,46 @@ import type { CompanyContext } from '../../../common/types/company-context.type'
 import { PurchaseOrderService } from './purchase-order.service';
 import {
   CreatePurchaseOrderDto,
+  ListPurchaseOrdersQueryDto,
   ReceiveGoodsDto,
   ReturnGoodsDto,
   UpdatePurchaseOrderDto,
 } from './dto/purchase-order.dto';
 
 @Controller('companies/:companyId/purchase-orders')
-@UseGuards(JwtAuthGuard, CompanyContextGuard, SubscriptionStatusGuard, CompanyPermissionsGuard)
+@UseGuards(
+  JwtAuthGuard,
+  CompanyContextGuard,
+  SubscriptionStatusGuard,
+  CompanyPermissionsGuard,
+)
 export class PurchaseOrderController {
   constructor(private readonly service: PurchaseOrderService) {}
 
   @Get()
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.PURCHASE_ORDER_READ)
-  list(@CurrentCompany() context: CompanyContext) {
-    return this.service.list(context);
+  list(
+    @CurrentCompany() context: CompanyContext,
+    @Query() query: ListPurchaseOrdersQueryDto,
+  ) {
+    return this.service.list(context, query);
   }
 
   @Get('returns')
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.PURCHASE_RETURN_READ)
-  listReturns(@CurrentCompany() context: CompanyContext, @Query('purchaseOrderId') purchaseOrderId?: string) {
+  listReturns(
+    @CurrentCompany() context: CompanyContext,
+    @Query('purchaseOrderId') purchaseOrderId?: string,
+  ) {
     return this.service.listReturns(context, purchaseOrderId);
   }
 
   @Get(':id')
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.PURCHASE_ORDER_READ)
-  findOne(@CurrentCompany() context: CompanyContext, @Param('id', ParseUUIDPipe) id: string) {
+  findOne(
+    @CurrentCompany() context: CompanyContext,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return this.service.findOne(context, id);
   }
 

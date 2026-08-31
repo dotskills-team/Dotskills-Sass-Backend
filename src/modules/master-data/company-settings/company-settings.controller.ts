@@ -14,7 +14,12 @@ import { CompanySettingsService } from './company-settings.service';
 import { UpdateCompanySettingsDto } from './dto/company-settings.dto';
 
 @Controller('companies/:companyId/settings')
-@UseGuards(JwtAuthGuard, CompanyContextGuard, SubscriptionStatusGuard, CompanyPermissionsGuard)
+@UseGuards(
+  JwtAuthGuard,
+  CompanyContextGuard,
+  SubscriptionStatusGuard,
+  CompanyPermissionsGuard,
+)
 export class CompanySettingsController {
   constructor(private readonly service: CompanySettingsService) {}
 

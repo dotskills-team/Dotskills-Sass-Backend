@@ -41,7 +41,9 @@ export class SubscriptionRenewalScheduler {
 
     const candidates = await this.prisma.subscription.findMany({
       where: {
-        status: { in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.PAST_DUE] },
+        status: {
+          in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.PAST_DUE],
+        },
         currentPeriodEnd: { lte: now },
         autoRenew: true,
       },
@@ -159,7 +161,10 @@ export class SubscriptionRenewalScheduler {
       }
     }
 
-    this.logger.log({ event: 'subscription_auto_renewal_completed', ...result });
+    this.logger.log({
+      event: 'subscription_auto_renewal_completed',
+      ...result,
+    });
     return result;
   }
 }

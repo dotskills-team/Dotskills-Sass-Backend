@@ -1,5 +1,15 @@
-import { IsEmail, IsEnum, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
-import { CustomerStatus, CustomerType } from 'src/generated/phase-1-prisma/enums';
+import {
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
+import {
+  CustomerStatus,
+  CustomerType,
+} from 'src/generated/phase-1-prisma/enums';
 
 export class CreateCustomerDto {
   @IsString()

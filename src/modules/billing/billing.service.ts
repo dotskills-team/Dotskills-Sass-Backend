@@ -433,7 +433,10 @@ export class BillingService {
           entityType: 'Billing',
           entityId: updated.id,
           beforeData: { status: BillingStatus.PENDING },
-          afterData: { status: updated.status, attemptCount: updated.attemptCount },
+          afterData: {
+            status: updated.status,
+            attemptCount: updated.attemptCount,
+          },
         },
       });
 
@@ -521,7 +524,10 @@ export class BillingService {
           entityType: 'Billing',
           entityId: updated.id,
           beforeData: { status: BillingStatus.FAILED },
-          afterData: { status: updated.status, attemptCount: updated.attemptCount },
+          afterData: {
+            status: updated.status,
+            attemptCount: updated.attemptCount,
+          },
         },
       });
 

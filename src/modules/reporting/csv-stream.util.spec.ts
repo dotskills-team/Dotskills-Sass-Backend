@@ -45,9 +45,15 @@ describe('createCsvStream', () => {
 
   it('pulls multiple batches via fetchPage(skip, take) until an empty batch ends the stream', async () => {
     const allRows = Array.from({ length: 5 }, (_, i) => ({ id: i }));
-    const fetchPage = jest.fn(async (skip: number, take: number) => allRows.slice(skip, skip + take));
+    const fetchPage = jest.fn(async (skip: number, take: number) =>
+      allRows.slice(skip, skip + take),
+    );
 
-    const stream = createCsvStream<{ id: number }>([{ header: 'Id', value: (r) => r.id }], fetchPage, 2);
+    const stream = createCsvStream<{ id: number }>(
+      [{ header: 'Id', value: (r) => r.id }],
+      fetchPage,
+      2,
+    );
     const output = await drain(stream);
 
     const lines = output.replace(/^﻿/, '').split('\r\n').filter(Boolean);
@@ -58,7 +64,10 @@ describe('createCsvStream', () => {
   });
 
   it('produces just the header row (plus BOM) for an empty result set', async () => {
-    const stream = createCsvStream<{ id: number }>([{ header: 'Id', value: (r) => r.id }], async () => []);
+    const stream = createCsvStream<{ id: number }>(
+      [{ header: 'Id', value: (r) => r.id }],
+      async () => [],
+    );
     const output = await drain(stream);
 
     expect(output).toBe('﻿Id\r\n');

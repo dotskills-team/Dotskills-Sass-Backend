@@ -72,18 +72,18 @@ describe('BillingService.markFailed', () => {
       status: BillingStatus.PENDING,
     });
 
-    await expect(
-      service.markFailed('billing-1', {}, 'user-1'),
-    ).rejects.toThrow(BadRequestException);
+    await expect(service.markFailed('billing-1', {}, 'user-1')).rejects.toThrow(
+      BadRequestException,
+    );
   });
 
   it('rejects when there is no active STARTED attempt to settle', async () => {
     mockTx.billing.findUnique.mockResolvedValue(processingBilling);
     mockTx.billingAttempt.findFirst.mockResolvedValue(null);
 
-    await expect(
-      service.markFailed('billing-1', {}, 'user-1'),
-    ).rejects.toThrow(NotFoundException);
+    await expect(service.markFailed('billing-1', {}, 'user-1')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 
   it('marks Billing and BillingAttempt FAILED, preserving failureCode/failureMessage', async () => {
@@ -163,7 +163,9 @@ describe('BillingService.markFailed', () => {
 
     expect(mockSubscriptionLifecycleService.paymentFailed).toHaveBeenCalled();
     expect(mockTx.billing.update).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ status: BillingStatus.FAILED }) }),
+      expect.objectContaining({
+        data: expect.objectContaining({ status: BillingStatus.FAILED }),
+      }),
     );
     expect(mockTx.billingAttempt.update).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -181,11 +183,16 @@ describe('BillingService.markFailed', () => {
    * with no way to retry. markFailed() must now sync any such Payment to
    * FAILED in the same transaction.
    */
-  it('syncs a still-PENDING/PROCESSING Payment on this Billing\'s Invoice to FAILED', async () => {
+  it("syncs a still-PENDING/PROCESSING Payment on this Billing's Invoice to FAILED", async () => {
     mockTx.billing.findUnique.mockResolvedValue(processingBilling);
     mockTx.billingAttempt.findFirst.mockResolvedValue(startedAttempt);
-    mockSubscriptionLifecycleService.paymentFailed.mockResolvedValue({ id: 'sub-1' });
-    mockTx.billing.update.mockResolvedValue({ ...processingBilling, status: BillingStatus.FAILED });
+    mockSubscriptionLifecycleService.paymentFailed.mockResolvedValue({
+      id: 'sub-1',
+    });
+    mockTx.billing.update.mockResolvedValue({
+      ...processingBilling,
+      status: BillingStatus.FAILED,
+    });
     mockTx.invoice.findUnique.mockResolvedValue({ id: 'invoice-1' });
 
     await service.markFailed(
@@ -214,8 +221,13 @@ describe('BillingService.markFailed', () => {
   it('skips the Payment sync (no-op) when this Billing has no Invoice yet', async () => {
     mockTx.billing.findUnique.mockResolvedValue(processingBilling);
     mockTx.billingAttempt.findFirst.mockResolvedValue(startedAttempt);
-    mockSubscriptionLifecycleService.paymentFailed.mockResolvedValue({ id: 'sub-1' });
-    mockTx.billing.update.mockResolvedValue({ ...processingBilling, status: BillingStatus.FAILED });
+    mockSubscriptionLifecycleService.paymentFailed.mockResolvedValue({
+      id: 'sub-1',
+    });
+    mockTx.billing.update.mockResolvedValue({
+      ...processingBilling,
+      status: BillingStatus.FAILED,
+    });
     mockTx.invoice.findUnique.mockResolvedValue(null);
 
     await service.markFailed('billing-1', {}, 'user-1');
@@ -317,10 +329,7 @@ describe('BillingService.releaseCancelledAttempt', () => {
       status: BillingStatus.PENDING,
     });
 
-    const result = await service.releaseCancelledAttempt(
-      'billing-1',
-      'user-1',
-    );
+    const result = await service.releaseCancelledAttempt('billing-1', 'user-1');
 
     expect(mockTx.billingAttempt.update).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -344,11 +353,17 @@ describe('BillingService.releaseCancelledAttempt', () => {
       }),
     );
     // attemptCount is never part of this update — MAX_ATTEMPTS counting is untouched
-    expect(mockTx.billing.update.mock.calls[0][0].data.attemptCount).toBeUndefined();
+    expect(
+      mockTx.billing.update.mock.calls[0][0].data.attemptCount,
+    ).toBeUndefined();
     expect(result.status).toBe(BillingStatus.PENDING);
 
-    expect(mockSubscriptionLifecycleService.paymentFailed).not.toHaveBeenCalled();
-    expect(mockSubscriptionLifecycleService.paymentSucceeded).not.toHaveBeenCalled();
+    expect(
+      mockSubscriptionLifecycleService.paymentFailed,
+    ).not.toHaveBeenCalled();
+    expect(
+      mockSubscriptionLifecycleService.paymentSucceeded,
+    ).not.toHaveBeenCalled();
 
     expect(mockTx.auditLog.create).toHaveBeenCalledWith(
       expect.objectContaining({

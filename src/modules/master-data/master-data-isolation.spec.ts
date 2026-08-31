@@ -56,7 +56,9 @@ describe('Business Ops Master Data — multi-tenant isolation (integration)', ()
   };
 
   beforeAll(async () => {
-    moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
 
     prisma = moduleRef.get(PrismaService);
     companyManagementService = moduleRef.get(CompanyManagementService);
@@ -72,7 +74,7 @@ describe('Business Ops Master Data — multi-tenant isolation (integration)', ()
         code: 'ISOA',
         legalName: 'Isolation Test A (disposable)',
         baseCurrencyCode: 'BDT',
-      } as any,
+      },
       CREATOR_USER_ID,
     );
     const companyB = await companyManagementService.create(
@@ -82,14 +84,28 @@ describe('Business Ops Master Data — multi-tenant isolation (integration)', ()
         code: 'ISOB',
         legalName: 'Isolation Test B (disposable)',
         baseCurrencyCode: 'BDT',
-      } as any,
+      },
       CREATOR_USER_ID,
     );
 
     companyAId = companyA.id;
     companyBId = companyB.id;
-    contextA = { tenantId: TENANT_1, companyId: companyAId, companyMemberId: 'n/a', companyStatus: 'DRAFT', tenantStatus: 'ACTIVE', scopes: [] };
-    contextB = { tenantId: TENANT_2, companyId: companyBId, companyMemberId: 'n/a', companyStatus: 'DRAFT', tenantStatus: 'ACTIVE', scopes: [] };
+    contextA = {
+      tenantId: TENANT_1,
+      companyId: companyAId,
+      companyMemberId: 'n/a',
+      companyStatus: 'DRAFT',
+      tenantStatus: 'ACTIVE',
+      scopes: [],
+    };
+    contextB = {
+      tenantId: TENANT_2,
+      companyId: companyBId,
+      companyMemberId: 'n/a',
+      companyStatus: 'DRAFT',
+      tenantStatus: 'ACTIVE',
+      scopes: [],
+    };
   }, 30000);
 
   afterAll(async () => {
@@ -109,41 +125,104 @@ describe('Business Ops Master Data — multi-tenant isolation (integration)', ()
   }, 30000);
 
   it('lets two different companies use the identical Location name, Unit code, Customer phone independently', async () => {
-    const locA = await locationService.create(contextA, { name: 'Main Branch', locationType: 'BRANCH' as any }, actor);
-    const locB = await locationService.create(contextB, { name: 'Main Branch', locationType: 'BRANCH' as any }, actor);
+    const locA = await locationService.create(
+      contextA,
+      { name: 'Main Branch', locationType: 'BRANCH' },
+      actor,
+    );
+    const locB = await locationService.create(
+      contextB,
+      { name: 'Main Branch', locationType: 'BRANCH' },
+      actor,
+    );
     expect(locA.data.name).toBe('Main Branch');
     expect(locB.data.name).toBe('Main Branch');
     expect(locA.data.id).not.toBe(locB.data.id);
 
-    const unitA = await unitService.create(contextA, { name: 'Piece', code: 'PCS' }, actor);
-    const unitB = await unitService.create(contextB, { name: 'Piece', code: 'PCS' }, actor);
+    const unitA = await unitService.create(
+      contextA,
+      { name: 'Piece', code: 'PCS' },
+      actor,
+    );
+    const unitB = await unitService.create(
+      contextB,
+      { name: 'Piece', code: 'PCS' },
+      actor,
+    );
     expect(unitA.data.code).toBe('PCS');
     expect(unitB.data.code).toBe('PCS');
 
-    const custA = await customerService.create(contextA, { name: 'Karim', phone: '01700000000' }, actor);
-    const custB = await customerService.create(contextB, { name: 'Rahim', phone: '01700000000' }, actor);
+    const custA = await customerService.create(
+      contextA,
+      { name: 'Karim', phone: '01700000000' },
+      actor,
+    );
+    const custB = await customerService.create(
+      contextB,
+      { name: 'Rahim', phone: '01700000000' },
+      actor,
+    );
     expect(custA.data.phone).toBe('01700000000');
     expect(custB.data.phone).toBe('01700000000');
 
-    const prodA = await productService.create(contextA, { sku: 'RICE-5KG', name: 'Rice 5kg', baseUnitId: unitA.data.id, barcode: '8801234567890' }, actor);
-    const prodB = await productService.create(contextB, { sku: 'RICE-5KG', name: 'Rice 5kg', baseUnitId: unitB.data.id, barcode: '8801234567890' }, actor);
+    const prodA = await productService.create(
+      contextA,
+      {
+        sku: 'RICE-5KG',
+        name: 'Rice 5kg',
+        baseUnitId: unitA.data.id,
+        barcode: '8801234567890',
+      },
+      actor,
+    );
+    const prodB = await productService.create(
+      contextB,
+      {
+        sku: 'RICE-5KG',
+        name: 'Rice 5kg',
+        baseUnitId: unitB.data.id,
+        barcode: '8801234567890',
+      },
+      actor,
+    );
     expect(prodA.data.sku).toBe('RICE-5KG');
     expect(prodB.data.sku).toBe('RICE-5KG');
   }, 20000);
 
   it("Company A's context cannot read Company B's Location/Customer by id — 404, not leaked", async () => {
-    const locB = await locationService.create(contextB, { name: 'Cross-Tenant-Read-Target', locationType: 'WAREHOUSE' as any }, actor);
-    const custB = await customerService.create(contextB, { name: 'CrossTenantReadTarget', phone: '01711111111' }, actor);
+    const locB = await locationService.create(
+      contextB,
+      { name: 'Cross-Tenant-Read-Target', locationType: 'WAREHOUSE' },
+      actor,
+    );
+    const custB = await customerService.create(
+      contextB,
+      { name: 'CrossTenantReadTarget', phone: '01711111111' },
+      actor,
+    );
 
-    await expect(locationService.findOne(contextA, locB.data.id)).rejects.toThrow(NotFoundException);
-    await expect(customerService.findOne(contextA, custB.data.id)).rejects.toThrow(NotFoundException);
+    await expect(
+      locationService.findOne(contextA, locB.data.id),
+    ).rejects.toThrow(NotFoundException);
+    await expect(
+      customerService.findOne(contextA, custB.data.id),
+    ).rejects.toThrow(NotFoundException);
   }, 20000);
 
   it("Company A's context cannot update Company B's resource, and Company B's row stays unchanged", async () => {
-    const custB = await customerService.create(contextB, { name: 'CrossTenantWriteTarget', phone: '01722222222' }, actor);
+    const custB = await customerService.create(
+      contextB,
+      { name: 'CrossTenantWriteTarget', phone: '01722222222' },
+      actor,
+    );
 
     await expect(
-      customerService.update(contextA, custB.data.id, { name: 'HACKED' }, actor),
+      customerService.update(
+        contextA,
+        custB.data.id,
+        { name: 'HACKED' },
+        actor,
+      ),
     ).rejects.toThrow(NotFoundException);
 
     const stillB = await customerService.findOne(contextB, custB.data.id);
@@ -151,7 +230,11 @@ describe('Business Ops Master Data — multi-tenant isolation (integration)', ()
   }, 20000);
 
   it("Company A's list never returns any row belonging to Company B", async () => {
-    await customerService.create(contextB, { name: 'OnlyInB', phone: '01733333333' }, actor);
+    await customerService.create(
+      contextB,
+      { name: 'OnlyInB', phone: '01733333333' },
+      actor,
+    );
 
     const listA = await customerService.list(contextA);
     const namesInA = listA.data.map((c) => c.name);

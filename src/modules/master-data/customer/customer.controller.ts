@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 
 import { COMPANY_PERMISSIONS } from '../../../common/constants/permission.constants';
 import { CurrentCompany } from '../../../common/decorators/current-company.decorator';
@@ -14,7 +23,12 @@ import { CustomerService } from './customer.service';
 import { CreateCustomerDto, UpdateCustomerDto } from './dto/customer.dto';
 
 @Controller('companies/:companyId/customers')
-@UseGuards(JwtAuthGuard, CompanyContextGuard, SubscriptionStatusGuard, CompanyPermissionsGuard)
+@UseGuards(
+  JwtAuthGuard,
+  CompanyContextGuard,
+  SubscriptionStatusGuard,
+  CompanyPermissionsGuard,
+)
 export class CustomerController {
   constructor(private readonly service: CustomerService) {}
 
@@ -26,7 +40,10 @@ export class CustomerController {
 
   @Get(':id')
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.CUSTOMER_READ)
-  findOne(@CurrentCompany() context: CompanyContext, @Param('id', ParseUUIDPipe) id: string) {
+  findOne(
+    @CurrentCompany() context: CompanyContext,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return this.service.findOne(context, id);
   }
 

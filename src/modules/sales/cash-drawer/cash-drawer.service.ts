@@ -1,11 +1,23 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { Prisma } from 'src/generated/phase-1-prisma/client';
-import { CashDrawerSessionStatus, SalePaymentMethod, SaleStatus } from 'src/generated/phase-1-prisma/enums';
+import {
+  CashDrawerSessionStatus,
+  SalePaymentMethod,
+  SaleStatus,
+} from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
-import { CloseCashDrawerSessionDto, OpenCashDrawerSessionDto } from './dto/cash-drawer.dto';
+import {
+  CloseCashDrawerSessionDto,
+  OpenCashDrawerSessionDto,
+} from './dto/cash-drawer.dto';
 
 const SESSION_SELECT = {
   id: true,
@@ -56,12 +68,23 @@ export class CashDrawerSessionService {
    * standing rule that a derivable financial value is never trusted from
    * the client (same as Sale.totalAmount).
    */
-  async openSession(context: CompanyContext, dto: OpenCashDrawerSessionDto, actor: AuthenticatedUser) {
+  async openSession(
+    context: CompanyContext,
+    dto: OpenCashDrawerSessionDto,
+    actor: AuthenticatedUser,
+  ) {
     const location = await this.prisma.location.findFirst({
-      where: { id: dto.locationId, tenantId: context.tenantId, companyId: context.companyId },
+      where: {
+        id: dto.locationId,
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
       select: { id: true },
     });
-    if (!location) throw new BadRequestException('locationId does not belong to this company');
+    if (!location)
+      throw new BadRequestException(
+        'locationId does not belong to this company',
+      );
 
     const previousClosed = await this.prisma.cashDrawerSession.findFirst({
       where: {
@@ -80,7 +103,9 @@ export class CashDrawerSessionService {
       openingBalance = Number(previousClosed.actualClosingBalance);
     } else {
       if (dto.openingBalance === undefined) {
-        throw new BadRequestException('openingBalance is required for this cashier\'s first session at this location');
+        throw new BadRequestException(
+          "openingBalance is required for this cashier's first session at this location",
+        );
       }
       openingBalance = dto.openingBalance;
     }
@@ -98,13 +123,24 @@ export class CashDrawerSessionService {
           select: SESSION_SELECT,
         });
 
-        await this.createAudit(tx, context, actor.userId, 'CASH_DRAWER_SESSION_OPENED', created.id, null, created);
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'CASH_DRAWER_SESSION_OPENED',
+          created.id,
+          null,
+          created,
+        );
         return created;
       });
 
       return { success: true, data: session };
     } catch (error) {
-      this.throwKnownConflict(error, 'An open cash drawer session already exists for this cashier');
+      this.throwKnownConflict(
+        error,
+        'An open cash drawer session already exists for this cashier',
+      );
       throw error;
     }
   }
@@ -116,10 +152,17 @@ export class CashDrawerSessionService {
    * exists on SaleReturn) — a cash refund during an open session will
    * correctly show up as variance, which is Day-Close doing its job.
    */
-  async closeSession(context: CompanyContext, id: string, dto: CloseCashDrawerSessionDto, actor: AuthenticatedUser) {
+  async closeSession(
+    context: CompanyContext,
+    id: string,
+    dto: CloseCashDrawerSessionDto,
+    actor: AuthenticatedUser,
+  ) {
     const before = await this.requireSession(context, id);
     if (before.status !== CashDrawerSessionStatus.OPEN) {
-      throw new BadRequestException(`Cannot close a session with status ${before.status}`);
+      throw new BadRequestException(
+        `Cannot close a session with status ${before.status}`,
+      );
     }
 
     const session = await this.prisma.$transaction(async (tx) => {
@@ -131,7 +174,8 @@ export class CashDrawerSessionService {
         _sum: { amount: true },
       });
       const cashSalesTotal = Number(cashTotal._sum.amount ?? 0);
-      const expectedClosingBalance = Number(before.openingBalance) + cashSalesTotal;
+      const expectedClosingBalance =
+        Number(before.openingBalance) + cashSalesTotal;
       const variance = dto.actualClosingBalance - expectedClosingBalance;
 
       const updated = await tx.cashDrawerSession.update({
@@ -147,10 +191,18 @@ export class CashDrawerSessionService {
         select: SESSION_SELECT,
       });
 
-      await this.createAudit(tx, context, actor.userId, 'CASH_DRAWER_SESSION_CLOSED', updated.id, before, {
-        ...updated,
-        cashSalesTotal,
-      });
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'CASH_DRAWER_SESSION_CLOSED',
+        updated.id,
+        before,
+        {
+          ...updated,
+          cashSalesTotal,
+        },
+      );
       return updated;
     });
 
@@ -162,7 +214,8 @@ export class CashDrawerSessionService {
       where: { id, tenantId: context.tenantId, companyId: context.companyId },
       select: SESSION_SELECT,
     });
-    if (!session) throw new NotFoundException('Cash drawer session was not found');
+    if (!session)
+      throw new NotFoundException('Cash drawer session was not found');
     return session;
   }
 
@@ -184,14 +237,17 @@ export class CashDrawerSessionService {
         action,
         entityType: 'CashDrawerSession',
         entityId,
-        ...(beforeData === null ? {} : { beforeData: beforeData as Prisma.InputJsonValue }),
-        ...(afterData === null ? {} : { afterData: afterData as Prisma.InputJsonValue }),
+        ...(beforeData === null ? {} : { beforeData: beforeData }),
+        ...(afterData === null ? {} : { afterData: afterData }),
       },
     });
   }
 
   private throwKnownConflict(error: unknown, message: string): never | void {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
       throw new ConflictException(message);
     }
   }

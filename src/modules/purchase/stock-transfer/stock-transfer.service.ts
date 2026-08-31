@@ -1,12 +1,22 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { Prisma } from 'src/generated/phase-1-prisma/client';
-import { StockMovementType, StockTransferStatus } from 'src/generated/phase-1-prisma/enums';
+import {
+  StockMovementType,
+  StockTransferStatus,
+} from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
-import { CreateStockTransferDto } from './dto/stock-transfer.dto';
+import {
+  CreateStockTransferDto,
+  ListStockTransfersQueryDto,
+} from './dto/stock-transfer.dto';
 
 const TRANSFER_SELECT = {
   id: true,
@@ -37,13 +47,31 @@ export class StockTransferService {
     private readonly inventoryService: InventoryService,
   ) {}
 
-  async list(context: CompanyContext) {
-    const transfers = await this.prisma.stockTransfer.findMany({
-      where: { tenantId: context.tenantId, companyId: context.companyId },
-      select: TRANSFER_SELECT,
-      orderBy: { createdAt: 'desc' },
-    });
-    return { success: true, count: transfers.length, data: transfers };
+  async list(context: CompanyContext, query: ListStockTransfersQueryDto = {}) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 50;
+    const skip = (page - 1) * limit;
+    const where: Prisma.StockTransferWhereInput = {
+      tenantId: context.tenantId,
+      companyId: context.companyId,
+    };
+
+    const [transfers, total] = await this.prisma.$transaction([
+      this.prisma.stockTransfer.findMany({
+        where,
+        select: TRANSFER_SELECT,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.stockTransfer.count({ where }),
+    ]);
+
+    return {
+      success: true,
+      data: transfers,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async findOne(context: CompanyContext, id: string) {
@@ -51,9 +79,15 @@ export class StockTransferService {
     return { success: true, data: transfer };
   }
 
-  async create(context: CompanyContext, dto: CreateStockTransferDto, actor: AuthenticatedUser) {
+  async create(
+    context: CompanyContext,
+    dto: CreateStockTransferDto,
+    actor: AuthenticatedUser,
+  ) {
     if (dto.fromLocationId === dto.toLocationId) {
-      throw new BadRequestException('fromLocationId and toLocationId must be different locations');
+      throw new BadRequestException(
+        'fromLocationId and toLocationId must be different locations',
+      );
     }
 
     const transfer = await this.prisma.$transaction(async (tx) => {
@@ -69,17 +103,31 @@ export class StockTransferService {
         },
         select: TRANSFER_SELECT,
       });
-      await this.createAudit(tx, context, actor.userId, 'STOCK_TRANSFER_CREATED', created.id, null, created);
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'STOCK_TRANSFER_CREATED',
+        created.id,
+        null,
+        created,
+      );
       return created;
     });
 
     return { success: true, data: transfer };
   }
 
-  async dispatch(context: CompanyContext, id: string, actor: AuthenticatedUser) {
+  async dispatch(
+    context: CompanyContext,
+    id: string,
+    actor: AuthenticatedUser,
+  ) {
     const before = await this.requireTransfer(context, id);
     if (before.status !== StockTransferStatus.PENDING) {
-      throw new BadRequestException(`Transfer cannot be dispatched from ${before.status} state`);
+      throw new BadRequestException(
+        `Transfer cannot be dispatched from ${before.status} state`,
+      );
     }
 
     const transfer = await this.prisma.$transaction(async (tx) => {
@@ -97,10 +145,21 @@ export class StockTransferService {
 
       const updated = await tx.stockTransfer.update({
         where: { id },
-        data: { status: StockTransferStatus.IN_TRANSIT, dispatchedAt: new Date() },
+        data: {
+          status: StockTransferStatus.IN_TRANSIT,
+          dispatchedAt: new Date(),
+        },
         select: TRANSFER_SELECT,
       });
-      await this.createAudit(tx, context, actor.userId, 'STOCK_TRANSFER_DISPATCHED', updated.id, before, updated);
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'STOCK_TRANSFER_DISPATCHED',
+        updated.id,
+        before,
+        updated,
+      );
       return updated;
     });
 
@@ -110,7 +169,9 @@ export class StockTransferService {
   async receive(context: CompanyContext, id: string, actor: AuthenticatedUser) {
     const before = await this.requireTransfer(context, id);
     if (before.status !== StockTransferStatus.IN_TRANSIT) {
-      throw new BadRequestException(`Transfer cannot be received from ${before.status} state`);
+      throw new BadRequestException(
+        `Transfer cannot be received from ${before.status} state`,
+      );
     }
 
     const transfer = await this.prisma.$transaction(async (tx) => {
@@ -130,7 +191,15 @@ export class StockTransferService {
         data: { status: StockTransferStatus.RECEIVED, receivedAt: new Date() },
         select: TRANSFER_SELECT,
       });
-      await this.createAudit(tx, context, actor.userId, 'STOCK_TRANSFER_RECEIVED', updated.id, before, updated);
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'STOCK_TRANSFER_RECEIVED',
+        updated.id,
+        before,
+        updated,
+      );
       return updated;
     });
 
@@ -164,8 +233,8 @@ export class StockTransferService {
         action,
         entityType: 'StockTransfer',
         entityId,
-        ...(beforeData === null ? {} : { beforeData: beforeData as Prisma.InputJsonValue }),
-        ...(afterData === null ? {} : { afterData: afterData as Prisma.InputJsonValue }),
+        ...(beforeData === null ? {} : { beforeData: beforeData }),
+        ...(afterData === null ? {} : { afterData: afterData }),
       },
     });
   }

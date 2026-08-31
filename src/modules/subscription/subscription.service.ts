@@ -138,8 +138,16 @@ export class SubscriptionService {
       isComplimentary?: boolean;
     },
   ) {
-    const { company, plan, billingCycle, price, actorUserId, actorType, reason, source } =
-      params;
+    const {
+      company,
+      plan,
+      billingCycle,
+      price,
+      actorUserId,
+      actorType,
+      reason,
+      source,
+    } = params;
     const now = new Date();
     const trialEndsAt =
       plan.trialDays > 0 ? this.addDays(now, plan.trialDays) : null;

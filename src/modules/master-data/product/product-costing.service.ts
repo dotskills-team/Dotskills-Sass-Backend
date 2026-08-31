@@ -29,13 +29,23 @@ export class ProductCostingService {
         select: { costPrice: true },
       }),
       tx.inventory.aggregate({
-        where: { tenantId: context.tenantId, companyId: context.companyId, productId },
+        where: {
+          tenantId: context.tenantId,
+          companyId: context.companyId,
+          productId,
+        },
         _sum: { quantity: true },
       }),
     ]);
 
-    const currentQty = stockAcrossLocations._sum.quantity ?? new Prisma.Decimal(0);
-    const newCost = calculateWeightedAverageCost(currentQty, product.costPrice, incomingQty, incomingUnitCost);
+    const currentQty =
+      stockAcrossLocations._sum.quantity ?? new Prisma.Decimal(0);
+    const newCost = calculateWeightedAverageCost(
+      currentQty,
+      product.costPrice,
+      incomingQty,
+      incomingUnitCost,
+    );
 
     await tx.product.update({
       where: { id: productId },

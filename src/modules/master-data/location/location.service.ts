@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { Prisma } from 'src/generated/phase-1-prisma/client';
 import { PrismaService } from '../../../prisma/prisma.service';
@@ -35,7 +39,11 @@ export class LocationService {
     return { success: true, data: location };
   }
 
-  async create(context: CompanyContext, dto: CreateLocationDto, actor: AuthenticatedUser) {
+  async create(
+    context: CompanyContext,
+    dto: CreateLocationDto,
+    actor: AuthenticatedUser,
+  ) {
     try {
       const location = await this.prisma.$transaction(async (tx) => {
         const created = await tx.location.create({
@@ -49,17 +57,33 @@ export class LocationService {
           },
           select: LOCATION_SELECT,
         });
-        await this.createAudit(tx, context, actor.userId, 'LOCATION_CREATED', created.id, null, created);
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'LOCATION_CREATED',
+          created.id,
+          null,
+          created,
+        );
         return created;
       });
       return { success: true, data: location };
     } catch (error) {
-      this.throwKnownConflict(error, 'A location with this name already exists in this company');
+      this.throwKnownConflict(
+        error,
+        'A location with this name already exists in this company',
+      );
       throw error;
     }
   }
 
-  async update(context: CompanyContext, id: string, dto: UpdateLocationDto, actor: AuthenticatedUser) {
+  async update(
+    context: CompanyContext,
+    id: string,
+    dto: UpdateLocationDto,
+    actor: AuthenticatedUser,
+  ) {
     const before = await this.requireLocation(context, id);
     try {
       const location = await this.prisma.$transaction(async (tx) => {
@@ -67,18 +91,33 @@ export class LocationService {
           where: { id },
           data: {
             ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
-            ...(dto.address !== undefined ? { address: dto.address.trim() || null } : {}),
-            ...(dto.isSalesEnabled !== undefined ? { isSalesEnabled: dto.isSalesEnabled } : {}),
+            ...(dto.address !== undefined
+              ? { address: dto.address.trim() || null }
+              : {}),
+            ...(dto.isSalesEnabled !== undefined
+              ? { isSalesEnabled: dto.isSalesEnabled }
+              : {}),
             ...(dto.status !== undefined ? { status: dto.status } : {}),
           },
           select: LOCATION_SELECT,
         });
-        await this.createAudit(tx, context, actor.userId, 'LOCATION_UPDATED', updated.id, before, updated);
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'LOCATION_UPDATED',
+          updated.id,
+          before,
+          updated,
+        );
         return updated;
       });
       return { success: true, data: location };
     } catch (error) {
-      this.throwKnownConflict(error, 'A location with this name already exists in this company');
+      this.throwKnownConflict(
+        error,
+        'A location with this name already exists in this company',
+      );
       throw error;
     }
   }
@@ -110,14 +149,17 @@ export class LocationService {
         action,
         entityType: 'Location',
         entityId,
-        ...(beforeData === null ? {} : { beforeData: beforeData as Prisma.InputJsonValue }),
-        ...(afterData === null ? {} : { afterData: afterData as Prisma.InputJsonValue }),
+        ...(beforeData === null ? {} : { beforeData: beforeData }),
+        ...(afterData === null ? {} : { afterData: afterData }),
       },
     });
   }
 
   private throwKnownConflict(error: unknown, message: string): never | void {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
       throw new ConflictException(message);
     }
   }

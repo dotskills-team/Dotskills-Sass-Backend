@@ -14,13 +14,21 @@ import { CustomerPaymentService } from './customer-payment.service';
 import { RecordCustomerPaymentDto } from './dto/customer-payment.dto';
 
 @Controller('companies/:companyId/customer-payments')
-@UseGuards(JwtAuthGuard, CompanyContextGuard, SubscriptionStatusGuard, CompanyPermissionsGuard)
+@UseGuards(
+  JwtAuthGuard,
+  CompanyContextGuard,
+  SubscriptionStatusGuard,
+  CompanyPermissionsGuard,
+)
 export class CustomerPaymentController {
   constructor(private readonly service: CustomerPaymentService) {}
 
   @Get()
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.CUSTOMER_PAYMENT_READ)
-  list(@CurrentCompany() context: CompanyContext, @Query('customerId') customerId?: string) {
+  list(
+    @CurrentCompany() context: CompanyContext,
+    @Query('customerId') customerId?: string,
+  ) {
     return this.service.list(context, customerId);
   }
 

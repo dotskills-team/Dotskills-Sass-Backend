@@ -23,9 +23,17 @@ export class SupplierPaymentService {
     return { success: true, count: entries.length, data: entries };
   }
 
-  async recordPayment(context: CompanyContext, dto: RecordSupplierPaymentDto, actor: AuthenticatedUser) {
+  async recordPayment(
+    context: CompanyContext,
+    dto: RecordSupplierPaymentDto,
+    actor: AuthenticatedUser,
+  ) {
     const supplier = await this.prisma.supplier.findFirst({
-      where: { id: dto.supplierId, tenantId: context.tenantId, companyId: context.companyId },
+      where: {
+        id: dto.supplierId,
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
       select: { id: true },
     });
     if (!supplier) throw new NotFoundException('Supplier was not found');
@@ -57,7 +65,7 @@ export class SupplierPaymentService {
           action: 'SUPPLIER_PAYMENT_RECORDED',
           entityType: 'SupplierPayableLedger',
           entityId: created.id,
-          afterData: created as unknown as Prisma.InputJsonValue,
+          afterData: created,
         },
       });
 

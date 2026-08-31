@@ -466,7 +466,11 @@ export class SubscriptionLifecycleService {
    * Resubscribe flow with the Plan's *current* price, never the stale one.
    */
   async voidStaleIssuedInvoices(now = new Date()) {
-    const result = { invoicesVoided: 0, subscriptionsExpired: 0, failures: [] as Array<{ invoiceId: string; message: string }> };
+    const result = {
+      invoicesVoided: 0,
+      subscriptionsExpired: 0,
+      failures: [] as Array<{ invoiceId: string; message: string }>,
+    };
 
     const cutoff = new Date(
       now.getTime() -

@@ -886,6 +886,13 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
     name: 'Update company products',
   },
   {
+    code: COMPANY_PERMISSIONS.PRODUCT_BULK_IMPORT,
+    moduleCode: 'company_master_data',
+    resource: 'product',
+    action: 'bulk-import',
+    name: 'Bulk import products',
+  },
+  {
     code: COMPANY_PERMISSIONS.CUSTOMER_READ,
     moduleCode: 'company_master_data',
     resource: 'customer',
