@@ -16,6 +16,7 @@ import type { CompanyContext } from '../../../common/types/company-context.type'
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import {
   CloseCashDrawerSessionDto,
+  ListCashDrawerSessionsQueryDto,
   OpenCashDrawerSessionDto,
 } from './dto/cash-drawer.dto';
 
@@ -45,13 +46,37 @@ const SESSION_SELECT = {
 export class CashDrawerSessionService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(context: CompanyContext) {
-    const sessions = await this.prisma.cashDrawerSession.findMany({
-      where: { tenantId: context.tenantId, companyId: context.companyId },
-      select: SESSION_SELECT,
-      orderBy: { shiftStart: 'desc' },
-    });
-    return { success: true, count: sessions.length, data: sessions };
+  async list(
+    context: CompanyContext,
+    query: ListCashDrawerSessionsQueryDto = {},
+  ) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 50;
+    const skip = (page - 1) * limit;
+    const where: Prisma.CashDrawerSessionWhereInput = {
+      tenantId: context.tenantId,
+      companyId: context.companyId,
+      ...(query.locationId ? { locationId: query.locationId } : {}),
+      ...(query.cashierId ? { cashierId: query.cashierId } : {}),
+      ...(query.status ? { status: query.status } : {}),
+    };
+
+    const [sessions, total] = await this.prisma.$transaction([
+      this.prisma.cashDrawerSession.findMany({
+        where,
+        select: SESSION_SELECT,
+        orderBy: { shiftStart: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.cashDrawerSession.count({ where }),
+    ]);
+
+    return {
+      success: true,
+      data: sessions,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async findOne(context: CompanyContext, id: string) {

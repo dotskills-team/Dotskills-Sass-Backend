@@ -51,11 +51,16 @@ export class PaginationQueryDto {
   limit?: number = 50;
 }
 
-/** Stock Report — point-in-time, no date range, optional Location filter. */
+/** Stock Report — point-in-time, no date range, optional Location and/or Product filter. */
 export class StockReportQueryDto extends PaginationQueryDto {
   @IsOptional()
   @IsUUID()
   locationId?: string;
+
+  /** Location-wise Stock Visibility micro-chunk — Product-primary view (all Locations for one Product). */
+  @IsOptional()
+  @IsUUID()
+  productId?: string;
 
   @IsOptional()
   @Type(() => Boolean)

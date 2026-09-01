@@ -45,6 +45,7 @@ export class StockReportService {
       tenantId: context.tenantId,
       companyId: context.companyId,
       ...(query.locationId ? { locationId: query.locationId } : {}),
+      ...(query.productId ? { productId: query.productId } : {}),
     };
 
     const [items, total] = await this.prisma.$transaction([

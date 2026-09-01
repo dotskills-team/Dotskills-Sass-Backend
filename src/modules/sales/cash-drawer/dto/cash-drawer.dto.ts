@@ -1,4 +1,5 @@
 import {
+  IsEnum,
   IsNumber,
   IsOptional,
   IsString,
@@ -6,6 +7,30 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { CashDrawerSessionStatus } from 'src/generated/phase-1-prisma/enums';
+
+import { PaginationQueryDto } from '../../../../common/dto/pagination-query.dto';
+
+/**
+ * Frontend Phase 4 addition. Three optional filters, not just
+ * `locationId` — `status` lets the header's "do I have a session open"
+ * check stay cheap (never scanning the whole ever-growing history), and
+ * `cashierId` lets the Open-Session form correctly preview *this*
+ * cashier's own carry-forward balance at a Location, not any cashier's.
+ */
+export class ListCashDrawerSessionsQueryDto extends PaginationQueryDto {
+  @IsOptional()
+  @IsUUID()
+  locationId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  cashierId?: string;
+
+  @IsOptional()
+  @IsEnum(CashDrawerSessionStatus)
+  status?: CashDrawerSessionStatus;
+}
 
 export class OpenCashDrawerSessionDto {
   @IsUUID()

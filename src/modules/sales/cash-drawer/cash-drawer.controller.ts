@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 
@@ -21,6 +22,7 @@ import type { CompanyContext } from '../../../common/types/company-context.type'
 import { CashDrawerSessionService } from './cash-drawer.service';
 import {
   CloseCashDrawerSessionDto,
+  ListCashDrawerSessionsQueryDto,
   OpenCashDrawerSessionDto,
 } from './dto/cash-drawer.dto';
 
@@ -36,8 +38,11 @@ export class CashDrawerSessionController {
 
   @Get()
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.CASH_DRAWER_SESSION_READ)
-  list(@CurrentCompany() context: CompanyContext) {
-    return this.service.list(context);
+  list(
+    @CurrentCompany() context: CompanyContext,
+    @Query() query: ListCashDrawerSessionsQueryDto,
+  ) {
+    return this.service.list(context, query);
   }
 
   @Get(':id')
