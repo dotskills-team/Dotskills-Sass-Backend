@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 
 import {
   StockMovementType,
@@ -7,6 +7,7 @@ import {
 } from '../../../generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
+import { LocationAccessService } from '../../../common/services/location-access.service';
 import { StockTransferService } from './stock-transfer.service';
 
 describe('StockTransferService', () => {
@@ -28,18 +29,28 @@ describe('StockTransferService', () => {
     increaseStock: jest.fn(),
     decreaseStock: jest.fn(),
   };
+  const mockLocationAccessService = {
+    assertHasLocationAccess: jest.fn().mockResolvedValue(undefined),
+  };
 
   const context = { tenantId: 'tenant-1', companyId: 'company-1' } as any;
   const actor = { userId: 'user-1' } as any;
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockLocationAccessService.assertHasLocationAccess.mockResolvedValue(
+      undefined,
+    );
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         StockTransferService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: InventoryService, useValue: mockInventoryService },
+        {
+          provide: LocationAccessService,
+          useValue: mockLocationAccessService,
+        },
       ],
     }).compile();
 
@@ -82,6 +93,48 @@ describe('StockTransferService', () => {
 
       expect(mockInventoryService.decreaseStock).not.toHaveBeenCalled();
       expect(mockInventoryService.increaseStock).not.toHaveBeenCalled();
+    });
+
+    it('checks Location access for the source (fromLocationId), not the destination', async () => {
+      mockTx.stockTransfer.create.mockResolvedValue({
+        id: 't-1',
+        status: StockTransferStatus.PENDING,
+      });
+
+      await service.create(
+        context,
+        {
+          fromLocationId: 'loc-1',
+          toLocationId: 'loc-2',
+          productId: 'p-1',
+          quantity: 5,
+        },
+        actor,
+      );
+
+      expect(
+        mockLocationAccessService.assertHasLocationAccess,
+      ).toHaveBeenCalledWith(context, 'loc-1');
+    });
+
+    it('propagates ForbiddenException from LocationAccessService and never writes a StockTransfer', async () => {
+      mockLocationAccessService.assertHasLocationAccess.mockRejectedValueOnce(
+        new ForbiddenException('You do not have access to this location'),
+      );
+
+      await expect(
+        service.create(
+          context,
+          {
+            fromLocationId: 'unassigned-loc',
+            toLocationId: 'loc-2',
+            productId: 'p-1',
+            quantity: 5,
+          } as any,
+          actor,
+        ),
+      ).rejects.toThrow(ForbiddenException);
+      expect(mockTx.stockTransfer.create).not.toHaveBeenCalled();
     });
   });
 
@@ -137,6 +190,33 @@ describe('StockTransferService', () => {
       // destination must not be touched at dispatch time
       expect(mockInventoryService.increaseStock).not.toHaveBeenCalled();
     });
+
+    it('checks Location access for the source (fromLocationId)', async () => {
+      mockPrisma.stockTransfer.findFirst.mockResolvedValue(pending);
+      mockInventoryService.decreaseStock.mockResolvedValue({});
+      mockTx.stockTransfer.update.mockResolvedValue({
+        id: 't-1',
+        status: StockTransferStatus.IN_TRANSIT,
+      });
+
+      await service.dispatch(context, 't-1', actor);
+
+      expect(
+        mockLocationAccessService.assertHasLocationAccess,
+      ).toHaveBeenCalledWith(context, 'loc-1');
+    });
+
+    it('propagates ForbiddenException from LocationAccessService and never decreases stock', async () => {
+      mockPrisma.stockTransfer.findFirst.mockResolvedValue(pending);
+      mockLocationAccessService.assertHasLocationAccess.mockRejectedValueOnce(
+        new ForbiddenException('You do not have access to this location'),
+      );
+
+      await expect(service.dispatch(context, 't-1', actor)).rejects.toThrow(
+        ForbiddenException,
+      );
+      expect(mockInventoryService.decreaseStock).not.toHaveBeenCalled();
+    });
   });
 
   describe('receive', () => {
@@ -189,6 +269,33 @@ describe('StockTransferService', () => {
       );
       // source must not be touched again at receive time
       expect(mockInventoryService.decreaseStock).not.toHaveBeenCalled();
+    });
+
+    it('checks Location access for the destination (toLocationId)', async () => {
+      mockPrisma.stockTransfer.findFirst.mockResolvedValue(inTransit);
+      mockInventoryService.increaseStock.mockResolvedValue({});
+      mockTx.stockTransfer.update.mockResolvedValue({
+        id: 't-1',
+        status: StockTransferStatus.RECEIVED,
+      });
+
+      await service.receive(context, 't-1', actor);
+
+      expect(
+        mockLocationAccessService.assertHasLocationAccess,
+      ).toHaveBeenCalledWith(context, 'loc-2');
+    });
+
+    it('propagates ForbiddenException from LocationAccessService and never increases stock', async () => {
+      mockPrisma.stockTransfer.findFirst.mockResolvedValue(inTransit);
+      mockLocationAccessService.assertHasLocationAccess.mockRejectedValueOnce(
+        new ForbiddenException('You do not have access to this location'),
+      );
+
+      await expect(service.receive(context, 't-1', actor)).rejects.toThrow(
+        ForbiddenException,
+      );
+      expect(mockInventoryService.increaseStock).not.toHaveBeenCalled();
     });
   });
 });

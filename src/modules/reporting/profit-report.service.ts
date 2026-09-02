@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { Prisma } from 'src/generated/phase-1-prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { LocationAccessService } from '../../common/services/location-access.service';
 import type { CompanyContext } from '../../common/types/company-context.type';
 import { DateRangeReportQueryDto } from './dto/report-query.dto';
 import { parseReportDateRange } from './report-date-range.util';
@@ -48,16 +49,48 @@ interface ProfitReportCsvRow {
  */
 @Injectable()
 export class ProfitReportService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly locationAccessService: LocationAccessService,
+  ) {}
 
-  private buildBaseWhere(
+  /**
+   * Same explicit-vs-implicit rule as the other reports, expressed as a raw
+   * SQL fragment since this service's WHERE clause is already raw SQL
+   * (date-bucketing has no Prisma query-builder equivalent). An actor
+   * assigned to zero Locations must match zero rows — `locationId IN ()`
+   * is invalid Postgres syntax, so that case is a literal `AND FALSE`
+   * rather than an empty IN-list.
+   */
+  private async resolveLocationSql(
+    context: CompanyContext,
+    explicitLocationId?: string,
+  ): Promise<Prisma.Sql> {
+    if (explicitLocationId) {
+      await this.locationAccessService.assertHasLocationAccess(
+        context,
+        explicitLocationId,
+      );
+      return Prisma.sql`AND s."locationId" = ${explicitLocationId}::uuid`;
+    }
+    const assigned =
+      await this.locationAccessService.getAssignedLocationIds(context);
+    if (assigned === 'ALL') return Prisma.empty;
+    if (assigned.length === 0) return Prisma.sql`AND FALSE`;
+    return Prisma.sql`AND s."locationId" IN (${Prisma.join(
+      assigned.map((id) => Prisma.sql`${id}::uuid`),
+    )})`;
+  }
+
+  private async buildBaseWhere(
     context: CompanyContext,
     query: Pick<DateRangeReportQueryDto, 'dateFrom' | 'dateTo' | 'locationId'>,
   ) {
     const { from, to } = parseReportDateRange(query.dateFrom, query.dateTo);
-    const locationFilter = query.locationId
-      ? Prisma.sql`AND s."locationId" = ${query.locationId}::uuid`
-      : Prisma.empty;
+    const locationFilter = await this.resolveLocationSql(
+      context,
+      query.locationId,
+    );
     return Prisma.sql`
       s."tenantId" = ${context.tenantId}::uuid
       AND s."companyId" = ${context.companyId}::uuid
@@ -72,7 +105,7 @@ export class ProfitReportService {
     context: CompanyContext,
     query: DateRangeReportQueryDto,
   ) {
-    const baseWhere = this.buildBaseWhere(context, query);
+    const baseWhere = await this.buildBaseWhere(context, query);
     const page = query.page ?? 1;
     const limit = query.limit ?? 50;
     const skip = (page - 1) * limit;
@@ -146,11 +179,11 @@ export class ProfitReportService {
   }
 
   /** All day-buckets for the range in one query — inherently small (at most a few thousand rows even across years), so no batching is needed beyond the util's own single-shot contract. */
-  streamProfitReportCsv(
+  async streamProfitReportCsv(
     context: CompanyContext,
     query: DateRangeReportQueryDto,
   ) {
-    const baseWhere = this.buildBaseWhere(context, query);
+    const baseWhere = await this.buildBaseWhere(context, query);
     let served = false;
 
     return createCsvStream<ProfitReportCsvRow>(

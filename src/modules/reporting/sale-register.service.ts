@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from 'src/generated/phase-1-prisma/client';
 import { SaleStatus } from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
+import { LocationAccessService } from '../../common/services/location-access.service';
 import type { CompanyContext } from '../../common/types/company-context.type';
 import { DateRangeReportQueryDto } from './dto/report-query.dto';
 import { parseReportDateRange } from './report-date-range.util';
@@ -32,18 +33,48 @@ const SALE_REGISTER_SELECT = {
  */
 @Injectable()
 export class SaleRegisterService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly locationAccessService: LocationAccessService,
+  ) {}
 
-  private buildWhere(
+  /**
+   * Explicit `locationId` -> a clear 403 if the actor isn't assigned to it
+   * (never a silently-empty result misreadable as "no sales happened
+   * here"). Omitted -> implicitly scoped to the actor's full assigned set,
+   * so "show me everything" never means company-wide for a location-scoped
+   * actor.
+   */
+  private async resolveLocationFilter(
+    context: CompanyContext,
+    explicitLocationId?: string,
+  ): Promise<Pick<Prisma.SaleWhereInput, 'locationId'>> {
+    if (explicitLocationId) {
+      await this.locationAccessService.assertHasLocationAccess(
+        context,
+        explicitLocationId,
+      );
+      return { locationId: explicitLocationId };
+    }
+    const assigned =
+      await this.locationAccessService.getAssignedLocationIds(context);
+    return assigned === 'ALL' ? {} : { locationId: { in: assigned } };
+  }
+
+  private async buildWhere(
     context: CompanyContext,
     query: Pick<DateRangeReportQueryDto, 'dateFrom' | 'dateTo' | 'locationId'>,
-  ): Prisma.SaleWhereInput {
+  ): Promise<Prisma.SaleWhereInput> {
     const { from, to } = parseReportDateRange(query.dateFrom, query.dateTo);
+    const locationFilter = await this.resolveLocationFilter(
+      context,
+      query.locationId,
+    );
     return {
       tenantId: context.tenantId,
       companyId: context.companyId,
       saleDate: { gte: from, lte: to },
-      ...(query.locationId ? { locationId: query.locationId } : {}),
+      ...locationFilter,
     };
   }
 
@@ -51,7 +82,7 @@ export class SaleRegisterService {
     context: CompanyContext,
     query: DateRangeReportQueryDto,
   ) {
-    const where = this.buildWhere(context, query);
+    const where = await this.buildWhere(context, query);
     const page = query.page ?? 1;
     const limit = query.limit ?? 50;
     const skip = (page - 1) * limit;
@@ -101,11 +132,11 @@ export class SaleRegisterService {
   }
 
   /** Streams the full date-range result (every status, matching the on-screen listing) — never paginated, never buffered in full. */
-  streamSaleRegisterCsv(
+  async streamSaleRegisterCsv(
     context: CompanyContext,
     query: DateRangeReportQueryDto,
   ) {
-    const where = this.buildWhere(context, query);
+    const where = await this.buildWhere(context, query);
     return createCsvStream(
       [
         { header: 'Sale Number', value: (r: any) => r.saleNumber },

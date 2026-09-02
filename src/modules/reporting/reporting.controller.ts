@@ -100,12 +100,12 @@ export class ReportingController {
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.REPORT_READ)
   @Header('Content-Type', 'text/csv; charset=utf-8')
   @Header('Content-Disposition', 'attachment; filename="sale-register.csv"')
-  exportSaleRegister(
+  async exportSaleRegister(
     @CurrentCompany() context: CompanyContext,
     @Query() query: DateRangeReportQueryDto,
   ) {
     return new StreamableFile(
-      this.saleRegisterService.streamSaleRegisterCsv(context, query),
+      await this.saleRegisterService.streamSaleRegisterCsv(context, query),
     );
   }
 
@@ -113,12 +113,15 @@ export class ReportingController {
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.REPORT_READ)
   @Header('Content-Type', 'text/csv; charset=utf-8')
   @Header('Content-Disposition', 'attachment; filename="purchase-register.csv"')
-  exportPurchaseRegister(
+  async exportPurchaseRegister(
     @CurrentCompany() context: CompanyContext,
     @Query() query: DateRangeReportQueryDto,
   ) {
     return new StreamableFile(
-      this.purchaseRegisterService.streamPurchaseRegisterCsv(context, query),
+      await this.purchaseRegisterService.streamPurchaseRegisterCsv(
+        context,
+        query,
+      ),
     );
   }
 
@@ -126,12 +129,12 @@ export class ReportingController {
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.PROFIT_REPORT_READ)
   @Header('Content-Type', 'text/csv; charset=utf-8')
   @Header('Content-Disposition', 'attachment; filename="profit-report.csv"')
-  exportProfitReport(
+  async exportProfitReport(
     @CurrentCompany() context: CompanyContext,
     @Query() query: DateRangeReportQueryDto,
   ) {
     return new StreamableFile(
-      this.profitReportService.streamProfitReportCsv(context, query),
+      await this.profitReportService.streamProfitReportCsv(context, query),
     );
   }
 
@@ -139,12 +142,12 @@ export class ReportingController {
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.REPORT_READ)
   @Header('Content-Type', 'text/csv; charset=utf-8')
   @Header('Content-Disposition', 'attachment; filename="stock-report.csv"')
-  exportStockReport(
+  async exportStockReport(
     @CurrentCompany() context: CompanyContext,
     @Query() query: StockReportQueryDto,
   ) {
     return new StreamableFile(
-      this.stockReportService.streamStockReportCsv(context, query),
+      await this.stockReportService.streamStockReportCsv(context, query),
     );
   }
 

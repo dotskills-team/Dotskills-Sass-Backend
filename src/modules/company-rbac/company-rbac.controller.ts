@@ -23,11 +23,13 @@ import { SubscriptionStatusGuard } from '../../common/guards/subscription-status
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import type { CompanyContext } from '../../common/types/company-context.type';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { LocationAccessService } from '../../common/services/location-access.service';
 import { CompanyRbacService } from './company-rbac.service';
 import {
   BootstrapCompanyRbacDto,
   CreateCompanyMemberDto,
   CreateCompanyRoleDto,
+  ReplaceCompanyMemberLocationsDto,
   ReplaceCompanyMemberRolesDto,
   ReplaceCompanyMemberScopesDto,
   ReplaceCompanyRolePermissionsDto,
@@ -59,12 +61,37 @@ export class CompanyRbacBootstrapController {
   CompanyPermissionsGuard,
 )
 export class CompanyRbacController {
-  constructor(private readonly service: CompanyRbacService) {}
+  constructor(
+    private readonly service: CompanyRbacService,
+    private readonly locationAccessService: LocationAccessService,
+  ) {}
 
   @Get('permissions')
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.RBAC_READ)
   listPermissions() {
     return this.service.listPermissions();
+  }
+
+  /**
+   * No @RequireCompanyPermissions — CompanyPermissionsGuard allows any
+   * active member through when no metadata is present, matching this
+   * route's own purpose: "what can I access" is safe self-information for
+   * every authenticated member, the same class of route as GET
+   * /auth/me/companies. Every LBAC-aware Location <Select> (POS, Cash
+   * Drawer, Reports) calls this to filter its options — the real security
+   * boundary is still the backend LocationAccessService calls in each
+   * business-ops service, this is only the UX-quality companion.
+   */
+  @Get('my-location-access')
+  async getMyLocationAccess(@CurrentCompany() context: CompanyContext) {
+    const assigned = await this.locationAccessService.getAssignedLocationIds(context);
+    return {
+      success: true,
+      data:
+        assigned === 'ALL'
+          ? { all: true as const, locationIds: [] as string[] }
+          : { all: false as const, locationIds: assigned },
+    };
   }
 
   @Get('roles')
@@ -152,5 +179,16 @@ export class CompanyRbacController {
     @CurrentUser() actor: AuthenticatedUser,
   ) {
     return this.service.replaceMemberScopes(context, memberId, dto, actor);
+  }
+
+  @Put('members/:memberId/locations')
+  @RequireCompanyPermissions(COMPANY_PERMISSIONS.MEMBER_SCOPE_ASSIGN)
+  replaceMemberLocations(
+    @CurrentCompany() context: CompanyContext,
+    @Param('memberId') memberId: string,
+    @Body() dto: ReplaceCompanyMemberLocationsDto,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.service.replaceMemberLocations(context, memberId, dto, actor);
   }
 }

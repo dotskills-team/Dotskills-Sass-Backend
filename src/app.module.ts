@@ -32,6 +32,7 @@ import { ThrottlerModule, ThrottlerGuard, seconds } from '@nestjs/throttler';
 
 import { AppController } from './app.controller';
 import { PrismaModule } from './prisma/prisma.module';
+import { LocationAccessModule } from './common/services/location-access.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { validateEnvironment } from './config/env.validation';
 
@@ -61,6 +62,7 @@ import { CustomerModule } from './modules/master-data/customer/customer.module';
 import { SupplierModule } from './modules/master-data/supplier/supplier.module';
 import { CompanySettingsModule } from './modules/master-data/company-settings/company-settings.module';
 import { InventoryModule } from './modules/master-data/inventory/inventory.module';
+import { StockAdjustmentModule } from './modules/master-data/stock-adjustment/stock-adjustment.module';
 import { PurchaseOrderModule } from './modules/purchase/purchase-order/purchase-order.module';
 import { StockTransferModule } from './modules/purchase/stock-transfer/stock-transfer.module';
 import { SupplierPaymentModule } from './modules/purchase/supplier-payment/supplier-payment.module';
@@ -86,6 +88,7 @@ import { ReportingModule } from './modules/reporting/reporting.module';
     ]),
 
     PrismaModule,
+    LocationAccessModule,
     AuthModule,
     AccessControlSetupModule,
     PlatformStaffModule,
@@ -112,6 +115,7 @@ import { ReportingModule } from './modules/reporting/reporting.module';
     SupplierModule,
     CompanySettingsModule,
     InventoryModule,
+    StockAdjustmentModule,
     PurchaseOrderModule,
     StockTransferModule,
     SupplierPaymentModule,

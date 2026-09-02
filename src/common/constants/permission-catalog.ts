@@ -823,6 +823,13 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
     name: 'Update company locations',
   },
   {
+    code: COMPANY_PERMISSIONS.LOCATION_ACCESS_ALL,
+    moduleCode: 'company_master_data',
+    resource: 'location',
+    action: 'access-all',
+    name: 'Access every location, bypassing per-member Location assignment',
+  },
+  {
     code: COMPANY_PERMISSIONS.CATEGORY_READ,
     moduleCode: 'company_master_data',
     resource: 'category',
@@ -1118,6 +1125,13 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
     name: 'Close a cash drawer session',
   },
   {
+    code: COMPANY_PERMISSIONS.CASH_DRAWER_SESSION_MANAGE_ALL,
+    moduleCode: 'company_sales',
+    resource: 'cash-drawer-session',
+    action: 'manage-all',
+    name: 'View or close any cashier\'s cash drawer session',
+  },
+  {
     code: COMPANY_PERMISSIONS.REPORT_READ,
     moduleCode: 'company_reporting',
     resource: 'report',
@@ -1130,6 +1144,20 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
     resource: 'profit-report',
     action: 'read',
     name: 'Read the profit report',
+  },
+  {
+    code: COMPANY_PERMISSIONS.STOCK_ADJUSTMENT_READ,
+    moduleCode: 'company_inventory',
+    resource: 'stock-adjustment',
+    action: 'read',
+    name: 'Read stock adjustments',
+  },
+  {
+    code: COMPANY_PERMISSIONS.STOCK_ADJUSTMENT_CREATE,
+    moduleCode: 'company_inventory',
+    resource: 'stock-adjustment',
+    action: 'create',
+    name: 'Create a stock adjustment',
   },
 ];
 

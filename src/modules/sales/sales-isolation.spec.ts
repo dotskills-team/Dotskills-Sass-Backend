@@ -4,6 +4,7 @@ import { NotFoundException } from '@nestjs/common';
 import { AppModule } from '../../app.module';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CompanyManagementService } from '../company-management/company-management.service';
+import { CompanyRbacService } from '../company-rbac/company-rbac.service';
 import { LocationService } from '../master-data/location/location.service';
 import { UnitService } from '../master-data/unit/unit.service';
 import { ProductService } from '../master-data/product/product.service';
@@ -34,6 +35,7 @@ describe('Business Ops Sales/POS — multi-tenant isolation (integration)', () =
   let moduleRef: TestingModule;
   let prisma: PrismaService;
   let companyManagementService: CompanyManagementService;
+  let companyRbacService: CompanyRbacService;
   let locationService: LocationService;
   let unitService: UnitService;
   let productService: ProductService;
@@ -63,6 +65,7 @@ describe('Business Ops Sales/POS — multi-tenant isolation (integration)', () =
 
     prisma = moduleRef.get(PrismaService);
     companyManagementService = moduleRef.get(CompanyManagementService);
+    companyRbacService = moduleRef.get(CompanyRbacService);
     locationService = moduleRef.get(LocationService);
     unitService = moduleRef.get(UnitService);
     productService = moduleRef.get(ProductService);
@@ -94,10 +97,26 @@ describe('Business Ops Sales/POS — multi-tenant isolation (integration)', () =
 
     companyAId = companyA.id;
     companyBId = companyB.id;
+
+    // A real Owner CompanyMember is required so LocationAccessService's
+    // permission-resolution queries (LOCATION_ACCESS_ALL, auto-inherited by
+    // COMPANY_OWNER) have a real companyMemberId to resolve — 'n/a' would
+    // fail the underlying UUID column, not just resolve to "no access".
+    const bootstrapA = await companyRbacService.bootstrap(
+      companyAId,
+      { ownerUserId: CREATOR_USER_ID },
+      actor,
+    );
+    const bootstrapB = await companyRbacService.bootstrap(
+      companyBId,
+      { ownerUserId: CREATOR_USER_ID },
+      actor,
+    );
+
     contextA = {
       tenantId: TENANT_1,
       companyId: companyAId,
-      companyMemberId: 'n/a',
+      companyMemberId: bootstrapA.data.ownerMemberId!,
       companyStatus: 'DRAFT',
       tenantStatus: 'ACTIVE',
       scopes: [],
@@ -105,7 +124,7 @@ describe('Business Ops Sales/POS — multi-tenant isolation (integration)', () =
     contextB = {
       tenantId: TENANT_2,
       companyId: companyBId,
-      companyMemberId: 'n/a',
+      companyMemberId: bootstrapB.data.ownerMemberId!,
       companyStatus: 'DRAFT',
       tenantStatus: 'ACTIVE',
       scopes: [],
@@ -129,6 +148,12 @@ describe('Business Ops Sales/POS — multi-tenant isolation (integration)', () =
       await prisma.location.deleteMany({ where: { companyId } });
       await prisma.companySettings.deleteMany({ where: { companyId } });
       await prisma.subscription.deleteMany({ where: { companyId } });
+      // RBAC rows created by bootstrap() in beforeAll — companyOwnership is
+      // onDelete:Restrict on companyMember, so it must go first; deleting
+      // companyMember/companyRole cascades their own child rows.
+      await prisma.companyOwnership.deleteMany({ where: { companyId } });
+      await prisma.companyMember.deleteMany({ where: { companyId } });
+      await prisma.companyRole.deleteMany({ where: { companyId } });
       await prisma.company.delete({ where: { id: companyId } });
     }
     await moduleRef.close();

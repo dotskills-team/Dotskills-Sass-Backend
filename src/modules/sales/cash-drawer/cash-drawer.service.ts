@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,7 +12,10 @@ import {
   SalePaymentMethod,
   SaleStatus,
 } from 'src/generated/phase-1-prisma/enums';
+import { COMPANY_PERMISSIONS } from '../../../common/constants/permission.constants';
 import { PrismaService } from '../../../prisma/prisma.service';
+import { CompanyPermissionResolverService } from '../../../common/services/company-permission-resolver.service';
+import { LocationAccessService } from '../../../common/services/location-access.service';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import {
@@ -44,20 +48,58 @@ const SESSION_SELECT = {
  */
 @Injectable()
 export class CashDrawerSessionService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly permissionResolver: CompanyPermissionResolverService,
+    private readonly locationAccessService: LocationAccessService,
+  ) {}
 
   async list(
     context: CompanyContext,
     query: ListCashDrawerSessionsQueryDto = {},
+    actor: AuthenticatedUser,
   ) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 50;
     const skip = (page - 1) * limit;
+    const canManageAll = await this.permissionResolver.hasPermission(
+      context,
+      COMPANY_PERMISSIONS.CASH_DRAWER_SESSION_MANAGE_ALL,
+    );
+
+    // Explicit locationId -> a clear 403 if the actor isn't assigned to it
+    // (never a silently-empty result that could be misread as "no sessions
+    // here"). Omitted -> implicitly scoped to the actor's full assigned set,
+    // same "no rows = no access" fail-safe default as every other LBAC call
+    // site.
+    let locationFilter: Prisma.CashDrawerSessionWhereInput = {};
+    if (query.locationId) {
+      await this.locationAccessService.assertHasLocationAccess(
+        context,
+        query.locationId,
+      );
+      locationFilter = { locationId: query.locationId };
+    } else {
+      const assignedLocationIds =
+        await this.locationAccessService.getAssignedLocationIds(context);
+      if (assignedLocationIds !== 'ALL') {
+        locationFilter = { locationId: { in: assignedLocationIds } };
+      }
+    }
+
     const where: Prisma.CashDrawerSessionWhereInput = {
       tenantId: context.tenantId,
       companyId: context.companyId,
-      ...(query.locationId ? { locationId: query.locationId } : {}),
-      ...(query.cashierId ? { cashierId: query.cashierId } : {}),
+      ...locationFilter,
+      // A non-elevated actor (Cashier) is always scoped to their own
+      // sessions, regardless of what cashierId the client asked for —
+      // never trust client input over what the actor is actually allowed
+      // to see.
+      ...(canManageAll
+        ? query.cashierId
+          ? { cashierId: query.cashierId }
+          : {}
+        : { cashierId: actor.userId }),
       ...(query.status ? { status: query.status } : {}),
     };
 
@@ -79,8 +121,13 @@ export class CashDrawerSessionService {
     };
   }
 
-  async findOne(context: CompanyContext, id: string) {
+  async findOne(context: CompanyContext, id: string, actor: AuthenticatedUser) {
     const session = await this.requireSession(context, id);
+    await this.assertCanAccessSession(context, session, actor);
+    await this.locationAccessService.assertHasLocationAccess(
+      context,
+      session.locationId,
+    );
     return { success: true, data: session };
   }
 
@@ -110,6 +157,10 @@ export class CashDrawerSessionService {
       throw new BadRequestException(
         'locationId does not belong to this company',
       );
+    await this.locationAccessService.assertHasLocationAccess(
+      context,
+      dto.locationId,
+    );
 
     const previousClosed = await this.prisma.cashDrawerSession.findFirst({
       where: {
@@ -184,6 +235,11 @@ export class CashDrawerSessionService {
     actor: AuthenticatedUser,
   ) {
     const before = await this.requireSession(context, id);
+    await this.assertCanAccessSession(context, before, actor);
+    await this.locationAccessService.assertHasLocationAccess(
+      context,
+      before.locationId,
+    );
     if (before.status !== CashDrawerSessionStatus.OPEN) {
       throw new BadRequestException(
         `Cannot close a session with status ${before.status}`,
@@ -242,6 +298,26 @@ export class CashDrawerSessionService {
     if (!session)
       throw new NotFoundException('Cash drawer session was not found');
     return session;
+  }
+
+  private async assertCanAccessSession(
+    context: CompanyContext,
+    session: { cashierId: string },
+    actor: AuthenticatedUser,
+  ): Promise<void> {
+    if (session.cashierId === actor.userId) return;
+    // A Cashier only ever sees/closes their own session; Owner/Admin
+    // (automatic) and Manager (explicit) hold CASH_DRAWER_SESSION_MANAGE_ALL
+    // and can act on any cashier's session.
+    const canManageAll = await this.permissionResolver.hasPermission(
+      context,
+      COMPANY_PERMISSIONS.CASH_DRAWER_SESSION_MANAGE_ALL,
+    );
+    if (!canManageAll) {
+      throw new ForbiddenException(
+        'You can only view or close your own cash drawer session',
+      );
+    }
   }
 
   private createAudit(

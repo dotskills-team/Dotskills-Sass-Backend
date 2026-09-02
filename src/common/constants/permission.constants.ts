@@ -525,6 +525,14 @@ export const COMPANY_PERMISSIONS = {
   LOCATION_CREATE: 'company.location.create',
   LOCATION_UPDATE: 'company.location.update',
 
+  /**
+   * Location-Based Access Control — held only by Owner/Admin (automatic
+   * via Object.values). Its absence is what subjects MANAGER/CASHIER to
+   * the CompanyMemberLocation-based restriction enforced by
+   * LocationAccessService; it isn't a route-gating permission on its own.
+   */
+  LOCATION_ACCESS_ALL: 'company.location.access-all',
+
   CATEGORY_READ: 'company.category.read',
   CATEGORY_CREATE: 'company.category.create',
   CATEGORY_UPDATE: 'company.category.update',
@@ -602,6 +610,17 @@ export const COMPANY_PERMISSIONS = {
   CASH_DRAWER_SESSION_CLOSE: 'company.cash-drawer-session.close',
 
   /**
+   * MANAGER/CASHIER role curation — a Cashier only ever sees/closes their
+   * OWN session (enforced in the service layer, see cash-drawer.service.ts);
+   * this permission is the one signal that lifts that restriction, held
+   * only by Owner/Admin (automatic) and Manager (explicit) so a Manager
+   * can still close a session a Cashier forgot to, or review any cashier's
+   * shift — same dotted convention as every other code here, not a new
+   * pattern.
+   */
+  CASH_DRAWER_SESSION_MANAGE_ALL: 'company.cash-drawer-session.manage-all',
+
+  /**
    * Reporting (Phase 6). PROFIT_REPORT_READ is kept separate from
    * REPORT_READ — margin/profit visibility is a classic case an Owner
    * wants hidden from a Branch Manager even while everything else in
@@ -609,6 +628,10 @@ export const COMPANY_PERMISSIONS = {
    */
   REPORT_READ: 'company.report.read',
   PROFIT_REPORT_READ: 'company.profit-report.read',
+
+  /** Manual Stock Adjustment — damage/theft/count-mismatch/expiry/opening-stock corrections, Owner/Manager tier (kept out of Cashier reach, same as SALE_VOID). */
+  STOCK_ADJUSTMENT_READ: 'company.stock-adjustment.read',
+  STOCK_ADJUSTMENT_CREATE: 'company.stock-adjustment.create',
 } as const;
 
 /**

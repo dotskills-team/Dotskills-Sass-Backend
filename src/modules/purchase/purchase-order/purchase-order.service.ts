@@ -16,6 +16,7 @@ import type { CompanyContext } from '../../../common/types/company-context.type'
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
 import { ProductCostingService } from '../../master-data/product/product-costing.service';
+import { LocationAccessService } from '../../../common/services/location-access.service';
 import {
   CreatePurchaseOrderDto,
   ListPurchaseOrdersQueryDto,
@@ -52,6 +53,7 @@ export class PurchaseOrderService {
     private readonly prisma: PrismaService,
     private readonly inventoryService: InventoryService,
     private readonly costingService: ProductCostingService,
+    private readonly locationAccessService: LocationAccessService,
   ) {}
 
   async list(context: CompanyContext, query: ListPurchaseOrdersQueryDto = {}) {
@@ -91,6 +93,11 @@ export class PurchaseOrderService {
     dto: CreatePurchaseOrderDto,
     actor: AuthenticatedUser,
   ) {
+    await this.locationAccessService.assertHasLocationAccess(
+      context,
+      dto.locationId,
+    );
+
     const totalAmount = dto.items.reduce(
       (sum, item) => sum + item.orderedQty * item.unitCost,
       0,
@@ -246,6 +253,10 @@ export class PurchaseOrderService {
     actor: AuthenticatedUser,
   ) {
     const order = await this.requireOrder(context, id);
+    await this.locationAccessService.assertHasLocationAccess(
+      context,
+      order.locationId,
+    );
     if (order.status === PurchaseOrderStatus.CANCELLED) {
       throw new BadRequestException(
         'Cannot receive goods against a cancelled purchase order',
@@ -383,6 +394,10 @@ export class PurchaseOrderService {
     actor: AuthenticatedUser,
   ) {
     const order = await this.requireOrder(context, id);
+    await this.locationAccessService.assertHasLocationAccess(
+      context,
+      order.locationId,
+    );
     if (
       order.status === PurchaseOrderStatus.DRAFT ||
       order.status === PurchaseOrderStatus.CANCELLED

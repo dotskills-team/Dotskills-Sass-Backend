@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, ConflictException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException } from '@nestjs/common';
 
 import {
   SalePaymentMethod,
@@ -8,6 +8,7 @@ import {
 } from '../../../generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
+import { LocationAccessService } from '../../../common/services/location-access.service';
 import { SaleService } from './sale.service';
 
 describe('SaleService', () => {
@@ -38,6 +39,11 @@ describe('SaleService', () => {
     decreaseStock: jest.fn(),
   };
 
+  /** Unrestricted by default — Location-scoping is exercised in its own dedicated describe block below. */
+  const mockLocationAccessService = {
+    assertHasLocationAccess: jest.fn().mockResolvedValue(undefined),
+  };
+
   const context = { tenantId: 'tenant-1', companyId: 'company-1' } as any;
   const actor = { userId: 'user-1' } as any;
 
@@ -49,6 +55,7 @@ describe('SaleService', () => {
         SaleService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: InventoryService, useValue: mockInventoryService },
+        { provide: LocationAccessService, useValue: mockLocationAccessService },
       ],
     }).compile();
 
@@ -112,6 +119,44 @@ describe('SaleService', () => {
       const createCall = mockTx.sale.create.mock.calls[0][0];
       expect(createCall.data.cashDrawerSessionId).toBeNull();
       expect(result.success).toBe(true);
+    });
+  });
+
+  describe('create — Location-Based Access Control', () => {
+    it('checks Location access for dto.locationId before doing anything else', async () => {
+      await service.create(
+        context,
+        {
+          locationId: 'loc-1',
+          items: [{ productId: 'product-1', quantity: 1 }],
+          payments: [{ method: 'CASH', amount: 100 }],
+        } as any,
+        actor,
+      );
+
+      expect(mockLocationAccessService.assertHasLocationAccess).toHaveBeenCalledWith(
+        context,
+        'loc-1',
+      );
+    });
+
+    it('propagates ForbiddenException from LocationAccessService and never writes a Sale', async () => {
+      mockLocationAccessService.assertHasLocationAccess.mockRejectedValueOnce(
+        new ForbiddenException('You do not have access to this location'),
+      );
+
+      await expect(
+        service.create(
+          context,
+          {
+            locationId: 'unassigned-loc',
+            items: [{ productId: 'product-1', quantity: 1 }],
+            payments: [{ method: 'CASH', amount: 100 }],
+          } as any,
+          actor,
+        ),
+      ).rejects.toThrow(ForbiddenException);
+      expect(mockTx.sale.create).not.toHaveBeenCalled();
     });
   });
 

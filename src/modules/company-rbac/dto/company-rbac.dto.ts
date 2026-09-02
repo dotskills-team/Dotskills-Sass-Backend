@@ -154,3 +154,15 @@ export class ReplaceCompanyMemberScopesDto {
   @Type(() => CompanyMemberScopeItemDto)
   scopes!: CompanyMemberScopeItemDto[];
 }
+
+/**
+ * No @ArrayMinSize — unlike Scopes (which always needs the default
+ * {COMPANY,'*'} catch-all row), an empty array is a real, meaningful state
+ * for CompanyMemberLocation: it revokes all Location access, matching the
+ * LBAC design's own fail-safe default ("no rows = no access").
+ */
+export class ReplaceCompanyMemberLocationsDto {
+  @IsArray()
+  @IsUUID('4', { each: true })
+  locationIds!: string[];
+}

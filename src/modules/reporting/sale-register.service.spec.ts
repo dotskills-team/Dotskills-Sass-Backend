@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 
 import { Prisma } from '../../generated/phase-1-prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
+import { LocationAccessService } from '../../common/services/location-access.service';
 import { SaleRegisterService } from './sale-register.service';
 
 describe('SaleRegisterService', () => {
@@ -14,15 +15,28 @@ describe('SaleRegisterService', () => {
     $transaction: jest.fn((arg: any[]) => Promise.all(arg)),
   };
 
+  const mockLocationAccessService = {
+    assertHasLocationAccess: jest.fn().mockResolvedValue(undefined),
+    getAssignedLocationIds: jest.fn().mockResolvedValue('ALL'),
+  };
+
   const context = { tenantId: 'tenant-1', companyId: 'company-1' } as any;
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockLocationAccessService.assertHasLocationAccess.mockResolvedValue(
+      undefined,
+    );
+    mockLocationAccessService.getAssignedLocationIds.mockResolvedValue('ALL');
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SaleRegisterService,
         { provide: PrismaService, useValue: mockPrisma },
+        {
+          provide: LocationAccessService,
+          useValue: mockLocationAccessService,
+        },
       ],
     }).compile();
 
@@ -92,6 +106,62 @@ describe('SaleRegisterService', () => {
     expect(mockPrisma.sale.aggregate.mock.calls[0][0].where.locationId).toBe(
       'loc-1',
     );
+  });
+
+  describe('Location-Based Access Control', () => {
+    it('checks Location access when an explicit locationId is given', async () => {
+      await service.getSaleRegister(context, {
+        dateFrom: '2026-01-01',
+        dateTo: '2026-01-31',
+        locationId: 'loc-1',
+      });
+
+      expect(
+        mockLocationAccessService.assertHasLocationAccess,
+      ).toHaveBeenCalledWith(context, 'loc-1');
+    });
+
+    it('propagates ForbiddenException for an unassigned explicit locationId', async () => {
+      mockLocationAccessService.assertHasLocationAccess.mockRejectedValueOnce(
+        new ForbiddenException('You do not have access to this location'),
+      );
+
+      await expect(
+        service.getSaleRegister(context, {
+          dateFrom: '2026-01-01',
+          dateTo: '2026-01-31',
+          locationId: 'unassigned-loc',
+        }),
+      ).rejects.toThrow(ForbiddenException);
+      expect(mockPrisma.sale.findMany).not.toHaveBeenCalled();
+    });
+
+    it('implicitly scopes to the assigned-locations set when no locationId is given and the actor is not LOCATION_ACCESS_ALL', async () => {
+      mockLocationAccessService.getAssignedLocationIds.mockResolvedValue([
+        'loc-1',
+        'loc-2',
+      ]);
+
+      await service.getSaleRegister(context, {
+        dateFrom: '2026-01-01',
+        dateTo: '2026-01-31',
+      });
+
+      expect(mockPrisma.sale.findMany.mock.calls[0][0].where.locationId).toEqual(
+        { in: ['loc-1', 'loc-2'] },
+      );
+    });
+
+    it('applies no location filter when the actor holds LOCATION_ACCESS_ALL and no locationId was given', async () => {
+      await service.getSaleRegister(context, {
+        dateFrom: '2026-01-01',
+        dateTo: '2026-01-31',
+      });
+
+      expect(
+        mockPrisma.sale.findMany.mock.calls[0][0].where.locationId,
+      ).toBeUndefined();
+    });
   });
 
   it('returns pagination metadata computed from total/limit', async () => {

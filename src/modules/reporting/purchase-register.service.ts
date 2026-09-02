@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from 'src/generated/phase-1-prisma/client';
 import { PurchaseOrderStatus } from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
+import { LocationAccessService } from '../../common/services/location-access.service';
 import type { CompanyContext } from '../../common/types/company-context.type';
 import { DateRangeReportQueryDto } from './dto/report-query.dto';
 import { parseReportDateRange } from './report-date-range.util';
@@ -26,18 +27,42 @@ const PURCHASE_REGISTER_SELECT = {
  */
 @Injectable()
 export class PurchaseRegisterService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly locationAccessService: LocationAccessService,
+  ) {}
 
-  private buildWhere(
+  /** Same explicit-vs-implicit rule as SaleRegisterService.resolveLocationFilter(). */
+  private async resolveLocationFilter(
+    context: CompanyContext,
+    explicitLocationId?: string,
+  ): Promise<Pick<Prisma.PurchaseOrderWhereInput, 'locationId'>> {
+    if (explicitLocationId) {
+      await this.locationAccessService.assertHasLocationAccess(
+        context,
+        explicitLocationId,
+      );
+      return { locationId: explicitLocationId };
+    }
+    const assigned =
+      await this.locationAccessService.getAssignedLocationIds(context);
+    return assigned === 'ALL' ? {} : { locationId: { in: assigned } };
+  }
+
+  private async buildWhere(
     context: CompanyContext,
     query: Pick<DateRangeReportQueryDto, 'dateFrom' | 'dateTo' | 'locationId'>,
-  ): Prisma.PurchaseOrderWhereInput {
+  ): Promise<Prisma.PurchaseOrderWhereInput> {
     const { from, to } = parseReportDateRange(query.dateFrom, query.dateTo);
+    const locationFilter = await this.resolveLocationFilter(
+      context,
+      query.locationId,
+    );
     return {
       tenantId: context.tenantId,
       companyId: context.companyId,
       orderDate: { gte: from, lte: to },
-      ...(query.locationId ? { locationId: query.locationId } : {}),
+      ...locationFilter,
     };
   }
 
@@ -45,7 +70,7 @@ export class PurchaseRegisterService {
     context: CompanyContext,
     query: DateRangeReportQueryDto,
   ) {
-    const where = this.buildWhere(context, query);
+    const where = await this.buildWhere(context, query);
     const page = query.page ?? 1;
     const limit = query.limit ?? 50;
     const skip = (page - 1) * limit;
@@ -82,11 +107,11 @@ export class PurchaseRegisterService {
     };
   }
 
-  streamPurchaseRegisterCsv(
+  async streamPurchaseRegisterCsv(
     context: CompanyContext,
     query: DateRangeReportQueryDto,
   ) {
-    const where = this.buildWhere(context, query);
+    const where = await this.buildWhere(context, query);
     return createCsvStream(
       [
         { header: 'Order Number', value: (r: any) => r.orderNumber },

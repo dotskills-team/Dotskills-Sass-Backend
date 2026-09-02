@@ -15,6 +15,7 @@ import type {
   BootstrapCompanyRbacDto,
   CreateCompanyMemberDto,
   CreateCompanyRoleDto,
+  ReplaceCompanyMemberLocationsDto,
   ReplaceCompanyMemberRolesDto,
   ReplaceCompanyMemberScopesDto,
   ReplaceCompanyRolePermissionsDto,
@@ -36,6 +37,12 @@ const DEFAULT_ROLES = [
     permissions: COMPANY_PERMISSION_CODES,
   },
   {
+    // Production-readiness role curation (design doc Section ৮'s
+    // Owner/Branch-Manager/Cashier table) — Manager gets nearly every
+    // Business Ops permission; SETTINGS_UPDATE and Location/Branch-scoped
+    // restriction are the only two deliberate boundaries kept out of this
+    // pass (see the plan's own flags), a Company Owner can add either
+    // individually via the existing "Manage permissions" screen.
     code: 'MANAGER',
     name: 'Manager',
     permissions: [
@@ -45,12 +52,85 @@ const DEFAULT_ROLES = [
       COMPANY_PERMISSIONS.MEMBER_UPDATE,
       COMPANY_PERMISSIONS.MEMBER_ROLE_ASSIGN,
       COMPANY_PERMISSIONS.MEMBER_SCOPE_ASSIGN,
+      COMPANY_PERMISSIONS.LOCATION_READ,
+      COMPANY_PERMISSIONS.LOCATION_CREATE,
+      COMPANY_PERMISSIONS.LOCATION_UPDATE,
+      COMPANY_PERMISSIONS.CATEGORY_READ,
+      COMPANY_PERMISSIONS.CATEGORY_CREATE,
+      COMPANY_PERMISSIONS.CATEGORY_UPDATE,
+      COMPANY_PERMISSIONS.UNIT_READ,
+      COMPANY_PERMISSIONS.UNIT_CREATE,
+      COMPANY_PERMISSIONS.UNIT_UPDATE,
+      COMPANY_PERMISSIONS.PRODUCT_READ,
+      COMPANY_PERMISSIONS.PRODUCT_CREATE,
+      COMPANY_PERMISSIONS.PRODUCT_UPDATE,
+      COMPANY_PERMISSIONS.PRODUCT_BULK_IMPORT,
+      COMPANY_PERMISSIONS.CUSTOMER_READ,
+      COMPANY_PERMISSIONS.CUSTOMER_CREATE,
+      COMPANY_PERMISSIONS.CUSTOMER_UPDATE,
+      COMPANY_PERMISSIONS.SUPPLIER_READ,
+      COMPANY_PERMISSIONS.SUPPLIER_CREATE,
+      COMPANY_PERMISSIONS.SUPPLIER_UPDATE,
+      // SETTINGS_UPDATE deliberately excluded — company-wide toggles
+      // (tax/multi-unit/etc.) are a structural decision, kept Owner-only.
+      COMPANY_PERMISSIONS.SETTINGS_READ,
+      COMPANY_PERMISSIONS.PURCHASE_ORDER_READ,
+      COMPANY_PERMISSIONS.PURCHASE_ORDER_CREATE,
+      COMPANY_PERMISSIONS.PURCHASE_ORDER_UPDATE,
+      COMPANY_PERMISSIONS.PURCHASE_ORDER_CANCEL,
+      COMPANY_PERMISSIONS.PURCHASE_ORDER_RECEIVE,
+      COMPANY_PERMISSIONS.PURCHASE_RETURN_READ,
+      COMPANY_PERMISSIONS.PURCHASE_RETURN_CREATE,
+      COMPANY_PERMISSIONS.STOCK_TRANSFER_READ,
+      COMPANY_PERMISSIONS.STOCK_TRANSFER_CREATE,
+      COMPANY_PERMISSIONS.STOCK_TRANSFER_DISPATCH,
+      COMPANY_PERMISSIONS.STOCK_TRANSFER_RECEIVE,
+      COMPANY_PERMISSIONS.SUPPLIER_PAYMENT_READ,
+      COMPANY_PERMISSIONS.SUPPLIER_PAYMENT_CREATE,
+      COMPANY_PERMISSIONS.SALE_READ,
+      COMPANY_PERMISSIONS.SALE_CREATE,
+      // Void/Return — Owner/Manager trust tier (design doc Section ৫.৫):
+      // a Cashier who could both take cash and Void could pocket the cash
+      // and erase the transaction, with stock reversal hiding it even
+      // from a physical count.
+      COMPANY_PERMISSIONS.SALE_VOID,
+      COMPANY_PERMISSIONS.SALE_RETURN_READ,
+      COMPANY_PERMISSIONS.SALE_RETURN_CREATE,
+      COMPANY_PERMISSIONS.CUSTOMER_PAYMENT_READ,
+      COMPANY_PERMISSIONS.CUSTOMER_PAYMENT_CREATE,
+      COMPANY_PERMISSIONS.CASH_DRAWER_SESSION_READ,
+      COMPANY_PERMISSIONS.CASH_DRAWER_SESSION_OPEN,
+      COMPANY_PERMISSIONS.CASH_DRAWER_SESSION_CLOSE,
+      // Lets a Manager view/close a session a Cashier forgot to close —
+      // see cash-drawer.service.ts's ownership-scoping logic.
+      COMPANY_PERMISSIONS.CASH_DRAWER_SESSION_MANAGE_ALL,
+      COMPANY_PERMISSIONS.REPORT_READ,
+      COMPANY_PERMISSIONS.PROFIT_REPORT_READ,
+      COMPANY_PERMISSIONS.STOCK_ADJUSTMENT_READ,
+      COMPANY_PERMISSIONS.STOCK_ADJUSTMENT_CREATE,
     ],
   },
   {
-    code: 'STAFF',
-    name: 'Staff',
-    permissions: [COMPANY_PERMISSIONS.RBAC_READ],
+    // Renamed from STAFF (see the migration script) — a POS-focused,
+    // deliberately narrow role. No RBAC_READ (a Cashier doesn't need to
+    // see the company's role/member list), no Void/Return, no Purchase/
+    // Stock-Transfer/Stock-Adjustment/Report access at all.
+    code: 'CASHIER',
+    name: 'Cashier',
+    permissions: [
+      COMPANY_PERMISSIONS.SALE_READ,
+      COMPANY_PERMISSIONS.SALE_CREATE,
+      // Cash Drawer READ/OPEN/CLOSE, but never MANAGE_ALL — scoped in the
+      // service layer to only this cashier's own session.
+      COMPANY_PERMISSIONS.CASH_DRAWER_SESSION_READ,
+      COMPANY_PERMISSIONS.CASH_DRAWER_SESSION_OPEN,
+      COMPANY_PERMISSIONS.CASH_DRAWER_SESSION_CLOSE,
+      COMPANY_PERMISSIONS.PRODUCT_READ,
+      COMPANY_PERMISSIONS.CUSTOMER_READ,
+      // Not in the original ask, but structurally required — POS and Cash
+      // Drawer both need a Location selector to function at all.
+      COMPANY_PERMISSIONS.LOCATION_READ,
+    ],
   },
 ] as const;
 
@@ -73,6 +153,9 @@ const MEMBER_SELECT = {
   },
   scopes: {
     select: { id: true, scopeType: true, scopeKey: true, validUntil: true },
+  },
+  locations: {
+    select: { locationId: true, location: { select: { name: true } } },
   },
 } satisfies Prisma.CompanyMemberSelect;
 
@@ -658,6 +741,73 @@ export class CompanyRbacService {
         memberId,
         null,
         dto.scopes,
+      );
+      return tx.companyMember.findUniqueOrThrow({
+        where: { id: memberId },
+        select: MEMBER_SELECT,
+      });
+    });
+    return { success: true, data: updated };
+  }
+
+  /**
+   * Full replace, same shape as replaceMemberScopes() — an empty
+   * `locationIds` array is valid (revokes all Location access, matching
+   * LBAC's own fail-safe default). Every id is existence-checked against
+   * this company before writing — never trust a client-supplied id
+   * without a scoped check, same discipline as every other module.
+   */
+  async replaceMemberLocations(
+    context: CompanyContext,
+    memberId: string,
+    dto: ReplaceCompanyMemberLocationsDto,
+    actor: AuthenticatedUser,
+  ) {
+    await this.requireMember(context, memberId);
+
+    const uniqueIds = [...new Set(dto.locationIds)];
+    if (uniqueIds.length > 0) {
+      const found = await this.prisma.location.findMany({
+        where: {
+          id: { in: uniqueIds },
+          tenantId: context.tenantId,
+          companyId: context.companyId,
+        },
+        select: { id: true },
+      });
+      if (found.length !== uniqueIds.length) {
+        const foundIds = new Set(found.map((location) => location.id));
+        const missing = uniqueIds.filter((id) => !foundIds.has(id));
+        throw new BadRequestException(
+          `Invalid locationIds for this company: ${missing.join(', ')}`,
+        );
+      }
+    }
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      await tx.companyMemberLocation.deleteMany({
+        where: { companyMemberId: memberId },
+      });
+      if (uniqueIds.length > 0) {
+        await tx.companyMemberLocation.createMany({
+          data: uniqueIds.map((locationId) => ({
+            tenantId: context.tenantId,
+            companyId: context.companyId,
+            companyMemberId: memberId,
+            locationId,
+            assignedByUserId: actor.userId,
+          })),
+        });
+      }
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'COMPANY_MEMBER_LOCATIONS_REPLACED',
+        'CompanyMember',
+        memberId,
+        null,
+        { locationIds: uniqueIds },
       );
       return tx.companyMember.findUniqueOrThrow({
         where: { id: memberId },

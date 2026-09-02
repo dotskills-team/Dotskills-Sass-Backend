@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 
 import {
   PurchaseOrderStatus,
@@ -9,6 +9,7 @@ import {
 import { PrismaService } from '../../../prisma/prisma.service';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
 import { ProductCostingService } from '../../master-data/product/product-costing.service';
+import { LocationAccessService } from '../../../common/services/location-access.service';
 import { PurchaseOrderService } from './purchase-order.service';
 
 describe('PurchaseOrderService', () => {
@@ -42,12 +43,18 @@ describe('PurchaseOrderService', () => {
     decreaseStock: jest.fn(),
   };
   const mockCostingService = { applyPurchaseCost: jest.fn() };
+  const mockLocationAccessService = {
+    assertHasLocationAccess: jest.fn().mockResolvedValue(undefined),
+  };
 
   const context = { tenantId: 'tenant-1', companyId: 'company-1' } as any;
   const actor = { userId: 'user-1' } as any;
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockLocationAccessService.assertHasLocationAccess.mockResolvedValue(
+      undefined,
+    );
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -55,10 +62,56 @@ describe('PurchaseOrderService', () => {
         { provide: PrismaService, useValue: mockPrisma },
         { provide: InventoryService, useValue: mockInventoryService },
         { provide: ProductCostingService, useValue: mockCostingService },
+        {
+          provide: LocationAccessService,
+          useValue: mockLocationAccessService,
+        },
       ],
     }).compile();
 
     service = module.get(PurchaseOrderService);
+  });
+
+  describe('create — Location-Based Access Control', () => {
+    beforeEach(() => {
+      mockTx.$queryRaw.mockResolvedValue([{ lastNumber: 1 }]);
+      mockTx.purchaseOrder.create.mockResolvedValue({ id: 'po-new' });
+    });
+
+    it('checks Location access for dto.locationId before doing anything else', async () => {
+      await service.create(
+        context,
+        {
+          supplierId: 'supplier-1',
+          locationId: 'loc-1',
+          items: [{ productId: 'product-1', orderedQty: 1, unitCost: 10 }],
+        } as any,
+        actor,
+      );
+
+      expect(
+        mockLocationAccessService.assertHasLocationAccess,
+      ).toHaveBeenCalledWith(context, 'loc-1');
+    });
+
+    it('propagates ForbiddenException from LocationAccessService and never writes a PurchaseOrder', async () => {
+      mockLocationAccessService.assertHasLocationAccess.mockRejectedValueOnce(
+        new ForbiddenException('You do not have access to this location'),
+      );
+
+      await expect(
+        service.create(
+          context,
+          {
+            supplierId: 'supplier-1',
+            locationId: 'unassigned-loc',
+            items: [{ productId: 'product-1', orderedQty: 1, unitCost: 10 }],
+          } as any,
+          actor,
+        ),
+      ).rejects.toThrow(ForbiddenException);
+      expect(mockTx.purchaseOrder.create).not.toHaveBeenCalled();
+    });
   });
 
   describe('update / cancel — DRAFT-only immutability', () => {
@@ -104,6 +157,46 @@ describe('PurchaseOrderService', () => {
         },
       ],
     };
+
+    it("checks Location access for the loaded order's own locationId", async () => {
+      mockPrisma.purchaseOrder.findFirst.mockResolvedValue(draftOrder);
+      mockTx.goodsReceipt.create.mockResolvedValue({ id: 'receipt-loc' });
+      mockCostingService.applyPurchaseCost.mockResolvedValue(50);
+      mockInventoryService.increaseStock.mockResolvedValue({});
+      mockTx.purchaseOrderItem.update.mockResolvedValue({});
+      mockTx.purchaseOrderItem.findMany.mockResolvedValue([
+        { orderedQty: 10, receivedQty: 4 },
+      ]);
+      mockTx.purchaseOrder.update.mockResolvedValue({ id: 'po-1' });
+
+      await service.receive(
+        context,
+        'po-1',
+        { items: [{ purchaseOrderItemId: 'item-1', receivedQty: 4 }] },
+        actor,
+      );
+
+      expect(
+        mockLocationAccessService.assertHasLocationAccess,
+      ).toHaveBeenCalledWith(context, 'location-1');
+    });
+
+    it('propagates ForbiddenException from LocationAccessService and never creates a GoodsReceipt', async () => {
+      mockPrisma.purchaseOrder.findFirst.mockResolvedValue(draftOrder);
+      mockLocationAccessService.assertHasLocationAccess.mockRejectedValueOnce(
+        new ForbiddenException('You do not have access to this location'),
+      );
+
+      await expect(
+        service.receive(
+          context,
+          'po-1',
+          { items: [{ purchaseOrderItemId: 'item-1', receivedQty: 4 }] } as any,
+          actor,
+        ),
+      ).rejects.toThrow(ForbiddenException);
+      expect(mockTx.goodsReceipt.create).not.toHaveBeenCalled();
+    });
 
     it('rejects receiving more than was ordered for a line item', async () => {
       mockPrisma.purchaseOrder.findFirst.mockResolvedValue(draftOrder);
@@ -251,6 +344,46 @@ describe('PurchaseOrderService', () => {
       status: PurchaseOrderStatus.PARTIALLY_RECEIVED,
       items: [],
     };
+
+    it("checks Location access for the loaded order's own locationId", async () => {
+      mockPrisma.purchaseOrder.findFirst.mockResolvedValue(receivedOrder);
+      mockTx.purchaseReturn.create.mockResolvedValue({ id: 'return-loc' });
+      mockInventoryService.decreaseStock.mockResolvedValue({});
+
+      await service.createReturn(
+        context,
+        'po-1',
+        {
+          reason: 'damaged',
+          items: [{ productId: 'product-1', quantity: 2 }],
+        },
+        actor,
+      );
+
+      expect(
+        mockLocationAccessService.assertHasLocationAccess,
+      ).toHaveBeenCalledWith(context, 'location-1');
+    });
+
+    it('propagates ForbiddenException from LocationAccessService and never creates a PurchaseReturn', async () => {
+      mockPrisma.purchaseOrder.findFirst.mockResolvedValue(receivedOrder);
+      mockLocationAccessService.assertHasLocationAccess.mockRejectedValueOnce(
+        new ForbiddenException('You do not have access to this location'),
+      );
+
+      await expect(
+        service.createReturn(
+          context,
+          'po-1',
+          {
+            reason: 'damaged',
+            items: [{ productId: 'product-1', quantity: 2 }],
+          } as any,
+          actor,
+        ),
+      ).rejects.toThrow(ForbiddenException);
+      expect(mockTx.purchaseReturn.create).not.toHaveBeenCalled();
+    });
 
     it('rejects a return against a DRAFT order (nothing has ever been received)', async () => {
       mockPrisma.purchaseOrder.findFirst.mockResolvedValue({

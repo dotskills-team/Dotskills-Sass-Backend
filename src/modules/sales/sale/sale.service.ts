@@ -14,6 +14,7 @@ import {
   StockMovementType,
 } from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
+import { LocationAccessService } from '../../../common/services/location-access.service';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
@@ -67,6 +68,7 @@ export class SaleService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly inventoryService: InventoryService,
+    private readonly locationAccessService: LocationAccessService,
   ) {}
 
   async list(context: CompanyContext, query: ListSalesQueryDto = {}) {
@@ -114,6 +116,11 @@ export class SaleService {
     dto: CreateSaleDto,
     actor: AuthenticatedUser,
   ) {
+    await this.locationAccessService.assertHasLocationAccess(
+      context,
+      dto.locationId,
+    );
+
     const settings = await this.prisma.companySettings.findUniqueOrThrow({
       where: { companyId: context.companyId },
       select: {

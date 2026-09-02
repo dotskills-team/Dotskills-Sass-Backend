@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from 'src/generated/phase-1-prisma/client';
 import { ProductStatus } from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
+import { LocationAccessService } from '../../common/services/location-access.service';
 import type { CompanyContext } from '../../common/types/company-context.type';
 import { StockReportQueryDto } from './dto/report-query.dto';
 import { createCsvStream } from './csv-stream.util';
@@ -30,7 +31,54 @@ interface BelowReorderRow {
  */
 @Injectable()
 export class StockReportService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly locationAccessService: LocationAccessService,
+  ) {}
+
+  /** Same explicit-vs-implicit rule as the other reports, for a plain Prisma `where` clause. */
+  private async resolveLocationFilter(
+    context: CompanyContext,
+    explicitLocationId?: string,
+  ): Promise<Pick<Prisma.InventoryWhereInput, 'locationId'>> {
+    if (explicitLocationId) {
+      await this.locationAccessService.assertHasLocationAccess(
+        context,
+        explicitLocationId,
+      );
+      return { locationId: explicitLocationId };
+    }
+    const assigned =
+      await this.locationAccessService.getAssignedLocationIds(context);
+    return assigned === 'ALL' ? {} : { locationId: { in: assigned } };
+  }
+
+  /**
+   * Same rule as `resolveLocationFilter`, as a raw SQL fragment for the
+   * belowReorderOnly path (Prisma's query builder can't filter one column
+   * against another joined column). An actor assigned to zero Locations
+   * must match zero rows — `IN ()` is invalid Postgres syntax, so that
+   * case is a literal `AND FALSE` rather than an empty IN-list.
+   */
+  private async resolveLocationSql(
+    context: CompanyContext,
+    explicitLocationId?: string,
+  ): Promise<Prisma.Sql> {
+    if (explicitLocationId) {
+      await this.locationAccessService.assertHasLocationAccess(
+        context,
+        explicitLocationId,
+      );
+      return Prisma.sql`AND i."locationId" = ${explicitLocationId}::uuid`;
+    }
+    const assigned =
+      await this.locationAccessService.getAssignedLocationIds(context);
+    if (assigned === 'ALL') return Prisma.empty;
+    if (assigned.length === 0) return Prisma.sql`AND FALSE`;
+    return Prisma.sql`AND i."locationId" IN (${Prisma.join(
+      assigned.map((id) => Prisma.sql`${id}::uuid`),
+    )})`;
+  }
 
   async getStockReport(context: CompanyContext, query: StockReportQueryDto) {
     const page = query.page ?? 1;
@@ -41,10 +89,14 @@ export class StockReportService {
       return this.getBelowReorderReport(context, query, page, limit, skip);
     }
 
+    const locationFilter = await this.resolveLocationFilter(
+      context,
+      query.locationId,
+    );
     const where: Prisma.InventoryWhereInput = {
       tenantId: context.tenantId,
       companyId: context.companyId,
-      ...(query.locationId ? { locationId: query.locationId } : {}),
+      ...locationFilter,
       ...(query.productId ? { productId: query.productId } : {}),
     };
 
@@ -85,9 +137,10 @@ export class StockReportService {
     limit: number,
     skip: number,
   ) {
-    const locationFilter = query.locationId
-      ? Prisma.sql`AND i."locationId" = ${query.locationId}::uuid`
-      : Prisma.empty;
+    const locationFilter = await this.resolveLocationSql(
+      context,
+      query.locationId,
+    );
     const baseWhere = Prisma.sql`
       i."tenantId" = ${context.tenantId}::uuid
       AND i."companyId" = ${context.companyId}::uuid
@@ -143,7 +196,10 @@ export class StockReportService {
     };
   }
 
-  streamStockReportCsv(context: CompanyContext, query: StockReportQueryDto) {
+  async streamStockReportCsv(
+    context: CompanyContext,
+    query: StockReportQueryDto,
+  ) {
     const columns = [
       {
         header: 'Product Name',
@@ -167,9 +223,10 @@ export class StockReportService {
     ];
 
     if (query.belowReorderOnly) {
-      const locationFilter = query.locationId
-        ? Prisma.sql`AND i."locationId" = ${query.locationId}::uuid`
-        : Prisma.empty;
+      const locationFilter = await this.resolveLocationSql(
+        context,
+        query.locationId,
+      );
       const baseWhere = Prisma.sql`
         i."tenantId" = ${context.tenantId}::uuid
         AND i."companyId" = ${context.companyId}::uuid
@@ -201,10 +258,14 @@ export class StockReportService {
       );
     }
 
+    const locationFilter = await this.resolveLocationFilter(
+      context,
+      query.locationId,
+    );
     const where: Prisma.InventoryWhereInput = {
       tenantId: context.tenantId,
       companyId: context.companyId,
-      ...(query.locationId ? { locationId: query.locationId } : {}),
+      ...locationFilter,
     };
     return createCsvStream(columns, (skip, take) =>
       this.prisma.inventory

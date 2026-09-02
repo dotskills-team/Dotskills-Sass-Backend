@@ -2,7 +2,10 @@ import { ConflictException } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 
 import { Prisma } from 'src/generated/phase-1-prisma/client';
-import { StockMovementType } from 'src/generated/phase-1-prisma/enums';
+import {
+  StockMovementType,
+  StockAdjustmentReason,
+} from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 
@@ -17,6 +20,8 @@ interface StockMoveInput {
   actorUserId?: string;
   unitCost?: number | Prisma.Decimal;
   note?: string;
+  /** Only ever set by Stock Adjustment callers — every other caller omits it, written as null. */
+  reason?: StockAdjustmentReason;
 }
 
 interface DecreaseStockInput extends StockMoveInput {
@@ -49,6 +54,7 @@ export class InventoryService {
       actorUserId,
       unitCost,
       note,
+      reason,
     } = input;
 
     const balance = await tx.inventory.upsert({
@@ -75,6 +81,7 @@ export class InventoryService {
         changeQty: quantity,
         balanceAfter: balance.quantity,
         unitCost,
+        reason,
         referenceId,
         actorUserId,
         note,
@@ -104,6 +111,7 @@ export class InventoryService {
       actorUserId,
       unitCost,
       note,
+      reason,
       allowNegative,
     } = input;
 
@@ -144,6 +152,7 @@ export class InventoryService {
         changeQty: new Prisma.Decimal(quantity).negated(),
         balanceAfter: balance.quantity,
         unitCost,
+        reason,
         referenceId,
         actorUserId,
         note,

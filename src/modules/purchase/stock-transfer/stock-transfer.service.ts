@@ -13,6 +13,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
+import { LocationAccessService } from '../../../common/services/location-access.service';
 import {
   CreateStockTransferDto,
   ListStockTransfersQueryDto,
@@ -45,6 +46,7 @@ export class StockTransferService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly inventoryService: InventoryService,
+    private readonly locationAccessService: LocationAccessService,
   ) {}
 
   async list(context: CompanyContext, query: ListStockTransfersQueryDto = {}) {
@@ -89,6 +91,10 @@ export class StockTransferService {
         'fromLocationId and toLocationId must be different locations',
       );
     }
+    await this.locationAccessService.assertHasLocationAccess(
+      context,
+      dto.fromLocationId,
+    );
 
     const transfer = await this.prisma.$transaction(async (tx) => {
       const created = await tx.stockTransfer.create({
@@ -124,6 +130,10 @@ export class StockTransferService {
     actor: AuthenticatedUser,
   ) {
     const before = await this.requireTransfer(context, id);
+    await this.locationAccessService.assertHasLocationAccess(
+      context,
+      before.fromLocationId,
+    );
     if (before.status !== StockTransferStatus.PENDING) {
       throw new BadRequestException(
         `Transfer cannot be dispatched from ${before.status} state`,
@@ -168,6 +178,10 @@ export class StockTransferService {
 
   async receive(context: CompanyContext, id: string, actor: AuthenticatedUser) {
     const before = await this.requireTransfer(context, id);
+    await this.locationAccessService.assertHasLocationAccess(
+      context,
+      before.toLocationId,
+    );
     if (before.status !== StockTransferStatus.IN_TRANSIT) {
       throw new BadRequestException(
         `Transfer cannot be received from ${before.status} state`,

@@ -386,6 +386,8 @@ model Tenant {
   saleReturns       SaleReturn[]
   customerDueLedgerEntries CustomerDueLedger[]
   cashDrawerSessions CashDrawerSession[]
+  stockAdjustments  StockAdjustment[]
+  companyMemberLocations CompanyMemberLocation[]
 
   @@index([status, trialEndsAt])
   @@map("tenants")
@@ -454,6 +456,8 @@ model Company {
   saleReturns       SaleReturn[]
   customerDueLedgerEntries CustomerDueLedger[]
   cashDrawerSessions CashDrawerSession[]
+  stockAdjustments  StockAdjustment[]
+  companyMemberLocations CompanyMemberLocation[]
 
   @@unique([tenantId, code])
   @@unique([tenantId, id])
@@ -496,6 +500,7 @@ model Location {
   transfersTo       StockTransfer[] @relation("TransferToLocation")
   sales             Sale[]
   cashDrawerSessions CashDrawerSession[]
+  memberAssignments  CompanyMemberLocation[]
 
   @@unique([tenantId, companyId, name])
   @@index([tenantId, companyId, status])
@@ -687,26 +692,59 @@ enum StockMovementType {
 }
 
 model StockMovement {
-  id            String            @id @default(uuid()) @db.Uuid
-  tenantId      String            @db.Uuid
-  companyId     String            @db.Uuid
-  productId     String            @db.Uuid
-  locationId    String            @db.Uuid
+  id            String                 @id @default(uuid()) @db.Uuid
+  tenantId      String                 @db.Uuid
+  companyId     String                 @db.Uuid
+  productId     String                 @db.Uuid
+  locationId    String                 @db.Uuid
   movementType  StockMovementType
-  changeQty     Decimal           @db.Decimal(14, 4)
-  balanceAfter  Decimal           @db.Decimal(14, 4)
-  unitCost      Decimal?          @db.Decimal(20, 4)
-  referenceId   String?           @db.Uuid
-  actorUserId   String?           @db.Uuid
-  note          String?           @db.Text
-  createdAt     DateTime          @default(now()) @db.Timestamptz(6)
-  tenant        Tenant            @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  company       Company           @relation(fields: [companyId], references: [id], onDelete: Restrict)
-  product       Product           @relation(fields: [productId], references: [id], onDelete: Restrict)
-  location      Location          @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  changeQty     Decimal                @db.Decimal(14, 4)
+  balanceAfter  Decimal                @db.Decimal(14, 4)
+  unitCost      Decimal?               @db.Decimal(20, 4)
+  /** Only ever populated for ADJUSTMENT-type rows — null for every other movement type. */
+  reason        StockAdjustmentReason?
+  referenceId   String?                @db.Uuid
+  actorUserId   String?                @db.Uuid
+  note          String?                @db.Text
+  createdAt     DateTime               @default(now()) @db.Timestamptz(6)
+  tenant        Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company       Company                @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  product       Product                @relation(fields: [productId], references: [id], onDelete: Restrict)
+  location      Location               @relation(fields: [locationId], references: [id], onDelete: Restrict)
 
   @@index([tenantId, companyId, productId, locationId, createdAt])
   @@map("stock_movements")
+}
+
+enum StockAdjustmentReason {
+  DAMAGE
+  THEFT_SHRINKAGE
+  COUNT_MISMATCH
+  EXPIRED
+  OPENING_STOCK
+  OTHER
+}
+
+/**
+ * A lightweight batch header — the same "header row + per-line
+ * StockMovement rows referencing it" shape GoodsReceipt/PurchaseReturn/
+ * SaleReturn already use, not a new concept. `reason` lives on each
+ * StockMovement line (not here) since one bulk submission can legitimately
+ * mix reasons (e.g. a physical count session finding both DAMAGE and
+ * COUNT_MISMATCH lines) — this header exists so a multi-line submission is
+ * traceable as one event, and as StockMovement.referenceId's target.
+ */
+model StockAdjustment {
+  id          String   @id @default(uuid()) @db.Uuid
+  tenantId    String   @db.Uuid
+  companyId   String   @db.Uuid
+  actorUserId String?  @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, companyId, createdAt])
+  @@map("stock_adjustments")
 }
 
 // ============================================================
@@ -1087,6 +1125,7 @@ model CompanyMember {
   user         User                    @relation(fields: [userId], references: [id], onDelete: Restrict)
   roles        CompanyMemberRole[]
   scopes       CompanyMemberScope[]
+  locations    CompanyMemberLocation[]
   ownerships   CompanyOwnership[]      @relation("OwnershipMember")
 
   @@unique([tenantId, companyId, userId])
@@ -1150,6 +1189,36 @@ model CompanyMemberScope {
   @@unique([companyMemberId, scopeType, scopeKey])
   @@index([tenantId, companyId, scopeType, scopeKey, validUntil])
   @@map("company_member_scopes")
+}
+
+/**
+ * Location-Based Access Control — deliberately a dedicated table, not a
+ * reuse of CompanyMemberScope above: `locationId` here is a real FK
+ * (onDelete: Restrict, matching every other location-touching table in
+ * this module), and every existing member already carries an
+ * unconditional {COMPANY, '*'} CompanyMemberScope row from creation —
+ * reusing that table would mean reasoning about that legacy row's
+ * interaction with real Location rows for every member. No rows here for
+ * a member = no Location access at all (fail-safe default); Owner/Admin
+ * are exempt via the LOCATION_ACCESS_ALL permission instead of needing
+ * any rows here.
+ */
+model CompanyMemberLocation {
+  id               String        @id @default(uuid()) @db.Uuid
+  tenantId         String        @db.Uuid
+  companyId        String        @db.Uuid
+  companyMemberId  String        @db.Uuid
+  locationId       String        @db.Uuid
+  assignedByUserId String?       @db.Uuid
+  createdAt        DateTime      @default(now()) @db.Timestamptz(6)
+  tenant           Tenant        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company          Company       @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  companyMember    CompanyMember @relation(fields: [companyMemberId], references: [id], onDelete: Cascade)
+  location         Location      @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
+  @@unique([companyMemberId, locationId])
+  @@index([tenantId, companyId, companyMemberId])
+  @@map("company_member_locations")
 }
 
 model CompanyOwnership {

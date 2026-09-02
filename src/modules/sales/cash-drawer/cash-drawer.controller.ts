@@ -41,14 +41,19 @@ export class CashDrawerSessionController {
   list(
     @CurrentCompany() context: CompanyContext,
     @Query() query: ListCashDrawerSessionsQueryDto,
+    @CurrentUser() actor: AuthenticatedUser,
   ) {
-    return this.service.list(context, query);
+    return this.service.list(context, query, actor);
   }
 
   @Get(':id')
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.CASH_DRAWER_SESSION_READ)
-  findOne(@CurrentCompany() context: CompanyContext, @Param('id') id: string) {
-    return this.service.findOne(context, id);
+  findOne(
+    @CurrentCompany() context: CompanyContext,
+    @Param('id') id: string,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.service.findOne(context, id, actor);
   }
 
   @Post()
