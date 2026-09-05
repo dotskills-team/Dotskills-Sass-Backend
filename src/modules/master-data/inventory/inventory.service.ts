@@ -5,8 +5,11 @@ import { Prisma } from 'src/generated/phase-1-prisma/client';
 import {
   StockMovementType,
   StockAdjustmentReason,
+  NotificationType,
+  NotificationRelatedEntityType,
 } from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
+import { NotificationService } from '../../notification/notification.service';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 
 interface StockMoveInput {
@@ -35,7 +38,10 @@ interface DecreaseStockInput extends StockMoveInput {
 
 @Injectable()
 export class InventoryService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   /**
    * No race risk on an increase (nothing to conflict with going up), so a
@@ -142,7 +148,7 @@ export class InventoryService {
       select: { quantity: true },
     });
 
-    return tx.stockMovement.create({
+    const movement = await tx.stockMovement.create({
       data: {
         tenantId,
         companyId,
@@ -156,6 +162,84 @@ export class InventoryService {
         referenceId,
         actorUserId,
         note,
+      },
+    });
+
+    await this.notifyOnStockThresholdCrossed(tx, {
+      tenantId,
+      companyId,
+      productId,
+      locationId,
+      afterQty: balance.quantity,
+      quantityDecremented: new Prisma.Decimal(quantity),
+    });
+
+    return movement;
+  }
+
+  /**
+   * Edge-triggered, not polled — fires only on the exact movement that
+   * crosses a threshold, never on every movement while already below it
+   * (a product already sitting under its reorder level that gets sold
+   * further down fires nothing further; it only re-fires after a
+   * Purchase/Transfer/Adjustment brings it back to >= reorderLevel and a
+   * later decrease crosses back down). The before-quantity is derived for
+   * free from the already-known after-quantity + the decrement amount —
+   * no extra Inventory read needed. Lives here (not duplicated in Sale/
+   * Transfer/Adjustment) since decreaseStock() is the one shared
+   * choke-point every stock-reducing action already funnels through, so a
+   * Stock Adjustment (damage) that zeroes out a product is caught too, not
+   * just Sales.
+   */
+  private async notifyOnStockThresholdCrossed(
+    tx: Prisma.TransactionClient,
+    params: {
+      tenantId: string;
+      companyId: string;
+      productId: string;
+      locationId: string;
+      afterQty: Prisma.Decimal;
+      quantityDecremented: Prisma.Decimal;
+    },
+  ) {
+    const { tenantId, companyId, productId, locationId, afterQty, quantityDecremented } = params;
+    const beforeQty = afterQty.plus(quantityDecremented);
+
+    const crossedIntoOutOfStock =
+      beforeQty.greaterThan(0) && afterQty.lessThanOrEqualTo(0);
+
+    const product = await tx.product.findUnique({
+      where: { id: productId },
+      select: { name: true, sku: true, reorderLevel: true },
+    });
+    if (!product) return;
+
+    const crossedIntoLowStock =
+      !crossedIntoOutOfStock &&
+      product.reorderLevel.greaterThan(0) &&
+      beforeQty.greaterThanOrEqualTo(product.reorderLevel) &&
+      afterQty.lessThan(product.reorderLevel);
+
+    if (!crossedIntoOutOfStock && !crossedIntoLowStock) return;
+
+    const location = await tx.location.findUnique({
+      where: { id: locationId },
+      select: { name: true },
+    });
+
+    await this.notificationService.create(tx, { tenantId, companyId }, {
+      type: crossedIntoOutOfStock
+        ? NotificationType.OUT_OF_STOCK
+        : NotificationType.LOW_STOCK,
+      relatedEntityType: NotificationRelatedEntityType.PRODUCT,
+      relatedEntityId: productId,
+      locationId,
+      metadata: {
+        productName: product.name,
+        sku: product.sku,
+        locationName: location?.name ?? '',
+        quantity: afterQty.toString(),
+        reorderLevel: product.reorderLevel.toString(),
       },
     });
   }

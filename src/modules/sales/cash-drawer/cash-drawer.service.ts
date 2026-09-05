@@ -11,11 +11,14 @@ import {
   CashDrawerSessionStatus,
   SalePaymentMethod,
   SaleStatus,
+  NotificationType,
+  NotificationRelatedEntityType,
 } from 'src/generated/phase-1-prisma/enums';
 import { COMPANY_PERMISSIONS } from '../../../common/constants/permission.constants';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CompanyPermissionResolverService } from '../../../common/services/company-permission-resolver.service';
 import { LocationAccessService } from '../../../common/services/location-access.service';
+import { NotificationService } from '../../notification/notification.service';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import {
@@ -52,6 +55,7 @@ export class CashDrawerSessionService {
     private readonly prisma: PrismaService,
     private readonly permissionResolver: CompanyPermissionResolverService,
     private readonly locationAccessService: LocationAccessService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async list(
@@ -284,6 +288,31 @@ export class CashDrawerSessionService {
           cashSalesTotal,
         },
       );
+
+      // Never rejects/blocks on this — Decision #3 — it's purely a
+      // notification. Unconditional on any non-zero variance: unlike
+      // Out-of-Stock/Low-Stock, each session-close is already a one-time,
+      // discrete event (no "continuously in a bad state" to re-enter), so
+      // no dedup logic is needed here.
+      if (variance !== 0) {
+        const location = await tx.location.findUnique({
+          where: { id: before.locationId },
+          select: { name: true },
+        });
+        await this.notificationService.create(tx, context, {
+          type: NotificationType.CASH_DRAWER_VARIANCE,
+          relatedEntityType: NotificationRelatedEntityType.CASH_DRAWER_SESSION,
+          relatedEntityId: updated.id,
+          locationId: before.locationId,
+          metadata: {
+            locationName: location?.name ?? '',
+            variance: variance.toString(),
+            expectedClosingBalance: expectedClosingBalance.toString(),
+            actualClosingBalance: dto.actualClosingBalance.toString(),
+          },
+        });
+      }
+
       return updated;
     });
 

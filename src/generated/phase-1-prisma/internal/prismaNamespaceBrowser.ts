@@ -93,6 +93,7 @@ export const ModelName = {
   CompanyMemberRole: 'CompanyMemberRole',
   CompanyMemberScope: 'CompanyMemberScope',
   CompanyMemberLocation: 'CompanyMemberLocation',
+  Notification: 'Notification',
   CompanyOwnership: 'CompanyOwnership',
   Subscription: 'Subscription',
   Billing: 'Billing',
@@ -705,6 +706,7 @@ export const CompanySettingsScalarFieldEnum = {
   enableMultiLocation: 'enableMultiLocation',
   allowNegativeStock: 'allowNegativeStock',
   maxCustomerDueLimit: 'maxCustomerDueLimit',
+  maxSupplierPayableLimit: 'maxSupplierPayableLimit',
   enableTax: 'enableTax',
   defaultTaxRate: 'defaultTaxRate',
   createdAt: 'createdAt',
@@ -787,6 +789,23 @@ export const CompanyMemberLocationScalarFieldEnum = {
 } as const
 
 export type CompanyMemberLocationScalarFieldEnum = (typeof CompanyMemberLocationScalarFieldEnum)[keyof typeof CompanyMemberLocationScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  companyId: 'companyId',
+  type: 'type',
+  relatedEntityType: 'relatedEntityType',
+  relatedEntityId: 'relatedEntityId',
+  locationId: 'locationId',
+  metadata: 'metadata',
+  isRead: 'isRead',
+  readAt: 'readAt',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const CompanyOwnershipScalarFieldEnum = {

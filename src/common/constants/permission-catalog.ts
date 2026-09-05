@@ -1159,6 +1159,13 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
     action: 'create',
     name: 'Create a stock adjustment',
   },
+  {
+    code: COMPANY_PERMISSIONS.NOTIFICATION_READ,
+    moduleCode: 'company_notification',
+    resource: 'notification',
+    action: 'read',
+    name: 'Read dashboard notifications',
+  },
 ];
 
 /**

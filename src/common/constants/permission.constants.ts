@@ -632,6 +632,14 @@ export const COMPANY_PERMISSIONS = {
   /** Manual Stock Adjustment — damage/theft/count-mismatch/expiry/opening-stock corrections, Owner/Manager tier (kept out of Cashier reach, same as SALE_VOID). */
   STOCK_ADJUSTMENT_READ: 'company.stock-adjustment.read',
   STOCK_ADJUSTMENT_CREATE: 'company.stock-adjustment.create',
+
+  /**
+   * Dashboard Notification Bell — Owner/Admin only this phase (deliberately
+   * not added to MANAGER/CASHIER's curated arrays; Manager/Cashier scope is
+   * a future extension, matching PROFIT_REPORT_READ's own precedent for an
+   * intentionally-narrower-than-everything-else permission).
+   */
+  NOTIFICATION_READ: 'company.notification.read',
 } as const;
 
 /**

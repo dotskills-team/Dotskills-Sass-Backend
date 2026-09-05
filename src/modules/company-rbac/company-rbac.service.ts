@@ -7,10 +7,15 @@ import {
 } from '@nestjs/common';
 import * as argon2 from 'argon2';
 import { Prisma } from '../../generated/phase-1-prisma/client';
+import {
+  NotificationType,
+  NotificationRelatedEntityType,
+} from '../../generated/phase-1-prisma/enums';
 import { COMPANY_PERMISSIONS } from '../../common/constants/permission.constants';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import type { CompanyContext } from '../../common/types/company-context.type';
 import { PrismaService } from '../../prisma/prisma.service';
+import { NotificationService } from '../notification/notification.service';
 import type {
   BootstrapCompanyRbacDto,
   CreateCompanyMemberDto,
@@ -161,7 +166,10 @@ const MEMBER_SELECT = {
 
 @Injectable()
 export class CompanyRbacService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   async bootstrap(
     companyId: string,
@@ -593,6 +601,12 @@ export class CompanyRbacService {
           null,
           { email, roleCodes: roles.map((role) => role.code) },
         );
+        await this.notificationService.create(tx, context, {
+          type: NotificationType.STAFF_ACTIVITY,
+          relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
+          relatedEntityId: created.id,
+          metadata: { memberName: created.user.fullName, action: 'MEMBER_CREATED' },
+        });
         return created;
       });
       return { success: true, data: member };
@@ -652,10 +666,17 @@ export class CompanyRbacService {
         { roleCodes: currentCodes },
         { roleCodes: nextCodes },
       );
-      return tx.companyMember.findUniqueOrThrow({
+      const result = await tx.companyMember.findUniqueOrThrow({
         where: { id: memberId },
         select: MEMBER_SELECT,
       });
+      await this.notificationService.create(tx, context, {
+        type: NotificationType.STAFF_ACTIVITY,
+        relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
+        relatedEntityId: memberId,
+        metadata: { memberName: result.user.fullName, action: 'MEMBER_ROLES_UPDATED' },
+      });
+      return result;
     });
     return { success: true, data: updated };
   }
@@ -809,10 +830,17 @@ export class CompanyRbacService {
         null,
         { locationIds: uniqueIds },
       );
-      return tx.companyMember.findUniqueOrThrow({
+      const result = await tx.companyMember.findUniqueOrThrow({
         where: { id: memberId },
         select: MEMBER_SELECT,
       });
+      await this.notificationService.create(tx, context, {
+        type: NotificationType.STAFF_ACTIVITY,
+        relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
+        relatedEntityId: memberId,
+        metadata: { memberName: result.user.fullName, action: 'MEMBER_LOCATIONS_UPDATED' },
+      });
+      return result;
     });
     return { success: true, data: updated };
   }

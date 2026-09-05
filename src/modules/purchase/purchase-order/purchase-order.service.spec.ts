@@ -5,11 +5,14 @@ import {
   PurchaseOrderStatus,
   StockMovementType,
   SupplierLedgerEntryType,
+  NotificationType,
+  NotificationRelatedEntityType,
 } from '../../../generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
 import { ProductCostingService } from '../../master-data/product/product-costing.service';
 import { LocationAccessService } from '../../../common/services/location-access.service';
+import { NotificationService } from '../../notification/notification.service';
 import { PurchaseOrderService } from './purchase-order.service';
 
 describe('PurchaseOrderService', () => {
@@ -25,7 +28,7 @@ describe('PurchaseOrderService', () => {
     goodsReceipt: { create: jest.fn() },
     purchaseReturn: { create: jest.fn() },
     supplierPayableLedger: { create: jest.fn() },
-    supplier: { update: jest.fn() },
+    supplier: { update: jest.fn(), findUnique: jest.fn() },
     auditLog: { create: jest.fn() },
     $queryRaw: jest.fn(),
   };
@@ -33,6 +36,7 @@ describe('PurchaseOrderService', () => {
   const mockPrisma = {
     purchaseOrder: { findFirst: jest.fn(), findMany: jest.fn() },
     purchaseReturn: { findMany: jest.fn() },
+    companySettings: { findUniqueOrThrow: jest.fn() },
     $transaction: jest.fn((arg: any) =>
       typeof arg === 'function' ? arg(mockTx) : Promise.all(arg),
     ),
@@ -46,6 +50,7 @@ describe('PurchaseOrderService', () => {
   const mockLocationAccessService = {
     assertHasLocationAccess: jest.fn().mockResolvedValue(undefined),
   };
+  const mockNotificationService = { create: jest.fn() };
 
   const context = { tenantId: 'tenant-1', companyId: 'company-1' } as any;
   const actor = { userId: 'user-1' } as any;
@@ -55,6 +60,13 @@ describe('PurchaseOrderService', () => {
     mockLocationAccessService.assertHasLocationAccess.mockResolvedValue(
       undefined,
     );
+    mockPrisma.companySettings.findUniqueOrThrow.mockResolvedValue({
+      maxSupplierPayableLimit: null,
+    });
+    mockTx.supplier.findUnique.mockResolvedValue({
+      name: 'Test Supplier',
+      payableBalance: 0,
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -66,6 +78,7 @@ describe('PurchaseOrderService', () => {
           provide: LocationAccessService,
           useValue: mockLocationAccessService,
         },
+        { provide: NotificationService, useValue: mockNotificationService },
       ],
     }).compile();
 
@@ -332,6 +345,90 @@ describe('PurchaseOrderService', () => {
       expect(mockTx.supplier.update).toHaveBeenCalledWith({
         where: { id: 'supplier-1' },
         data: { payableBalance: { increment: 200 } },
+      });
+    });
+
+    describe('SUPPLIER_PAYABLE_OVERDUE notification (edge-triggered, mirrors CUSTOMER_DUE_OVERDUE in sale.service.ts)', () => {
+      beforeEach(() => {
+        mockPrisma.purchaseOrder.findFirst.mockResolvedValue(draftOrder);
+        mockTx.goodsReceipt.create.mockResolvedValue({ id: 'receipt-notify' });
+        mockCostingService.applyPurchaseCost.mockResolvedValue(50);
+        mockInventoryService.increaseStock.mockResolvedValue({});
+        mockTx.purchaseOrderItem.update.mockResolvedValue({});
+        mockTx.purchaseOrderItem.findMany.mockResolvedValue([
+          { orderedQty: 10, receivedQty: 4 },
+        ]);
+        mockTx.purchaseOrder.update.mockResolvedValue({ id: 'po-1' });
+      });
+
+      it('fires when this receipt crosses the configured payable limit', async () => {
+        mockPrisma.companySettings.findUniqueOrThrow.mockResolvedValue({
+          maxSupplierPayableLimit: 1000,
+        });
+        mockTx.supplier.findUnique.mockResolvedValue({
+          name: 'Rahim Traders',
+          payableBalance: 900,
+        });
+
+        await service.receive(
+          context,
+          'po-1',
+          { items: [{ purchaseOrderItemId: 'item-1', receivedQty: 4 }] },
+          actor,
+        );
+
+        expect(mockNotificationService.create).toHaveBeenCalledWith(
+          mockTx,
+          context,
+          {
+            type: NotificationType.SUPPLIER_PAYABLE_OVERDUE,
+            relatedEntityType: NotificationRelatedEntityType.SUPPLIER,
+            relatedEntityId: 'supplier-1',
+            metadata: {
+              supplierName: 'Rahim Traders',
+              payableBalance: '1100',
+              limit: '1000',
+            },
+          },
+        );
+      });
+
+      it('does not re-fire when the supplier was already over the limit before this receipt (duplicate-prevention proof)', async () => {
+        mockPrisma.companySettings.findUniqueOrThrow.mockResolvedValue({
+          maxSupplierPayableLimit: 1000,
+        });
+        mockTx.supplier.findUnique.mockResolvedValue({
+          name: 'Rahim Traders',
+          payableBalance: 1100,
+        });
+
+        await service.receive(
+          context,
+          'po-1',
+          { items: [{ purchaseOrderItemId: 'item-1', receivedQty: 4 }] },
+          actor,
+        );
+
+        expect(mockNotificationService.create).not.toHaveBeenCalled();
+      });
+
+      it('does not fire when no payable limit is configured for the company', async () => {
+        mockPrisma.companySettings.findUniqueOrThrow.mockResolvedValue({
+          maxSupplierPayableLimit: null,
+        });
+        mockTx.supplier.findUnique.mockResolvedValue({
+          name: 'Rahim Traders',
+          payableBalance: 900,
+        });
+
+        await service.receive(
+          context,
+          'po-1',
+          { items: [{ purchaseOrderItemId: 'item-1', receivedQty: 4 }] },
+          actor,
+        );
+
+        expect(mockNotificationService.create).not.toHaveBeenCalled();
       });
     });
   });

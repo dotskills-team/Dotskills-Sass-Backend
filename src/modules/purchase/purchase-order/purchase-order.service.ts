@@ -10,6 +10,8 @@ import {
   PurchaseOrderStatus,
   StockMovementType,
   SupplierLedgerEntryType,
+  NotificationType,
+  NotificationRelatedEntityType,
 } from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
 import type { CompanyContext } from '../../../common/types/company-context.type';
@@ -17,6 +19,7 @@ import type { AuthenticatedUser } from '../../../common/types/authenticated-user
 import { InventoryService } from '../../master-data/inventory/inventory.service';
 import { ProductCostingService } from '../../master-data/product/product-costing.service';
 import { LocationAccessService } from '../../../common/services/location-access.service';
+import { NotificationService } from '../../notification/notification.service';
 import {
   CreatePurchaseOrderDto,
   ListPurchaseOrdersQueryDto,
@@ -54,6 +57,7 @@ export class PurchaseOrderService {
     private readonly inventoryService: InventoryService,
     private readonly costingService: ProductCostingService,
     private readonly locationAccessService: LocationAccessService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async list(context: CompanyContext, query: ListPurchaseOrdersQueryDto = {}) {
@@ -263,6 +267,11 @@ export class PurchaseOrderService {
       );
     }
 
+    const settings = await this.prisma.companySettings.findUniqueOrThrow({
+      where: { companyId: context.companyId },
+      select: { maxSupplierPayableLimit: true },
+    });
+
     const itemsById = new Map(order.items.map((item) => [item.id, item]));
     for (const line of dto.items) {
       const orderItem = itemsById.get(line.purchaseOrderItemId);
@@ -339,10 +348,32 @@ export class PurchaseOrderService {
             actorUserId: actor.userId,
           },
         });
+        const supplier = await tx.supplier.findUnique({
+          where: { id: order.supplierId },
+          select: { name: true, payableBalance: true },
+        });
         await tx.supplier.update({
           where: { id: order.supplierId },
           data: { payableBalance: { increment: receiptTotal } },
         });
+
+        if (settings.maxSupplierPayableLimit != null && supplier) {
+          const beforePayable = Number(supplier.payableBalance);
+          const afterPayable = beforePayable + receiptTotal;
+          const limit = Number(settings.maxSupplierPayableLimit);
+          if (beforePayable <= limit && afterPayable > limit) {
+            await this.notificationService.create(tx, context, {
+              type: NotificationType.SUPPLIER_PAYABLE_OVERDUE,
+              relatedEntityType: NotificationRelatedEntityType.SUPPLIER,
+              relatedEntityId: order.supplierId,
+              metadata: {
+                supplierName: supplier.name,
+                payableBalance: afterPayable.toString(),
+                limit: limit.toString(),
+              },
+            });
+          }
+        }
       }
 
       const refreshedItems = await tx.purchaseOrderItem.findMany({

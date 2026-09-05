@@ -232,6 +232,7 @@ export type LocationWhereInput = {
   sales?: Prisma.SaleListRelationFilter
   cashDrawerSessions?: Prisma.CashDrawerSessionListRelationFilter
   memberAssignments?: Prisma.CompanyMemberLocationListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
 }
 
 export type LocationOrderByWithRelationInput = {
@@ -255,6 +256,7 @@ export type LocationOrderByWithRelationInput = {
   sales?: Prisma.SaleOrderByRelationAggregateInput
   cashDrawerSessions?: Prisma.CashDrawerSessionOrderByRelationAggregateInput
   memberAssignments?: Prisma.CompanyMemberLocationOrderByRelationAggregateInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
 }
 
 export type LocationWhereUniqueInput = Prisma.AtLeast<{
@@ -282,6 +284,7 @@ export type LocationWhereUniqueInput = Prisma.AtLeast<{
   sales?: Prisma.SaleListRelationFilter
   cashDrawerSessions?: Prisma.CashDrawerSessionListRelationFilter
   memberAssignments?: Prisma.CompanyMemberLocationListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
 }, "id" | "tenantId_companyId_name">
 
 export type LocationOrderByWithAggregationInput = {
@@ -335,6 +338,7 @@ export type LocationCreateInput = {
   sales?: Prisma.SaleCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUncheckedCreateInput = {
@@ -356,6 +360,7 @@ export type LocationUncheckedCreateInput = {
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUpdateInput = {
@@ -377,6 +382,7 @@ export type LocationUpdateInput = {
   sales?: Prisma.SaleUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateInput = {
@@ -398,6 +404,7 @@ export type LocationUncheckedUpdateInput = {
   sales?: Prisma.SaleUncheckedUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationCreateManyInput = {
@@ -495,6 +502,11 @@ export type LocationMinOrderByAggregateInput = {
 export type LocationScalarRelationFilter = {
   is?: Prisma.LocationWhereInput
   isNot?: Prisma.LocationWhereInput
+}
+
+export type LocationNullableScalarRelationFilter = {
+  is?: Prisma.LocationWhereInput | null
+  isNot?: Prisma.LocationWhereInput | null
 }
 
 export type LocationCreateNestedManyWithoutTenantInput = {
@@ -701,6 +713,22 @@ export type LocationUpdateOneRequiredWithoutMemberAssignmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.LocationUpdateToOneWithWhereWithoutMemberAssignmentsInput, Prisma.LocationUpdateWithoutMemberAssignmentsInput>, Prisma.LocationUncheckedUpdateWithoutMemberAssignmentsInput>
 }
 
+export type LocationCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.LocationCreateWithoutNotificationsInput, Prisma.LocationUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.LocationCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.LocationWhereUniqueInput
+}
+
+export type LocationUpdateOneWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.LocationCreateWithoutNotificationsInput, Prisma.LocationUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.LocationCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.LocationUpsertWithoutNotificationsInput
+  disconnect?: Prisma.LocationWhereInput | boolean
+  delete?: Prisma.LocationWhereInput | boolean
+  connect?: Prisma.LocationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.LocationUpdateToOneWithWhereWithoutNotificationsInput, Prisma.LocationUpdateWithoutNotificationsInput>, Prisma.LocationUncheckedUpdateWithoutNotificationsInput>
+}
+
 export type LocationCreateWithoutTenantInput = {
   id?: string
   name: string
@@ -719,6 +747,7 @@ export type LocationCreateWithoutTenantInput = {
   sales?: Prisma.SaleCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUncheckedCreateWithoutTenantInput = {
@@ -739,6 +768,7 @@ export type LocationUncheckedCreateWithoutTenantInput = {
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutLocationInput
 }
 
 export type LocationCreateOrConnectWithoutTenantInput = {
@@ -801,6 +831,7 @@ export type LocationCreateWithoutCompanyInput = {
   sales?: Prisma.SaleCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUncheckedCreateWithoutCompanyInput = {
@@ -821,6 +852,7 @@ export type LocationUncheckedCreateWithoutCompanyInput = {
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutLocationInput
 }
 
 export type LocationCreateOrConnectWithoutCompanyInput = {
@@ -867,6 +899,7 @@ export type LocationCreateWithoutInventoryBalancesInput = {
   sales?: Prisma.SaleCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUncheckedCreateWithoutInventoryBalancesInput = {
@@ -887,6 +920,7 @@ export type LocationUncheckedCreateWithoutInventoryBalancesInput = {
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutLocationInput
 }
 
 export type LocationCreateOrConnectWithoutInventoryBalancesInput = {
@@ -923,6 +957,7 @@ export type LocationUpdateWithoutInventoryBalancesInput = {
   sales?: Prisma.SaleUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateWithoutInventoryBalancesInput = {
@@ -943,6 +978,7 @@ export type LocationUncheckedUpdateWithoutInventoryBalancesInput = {
   sales?: Prisma.SaleUncheckedUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationCreateWithoutStockMovementsInput = {
@@ -963,6 +999,7 @@ export type LocationCreateWithoutStockMovementsInput = {
   sales?: Prisma.SaleCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUncheckedCreateWithoutStockMovementsInput = {
@@ -983,6 +1020,7 @@ export type LocationUncheckedCreateWithoutStockMovementsInput = {
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutLocationInput
 }
 
 export type LocationCreateOrConnectWithoutStockMovementsInput = {
@@ -1019,6 +1057,7 @@ export type LocationUpdateWithoutStockMovementsInput = {
   sales?: Prisma.SaleUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateWithoutStockMovementsInput = {
@@ -1039,6 +1078,7 @@ export type LocationUncheckedUpdateWithoutStockMovementsInput = {
   sales?: Prisma.SaleUncheckedUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationCreateWithoutPurchaseOrdersInput = {
@@ -1059,6 +1099,7 @@ export type LocationCreateWithoutPurchaseOrdersInput = {
   sales?: Prisma.SaleCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUncheckedCreateWithoutPurchaseOrdersInput = {
@@ -1079,6 +1120,7 @@ export type LocationUncheckedCreateWithoutPurchaseOrdersInput = {
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutLocationInput
 }
 
 export type LocationCreateOrConnectWithoutPurchaseOrdersInput = {
@@ -1115,6 +1157,7 @@ export type LocationUpdateWithoutPurchaseOrdersInput = {
   sales?: Prisma.SaleUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateWithoutPurchaseOrdersInput = {
@@ -1135,6 +1178,7 @@ export type LocationUncheckedUpdateWithoutPurchaseOrdersInput = {
   sales?: Prisma.SaleUncheckedUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationCreateWithoutTransfersFromInput = {
@@ -1155,6 +1199,7 @@ export type LocationCreateWithoutTransfersFromInput = {
   sales?: Prisma.SaleCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUncheckedCreateWithoutTransfersFromInput = {
@@ -1175,6 +1220,7 @@ export type LocationUncheckedCreateWithoutTransfersFromInput = {
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutLocationInput
 }
 
 export type LocationCreateOrConnectWithoutTransfersFromInput = {
@@ -1200,6 +1246,7 @@ export type LocationCreateWithoutTransfersToInput = {
   sales?: Prisma.SaleCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUncheckedCreateWithoutTransfersToInput = {
@@ -1220,6 +1267,7 @@ export type LocationUncheckedCreateWithoutTransfersToInput = {
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutLocationInput
 }
 
 export type LocationCreateOrConnectWithoutTransfersToInput = {
@@ -1256,6 +1304,7 @@ export type LocationUpdateWithoutTransfersFromInput = {
   sales?: Prisma.SaleUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateWithoutTransfersFromInput = {
@@ -1276,6 +1325,7 @@ export type LocationUncheckedUpdateWithoutTransfersFromInput = {
   sales?: Prisma.SaleUncheckedUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUpsertWithoutTransfersToInput = {
@@ -1307,6 +1357,7 @@ export type LocationUpdateWithoutTransfersToInput = {
   sales?: Prisma.SaleUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateWithoutTransfersToInput = {
@@ -1327,6 +1378,7 @@ export type LocationUncheckedUpdateWithoutTransfersToInput = {
   sales?: Prisma.SaleUncheckedUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationCreateWithoutSalesInput = {
@@ -1347,6 +1399,7 @@ export type LocationCreateWithoutSalesInput = {
   transfersTo?: Prisma.StockTransferCreateNestedManyWithoutToLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUncheckedCreateWithoutSalesInput = {
@@ -1367,6 +1420,7 @@ export type LocationUncheckedCreateWithoutSalesInput = {
   transfersTo?: Prisma.StockTransferUncheckedCreateNestedManyWithoutToLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutLocationInput
 }
 
 export type LocationCreateOrConnectWithoutSalesInput = {
@@ -1403,6 +1457,7 @@ export type LocationUpdateWithoutSalesInput = {
   transfersTo?: Prisma.StockTransferUpdateManyWithoutToLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateWithoutSalesInput = {
@@ -1423,6 +1478,7 @@ export type LocationUncheckedUpdateWithoutSalesInput = {
   transfersTo?: Prisma.StockTransferUncheckedUpdateManyWithoutToLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationCreateWithoutCashDrawerSessionsInput = {
@@ -1443,6 +1499,7 @@ export type LocationCreateWithoutCashDrawerSessionsInput = {
   transfersTo?: Prisma.StockTransferCreateNestedManyWithoutToLocationInput
   sales?: Prisma.SaleCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUncheckedCreateWithoutCashDrawerSessionsInput = {
@@ -1463,6 +1520,7 @@ export type LocationUncheckedCreateWithoutCashDrawerSessionsInput = {
   transfersTo?: Prisma.StockTransferUncheckedCreateNestedManyWithoutToLocationInput
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutLocationInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutLocationInput
 }
 
 export type LocationCreateOrConnectWithoutCashDrawerSessionsInput = {
@@ -1499,6 +1557,7 @@ export type LocationUpdateWithoutCashDrawerSessionsInput = {
   transfersTo?: Prisma.StockTransferUpdateManyWithoutToLocationNestedInput
   sales?: Prisma.SaleUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateWithoutCashDrawerSessionsInput = {
@@ -1519,6 +1578,7 @@ export type LocationUncheckedUpdateWithoutCashDrawerSessionsInput = {
   transfersTo?: Prisma.StockTransferUncheckedUpdateManyWithoutToLocationNestedInput
   sales?: Prisma.SaleUncheckedUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationCreateWithoutMemberAssignmentsInput = {
@@ -1539,6 +1599,7 @@ export type LocationCreateWithoutMemberAssignmentsInput = {
   transfersTo?: Prisma.StockTransferCreateNestedManyWithoutToLocationInput
   sales?: Prisma.SaleCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutLocationInput
 }
 
 export type LocationUncheckedCreateWithoutMemberAssignmentsInput = {
@@ -1559,6 +1620,7 @@ export type LocationUncheckedCreateWithoutMemberAssignmentsInput = {
   transfersTo?: Prisma.StockTransferUncheckedCreateNestedManyWithoutToLocationInput
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutLocationInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutLocationInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutLocationInput
 }
 
 export type LocationCreateOrConnectWithoutMemberAssignmentsInput = {
@@ -1595,6 +1657,7 @@ export type LocationUpdateWithoutMemberAssignmentsInput = {
   transfersTo?: Prisma.StockTransferUpdateManyWithoutToLocationNestedInput
   sales?: Prisma.SaleUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateWithoutMemberAssignmentsInput = {
@@ -1615,6 +1678,107 @@ export type LocationUncheckedUpdateWithoutMemberAssignmentsInput = {
   transfersTo?: Prisma.StockTransferUncheckedUpdateManyWithoutToLocationNestedInput
   sales?: Prisma.SaleUncheckedUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutLocationNestedInput
+}
+
+export type LocationCreateWithoutNotificationsInput = {
+  id?: string
+  name: string
+  locationType: $Enums.LocationType
+  address?: string | null
+  isSalesEnabled?: boolean
+  status?: $Enums.LocationStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutLocationsInput
+  company: Prisma.CompanyCreateNestedOneWithoutLocationsInput
+  inventoryBalances?: Prisma.InventoryCreateNestedManyWithoutLocationInput
+  stockMovements?: Prisma.StockMovementCreateNestedManyWithoutLocationInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutLocationInput
+  transfersFrom?: Prisma.StockTransferCreateNestedManyWithoutFromLocationInput
+  transfersTo?: Prisma.StockTransferCreateNestedManyWithoutToLocationInput
+  sales?: Prisma.SaleCreateNestedManyWithoutLocationInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionCreateNestedManyWithoutLocationInput
+  memberAssignments?: Prisma.CompanyMemberLocationCreateNestedManyWithoutLocationInput
+}
+
+export type LocationUncheckedCreateWithoutNotificationsInput = {
+  id?: string
+  tenantId: string
+  companyId: string
+  name: string
+  locationType: $Enums.LocationType
+  address?: string | null
+  isSalesEnabled?: boolean
+  status?: $Enums.LocationStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  inventoryBalances?: Prisma.InventoryUncheckedCreateNestedManyWithoutLocationInput
+  stockMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutLocationInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutLocationInput
+  transfersFrom?: Prisma.StockTransferUncheckedCreateNestedManyWithoutFromLocationInput
+  transfersTo?: Prisma.StockTransferUncheckedCreateNestedManyWithoutToLocationInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutLocationInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedCreateNestedManyWithoutLocationInput
+  memberAssignments?: Prisma.CompanyMemberLocationUncheckedCreateNestedManyWithoutLocationInput
+}
+
+export type LocationCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.LocationWhereUniqueInput
+  create: Prisma.XOR<Prisma.LocationCreateWithoutNotificationsInput, Prisma.LocationUncheckedCreateWithoutNotificationsInput>
+}
+
+export type LocationUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.LocationUpdateWithoutNotificationsInput, Prisma.LocationUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.LocationCreateWithoutNotificationsInput, Prisma.LocationUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.LocationWhereInput
+}
+
+export type LocationUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.LocationWhereInput
+  data: Prisma.XOR<Prisma.LocationUpdateWithoutNotificationsInput, Prisma.LocationUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type LocationUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  locationType?: Prisma.EnumLocationTypeFieldUpdateOperationsInput | $Enums.LocationType
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSalesEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumLocationStatusFieldUpdateOperationsInput | $Enums.LocationStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutLocationsNestedInput
+  company?: Prisma.CompanyUpdateOneRequiredWithoutLocationsNestedInput
+  inventoryBalances?: Prisma.InventoryUpdateManyWithoutLocationNestedInput
+  stockMovements?: Prisma.StockMovementUpdateManyWithoutLocationNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutLocationNestedInput
+  transfersFrom?: Prisma.StockTransferUpdateManyWithoutFromLocationNestedInput
+  transfersTo?: Prisma.StockTransferUpdateManyWithoutToLocationNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutLocationNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutLocationNestedInput
+  memberAssignments?: Prisma.CompanyMemberLocationUpdateManyWithoutLocationNestedInput
+}
+
+export type LocationUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  locationType?: Prisma.EnumLocationTypeFieldUpdateOperationsInput | $Enums.LocationType
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isSalesEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumLocationStatusFieldUpdateOperationsInput | $Enums.LocationStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  inventoryBalances?: Prisma.InventoryUncheckedUpdateManyWithoutLocationNestedInput
+  stockMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutLocationNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutLocationNestedInput
+  transfersFrom?: Prisma.StockTransferUncheckedUpdateManyWithoutFromLocationNestedInput
+  transfersTo?: Prisma.StockTransferUncheckedUpdateManyWithoutToLocationNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutLocationNestedInput
+  cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutLocationNestedInput
+  memberAssignments?: Prisma.CompanyMemberLocationUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationCreateManyTenantInput = {
@@ -1647,6 +1811,7 @@ export type LocationUpdateWithoutTenantInput = {
   sales?: Prisma.SaleUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateWithoutTenantInput = {
@@ -1667,6 +1832,7 @@ export type LocationUncheckedUpdateWithoutTenantInput = {
   sales?: Prisma.SaleUncheckedUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateManyWithoutTenantInput = {
@@ -1711,6 +1877,7 @@ export type LocationUpdateWithoutCompanyInput = {
   sales?: Prisma.SaleUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateWithoutCompanyInput = {
@@ -1731,6 +1898,7 @@ export type LocationUncheckedUpdateWithoutCompanyInput = {
   sales?: Prisma.SaleUncheckedUpdateManyWithoutLocationNestedInput
   cashDrawerSessions?: Prisma.CashDrawerSessionUncheckedUpdateManyWithoutLocationNestedInput
   memberAssignments?: Prisma.CompanyMemberLocationUncheckedUpdateManyWithoutLocationNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutLocationNestedInput
 }
 
 export type LocationUncheckedUpdateManyWithoutCompanyInput = {
@@ -1759,6 +1927,7 @@ export type LocationCountOutputType = {
   sales: number
   cashDrawerSessions: number
   memberAssignments: number
+  notifications: number
 }
 
 export type LocationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1770,6 +1939,7 @@ export type LocationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   sales?: boolean | LocationCountOutputTypeCountSalesArgs
   cashDrawerSessions?: boolean | LocationCountOutputTypeCountCashDrawerSessionsArgs
   memberAssignments?: boolean | LocationCountOutputTypeCountMemberAssignmentsArgs
+  notifications?: boolean | LocationCountOutputTypeCountNotificationsArgs
 }
 
 /**
@@ -1838,6 +2008,13 @@ export type LocationCountOutputTypeCountMemberAssignmentsArgs<ExtArgs extends ru
   where?: Prisma.CompanyMemberLocationWhereInput
 }
 
+/**
+ * LocationCountOutputType without action
+ */
+export type LocationCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
 
 export type LocationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1860,6 +2037,7 @@ export type LocationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   sales?: boolean | Prisma.Location$salesArgs<ExtArgs>
   cashDrawerSessions?: boolean | Prisma.Location$cashDrawerSessionsArgs<ExtArgs>
   memberAssignments?: boolean | Prisma.Location$memberAssignmentsArgs<ExtArgs>
+  notifications?: boolean | Prisma.Location$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.LocationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["location"]>
 
@@ -1918,6 +2096,7 @@ export type LocationInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   sales?: boolean | Prisma.Location$salesArgs<ExtArgs>
   cashDrawerSessions?: boolean | Prisma.Location$cashDrawerSessionsArgs<ExtArgs>
   memberAssignments?: boolean | Prisma.Location$memberAssignmentsArgs<ExtArgs>
+  notifications?: boolean | Prisma.Location$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.LocationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type LocationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1942,6 +2121,7 @@ export type $LocationPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     sales: Prisma.$SalePayload<ExtArgs>[]
     cashDrawerSessions: Prisma.$CashDrawerSessionPayload<ExtArgs>[]
     memberAssignments: Prisma.$CompanyMemberLocationPayload<ExtArgs>[]
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2358,6 +2538,7 @@ export interface Prisma__LocationClient<T, Null = never, ExtArgs extends runtime
   sales<T extends Prisma.Location$salesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Location$salesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SalePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cashDrawerSessions<T extends Prisma.Location$cashDrawerSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Location$cashDrawerSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CashDrawerSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   memberAssignments<T extends Prisma.Location$memberAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Location$memberAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanyMemberLocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.Location$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Location$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2987,6 +3168,30 @@ export type Location$memberAssignmentsArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   distinct?: Prisma.CompanyMemberLocationScalarFieldEnum | Prisma.CompanyMemberLocationScalarFieldEnum[]
+}
+
+/**
+ * Location.notifications
+ */
+export type Location$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
 }
 
 /**

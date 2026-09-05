@@ -179,6 +179,7 @@ describe('CompanyMemberLocation — multi-tenant isolation (integration)', () =>
       await prisma.companyOwnership.deleteMany({ where: { companyId } });
       await prisma.companyMember.deleteMany({ where: { companyId } });
       await prisma.companyRole.deleteMany({ where: { companyId } });
+      await prisma.notification.deleteMany({ where: { companyId } });
       await prisma.company.delete({ where: { id: companyId } });
     }
     await moduleRef.close();

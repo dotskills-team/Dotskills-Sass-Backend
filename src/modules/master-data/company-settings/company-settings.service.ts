@@ -16,6 +16,7 @@ const SETTINGS_SELECT = {
   enableMultiLocation: true,
   allowNegativeStock: true,
   maxCustomerDueLimit: true,
+  maxSupplierPayableLimit: true,
   enableTax: true,
   defaultTaxRate: true,
   createdAt: true,
@@ -70,6 +71,9 @@ export class CompanySettingsService {
             : {}),
           ...(dto.maxCustomerDueLimit !== undefined
             ? { maxCustomerDueLimit: dto.maxCustomerDueLimit }
+            : {}),
+          ...(dto.maxSupplierPayableLimit !== undefined
+            ? { maxSupplierPayableLimit: dto.maxSupplierPayableLimit }
             : {}),
           ...(dto.enableTax !== undefined ? { enableTax: dto.enableTax } : {}),
           ...(dto.defaultTaxRate !== undefined

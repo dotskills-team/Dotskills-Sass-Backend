@@ -374,3 +374,29 @@ export const CashDrawerSessionStatus = {
 } as const
 
 export type CashDrawerSessionStatus = (typeof CashDrawerSessionStatus)[keyof typeof CashDrawerSessionStatus]
+
+
+export const NotificationType = {
+  OUT_OF_STOCK: 'OUT_OF_STOCK',
+  LOW_STOCK: 'LOW_STOCK',
+  CASH_DRAWER_VARIANCE: 'CASH_DRAWER_VARIANCE',
+  CUSTOMER_DUE_OVERDUE: 'CUSTOMER_DUE_OVERDUE',
+  SUPPLIER_PAYABLE_OVERDUE: 'SUPPLIER_PAYABLE_OVERDUE',
+  SUBSCRIPTION_EXPIRING_SOON: 'SUBSCRIPTION_EXPIRING_SOON',
+  SUBSCRIPTION_PAST_DUE: 'SUBSCRIPTION_PAST_DUE',
+  STAFF_ACTIVITY: 'STAFF_ACTIVITY'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const NotificationRelatedEntityType = {
+  PRODUCT: 'PRODUCT',
+  CASH_DRAWER_SESSION: 'CASH_DRAWER_SESSION',
+  CUSTOMER: 'CUSTOMER',
+  SUPPLIER: 'SUPPLIER',
+  SUBSCRIPTION: 'SUBSCRIPTION',
+  COMPANY_MEMBER: 'COMPANY_MEMBER'
+} as const
+
+export type NotificationRelatedEntityType = (typeof NotificationRelatedEntityType)[keyof typeof NotificationRelatedEntityType]

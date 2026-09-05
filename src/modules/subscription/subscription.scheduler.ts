@@ -20,5 +20,11 @@ export class SubscriptionScheduler {
       event: 'stale_issued_invoices_completed',
       ...staleInvoiceResult,
     });
+
+    const expiringSoonResult = await this.lifecycle.checkExpiringSoon();
+    this.logger.log({
+      event: 'subscription_expiring_soon_completed',
+      ...expiringSoonResult,
+    });
   }
 }

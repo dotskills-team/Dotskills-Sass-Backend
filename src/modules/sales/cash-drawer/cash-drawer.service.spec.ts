@@ -14,6 +14,7 @@ import {
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CompanyPermissionResolverService } from '../../../common/services/company-permission-resolver.service';
 import { LocationAccessService } from '../../../common/services/location-access.service';
+import { NotificationService } from '../../notification/notification.service';
 import { CashDrawerSessionService } from './cash-drawer.service';
 
 describe('CashDrawerSessionService', () => {
@@ -23,6 +24,7 @@ describe('CashDrawerSessionService', () => {
     cashDrawerSession: { create: jest.fn(), update: jest.fn() },
     salePayment: { aggregate: jest.fn() },
     auditLog: { create: jest.fn() },
+    location: { findUnique: jest.fn() },
   };
 
   const mockPrisma = {
@@ -48,6 +50,10 @@ describe('CashDrawerSessionService', () => {
     getAssignedLocationIds: jest.fn().mockResolvedValue('ALL'),
   };
 
+  const mockNotificationService = {
+    create: jest.fn(),
+  };
+
   const context = { tenantId: 'tenant-1', companyId: 'company-1' } as any;
   const actor = { userId: 'cashier-1' } as any;
 
@@ -67,12 +73,14 @@ describe('CashDrawerSessionService', () => {
           provide: LocationAccessService,
           useValue: mockLocationAccessService,
         },
+        { provide: NotificationService, useValue: mockNotificationService },
       ],
     }).compile();
 
     service = module.get(CashDrawerSessionService);
 
     mockPrisma.location.findFirst.mockResolvedValue({ id: 'loc-1' });
+    mockTx.location.findUnique.mockResolvedValue({ name: 'Main Branch' });
     mockPrisma.cashDrawerSession.findFirst.mockResolvedValue(null);
     mockManageAll(false);
     mockTx.cashDrawerSession.create.mockImplementation(({ data }: any) =>
@@ -273,6 +281,51 @@ describe('CashDrawerSessionService', () => {
       expect(result.success).toBe(true);
       const updateCall = mockTx.cashDrawerSession.update.mock.calls[0][0];
       expect(updateCall.data.variance).toBe(4000); // 5000 - 1000 (no cash sales)
+    });
+
+    describe('CASH_DRAWER_VARIANCE notification', () => {
+      it('fires when the variance is non-zero', async () => {
+        mockTx.salePayment.aggregate.mockResolvedValue({
+          _sum: { amount: new Prisma.Decimal(350) },
+        });
+
+        await service.closeSession(
+          context,
+          'session-1',
+          { actualClosingBalance: 1340 }, // expected 1350, variance -10
+          actor,
+        );
+
+        expect(mockNotificationService.create).toHaveBeenCalledWith(
+          mockTx,
+          context,
+          expect.objectContaining({
+            type: 'CASH_DRAWER_VARIANCE',
+            relatedEntityType: 'CASH_DRAWER_SESSION',
+            relatedEntityId: 'session-1',
+            locationId: 'location-1',
+            metadata: expect.objectContaining({
+              locationName: 'Main Branch',
+              variance: '-10',
+            }),
+          }),
+        );
+      });
+
+      it('does not fire when the variance is exactly zero', async () => {
+        mockTx.salePayment.aggregate.mockResolvedValue({
+          _sum: { amount: new Prisma.Decimal(350) },
+        });
+
+        await service.closeSession(
+          context,
+          'session-1',
+          { actualClosingBalance: 1350 }, // expected 1350, variance 0
+          actor,
+        );
+
+        expect(mockNotificationService.create).not.toHaveBeenCalled();
+      });
     });
 
     it('rejects closing another cashier\'s session when the actor lacks CASH_DRAWER_SESSION_MANAGE_ALL', async () => {

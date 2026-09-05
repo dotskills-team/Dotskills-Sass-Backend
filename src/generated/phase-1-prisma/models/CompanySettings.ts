@@ -28,11 +28,13 @@ export type AggregateCompanySettings = {
 
 export type CompanySettingsAvgAggregateOutputType = {
   maxCustomerDueLimit: runtime.Decimal | null
+  maxSupplierPayableLimit: runtime.Decimal | null
   defaultTaxRate: runtime.Decimal | null
 }
 
 export type CompanySettingsSumAggregateOutputType = {
   maxCustomerDueLimit: runtime.Decimal | null
+  maxSupplierPayableLimit: runtime.Decimal | null
   defaultTaxRate: runtime.Decimal | null
 }
 
@@ -48,6 +50,7 @@ export type CompanySettingsMinAggregateOutputType = {
   enableMultiLocation: boolean | null
   allowNegativeStock: boolean | null
   maxCustomerDueLimit: runtime.Decimal | null
+  maxSupplierPayableLimit: runtime.Decimal | null
   enableTax: boolean | null
   defaultTaxRate: runtime.Decimal | null
   createdAt: Date | null
@@ -66,6 +69,7 @@ export type CompanySettingsMaxAggregateOutputType = {
   enableMultiLocation: boolean | null
   allowNegativeStock: boolean | null
   maxCustomerDueLimit: runtime.Decimal | null
+  maxSupplierPayableLimit: runtime.Decimal | null
   enableTax: boolean | null
   defaultTaxRate: runtime.Decimal | null
   createdAt: Date | null
@@ -84,6 +88,7 @@ export type CompanySettingsCountAggregateOutputType = {
   enableMultiLocation: number
   allowNegativeStock: number
   maxCustomerDueLimit: number
+  maxSupplierPayableLimit: number
   enableTax: number
   defaultTaxRate: number
   createdAt: number
@@ -94,11 +99,13 @@ export type CompanySettingsCountAggregateOutputType = {
 
 export type CompanySettingsAvgAggregateInputType = {
   maxCustomerDueLimit?: true
+  maxSupplierPayableLimit?: true
   defaultTaxRate?: true
 }
 
 export type CompanySettingsSumAggregateInputType = {
   maxCustomerDueLimit?: true
+  maxSupplierPayableLimit?: true
   defaultTaxRate?: true
 }
 
@@ -114,6 +121,7 @@ export type CompanySettingsMinAggregateInputType = {
   enableMultiLocation?: true
   allowNegativeStock?: true
   maxCustomerDueLimit?: true
+  maxSupplierPayableLimit?: true
   enableTax?: true
   defaultTaxRate?: true
   createdAt?: true
@@ -132,6 +140,7 @@ export type CompanySettingsMaxAggregateInputType = {
   enableMultiLocation?: true
   allowNegativeStock?: true
   maxCustomerDueLimit?: true
+  maxSupplierPayableLimit?: true
   enableTax?: true
   defaultTaxRate?: true
   createdAt?: true
@@ -150,6 +159,7 @@ export type CompanySettingsCountAggregateInputType = {
   enableMultiLocation?: true
   allowNegativeStock?: true
   maxCustomerDueLimit?: true
+  maxSupplierPayableLimit?: true
   enableTax?: true
   defaultTaxRate?: true
   createdAt?: true
@@ -255,6 +265,7 @@ export type CompanySettingsGroupByOutputType = {
   enableMultiLocation: boolean
   allowNegativeStock: boolean
   maxCustomerDueLimit: runtime.Decimal | null
+  maxSupplierPayableLimit: runtime.Decimal | null
   enableTax: boolean
   defaultTaxRate: runtime.Decimal
   createdAt: Date
@@ -296,6 +307,7 @@ export type CompanySettingsWhereInput = {
   enableMultiLocation?: Prisma.BoolFilter<"CompanySettings"> | boolean
   allowNegativeStock?: Prisma.BoolFilter<"CompanySettings"> | boolean
   maxCustomerDueLimit?: Prisma.DecimalNullableFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.DecimalNullableFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolFilter<"CompanySettings"> | boolean
   defaultTaxRate?: Prisma.DecimalFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"CompanySettings"> | Date | string
@@ -316,6 +328,7 @@ export type CompanySettingsOrderByWithRelationInput = {
   enableMultiLocation?: Prisma.SortOrder
   allowNegativeStock?: Prisma.SortOrder
   maxCustomerDueLimit?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxSupplierPayableLimit?: Prisma.SortOrderInput | Prisma.SortOrder
   enableTax?: Prisma.SortOrder
   defaultTaxRate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -339,6 +352,7 @@ export type CompanySettingsWhereUniqueInput = Prisma.AtLeast<{
   enableMultiLocation?: Prisma.BoolFilter<"CompanySettings"> | boolean
   allowNegativeStock?: Prisma.BoolFilter<"CompanySettings"> | boolean
   maxCustomerDueLimit?: Prisma.DecimalNullableFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.DecimalNullableFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolFilter<"CompanySettings"> | boolean
   defaultTaxRate?: Prisma.DecimalFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"CompanySettings"> | Date | string
@@ -359,6 +373,7 @@ export type CompanySettingsOrderByWithAggregationInput = {
   enableMultiLocation?: Prisma.SortOrder
   allowNegativeStock?: Prisma.SortOrder
   maxCustomerDueLimit?: Prisma.SortOrderInput | Prisma.SortOrder
+  maxSupplierPayableLimit?: Prisma.SortOrderInput | Prisma.SortOrder
   enableTax?: Prisma.SortOrder
   defaultTaxRate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -385,6 +400,7 @@ export type CompanySettingsScalarWhereWithAggregatesInput = {
   enableMultiLocation?: Prisma.BoolWithAggregatesFilter<"CompanySettings"> | boolean
   allowNegativeStock?: Prisma.BoolWithAggregatesFilter<"CompanySettings"> | boolean
   maxCustomerDueLimit?: Prisma.DecimalNullableWithAggregatesFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.DecimalNullableWithAggregatesFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolWithAggregatesFilter<"CompanySettings"> | boolean
   defaultTaxRate?: Prisma.DecimalWithAggregatesFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"CompanySettings"> | Date | string
@@ -401,6 +417,7 @@ export type CompanySettingsCreateInput = {
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: boolean
   defaultTaxRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -421,6 +438,7 @@ export type CompanySettingsUncheckedCreateInput = {
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: boolean
   defaultTaxRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -437,6 +455,7 @@ export type CompanySettingsUpdateInput = {
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultTaxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -457,6 +476,7 @@ export type CompanySettingsUncheckedUpdateInput = {
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultTaxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -475,6 +495,7 @@ export type CompanySettingsCreateManyInput = {
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: boolean
   defaultTaxRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -491,6 +512,7 @@ export type CompanySettingsUpdateManyMutationInput = {
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultTaxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -509,6 +531,7 @@ export type CompanySettingsUncheckedUpdateManyInput = {
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultTaxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -542,6 +565,7 @@ export type CompanySettingsCountOrderByAggregateInput = {
   enableMultiLocation?: Prisma.SortOrder
   allowNegativeStock?: Prisma.SortOrder
   maxCustomerDueLimit?: Prisma.SortOrder
+  maxSupplierPayableLimit?: Prisma.SortOrder
   enableTax?: Prisma.SortOrder
   defaultTaxRate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -550,6 +574,7 @@ export type CompanySettingsCountOrderByAggregateInput = {
 
 export type CompanySettingsAvgOrderByAggregateInput = {
   maxCustomerDueLimit?: Prisma.SortOrder
+  maxSupplierPayableLimit?: Prisma.SortOrder
   defaultTaxRate?: Prisma.SortOrder
 }
 
@@ -565,6 +590,7 @@ export type CompanySettingsMaxOrderByAggregateInput = {
   enableMultiLocation?: Prisma.SortOrder
   allowNegativeStock?: Prisma.SortOrder
   maxCustomerDueLimit?: Prisma.SortOrder
+  maxSupplierPayableLimit?: Prisma.SortOrder
   enableTax?: Prisma.SortOrder
   defaultTaxRate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -583,6 +609,7 @@ export type CompanySettingsMinOrderByAggregateInput = {
   enableMultiLocation?: Prisma.SortOrder
   allowNegativeStock?: Prisma.SortOrder
   maxCustomerDueLimit?: Prisma.SortOrder
+  maxSupplierPayableLimit?: Prisma.SortOrder
   enableTax?: Prisma.SortOrder
   defaultTaxRate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -591,6 +618,7 @@ export type CompanySettingsMinOrderByAggregateInput = {
 
 export type CompanySettingsSumOrderByAggregateInput = {
   maxCustomerDueLimit?: Prisma.SortOrder
+  maxSupplierPayableLimit?: Prisma.SortOrder
   defaultTaxRate?: Prisma.SortOrder
 }
 
@@ -678,6 +706,7 @@ export type CompanySettingsCreateWithoutTenantInput = {
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: boolean
   defaultTaxRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -696,6 +725,7 @@ export type CompanySettingsUncheckedCreateWithoutTenantInput = {
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: boolean
   defaultTaxRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -743,6 +773,7 @@ export type CompanySettingsScalarWhereInput = {
   enableMultiLocation?: Prisma.BoolFilter<"CompanySettings"> | boolean
   allowNegativeStock?: Prisma.BoolFilter<"CompanySettings"> | boolean
   maxCustomerDueLimit?: Prisma.DecimalNullableFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.DecimalNullableFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolFilter<"CompanySettings"> | boolean
   defaultTaxRate?: Prisma.DecimalFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"CompanySettings"> | Date | string
@@ -759,6 +790,7 @@ export type CompanySettingsCreateWithoutCompanyInput = {
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: boolean
   defaultTaxRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -777,6 +809,7 @@ export type CompanySettingsUncheckedCreateWithoutCompanyInput = {
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: boolean
   defaultTaxRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -809,6 +842,7 @@ export type CompanySettingsUpdateWithoutCompanyInput = {
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultTaxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -827,6 +861,7 @@ export type CompanySettingsUncheckedUpdateWithoutCompanyInput = {
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultTaxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -844,6 +879,7 @@ export type CompanySettingsCreateManyTenantInput = {
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: boolean
   defaultTaxRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -860,6 +896,7 @@ export type CompanySettingsUpdateWithoutTenantInput = {
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultTaxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -878,6 +915,7 @@ export type CompanySettingsUncheckedUpdateWithoutTenantInput = {
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultTaxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -895,6 +933,7 @@ export type CompanySettingsUncheckedUpdateManyWithoutTenantInput = {
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  maxSupplierPayableLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   enableTax?: Prisma.BoolFieldUpdateOperationsInput | boolean
   defaultTaxRate?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -915,6 +954,7 @@ export type CompanySettingsSelect<ExtArgs extends runtime.Types.Extensions.Inter
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: boolean
+  maxSupplierPayableLimit?: boolean
   enableTax?: boolean
   defaultTaxRate?: boolean
   createdAt?: boolean
@@ -935,6 +975,7 @@ export type CompanySettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: boolean
+  maxSupplierPayableLimit?: boolean
   enableTax?: boolean
   defaultTaxRate?: boolean
   createdAt?: boolean
@@ -955,6 +996,7 @@ export type CompanySettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: boolean
+  maxSupplierPayableLimit?: boolean
   enableTax?: boolean
   defaultTaxRate?: boolean
   createdAt?: boolean
@@ -975,13 +1017,14 @@ export type CompanySettingsSelectScalar = {
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: boolean
+  maxSupplierPayableLimit?: boolean
   enableTax?: boolean
   defaultTaxRate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type CompanySettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "companyId" | "enableMultiUnit" | "enableCustomerDue" | "enableBarcode" | "enableProductVariant" | "enableComboOffer" | "enableMultiLocation" | "allowNegativeStock" | "maxCustomerDueLimit" | "enableTax" | "defaultTaxRate" | "createdAt" | "updatedAt", ExtArgs["result"]["companySettings"]>
+export type CompanySettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "companyId" | "enableMultiUnit" | "enableCustomerDue" | "enableBarcode" | "enableProductVariant" | "enableComboOffer" | "enableMultiLocation" | "allowNegativeStock" | "maxCustomerDueLimit" | "maxSupplierPayableLimit" | "enableTax" | "defaultTaxRate" | "createdAt" | "updatedAt", ExtArgs["result"]["companySettings"]>
 export type CompanySettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
@@ -1013,6 +1056,7 @@ export type $CompanySettingsPayload<ExtArgs extends runtime.Types.Extensions.Int
     enableMultiLocation: boolean
     allowNegativeStock: boolean
     maxCustomerDueLimit: runtime.Decimal | null
+    maxSupplierPayableLimit: runtime.Decimal | null
     enableTax: boolean
     defaultTaxRate: runtime.Decimal
     createdAt: Date
@@ -1453,6 +1497,7 @@ export interface CompanySettingsFieldRefs {
   readonly enableMultiLocation: Prisma.FieldRef<"CompanySettings", 'Boolean'>
   readonly allowNegativeStock: Prisma.FieldRef<"CompanySettings", 'Boolean'>
   readonly maxCustomerDueLimit: Prisma.FieldRef<"CompanySettings", 'Decimal'>
+  readonly maxSupplierPayableLimit: Prisma.FieldRef<"CompanySettings", 'Decimal'>
   readonly enableTax: Prisma.FieldRef<"CompanySettings", 'Boolean'>
   readonly defaultTaxRate: Prisma.FieldRef<"CompanySettings", 'Decimal'>
   readonly createdAt: Prisma.FieldRef<"CompanySettings", 'DateTime'>

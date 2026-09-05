@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConflictException } from '@nestjs/common';
 
+import { Prisma } from '../../../generated/phase-1-prisma/client';
 import { StockMovementType } from '../../../generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
+import { NotificationService } from '../../notification/notification.service';
 import { InventoryService } from './inventory.service';
 
 describe('InventoryService', () => {
@@ -17,11 +19,20 @@ describe('InventoryService', () => {
     stockMovement: {
       create: jest.fn(),
     },
+    // Threshold-crossing notification lookups — undefined by default (no
+    // product found) so every pre-existing test, which never sets these
+    // up, silently skips the notification path unchanged.
+    product: { findUnique: jest.fn() },
+    location: { findUnique: jest.fn() },
   };
 
   const mockPrisma = {
     inventory: { findUnique: jest.fn() },
     stockMovement: { findMany: jest.fn() },
+  };
+
+  const mockNotificationService = {
+    create: jest.fn(),
   };
 
   const baseInput = {
@@ -40,6 +51,7 @@ describe('InventoryService', () => {
       providers: [
         InventoryService,
         { provide: PrismaService, useValue: mockPrisma },
+        { provide: NotificationService, useValue: mockNotificationService },
       ],
     }).compile();
 
@@ -82,7 +94,7 @@ describe('InventoryService', () => {
   describe('decreaseStock', () => {
     it('uses a conditional gte updateMany (not check-then-update) when allowNegative is false', async () => {
       mockTx.inventory.updateMany.mockResolvedValue({ count: 1 });
-      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: 5 });
+      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(5) });
       mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-2' });
 
       await service.decreaseStock(mockTx as any, {
@@ -105,7 +117,7 @@ describe('InventoryService', () => {
 
     it('omits the gte guard entirely when allowNegative is true', async () => {
       mockTx.inventory.updateMany.mockResolvedValue({ count: 1 });
-      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: -5 });
+      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(-5) });
       mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-3' });
 
       await service.decreaseStock(mockTx as any, {
@@ -149,7 +161,7 @@ describe('InventoryService', () => {
 
     it('writes changeQty as the negated quantity on success', async () => {
       mockTx.inventory.updateMany.mockResolvedValue({ count: 1 });
-      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: 0 });
+      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(0) });
       mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-4' });
 
       await service.decreaseStock(mockTx as any, {
@@ -161,6 +173,98 @@ describe('InventoryService', () => {
 
       const call = mockTx.stockMovement.create.mock.calls[0][0];
       expect(call.data.changeQty.toString()).toBe('-7');
+    });
+
+    describe('Out-of-Stock / Low-Stock edge-triggered notification', () => {
+      beforeEach(() => {
+        mockTx.inventory.updateMany.mockResolvedValue({ count: 1 });
+        mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-x' });
+        mockTx.location.findUnique.mockResolvedValue({ name: 'Main Branch' });
+      });
+
+      it('fires OUT_OF_STOCK when the movement crosses from positive to <= 0', async () => {
+        mockTx.product.findUnique.mockResolvedValue({
+          name: 'Rice',
+          sku: 'RICE-1',
+          reorderLevel: new Prisma.Decimal(10),
+        });
+        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(0) }); // after = 0
+
+        await service.decreaseStock(mockTx as any, {
+          ...baseInput,
+          quantity: 5, // before = 0 + 5 = 5 > 0
+          movementType: StockMovementType.SALE,
+          allowNegative: false,
+        });
+
+        expect(mockNotificationService.create).toHaveBeenCalledWith(
+          mockTx,
+          { tenantId: 'tenant-1', companyId: 'company-1' },
+          expect.objectContaining({
+            type: 'OUT_OF_STOCK',
+            relatedEntityType: 'PRODUCT',
+            relatedEntityId: 'product-1',
+            locationId: 'location-1',
+            metadata: expect.objectContaining({ productName: 'Rice', locationName: 'Main Branch' }),
+          }),
+        );
+      });
+
+      it('fires LOW_STOCK when the movement crosses the reorder level but stays positive', async () => {
+        mockTx.product.findUnique.mockResolvedValue({
+          name: 'Rice',
+          sku: 'RICE-1',
+          reorderLevel: new Prisma.Decimal(10),
+        });
+        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(8) }); // after = 8
+
+        await service.decreaseStock(mockTx as any, {
+          ...baseInput,
+          quantity: 4, // before = 8 + 4 = 12 >= reorderLevel(10)
+          movementType: StockMovementType.SALE,
+          allowNegative: false,
+        });
+
+        expect(mockNotificationService.create).toHaveBeenCalledWith(
+          mockTx,
+          { tenantId: 'tenant-1', companyId: 'company-1' },
+          expect.objectContaining({ type: 'LOW_STOCK' }),
+        );
+      });
+
+      it('does NOT re-fire when the product was already below the reorder level before this movement (duplicate-prevention)', async () => {
+        mockTx.product.findUnique.mockResolvedValue({
+          name: 'Rice',
+          sku: 'RICE-1',
+          reorderLevel: new Prisma.Decimal(10),
+        });
+        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(4) }); // after = 4
+
+        await service.decreaseStock(mockTx as any, {
+          ...baseInput,
+          quantity: 2, // before = 4 + 2 = 6, already < reorderLevel(10) beforehand too
+          movementType: StockMovementType.SALE,
+          allowNegative: false,
+        });
+
+        expect(mockNotificationService.create).not.toHaveBeenCalled();
+      });
+
+      it('does not throw and does not notify when the product cannot be found', async () => {
+        mockTx.product.findUnique.mockResolvedValue(null);
+        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(0) });
+
+        await expect(
+          service.decreaseStock(mockTx as any, {
+            ...baseInput,
+            quantity: 5,
+            movementType: StockMovementType.SALE,
+            allowNegative: false,
+          }),
+        ).resolves.toBeDefined();
+
+        expect(mockNotificationService.create).not.toHaveBeenCalled();
+      });
     });
   });
 

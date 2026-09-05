@@ -388,6 +388,7 @@ model Tenant {
   cashDrawerSessions CashDrawerSession[]
   stockAdjustments  StockAdjustment[]
   companyMemberLocations CompanyMemberLocation[]
+  notifications     Notification[]
 
   @@index([status, trialEndsAt])
   @@map("tenants")
@@ -458,6 +459,7 @@ model Company {
   cashDrawerSessions CashDrawerSession[]
   stockAdjustments  StockAdjustment[]
   companyMemberLocations CompanyMemberLocation[]
+  notifications     Notification[]
 
   @@unique([tenantId, code])
   @@unique([tenantId, id])
@@ -501,6 +503,7 @@ model Location {
   sales             Sale[]
   cashDrawerSessions CashDrawerSession[]
   memberAssignments  CompanyMemberLocation[]
+  notifications      Notification[]
 
   @@unique([tenantId, companyId, name])
   @@index([tenantId, companyId, status])
@@ -1096,6 +1099,7 @@ model CompanySettings {
   enableMultiLocation  Boolean  @default(false)
   allowNegativeStock   Boolean  @default(false)
   maxCustomerDueLimit  Decimal? @db.Decimal(20, 4)
+  maxSupplierPayableLimit Decimal? @db.Decimal(20, 4)
   enableTax            Boolean  @default(false)
   defaultTaxRate       Decimal  @default(0) @db.Decimal(6, 3)
   createdAt            DateTime @default(now()) @db.Timestamptz(6)
@@ -1219,6 +1223,57 @@ model CompanyMemberLocation {
   @@unique([companyMemberId, locationId])
   @@index([tenantId, companyId, companyMemberId])
   @@map("company_member_locations")
+}
+
+enum NotificationType {
+  OUT_OF_STOCK
+  LOW_STOCK
+  CASH_DRAWER_VARIANCE
+  CUSTOMER_DUE_OVERDUE
+  SUPPLIER_PAYABLE_OVERDUE
+  SUBSCRIPTION_EXPIRING_SOON
+  SUBSCRIPTION_PAST_DUE
+  STAFF_ACTIVITY
+}
+
+enum NotificationRelatedEntityType {
+  PRODUCT
+  CASH_DRAWER_SESSION
+  CUSTOMER
+  SUPPLIER
+  SUBSCRIPTION
+  COMPANY_MEMBER
+}
+
+/**
+ * Dashboard Notification Bell — Owner/Admin only this phase.
+ * `relatedEntityId` is a plain field with no @relation, same convention as
+ * StockMovement.referenceId — it's polymorphic (points at a different
+ * table depending on relatedEntityType), so no single FK target exists.
+ * `locationId` IS a real FK (never polymorphic) — schema-ready for future
+ * Manager/Cashier location-scoping, unused for filtering this phase.
+ * `metadata` holds a structured snapshot for display — the frontend
+ * renders all text via i18n, never a pre-rendered server-side string,
+ * matching this codebase's unbroken convention.
+ */
+model Notification {
+  id                String                        @id @default(uuid()) @db.Uuid
+  tenantId          String                        @db.Uuid
+  companyId         String                        @db.Uuid
+  type              NotificationType
+  relatedEntityType NotificationRelatedEntityType
+  relatedEntityId   String                        @db.Uuid
+  locationId        String?                       @db.Uuid
+  metadata          Json                          @db.JsonB
+  isRead            Boolean                       @default(false)
+  readAt            DateTime?                     @db.Timestamptz(6)
+  createdAt         DateTime                      @default(now()) @db.Timestamptz(6)
+  tenant            Tenant                        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company           Company                       @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  location          Location?                     @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId, companyId, isRead, createdAt])
+  @@map("notifications")
 }
 
 model CompanyOwnership {

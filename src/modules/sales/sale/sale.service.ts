@@ -12,12 +12,15 @@ import {
   SalePaymentMethod,
   SaleStatus,
   StockMovementType,
+  NotificationType,
+  NotificationRelatedEntityType,
 } from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { LocationAccessService } from '../../../common/services/location-access.service';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
+import { NotificationService } from '../../notification/notification.service';
 import {
   CreateSaleDto,
   CreateSaleReturnDto,
@@ -69,6 +72,7 @@ export class SaleService {
     private readonly prisma: PrismaService,
     private readonly inventoryService: InventoryService,
     private readonly locationAccessService: LocationAccessService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async list(context: CompanyContext, query: ListSalesQueryDto = {}) {
@@ -157,7 +161,7 @@ export class SaleService {
         'A customerId is required when any payment uses the DUE method',
       );
     }
-    let customer: { id: string; dueBalance: Prisma.Decimal } | null = null;
+    let customer: { id: string; name: string; dueBalance: Prisma.Decimal } | null = null;
     if (dto.customerId) {
       const found = await this.prisma.customer.findFirst({
         where: {
@@ -165,7 +169,7 @@ export class SaleService {
           tenantId: context.tenantId,
           companyId: context.companyId,
         },
-        select: { id: true, dueBalance: true },
+        select: { id: true, name: true, dueBalance: true },
       });
       if (!found)
         throw new BadRequestException(
@@ -307,6 +311,30 @@ export class SaleService {
             where: { id: customer.id },
             data: { dueBalance: { increment: dueAmountThisSale } },
           });
+
+          // Edge-triggered, not the `warnings` field above (that fires on
+          // every over-limit sale, by design, for immediate checkout
+          // feedback) — this only fires the *first* time the customer
+          // crosses into over-limit, never again while they stay over it,
+          // per the plan's Q5 duplicate-prevention design. Resets only
+          // once a payment brings them back under the limit.
+          if (settings.maxCustomerDueLimit != null) {
+            const beforeDue = Number(customer.dueBalance);
+            const afterDue = beforeDue + dueAmountThisSale;
+            const limit = Number(settings.maxCustomerDueLimit);
+            if (beforeDue <= limit && afterDue > limit) {
+              await this.notificationService.create(tx, context, {
+                type: NotificationType.CUSTOMER_DUE_OVERDUE,
+                relatedEntityType: NotificationRelatedEntityType.CUSTOMER,
+                relatedEntityId: customer.id,
+                metadata: {
+                  customerName: customer.name,
+                  dueBalance: afterDue.toString(),
+                  limit: limit.toString(),
+                },
+              });
+            }
+          }
         }
 
         await this.createAudit(

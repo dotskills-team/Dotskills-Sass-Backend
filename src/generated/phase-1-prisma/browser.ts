@@ -260,6 +260,20 @@ export type CompanyMemberScope = Prisma.CompanyMemberScopeModel
  */
 export type CompanyMemberLocation = Prisma.CompanyMemberLocationModel
 /**
+ * Model Notification
+ * *
+ *  * Dashboard Notification Bell — Owner/Admin only this phase.
+ *  * `relatedEntityId` is a plain field with no @relation, same convention as
+ *  * StockMovement.referenceId — it's polymorphic (points at a different
+ *  * table depending on relatedEntityType), so no single FK target exists.
+ *  * `locationId` IS a real FK (never polymorphic) — schema-ready for future
+ *  * Manager/Cashier location-scoping, unused for filtering this phase.
+ *  * `metadata` holds a structured snapshot for display — the frontend
+ *  * renders all text via i18n, never a pre-rendered server-side string,
+ *  * matching this codebase's unbroken convention.
+ */
+export type Notification = Prisma.NotificationModel
+/**
  * Model CompanyOwnership
  * 
  */

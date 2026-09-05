@@ -38,6 +38,14 @@ export class UpdateCompanySettingsDto {
   maxCustomerDueLimit?: number;
 
   @IsOptional()
+  @IsNumber(
+    { maxDecimalPlaces: 4 },
+    { message: 'maxSupplierPayableLimit must have maximum 4 decimal places' },
+  )
+  @Min(0, { message: 'maxSupplierPayableLimit cannot be negative' })
+  maxSupplierPayableLimit?: number;
+
+  @IsOptional()
   @IsBoolean()
   enableTax?: boolean;
 

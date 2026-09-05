@@ -2,14 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import {
   AuditActorType,
+  NotificationType,
+  NotificationRelatedEntityType,
   SubscriptionStatus,
 } from '../../generated/phase-1-prisma/enums';
 
 import { PrismaService } from '../../prisma/prisma.service';
 import { InvoiceService } from '../invoice/invoice.service';
+import { NotificationService } from '../notification/notification.service';
 import { SubscriptionLifecycleService } from './subscription-lifecycle.service';
 
 const mockInvoiceService = { void: jest.fn() };
+const mockNotificationService = { create: jest.fn() };
 
 describe('SubscriptionLifecycleService.paymentFailed', () => {
   let service: SubscriptionLifecycleService;
@@ -53,6 +57,7 @@ describe('SubscriptionLifecycleService.paymentFailed', () => {
         SubscriptionLifecycleService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: InvoiceService, useValue: mockInvoiceService },
+        { provide: NotificationService, useValue: mockNotificationService },
       ],
     }).compile();
 
@@ -157,6 +162,130 @@ describe('SubscriptionLifecycleService.paymentFailed', () => {
   );
 });
 
+describe('SubscriptionLifecycleService — SUBSCRIPTION_PAST_DUE notification (no dedup needed, transition()\'s own compare-and-set already guarantees exactly-once)', () => {
+  let service: SubscriptionLifecycleService;
+
+  const mockTx = {
+    subscriptionEvent: { findUnique: jest.fn(), create: jest.fn() },
+    subscription: { updateMany: jest.fn(), findUniqueOrThrow: jest.fn() },
+    auditLog: { create: jest.fn() },
+  };
+
+  const mockPrisma = {
+    $transaction: jest.fn((arg: any) => {
+      if (typeof arg === 'function') return arg(mockTx);
+      return Promise.all(arg);
+    }),
+    subscription: { findFirst: jest.fn(), findUnique: jest.fn() },
+    subscriptionEvent: { findUnique: jest.fn() },
+  };
+
+  const context = {
+    userId: 'user-1',
+    actorType: AuditActorType.PLATFORM_MEMBER,
+  };
+
+  function subscriptionWith(status: SubscriptionStatus, companyId: string | null = 'company-1') {
+    return {
+      id: 'sub-1',
+      tenantId: 'tenant-1',
+      companyId,
+      status,
+      billingCycle: 'MONTHLY',
+    };
+  }
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    mockPrisma.subscriptionEvent.findUnique.mockResolvedValue(null);
+    mockTx.subscription.updateMany.mockResolvedValue({ count: 1 });
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        SubscriptionLifecycleService,
+        { provide: PrismaService, useValue: mockPrisma },
+        { provide: InvoiceService, useValue: mockInvoiceService },
+        { provide: NotificationService, useValue: mockNotificationService },
+      ],
+    }).compile();
+
+    service = module.get(SubscriptionLifecycleService);
+  });
+
+  it.each([
+    [SubscriptionStatus.ACTIVE, SubscriptionStatus.PAST_DUE],
+    [SubscriptionStatus.PAST_DUE, SubscriptionStatus.GRACE],
+    [SubscriptionStatus.GRACE, SubscriptionStatus.SUSPENDED],
+  ])('fires when transitioning %s → %s', async (from, to) => {
+    const subscription = subscriptionWith(from);
+    mockTx.subscription.findUniqueOrThrow.mockResolvedValue({ ...subscription, status: to });
+
+    await service.transition(subscription as any, to, context, {
+      reason: 'TEST_REASON',
+      source: 'PAYMENT',
+    });
+
+    expect(mockNotificationService.create).toHaveBeenCalledWith(
+      mockTx,
+      { tenantId: 'tenant-1', companyId: 'company-1' },
+      {
+        type: NotificationType.SUBSCRIPTION_PAST_DUE,
+        relatedEntityType: NotificationRelatedEntityType.SUBSCRIPTION,
+        relatedEntityId: 'sub-1',
+        metadata: { status: to, reason: 'TEST_REASON' },
+      },
+    );
+  });
+
+  it('does not fire when transitioning into a non-struggling status (e.g. recovering to ACTIVE)', async () => {
+    const subscription = subscriptionWith(SubscriptionStatus.SUSPENDED);
+    mockTx.subscription.findUniqueOrThrow.mockResolvedValue({
+      ...subscription,
+      status: SubscriptionStatus.ACTIVE,
+    });
+
+    await service.transition(subscription as any, SubscriptionStatus.ACTIVE, context, {
+      reason: 'PAYMENT_SUCCEEDED',
+      source: 'PAYMENT',
+    });
+
+    expect(mockNotificationService.create).not.toHaveBeenCalled();
+  });
+
+  it('does not fire for a platform-only subscription with no companyId', async () => {
+    const subscription = subscriptionWith(SubscriptionStatus.ACTIVE, null);
+    mockTx.subscription.findUniqueOrThrow.mockResolvedValue({
+      ...subscription,
+      status: SubscriptionStatus.PAST_DUE,
+    });
+
+    await service.transition(subscription as any, SubscriptionStatus.PAST_DUE, context, {
+      reason: 'PAYMENT_FAILED',
+      source: 'PAYMENT',
+    });
+
+    expect(mockNotificationService.create).not.toHaveBeenCalled();
+  });
+
+  it('does not fire again on an idempotent replay of an already-applied transition', async () => {
+    const subscription = subscriptionWith(SubscriptionStatus.ACTIVE);
+    mockTx.subscriptionEvent.findUnique.mockResolvedValue({ id: 'event-1' } as any);
+    mockTx.subscription.findUniqueOrThrow.mockResolvedValue({
+      ...subscription,
+      status: SubscriptionStatus.PAST_DUE,
+    });
+
+    await service.transition(subscription as any, SubscriptionStatus.PAST_DUE, context, {
+      reason: 'PAYMENT_FAILED',
+      source: 'PAYMENT',
+      idempotencyKey: 'already-used-key',
+    });
+
+    expect(mockTx.subscription.updateMany).not.toHaveBeenCalled();
+    expect(mockNotificationService.create).not.toHaveBeenCalled();
+  });
+});
+
 describe('SubscriptionLifecycleService.paymentSucceeded', () => {
   let service: SubscriptionLifecycleService;
 
@@ -200,6 +329,7 @@ describe('SubscriptionLifecycleService.paymentSucceeded', () => {
         SubscriptionLifecycleService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: InvoiceService, useValue: mockInvoiceService },
+        { provide: NotificationService, useValue: mockNotificationService },
       ],
     }).compile();
 
@@ -314,6 +444,7 @@ describe('SubscriptionLifecycleService.runDueTransitions — TRIALING fork', () 
         SubscriptionLifecycleService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: InvoiceService, useValue: mockInvoiceService },
+        { provide: NotificationService, useValue: mockNotificationService },
       ],
     }).compile();
 
@@ -386,6 +517,132 @@ describe('SubscriptionLifecycleService.runDueTransitions — TRIALING fork', () 
   });
 });
 
+describe('SubscriptionLifecycleService.checkExpiringSoon', () => {
+  let service: SubscriptionLifecycleService;
+
+  const mockNotifyTx = { notification: { findFirst: jest.fn() } };
+
+  const mockPrisma = {
+    subscription: { findMany: jest.fn() },
+    $transaction: jest.fn((arg: any) => {
+      if (typeof arg === 'function') return arg(mockNotifyTx);
+      return Promise.all(arg);
+    }),
+  };
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    mockPrisma.subscription.findMany.mockResolvedValue([]);
+    mockNotifyTx.notification.findFirst.mockResolvedValue(null);
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        SubscriptionLifecycleService,
+        { provide: PrismaService, useValue: mockPrisma },
+        { provide: InvoiceService, useValue: mockInvoiceService },
+        { provide: NotificationService, useValue: mockNotificationService },
+      ],
+    }).compile();
+
+    service = module.get(SubscriptionLifecycleService);
+  });
+
+  it('notifies for a TRIALING subscription whose trialEndsAt falls within the lookahead window', async () => {
+    const subscription = {
+      id: 'sub-1',
+      tenantId: 'tenant-1',
+      companyId: 'company-1',
+      status: SubscriptionStatus.TRIALING,
+      startsAt: new Date('2026-08-01T00:00:00Z'),
+      trialEndsAt: new Date('2026-09-07T00:00:00Z'),
+      currentPeriodStart: new Date('2026-08-01T00:00:00Z'),
+      currentPeriodEnd: new Date('2026-09-07T00:00:00Z'),
+    };
+    mockPrisma.subscription.findMany.mockResolvedValue([subscription]);
+
+    const result = await service.checkExpiringSoon(new Date('2026-09-05T00:00:00Z'));
+
+    expect(mockNotificationService.create).toHaveBeenCalledWith(
+      mockNotifyTx,
+      { tenantId: 'tenant-1', companyId: 'company-1' },
+      expect.objectContaining({
+        type: NotificationType.SUBSCRIPTION_EXPIRING_SOON,
+        relatedEntityType: NotificationRelatedEntityType.SUBSCRIPTION,
+        relatedEntityId: 'sub-1',
+        metadata: expect.objectContaining({ status: SubscriptionStatus.TRIALING }),
+      }),
+    );
+    expect(result.notified).toBe(1);
+  });
+
+  it('notifies for an ACTIVE subscription whose currentPeriodEnd falls within the lookahead window', async () => {
+    const subscription = {
+      id: 'sub-2',
+      tenantId: 'tenant-1',
+      companyId: 'company-1',
+      status: SubscriptionStatus.ACTIVE,
+      startsAt: new Date('2026-08-01T00:00:00Z'),
+      trialEndsAt: null,
+      currentPeriodStart: new Date('2026-08-07T00:00:00Z'),
+      currentPeriodEnd: new Date('2026-09-07T00:00:00Z'),
+    };
+    mockPrisma.subscription.findMany.mockResolvedValue([subscription]);
+
+    const result = await service.checkExpiringSoon(new Date('2026-09-05T00:00:00Z'));
+
+    expect(mockNotificationService.create).toHaveBeenCalledWith(
+      mockNotifyTx,
+      { tenantId: 'tenant-1', companyId: 'company-1' },
+      expect.objectContaining({
+        type: NotificationType.SUBSCRIPTION_EXPIRING_SOON,
+        relatedEntityId: 'sub-2',
+        metadata: expect.objectContaining({ status: SubscriptionStatus.ACTIVE }),
+      }),
+    );
+    expect(result.notified).toBe(1);
+  });
+
+  it('does not re-notify when a SUBSCRIPTION_EXPIRING_SOON notification already exists since the current period started (duplicate-prevention proof)', async () => {
+    const subscription = {
+      id: 'sub-3',
+      tenantId: 'tenant-1',
+      companyId: 'company-1',
+      status: SubscriptionStatus.ACTIVE,
+      startsAt: new Date('2026-08-01T00:00:00Z'),
+      trialEndsAt: null,
+      currentPeriodStart: new Date('2026-08-07T00:00:00Z'),
+      currentPeriodEnd: new Date('2026-09-07T00:00:00Z'),
+    };
+    mockPrisma.subscription.findMany.mockResolvedValue([subscription]);
+    mockNotifyTx.notification.findFirst.mockResolvedValue({ id: 'existing-notification' });
+
+    const result = await service.checkExpiringSoon(new Date('2026-09-05T00:00:00Z'));
+
+    expect(mockNotificationService.create).not.toHaveBeenCalled();
+    expect(result.notified).toBe(0);
+  });
+
+  it('skips a candidate with no companyId', async () => {
+    mockPrisma.subscription.findMany.mockResolvedValue([
+      {
+        id: 'sub-4',
+        tenantId: 'tenant-1',
+        companyId: null,
+        status: SubscriptionStatus.ACTIVE,
+        startsAt: new Date('2026-08-01T00:00:00Z'),
+        trialEndsAt: null,
+        currentPeriodStart: new Date('2026-08-07T00:00:00Z'),
+        currentPeriodEnd: new Date('2026-09-07T00:00:00Z'),
+      },
+    ]);
+
+    const result = await service.checkExpiringSoon(new Date('2026-09-05T00:00:00Z'));
+
+    expect(mockNotificationService.create).not.toHaveBeenCalled();
+    expect(result.notified).toBe(0);
+  });
+});
+
 describe('SubscriptionLifecycleService.voidStaleIssuedInvoices', () => {
   let service: SubscriptionLifecycleService;
 
@@ -404,6 +661,7 @@ describe('SubscriptionLifecycleService.voidStaleIssuedInvoices', () => {
         SubscriptionLifecycleService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: InvoiceService, useValue: mockInvoice },
+        { provide: NotificationService, useValue: mockNotificationService },
       ],
     }).compile();
 

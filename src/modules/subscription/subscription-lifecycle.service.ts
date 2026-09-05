@@ -6,8 +6,11 @@ import {
   AuditActorType,
   InvoiceStatus,
   SubscriptionStatus,
+  NotificationType,
+  NotificationRelatedEntityType,
 } from 'src/generated/phase-1-prisma/enums';
 import { InvoiceService } from '../invoice/invoice.service';
+import { NotificationService } from '../notification/notification.service';
 
 import {
   LifecycleRunResult,
@@ -34,7 +37,14 @@ export class SubscriptionLifecycleService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly invoiceService: InvoiceService,
+    private readonly notificationService: NotificationService,
   ) {}
+
+  private static readonly STRUGGLING_STATUSES: readonly SubscriptionStatus[] = [
+    SubscriptionStatus.PAST_DUE,
+    SubscriptionStatus.GRACE,
+    SubscriptionStatus.SUSPENDED,
+  ];
 
   async paymentSucceeded(
     id: string,
@@ -340,6 +350,23 @@ export class SubscriptionLifecycleService {
           afterData: { status: to, reason: options.reason },
         },
       });
+
+      if (
+        subscription.companyId &&
+        SubscriptionLifecycleService.STRUGGLING_STATUSES.includes(to)
+      ) {
+        await this.notificationService.create(
+          tx,
+          { tenantId: subscription.tenantId, companyId: subscription.companyId },
+          {
+            type: NotificationType.SUBSCRIPTION_PAST_DUE,
+            relatedEntityType: NotificationRelatedEntityType.SUBSCRIPTION,
+            relatedEntityId: subscription.id,
+            metadata: { status: to, reason: options.reason },
+          },
+        );
+      }
+
       return tx.subscription.findUniqueOrThrow({
         where: { id: subscription.id },
       });
@@ -452,6 +479,80 @@ export class SubscriptionLifecycleService {
       'cancelledExpired',
     );
     return result;
+  }
+
+  /**
+   * The one inherently time-based (not action-triggered) notification type —
+   * hooked into this same 10-minute scheduler tick rather than a new poll.
+   * Looks ahead EXPIRING_SOON_DAYS from trialEndsAt (TRIALING) or
+   * currentPeriodEnd (ACTIVE). Dedup is state-based like every other
+   * Notification hook this phase: skip a subscription that already has a
+   * SUBSCRIPTION_EXPIRING_SOON notification created since its current
+   * trial/period started — so a renewed period or a freshly-extended trial
+   * is eligible for its own, later notification.
+   */
+  async checkExpiringSoon(now = new Date()): Promise<{ notified: number }> {
+    const cutoff = this.addDays(now, SUBSCRIPTION_CONSTANTS.EXPIRING_SOON_DAYS);
+    let notified = 0;
+
+    const candidates = await this.prisma.subscription.findMany({
+      where: {
+        companyId: { not: null },
+        OR: [
+          {
+            status: SubscriptionStatus.TRIALING,
+            trialEndsAt: { gte: now, lte: cutoff },
+          },
+          {
+            status: SubscriptionStatus.ACTIVE,
+            currentPeriodEnd: { gte: now, lte: cutoff },
+          },
+        ],
+      },
+      take: SUBSCRIPTION_CONSTANTS.LIFECYCLE_BATCH_SIZE,
+    });
+
+    for (const subscription of candidates) {
+      if (!subscription.companyId) continue;
+
+      const periodStart =
+        subscription.status === SubscriptionStatus.TRIALING
+          ? subscription.startsAt
+          : subscription.currentPeriodStart;
+      const expiresAt =
+        subscription.status === SubscriptionStatus.TRIALING &&
+        subscription.trialEndsAt
+          ? subscription.trialEndsAt
+          : subscription.currentPeriodEnd;
+
+      await this.prisma.$transaction(async (tx) => {
+        const existing = await tx.notification.findFirst({
+          where: {
+            type: NotificationType.SUBSCRIPTION_EXPIRING_SOON,
+            relatedEntityId: subscription.id,
+            createdAt: { gte: periodStart },
+          },
+        });
+        if (existing) return;
+
+        await this.notificationService.create(
+          tx,
+          { tenantId: subscription.tenantId, companyId: subscription.companyId! },
+          {
+            type: NotificationType.SUBSCRIPTION_EXPIRING_SOON,
+            relatedEntityType: NotificationRelatedEntityType.SUBSCRIPTION,
+            relatedEntityId: subscription.id,
+            metadata: {
+              status: subscription.status,
+              expiresAt: expiresAt.toISOString(),
+            },
+          },
+        );
+        notified += 1;
+      });
+    }
+
+    return { notified };
   }
 
   /**

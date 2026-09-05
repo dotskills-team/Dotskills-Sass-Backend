@@ -9,6 +9,7 @@ import {
 import { PrismaService } from '../../../prisma/prisma.service';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
 import { LocationAccessService } from '../../../common/services/location-access.service';
+import { NotificationService } from '../../notification/notification.service';
 import { SaleService } from './sale.service';
 
 describe('SaleService', () => {
@@ -44,6 +45,10 @@ describe('SaleService', () => {
     assertHasLocationAccess: jest.fn().mockResolvedValue(undefined),
   };
 
+  const mockNotificationService = {
+    create: jest.fn(),
+  };
+
   const context = { tenantId: 'tenant-1', companyId: 'company-1' } as any;
   const actor = { userId: 'user-1' } as any;
 
@@ -56,6 +61,7 @@ describe('SaleService', () => {
         { provide: PrismaService, useValue: mockPrisma },
         { provide: InventoryService, useValue: mockInventoryService },
         { provide: LocationAccessService, useValue: mockLocationAccessService },
+        { provide: NotificationService, useValue: mockNotificationService },
       ],
     }).compile();
 
@@ -334,6 +340,96 @@ describe('SaleService', () => {
       expect(result.success).toBe(true);
       expect(result.warnings).toContain('DUE_LIMIT_EXCEEDED');
       expect(mockTx.sale.create).toHaveBeenCalled();
+    });
+
+    describe('CUSTOMER_DUE_OVERDUE notification (edge-triggered, distinct from the `warnings` field above)', () => {
+      it('fires when this sale crosses the customer from at-or-under the limit to over it', async () => {
+        mockPrisma.companySettings.findUniqueOrThrow.mockResolvedValue({
+          allowNegativeStock: false,
+          enableTax: false,
+          defaultTaxRate: 0,
+          maxCustomerDueLimit: 50,
+        });
+        mockPrisma.customer.findFirst.mockResolvedValue({
+          id: 'customer-1',
+          name: 'Customer One',
+          dueBalance: 0, // before = 0 <= 50
+        });
+
+        await service.create(
+          context,
+          {
+            locationId: 'loc-1',
+            customerId: 'customer-1',
+            items: [{ productId: 'product-1', quantity: 1 }],
+            payments: [{ method: SalePaymentMethod.DUE, amount: 100 }], // after = 100 > 50
+          },
+          actor,
+        );
+
+        expect(mockNotificationService.create).toHaveBeenCalledWith(
+          mockTx,
+          context,
+          expect.objectContaining({
+            type: 'CUSTOMER_DUE_OVERDUE',
+            relatedEntityType: 'CUSTOMER',
+            relatedEntityId: 'customer-1',
+            metadata: expect.objectContaining({
+              customerName: 'Customer One',
+              dueBalance: '100',
+              limit: '50',
+            }),
+          }),
+        );
+      });
+
+      it('does NOT re-fire when the customer was already over their due limit before this sale (duplicate-prevention)', async () => {
+        mockPrisma.companySettings.findUniqueOrThrow.mockResolvedValue({
+          allowNegativeStock: false,
+          enableTax: false,
+          defaultTaxRate: 0,
+          maxCustomerDueLimit: 50,
+        });
+        mockPrisma.customer.findFirst.mockResolvedValue({
+          id: 'customer-1',
+          name: 'Customer One',
+          dueBalance: 200, // already over the 50 limit before this sale
+        });
+
+        await service.create(
+          context,
+          {
+            locationId: 'loc-1',
+            customerId: 'customer-1',
+            items: [{ productId: 'product-1', quantity: 1 }],
+            payments: [{ method: SalePaymentMethod.DUE, amount: 100 }],
+          },
+          actor,
+        );
+
+        expect(mockNotificationService.create).not.toHaveBeenCalled();
+      });
+
+      it('does not fire when the company has no configured due limit', async () => {
+        mockPrisma.customer.findFirst.mockResolvedValue({
+          id: 'customer-1',
+          name: 'Customer One',
+          dueBalance: 0,
+        });
+
+        await service.create(
+          context,
+          {
+            locationId: 'loc-1',
+            customerId: 'customer-1',
+            items: [{ productId: 'product-1', quantity: 1 }],
+            payments: [{ method: SalePaymentMethod.DUE, amount: 100 }],
+          },
+          actor,
+        );
+
+        expect(mockNotificationService.create).not.toHaveBeenCalled();
+      });
     });
   });
 

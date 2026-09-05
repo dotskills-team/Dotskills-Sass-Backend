@@ -53,6 +53,10 @@ export const SUBSCRIPTION_CONSTANTS = {
   // ACTIVE → PAST_DUE deadline
   DEFAULT_PAST_DUE_DAYS: 3,
 
+  // How many days ahead of trialEndsAt/currentPeriodEnd the
+  // SUBSCRIPTION_EXPIRING_SOON notification looks.
+  EXPIRING_SOON_DAYS: 3,
+
   // PAST_DUE → GRACE duration
   DEFAULT_GRACE_DAYS: 7,
 
