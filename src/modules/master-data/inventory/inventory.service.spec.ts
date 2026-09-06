@@ -89,6 +89,106 @@ describe('InventoryService', () => {
         }),
       );
     });
+
+    describe('Out-of-Stock / Low-Stock edge-triggered notification (band-transition, shared with decreaseStock)', () => {
+      beforeEach(() => {
+        mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-x' });
+        mockTx.location.findUnique.mockResolvedValue({ name: 'Main Branch' });
+      });
+
+      it('fires LOW_STOCK when a restock lands the product below reorderLevel, moving it from the OUT band into the LOW band', async () => {
+        mockTx.product.findUnique.mockResolvedValue({
+          name: 'Kalijira Rice 5KG',
+          sku: 'RICE-10-05',
+          reorderLevel: new Prisma.Decimal(5),
+        });
+        mockTx.inventory.upsert.mockResolvedValue({ quantity: new Prisma.Decimal(3) }); // after = 3
+
+        await service.increaseStock(mockTx as any, {
+          ...baseInput,
+          quantity: 3, // before = 3 - 3 = 0 (OUT) -> after = 3 (LOW, since 3 < reorderLevel 5)
+          movementType: StockMovementType.PURCHASE,
+        });
+
+        expect(mockNotificationService.create).toHaveBeenCalledWith(
+          mockTx,
+          { tenantId: 'tenant-1', companyId: 'company-1' },
+          expect.objectContaining({
+            type: 'LOW_STOCK',
+            relatedEntityType: 'PRODUCT',
+            relatedEntityId: 'product-1',
+            locationId: 'location-1',
+            metadata: expect.objectContaining({ productName: 'Kalijira Rice 5KG', quantity: '3' }),
+          }),
+        );
+      });
+
+      it('does not fire when a restock stays within the OK band', async () => {
+        mockTx.product.findUnique.mockResolvedValue({
+          name: 'Rice',
+          sku: 'RICE-1',
+          reorderLevel: new Prisma.Decimal(5),
+        });
+        mockTx.inventory.upsert.mockResolvedValue({ quantity: new Prisma.Decimal(15) }); // after = 15
+
+        await service.increaseStock(mockTx as any, {
+          ...baseInput,
+          quantity: 5, // before = 15 - 5 = 10 (OK) -> after = 15 (OK)
+          movementType: StockMovementType.PURCHASE,
+        });
+
+        expect(mockNotificationService.create).not.toHaveBeenCalled();
+      });
+
+      it('does not fire when a restock jumps straight from the OUT band to the OK band, skipping LOW entirely', async () => {
+        mockTx.product.findUnique.mockResolvedValue({
+          name: 'Rice',
+          sku: 'RICE-1',
+          reorderLevel: new Prisma.Decimal(5),
+        });
+        mockTx.inventory.upsert.mockResolvedValue({ quantity: new Prisma.Decimal(20) }); // after = 20
+
+        await service.increaseStock(mockTx as any, {
+          ...baseInput,
+          quantity: 20, // before = 20 - 20 = 0 (OUT) -> after = 20 (OK)
+          movementType: StockMovementType.PURCHASE,
+        });
+
+        expect(mockNotificationService.create).not.toHaveBeenCalled();
+      });
+
+      it('does NOT re-fire LOW_STOCK when a partial restock leaves the product in the same LOW band it was already in (duplicate-prevention)', async () => {
+        mockTx.product.findUnique.mockResolvedValue({
+          name: 'Rice',
+          sku: 'RICE-1',
+          reorderLevel: new Prisma.Decimal(5),
+        });
+        mockTx.inventory.upsert.mockResolvedValue({ quantity: new Prisma.Decimal(4) }); // after = 4
+
+        await service.increaseStock(mockTx as any, {
+          ...baseInput,
+          quantity: 2, // before = 4 - 2 = 2 (LOW) -> after = 4 (still LOW)
+          movementType: StockMovementType.PURCHASE,
+        });
+
+        expect(mockNotificationService.create).not.toHaveBeenCalled();
+      });
+
+      it('does not throw and does not notify when the product cannot be found', async () => {
+        mockTx.product.findUnique.mockResolvedValue(null);
+        mockTx.inventory.upsert.mockResolvedValue({ quantity: new Prisma.Decimal(3) });
+
+        await expect(
+          service.increaseStock(mockTx as any, {
+            ...baseInput,
+            quantity: 3,
+            movementType: StockMovementType.PURCHASE,
+          }),
+        ).resolves.toBeDefined();
+
+        expect(mockNotificationService.create).not.toHaveBeenCalled();
+      });
+    });
   });
 
   describe('decreaseStock', () => {

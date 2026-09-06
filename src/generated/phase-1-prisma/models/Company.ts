@@ -32,6 +32,7 @@ export type CompanyMinAggregateOutputType = {
   code: string | null
   legalName: string | null
   tradeName: string | null
+  logoUrl: string | null
   email: string | null
   phone: string | null
   taxId: string | null
@@ -52,6 +53,7 @@ export type CompanyMaxAggregateOutputType = {
   code: string | null
   legalName: string | null
   tradeName: string | null
+  logoUrl: string | null
   email: string | null
   phone: string | null
   taxId: string | null
@@ -72,6 +74,7 @@ export type CompanyCountAggregateOutputType = {
   code: number
   legalName: number
   tradeName: number
+  logoUrl: number
   email: number
   phone: number
   taxId: number
@@ -94,6 +97,7 @@ export type CompanyMinAggregateInputType = {
   code?: true
   legalName?: true
   tradeName?: true
+  logoUrl?: true
   email?: true
   phone?: true
   taxId?: true
@@ -114,6 +118,7 @@ export type CompanyMaxAggregateInputType = {
   code?: true
   legalName?: true
   tradeName?: true
+  logoUrl?: true
   email?: true
   phone?: true
   taxId?: true
@@ -134,6 +139,7 @@ export type CompanyCountAggregateInputType = {
   code?: true
   legalName?: true
   tradeName?: true
+  logoUrl?: true
   email?: true
   phone?: true
   taxId?: true
@@ -227,6 +233,7 @@ export type CompanyGroupByOutputType = {
   code: string
   legalName: string
   tradeName: string | null
+  logoUrl: string | null
   email: string | null
   phone: string | null
   taxId: string | null
@@ -268,6 +275,7 @@ export type CompanyWhereInput = {
   code?: Prisma.StringFilter<"Company"> | string
   legalName?: Prisma.StringFilter<"Company"> | string
   tradeName?: Prisma.StringNullableFilter<"Company"> | string | null
+  logoUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   email?: Prisma.StringNullableFilter<"Company"> | string | null
   phone?: Prisma.StringNullableFilter<"Company"> | string | null
   taxId?: Prisma.StringNullableFilter<"Company"> | string | null
@@ -321,6 +329,7 @@ export type CompanyOrderByWithRelationInput = {
   code?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   tradeName?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   taxId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -379,6 +388,7 @@ export type CompanyWhereUniqueInput = Prisma.AtLeast<{
   code?: Prisma.StringFilter<"Company"> | string
   legalName?: Prisma.StringFilter<"Company"> | string
   tradeName?: Prisma.StringNullableFilter<"Company"> | string | null
+  logoUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   email?: Prisma.StringNullableFilter<"Company"> | string | null
   phone?: Prisma.StringNullableFilter<"Company"> | string | null
   taxId?: Prisma.StringNullableFilter<"Company"> | string | null
@@ -432,6 +442,7 @@ export type CompanyOrderByWithAggregationInput = {
   code?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   tradeName?: Prisma.SortOrderInput | Prisma.SortOrder
+  logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   taxId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -458,6 +469,7 @@ export type CompanyScalarWhereWithAggregatesInput = {
   code?: Prisma.StringWithAggregatesFilter<"Company"> | string
   legalName?: Prisma.StringWithAggregatesFilter<"Company"> | string
   tradeName?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
+  logoUrl?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   email?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
   taxId?: Prisma.StringNullableWithAggregatesFilter<"Company"> | string | null
@@ -475,6 +487,7 @@ export type CompanyCreateInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -528,6 +541,7 @@ export type CompanyUncheckedCreateInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -575,6 +589,7 @@ export type CompanyUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -628,6 +643,7 @@ export type CompanyUncheckedUpdateInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -678,6 +694,7 @@ export type CompanyCreateManyInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -695,6 +712,7 @@ export type CompanyUpdateManyMutationInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -715,6 +733,7 @@ export type CompanyUncheckedUpdateManyInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -755,6 +774,7 @@ export type CompanyCountOrderByAggregateInput = {
   code?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   tradeName?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   taxId?: Prisma.SortOrder
@@ -775,6 +795,7 @@ export type CompanyMaxOrderByAggregateInput = {
   code?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   tradeName?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   taxId?: Prisma.SortOrder
@@ -795,6 +816,7 @@ export type CompanyMinOrderByAggregateInput = {
   code?: Prisma.SortOrder
   legalName?: Prisma.SortOrder
   tradeName?: Prisma.SortOrder
+  logoUrl?: Prisma.SortOrder
   email?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   taxId?: Prisma.SortOrder
@@ -1384,6 +1406,7 @@ export type CompanyCreateWithoutCreatedByInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -1435,6 +1458,7 @@ export type CompanyUncheckedCreateWithoutCreatedByInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -1514,6 +1538,7 @@ export type CompanyScalarWhereInput = {
   code?: Prisma.StringFilter<"Company"> | string
   legalName?: Prisma.StringFilter<"Company"> | string
   tradeName?: Prisma.StringNullableFilter<"Company"> | string | null
+  logoUrl?: Prisma.StringNullableFilter<"Company"> | string | null
   email?: Prisma.StringNullableFilter<"Company"> | string | null
   phone?: Prisma.StringNullableFilter<"Company"> | string | null
   taxId?: Prisma.StringNullableFilter<"Company"> | string | null
@@ -1531,6 +1556,7 @@ export type CompanyCreateWithoutTenantInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -1582,6 +1608,7 @@ export type CompanyUncheckedCreateWithoutTenantInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -1655,6 +1682,7 @@ export type CompanyCreateWithoutIndustryInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -1706,6 +1734,7 @@ export type CompanyUncheckedCreateWithoutIndustryInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -1779,6 +1808,7 @@ export type CompanyCreateWithoutLocationsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -1831,6 +1861,7 @@ export type CompanyUncheckedCreateWithoutLocationsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -1893,6 +1924,7 @@ export type CompanyUpdateWithoutLocationsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1945,6 +1977,7 @@ export type CompanyUncheckedUpdateWithoutLocationsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1991,6 +2024,7 @@ export type CompanyCreateWithoutCategoriesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -2043,6 +2077,7 @@ export type CompanyUncheckedCreateWithoutCategoriesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -2105,6 +2140,7 @@ export type CompanyUpdateWithoutCategoriesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2157,6 +2193,7 @@ export type CompanyUncheckedUpdateWithoutCategoriesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2203,6 +2240,7 @@ export type CompanyCreateWithoutUnitsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -2255,6 +2293,7 @@ export type CompanyUncheckedCreateWithoutUnitsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -2317,6 +2356,7 @@ export type CompanyUpdateWithoutUnitsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2369,6 +2409,7 @@ export type CompanyUncheckedUpdateWithoutUnitsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2415,6 +2456,7 @@ export type CompanyCreateWithoutProductsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -2467,6 +2509,7 @@ export type CompanyUncheckedCreateWithoutProductsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -2529,6 +2572,7 @@ export type CompanyUpdateWithoutProductsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2581,6 +2625,7 @@ export type CompanyUncheckedUpdateWithoutProductsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2627,6 +2672,7 @@ export type CompanyCreateWithoutCustomersInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -2679,6 +2725,7 @@ export type CompanyUncheckedCreateWithoutCustomersInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -2741,6 +2788,7 @@ export type CompanyUpdateWithoutCustomersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2793,6 +2841,7 @@ export type CompanyUncheckedUpdateWithoutCustomersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2839,6 +2888,7 @@ export type CompanyCreateWithoutSuppliersInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -2891,6 +2941,7 @@ export type CompanyUncheckedCreateWithoutSuppliersInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -2953,6 +3004,7 @@ export type CompanyUpdateWithoutSuppliersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3005,6 +3057,7 @@ export type CompanyUncheckedUpdateWithoutSuppliersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3051,6 +3104,7 @@ export type CompanyCreateWithoutInventoryBalancesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -3103,6 +3157,7 @@ export type CompanyUncheckedCreateWithoutInventoryBalancesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -3165,6 +3220,7 @@ export type CompanyUpdateWithoutInventoryBalancesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3217,6 +3273,7 @@ export type CompanyUncheckedUpdateWithoutInventoryBalancesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3263,6 +3320,7 @@ export type CompanyCreateWithoutStockMovementsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -3315,6 +3373,7 @@ export type CompanyUncheckedCreateWithoutStockMovementsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -3377,6 +3436,7 @@ export type CompanyUpdateWithoutStockMovementsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3429,6 +3489,7 @@ export type CompanyUncheckedUpdateWithoutStockMovementsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3475,6 +3536,7 @@ export type CompanyCreateWithoutStockAdjustmentsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -3527,6 +3589,7 @@ export type CompanyUncheckedCreateWithoutStockAdjustmentsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -3589,6 +3652,7 @@ export type CompanyUpdateWithoutStockAdjustmentsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3641,6 +3705,7 @@ export type CompanyUncheckedUpdateWithoutStockAdjustmentsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3687,6 +3752,7 @@ export type CompanyCreateWithoutPurchaseOrdersInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -3739,6 +3805,7 @@ export type CompanyUncheckedCreateWithoutPurchaseOrdersInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -3801,6 +3868,7 @@ export type CompanyUpdateWithoutPurchaseOrdersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3853,6 +3921,7 @@ export type CompanyUncheckedUpdateWithoutPurchaseOrdersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3899,6 +3968,7 @@ export type CompanyCreateWithoutGoodsReceiptsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -3951,6 +4021,7 @@ export type CompanyUncheckedCreateWithoutGoodsReceiptsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -4013,6 +4084,7 @@ export type CompanyUpdateWithoutGoodsReceiptsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4065,6 +4137,7 @@ export type CompanyUncheckedUpdateWithoutGoodsReceiptsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4111,6 +4184,7 @@ export type CompanyCreateWithoutPurchaseReturnsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -4163,6 +4237,7 @@ export type CompanyUncheckedCreateWithoutPurchaseReturnsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -4225,6 +4300,7 @@ export type CompanyUpdateWithoutPurchaseReturnsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4277,6 +4353,7 @@ export type CompanyUncheckedUpdateWithoutPurchaseReturnsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4323,6 +4400,7 @@ export type CompanyCreateWithoutStockTransfersInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -4375,6 +4453,7 @@ export type CompanyUncheckedCreateWithoutStockTransfersInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -4437,6 +4516,7 @@ export type CompanyUpdateWithoutStockTransfersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4489,6 +4569,7 @@ export type CompanyUncheckedUpdateWithoutStockTransfersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4535,6 +4616,7 @@ export type CompanyCreateWithoutSupplierPayableLedgerEntriesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -4587,6 +4669,7 @@ export type CompanyUncheckedCreateWithoutSupplierPayableLedgerEntriesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -4649,6 +4732,7 @@ export type CompanyUpdateWithoutSupplierPayableLedgerEntriesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4701,6 +4785,7 @@ export type CompanyUncheckedUpdateWithoutSupplierPayableLedgerEntriesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4747,6 +4832,7 @@ export type CompanyCreateWithoutSalesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -4799,6 +4885,7 @@ export type CompanyUncheckedCreateWithoutSalesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -4861,6 +4948,7 @@ export type CompanyUpdateWithoutSalesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4913,6 +5001,7 @@ export type CompanyUncheckedUpdateWithoutSalesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4959,6 +5048,7 @@ export type CompanyCreateWithoutSaleReturnsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -5011,6 +5101,7 @@ export type CompanyUncheckedCreateWithoutSaleReturnsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -5073,6 +5164,7 @@ export type CompanyUpdateWithoutSaleReturnsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5125,6 +5217,7 @@ export type CompanyUncheckedUpdateWithoutSaleReturnsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5171,6 +5264,7 @@ export type CompanyCreateWithoutCustomerDueLedgerEntriesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -5223,6 +5317,7 @@ export type CompanyUncheckedCreateWithoutCustomerDueLedgerEntriesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -5285,6 +5380,7 @@ export type CompanyUpdateWithoutCustomerDueLedgerEntriesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5337,6 +5433,7 @@ export type CompanyUncheckedUpdateWithoutCustomerDueLedgerEntriesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5383,6 +5480,7 @@ export type CompanyCreateWithoutCashDrawerSessionsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -5435,6 +5533,7 @@ export type CompanyUncheckedCreateWithoutCashDrawerSessionsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -5497,6 +5596,7 @@ export type CompanyUpdateWithoutCashDrawerSessionsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5549,6 +5649,7 @@ export type CompanyUncheckedUpdateWithoutCashDrawerSessionsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5595,6 +5696,7 @@ export type CompanyCreateWithoutCompanySettingsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -5647,6 +5749,7 @@ export type CompanyUncheckedCreateWithoutCompanySettingsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -5709,6 +5812,7 @@ export type CompanyUpdateWithoutCompanySettingsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5761,6 +5865,7 @@ export type CompanyUncheckedUpdateWithoutCompanySettingsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5807,6 +5912,7 @@ export type CompanyCreateWithoutMembersInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -5859,6 +5965,7 @@ export type CompanyUncheckedCreateWithoutMembersInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -5921,6 +6028,7 @@ export type CompanyUpdateWithoutMembersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5973,6 +6081,7 @@ export type CompanyUncheckedUpdateWithoutMembersInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6019,6 +6128,7 @@ export type CompanyCreateWithoutRolesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -6071,6 +6181,7 @@ export type CompanyUncheckedCreateWithoutRolesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -6133,6 +6244,7 @@ export type CompanyUpdateWithoutRolesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6185,6 +6297,7 @@ export type CompanyUncheckedUpdateWithoutRolesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6231,6 +6344,7 @@ export type CompanyCreateWithoutCompanyMemberLocationsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -6283,6 +6397,7 @@ export type CompanyUncheckedCreateWithoutCompanyMemberLocationsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -6345,6 +6460,7 @@ export type CompanyUpdateWithoutCompanyMemberLocationsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6397,6 +6513,7 @@ export type CompanyUncheckedUpdateWithoutCompanyMemberLocationsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6443,6 +6560,7 @@ export type CompanyCreateWithoutNotificationsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -6495,6 +6613,7 @@ export type CompanyUncheckedCreateWithoutNotificationsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -6557,6 +6676,7 @@ export type CompanyUpdateWithoutNotificationsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6609,6 +6729,7 @@ export type CompanyUncheckedUpdateWithoutNotificationsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6655,6 +6776,7 @@ export type CompanyCreateWithoutOwnershipsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -6707,6 +6829,7 @@ export type CompanyUncheckedCreateWithoutOwnershipsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -6769,6 +6892,7 @@ export type CompanyUpdateWithoutOwnershipsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6821,6 +6945,7 @@ export type CompanyUncheckedUpdateWithoutOwnershipsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6867,6 +6992,7 @@ export type CompanyCreateWithoutSubscriptionsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -6919,6 +7045,7 @@ export type CompanyUncheckedCreateWithoutSubscriptionsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -6981,6 +7108,7 @@ export type CompanyUpdateWithoutSubscriptionsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7033,6 +7161,7 @@ export type CompanyUncheckedUpdateWithoutSubscriptionsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7079,6 +7208,7 @@ export type CompanyCreateWithoutBillingsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -7131,6 +7261,7 @@ export type CompanyUncheckedCreateWithoutBillingsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -7193,6 +7324,7 @@ export type CompanyUpdateWithoutBillingsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7245,6 +7377,7 @@ export type CompanyUncheckedUpdateWithoutBillingsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7291,6 +7424,7 @@ export type CompanyCreateWithoutInvoicesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -7343,6 +7477,7 @@ export type CompanyUncheckedCreateWithoutInvoicesInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -7405,6 +7540,7 @@ export type CompanyUpdateWithoutInvoicesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7457,6 +7593,7 @@ export type CompanyUncheckedUpdateWithoutInvoicesInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7503,6 +7640,7 @@ export type CompanyCreateWithoutPaymentsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -7555,6 +7693,7 @@ export type CompanyUncheckedCreateWithoutPaymentsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -7617,6 +7756,7 @@ export type CompanyUpdateWithoutPaymentsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7669,6 +7809,7 @@ export type CompanyUncheckedUpdateWithoutPaymentsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7715,6 +7856,7 @@ export type CompanyCreateWithoutInvitationsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -7767,6 +7909,7 @@ export type CompanyUncheckedCreateWithoutInvitationsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -7829,6 +7972,7 @@ export type CompanyUpdateWithoutInvitationsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7881,6 +8025,7 @@ export type CompanyUncheckedUpdateWithoutInvitationsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -7927,6 +8072,7 @@ export type CompanyCreateWithoutAuditLogsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -7979,6 +8125,7 @@ export type CompanyUncheckedCreateWithoutAuditLogsInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -8041,6 +8188,7 @@ export type CompanyUpdateWithoutAuditLogsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8093,6 +8241,7 @@ export type CompanyUncheckedUpdateWithoutAuditLogsInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8141,6 +8290,7 @@ export type CompanyCreateManyCreatedByInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -8158,6 +8308,7 @@ export type CompanyUpdateWithoutCreatedByInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8209,6 +8360,7 @@ export type CompanyUncheckedUpdateWithoutCreatedByInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8258,6 +8410,7 @@ export type CompanyUncheckedUpdateManyWithoutCreatedByInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8277,6 +8430,7 @@ export type CompanyCreateManyTenantInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -8294,6 +8448,7 @@ export type CompanyUpdateWithoutTenantInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8345,6 +8500,7 @@ export type CompanyUncheckedUpdateWithoutTenantInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8394,6 +8550,7 @@ export type CompanyUncheckedUpdateManyWithoutTenantInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8413,6 +8570,7 @@ export type CompanyCreateManyIndustryInput = {
   code: string
   legalName: string
   tradeName?: string | null
+  logoUrl?: string | null
   email?: string | null
   phone?: string | null
   taxId?: string | null
@@ -8430,6 +8588,7 @@ export type CompanyUpdateWithoutIndustryInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8481,6 +8640,7 @@ export type CompanyUncheckedUpdateWithoutIndustryInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8530,6 +8690,7 @@ export type CompanyUncheckedUpdateManyWithoutIndustryInput = {
   code?: Prisma.StringFieldUpdateOperationsInput | string
   legalName?: Prisma.StringFieldUpdateOperationsInput | string
   tradeName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   taxId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -8833,6 +8994,7 @@ export type CompanySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   code?: boolean
   legalName?: boolean
   tradeName?: boolean
+  logoUrl?: boolean
   email?: boolean
   phone?: boolean
   taxId?: boolean
@@ -8887,6 +9049,7 @@ export type CompanySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   code?: boolean
   legalName?: boolean
   tradeName?: boolean
+  logoUrl?: boolean
   email?: boolean
   phone?: boolean
   taxId?: boolean
@@ -8910,6 +9073,7 @@ export type CompanySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   code?: boolean
   legalName?: boolean
   tradeName?: boolean
+  logoUrl?: boolean
   email?: boolean
   phone?: boolean
   taxId?: boolean
@@ -8933,6 +9097,7 @@ export type CompanySelectScalar = {
   code?: boolean
   legalName?: boolean
   tradeName?: boolean
+  logoUrl?: boolean
   email?: boolean
   phone?: boolean
   taxId?: boolean
@@ -8945,7 +9110,7 @@ export type CompanySelectScalar = {
   updatedAt?: boolean
 }
 
-export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "industryId" | "createdByUserId" | "code" | "legalName" | "tradeName" | "email" | "phone" | "taxId" | "registrationNo" | "baseCurrencyCode" | "timezone" | "status" | "goLiveAt" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
+export type CompanyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "industryId" | "createdByUserId" | "code" | "legalName" | "tradeName" | "logoUrl" | "email" | "phone" | "taxId" | "registrationNo" | "baseCurrencyCode" | "timezone" | "status" | "goLiveAt" | "createdAt" | "updatedAt", ExtArgs["result"]["company"]>
 export type CompanyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   industry?: boolean | Prisma.IndustryDefaultArgs<ExtArgs>
@@ -9038,6 +9203,7 @@ export type $CompanyPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     code: string
     legalName: string
     tradeName: string | null
+    logoUrl: string | null
     email: string | null
     phone: string | null
     taxId: string | null
@@ -9511,6 +9677,7 @@ export interface CompanyFieldRefs {
   readonly code: Prisma.FieldRef<"Company", 'String'>
   readonly legalName: Prisma.FieldRef<"Company", 'String'>
   readonly tradeName: Prisma.FieldRef<"Company", 'String'>
+  readonly logoUrl: Prisma.FieldRef<"Company", 'String'>
   readonly email: Prisma.FieldRef<"Company", 'String'>
   readonly phone: Prisma.FieldRef<"Company", 'String'>
   readonly taxId: Prisma.FieldRef<"Company", 'String'>

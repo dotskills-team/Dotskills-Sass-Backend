@@ -313,6 +313,7 @@ export const CompanyScalarFieldEnum = {
   code: 'code',
   legalName: 'legalName',
   tradeName: 'tradeName',
+  logoUrl: 'logoUrl',
   email: 'email',
   phone: 'phone',
   taxId: 'taxId',

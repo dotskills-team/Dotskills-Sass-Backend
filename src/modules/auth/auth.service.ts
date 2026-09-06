@@ -371,6 +371,7 @@ export class AuthService {
           select: {
             legalName: true,
             tradeName: true,
+            logoUrl: true,
             status: true,
             tenant: { select: { status: true } },
           },
@@ -403,6 +404,7 @@ export class AuthService {
       companyMemberId: member.id,
       tenantId: member.tenantId,
       companyName: member.company.tradeName || member.company.legalName,
+      logoUrl: member.company.logoUrl,
       companyStatus: member.company.status,
       tenantStatus: member.company.tenant.status,
       roleCodes: member.roles.map((role) => role.companyRole.code),

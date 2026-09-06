@@ -77,7 +77,7 @@ export class InventoryService {
       select: { quantity: true },
     });
 
-    return tx.stockMovement.create({
+    const movement = await tx.stockMovement.create({
       data: {
         tenantId,
         companyId,
@@ -93,6 +93,17 @@ export class InventoryService {
         note,
       },
     });
+
+    await this.notifyOnStockThresholdCrossed(tx, {
+      tenantId,
+      companyId,
+      productId,
+      locationId,
+      afterQty: balance.quantity,
+      signedChangeQty: new Prisma.Decimal(quantity),
+    });
+
+    return movement;
   }
 
   /**
@@ -171,7 +182,7 @@ export class InventoryService {
       productId,
       locationId,
       afterQty: balance.quantity,
-      quantityDecremented: new Prisma.Decimal(quantity),
+      signedChangeQty: new Prisma.Decimal(quantity).negated(),
     });
 
     return movement;
@@ -179,17 +190,20 @@ export class InventoryService {
 
   /**
    * Edge-triggered, not polled — fires only on the exact movement that
-   * crosses a threshold, never on every movement while already below it
-   * (a product already sitting under its reorder level that gets sold
-   * further down fires nothing further; it only re-fires after a
-   * Purchase/Transfer/Adjustment brings it back to >= reorderLevel and a
-   * later decrease crosses back down). The before-quantity is derived for
-   * free from the already-known after-quantity + the decrement amount —
-   * no extra Inventory read needed. Lives here (not duplicated in Sale/
-   * Transfer/Adjustment) since decreaseStock() is the one shared
-   * choke-point every stock-reducing action already funnels through, so a
-   * Stock Adjustment (damage) that zeroes out a product is caught too, not
-   * just Sales.
+   * crosses a stock "band" (OUT ≤0 < LOW <reorderLevel≤ OK), never on
+   * every movement while already in the same band (a product already
+   * sitting under its reorder level that gets sold further down, or
+   * partially restocked but still below reorderLevel, fires nothing
+   * further). Shared by both `increaseStock()` and `decreaseStock()` — a
+   * Purchase/Transfer-in that lands a product below reorderLevel (or
+   * leaves it OUT_OF_STOCK) is exactly as real a "just became low" event
+   * as a Sale crossing down, so it must be caught here too, not just on
+   * decreases. `beforeQty` is derived for free from the already-known
+   * after-quantity plus the signed change (positive for an increase,
+   * negative for a decrease) — no extra Inventory read needed either way.
+   * The Product lookup runs first (before any Decimal math) so a
+   * not-found product short-circuits cheaply and safely regardless of
+   * direction.
    */
   private async notifyOnStockThresholdCrossed(
     tx: Prisma.TransactionClient,
@@ -199,14 +213,11 @@ export class InventoryService {
       productId: string;
       locationId: string;
       afterQty: Prisma.Decimal;
-      quantityDecremented: Prisma.Decimal;
+      /** Positive for an increase, negative for a decrease — `beforeQty = afterQty - signedChangeQty` either way. */
+      signedChangeQty: Prisma.Decimal;
     },
   ) {
-    const { tenantId, companyId, productId, locationId, afterQty, quantityDecremented } = params;
-    const beforeQty = afterQty.plus(quantityDecremented);
-
-    const crossedIntoOutOfStock =
-      beforeQty.greaterThan(0) && afterQty.lessThanOrEqualTo(0);
+    const { tenantId, companyId, productId, locationId, afterQty, signedChangeQty } = params;
 
     const product = await tx.product.findUnique({
       where: { id: productId },
@@ -214,11 +225,21 @@ export class InventoryService {
     });
     if (!product) return;
 
-    const crossedIntoLowStock =
-      !crossedIntoOutOfStock &&
-      product.reorderLevel.greaterThan(0) &&
-      beforeQty.greaterThanOrEqualTo(product.reorderLevel) &&
-      afterQty.lessThan(product.reorderLevel);
+    const beforeQty = afterQty.minus(signedChangeQty);
+
+    const band = (qty: Prisma.Decimal): 'OUT' | 'LOW' | 'OK' => {
+      if (qty.lessThanOrEqualTo(0)) return 'OUT';
+      if (product.reorderLevel.greaterThan(0) && qty.lessThan(product.reorderLevel)) {
+        return 'LOW';
+      }
+      return 'OK';
+    };
+
+    const beforeBand = band(beforeQty);
+    const afterBand = band(afterQty);
+
+    const crossedIntoOutOfStock = afterBand === 'OUT' && beforeBand !== 'OUT';
+    const crossedIntoLowStock = afterBand === 'LOW' && beforeBand !== 'LOW';
 
     if (!crossedIntoOutOfStock && !crossedIntoLowStock) return;
 

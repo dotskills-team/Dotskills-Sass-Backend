@@ -34,6 +34,7 @@ import { AppController } from './app.controller';
 import { PrismaModule } from './prisma/prisma.module';
 import { LocationAccessModule } from './common/services/location-access.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { StorageModule } from './modules/storage/storage.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { validateEnvironment } from './config/env.validation';
 
@@ -91,6 +92,7 @@ import { ReportingModule } from './modules/reporting/reporting.module';
     PrismaModule,
     LocationAccessModule,
     NotificationModule,
+    StorageModule,
     AuthModule,
     AccessControlSetupModule,
     PlatformStaffModule,

@@ -417,6 +417,7 @@ model Company {
   code             String             @db.VarChar(40)
   legalName        String             @db.VarChar(200)
   tradeName        String?            @db.VarChar(200)
+  logoUrl          String?            @db.VarChar(500)
   email            String?            @db.VarChar(200)
   phone            String?            @db.VarChar(32)
   taxId            String?            @db.VarChar(80)
