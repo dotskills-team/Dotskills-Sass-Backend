@@ -36,6 +36,7 @@ import { LocationAccessModule } from './common/services/location-access.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { UserProfileModule } from './modules/user-profile/user-profile.module';
 import { validateEnvironment } from './config/env.validation';
 
 import { AccessControlSetupModule } from './modules/access-control-setup/access-control-setup.module';
@@ -94,6 +95,7 @@ import { ReportingModule } from './modules/reporting/reporting.module';
     NotificationModule,
     StorageModule,
     AuthModule,
+    UserProfileModule,
     AccessControlSetupModule,
     PlatformStaffModule,
     PlatformRoleModule,

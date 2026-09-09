@@ -4661,6 +4661,7 @@ export const UserScalarFieldEnum = {
   phone: 'phone',
   passwordHash: 'passwordHash',
   fullName: 'fullName',
+  profileImageUrl: 'profileImageUrl',
   preferredLocale: 'preferredLocale',
   timezone: 'timezone',
   status: 'status',

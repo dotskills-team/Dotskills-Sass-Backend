@@ -40,6 +40,7 @@ export type UserMinAggregateOutputType = {
   phone: string | null
   passwordHash: string | null
   fullName: string | null
+  profileImageUrl: string | null
   preferredLocale: string | null
   timezone: string | null
   status: $Enums.AccountStatus | null
@@ -60,6 +61,7 @@ export type UserMaxAggregateOutputType = {
   phone: string | null
   passwordHash: string | null
   fullName: string | null
+  profileImageUrl: string | null
   preferredLocale: string | null
   timezone: string | null
   status: $Enums.AccountStatus | null
@@ -80,6 +82,7 @@ export type UserCountAggregateOutputType = {
   phone: number
   passwordHash: number
   fullName: number
+  profileImageUrl: number
   preferredLocale: number
   timezone: number
   status: number
@@ -110,6 +113,7 @@ export type UserMinAggregateInputType = {
   phone?: true
   passwordHash?: true
   fullName?: true
+  profileImageUrl?: true
   preferredLocale?: true
   timezone?: true
   status?: true
@@ -130,6 +134,7 @@ export type UserMaxAggregateInputType = {
   phone?: true
   passwordHash?: true
   fullName?: true
+  profileImageUrl?: true
   preferredLocale?: true
   timezone?: true
   status?: true
@@ -150,6 +155,7 @@ export type UserCountAggregateInputType = {
   phone?: true
   passwordHash?: true
   fullName?: true
+  profileImageUrl?: true
   preferredLocale?: true
   timezone?: true
   status?: true
@@ -257,6 +263,7 @@ export type UserGroupByOutputType = {
   phone: string | null
   passwordHash: string | null
   fullName: string
+  profileImageUrl: string | null
   preferredLocale: string
   timezone: string
   status: $Enums.AccountStatus
@@ -300,6 +307,7 @@ export type UserWhereInput = {
   phone?: Prisma.StringNullableFilter<"User"> | string | null
   passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   fullName?: Prisma.StringFilter<"User"> | string
+  profileImageUrl?: Prisma.StringNullableFilter<"User"> | string | null
   preferredLocale?: Prisma.StringFilter<"User"> | string
   timezone?: Prisma.StringFilter<"User"> | string
   status?: Prisma.EnumAccountStatusFilter<"User"> | $Enums.AccountStatus
@@ -329,6 +337,7 @@ export type UserOrderByWithRelationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
   fullName?: Prisma.SortOrder
+  profileImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   preferredLocale?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -361,6 +370,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   fullName?: Prisma.StringFilter<"User"> | string
+  profileImageUrl?: Prisma.StringNullableFilter<"User"> | string | null
   preferredLocale?: Prisma.StringFilter<"User"> | string
   timezone?: Prisma.StringFilter<"User"> | string
   status?: Prisma.EnumAccountStatusFilter<"User"> | $Enums.AccountStatus
@@ -390,6 +400,7 @@ export type UserOrderByWithAggregationInput = {
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
   fullName?: Prisma.SortOrder
+  profileImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   preferredLocale?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -418,6 +429,7 @@ export type UserScalarWhereWithAggregatesInput = {
   phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   passwordHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   fullName?: Prisma.StringWithAggregatesFilter<"User"> | string
+  profileImageUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   preferredLocale?: Prisma.StringWithAggregatesFilter<"User"> | string
   timezone?: Prisma.StringWithAggregatesFilter<"User"> | string
   status?: Prisma.EnumAccountStatusWithAggregatesFilter<"User"> | $Enums.AccountStatus
@@ -438,6 +450,7 @@ export type UserCreateInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -467,6 +480,7 @@ export type UserUncheckedCreateInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -496,6 +510,7 @@ export type UserUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -525,6 +540,7 @@ export type UserUncheckedUpdateInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -554,6 +570,7 @@ export type UserCreateManyInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -574,6 +591,7 @@ export type UserUpdateManyMutationInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -594,6 +612,7 @@ export type UserUncheckedUpdateManyInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -614,6 +633,7 @@ export type UserCountOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
+  profileImageUrl?: Prisma.SortOrder
   preferredLocale?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -638,6 +658,7 @@ export type UserMaxOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
+  profileImageUrl?: Prisma.SortOrder
   preferredLocale?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -658,6 +679,7 @@ export type UserMinOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
+  profileImageUrl?: Prisma.SortOrder
   preferredLocale?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -858,6 +880,7 @@ export type UserCreateWithoutSessionsInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -886,6 +909,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -930,6 +954,7 @@ export type UserUpdateWithoutSessionsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -958,6 +983,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -986,6 +1012,7 @@ export type UserCreateWithoutLoginEventsInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1014,6 +1041,7 @@ export type UserUncheckedCreateWithoutLoginEventsInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1058,6 +1086,7 @@ export type UserUpdateWithoutLoginEventsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1086,6 +1115,7 @@ export type UserUncheckedUpdateWithoutLoginEventsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1114,6 +1144,7 @@ export type UserCreateWithoutPlatformMemberInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1142,6 +1173,7 @@ export type UserUncheckedCreateWithoutPlatformMemberInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1186,6 +1218,7 @@ export type UserUpdateWithoutPlatformMemberInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1214,6 +1247,7 @@ export type UserUncheckedUpdateWithoutPlatformMemberInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1242,6 +1276,7 @@ export type UserCreateWithoutCreatedCompaniesInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1270,6 +1305,7 @@ export type UserUncheckedCreateWithoutCreatedCompaniesInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1314,6 +1350,7 @@ export type UserUpdateWithoutCreatedCompaniesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1342,6 +1379,7 @@ export type UserUncheckedUpdateWithoutCreatedCompaniesInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1370,6 +1408,7 @@ export type UserCreateWithoutCompanyMembershipsInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1398,6 +1437,7 @@ export type UserUncheckedCreateWithoutCompanyMembershipsInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1442,6 +1482,7 @@ export type UserUpdateWithoutCompanyMembershipsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1470,6 +1511,7 @@ export type UserUncheckedUpdateWithoutCompanyMembershipsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1498,6 +1540,7 @@ export type UserCreateWithoutOwnershipAssignedInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1526,6 +1569,7 @@ export type UserUncheckedCreateWithoutOwnershipAssignedInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1570,6 +1614,7 @@ export type UserUpdateWithoutOwnershipAssignedInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1598,6 +1643,7 @@ export type UserUncheckedUpdateWithoutOwnershipAssignedInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1626,6 +1672,7 @@ export type UserCreateWithoutOwnerInvitationsInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1654,6 +1701,7 @@ export type UserUncheckedCreateWithoutOwnerInvitationsInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1687,6 +1735,7 @@ export type UserCreateWithoutSentInvitationsInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1715,6 +1764,7 @@ export type UserUncheckedCreateWithoutSentInvitationsInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1759,6 +1809,7 @@ export type UserUpdateWithoutOwnerInvitationsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1787,6 +1838,7 @@ export type UserUncheckedUpdateWithoutOwnerInvitationsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1826,6 +1878,7 @@ export type UserUpdateWithoutSentInvitationsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1854,6 +1907,7 @@ export type UserUncheckedUpdateWithoutSentInvitationsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1882,6 +1936,7 @@ export type UserCreateWithoutAuditLogsInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1910,6 +1965,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   phone?: string | null
   passwordHash?: string | null
   fullName: string
+  profileImageUrl?: string | null
   preferredLocale?: string
   timezone?: string
   status?: $Enums.AccountStatus
@@ -1954,6 +2010,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -1982,6 +2039,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
@@ -2104,6 +2162,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   phone?: boolean
   passwordHash?: boolean
   fullName?: boolean
+  profileImageUrl?: boolean
   preferredLocale?: boolean
   timezone?: boolean
   status?: boolean
@@ -2134,6 +2193,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   phone?: boolean
   passwordHash?: boolean
   fullName?: boolean
+  profileImageUrl?: boolean
   preferredLocale?: boolean
   timezone?: boolean
   status?: boolean
@@ -2154,6 +2214,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   phone?: boolean
   passwordHash?: boolean
   fullName?: boolean
+  profileImageUrl?: boolean
   preferredLocale?: boolean
   timezone?: boolean
   status?: boolean
@@ -2174,6 +2235,7 @@ export type UserSelectScalar = {
   phone?: boolean
   passwordHash?: boolean
   fullName?: boolean
+  profileImageUrl?: boolean
   preferredLocale?: boolean
   timezone?: boolean
   status?: boolean
@@ -2188,7 +2250,7 @@ export type UserSelectScalar = {
   deletedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "phone" | "passwordHash" | "fullName" | "preferredLocale" | "timezone" | "status" | "emailVerifiedAt" | "phoneVerifiedAt" | "passwordChangedAt" | "failedLoginCount" | "lockedUntil" | "lastLoginAt" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "phone" | "passwordHash" | "fullName" | "profileImageUrl" | "preferredLocale" | "timezone" | "status" | "emailVerifiedAt" | "phoneVerifiedAt" | "passwordChangedAt" | "failedLoginCount" | "lockedUntil" | "lastLoginAt" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   loginEvents?: boolean | Prisma.User$loginEventsArgs<ExtArgs>
@@ -2223,6 +2285,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     phone: string | null
     passwordHash: string | null
     fullName: string
+    profileImageUrl: string | null
     preferredLocale: string
     timezone: string
     status: $Enums.AccountStatus
@@ -2672,6 +2735,7 @@ export interface UserFieldRefs {
   readonly phone: Prisma.FieldRef<"User", 'String'>
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly fullName: Prisma.FieldRef<"User", 'String'>
+  readonly profileImageUrl: Prisma.FieldRef<"User", 'String'>
   readonly preferredLocale: Prisma.FieldRef<"User", 'String'>
   readonly timezone: Prisma.FieldRef<"User", 'String'>
   readonly status: Prisma.FieldRef<"User", 'AccountStatus'>

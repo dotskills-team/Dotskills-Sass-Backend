@@ -1,11 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as argon2 from 'argon2';
-import * as bcrypt from 'bcrypt';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { resolvePermissionEffects } from '../../common/utils/resolve-permission-effects';
+import { hashPassword, verifyPassword } from '../../common/utils/password.util';
 import type { Prisma } from '../../generated/phase-1-prisma/client';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import type { LoginDto } from './dto/login.dto';
@@ -64,7 +63,7 @@ export class AuthService {
     this.lockMinutes = Number(
       configService.getOrThrow<string>('AUTH_LOCK_MINUTES'),
     );
-    this.dummyHashPromise = argon2.hash(randomBytes(32), this.argonOptions());
+    this.dummyHashPromise = hashPassword(randomBytes(32).toString('hex'));
   }
 
   // async login(dto: LoginDto, metadata: RequestMetadata) {
@@ -87,7 +86,7 @@ export class AuthService {
     const now = new Date();
 
     if (!user) {
-      await this.verifyPassword(await this.dummyHashPromise, dto.password);
+      await verifyPassword(await this.dummyHashPromise, dto.password);
       await this.recordLoginEvent(
         null,
         email,
@@ -149,7 +148,7 @@ export class AuthService {
     }
 
     const passwordIsValid = user.passwordHash
-      ? await this.verifyPassword(user.passwordHash, dto.password)
+      ? await verifyPassword(user.passwordHash, dto.password)
       : false;
 
     if (!passwordIsValid) {
@@ -159,7 +158,7 @@ export class AuthService {
 
     const upgradedPasswordHash = user.passwordHash!.startsWith('$argon2')
       ? undefined
-      : await argon2.hash(dto.password, this.argonOptions());
+      : await hashPassword(dto.password);
 
     const sessionId = randomUUID();
     const tokens = await this.issueTokenPair(user.id, sessionId, roles);
@@ -705,29 +704,6 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
-  }
-
-  private async verifyPassword(
-    hash: string,
-    password: string,
-  ): Promise<boolean> {
-    try {
-      if (hash.startsWith('$argon2'))
-        return await argon2.verify(hash, password);
-      if (/^\$2[aby]\$/.test(hash)) return await bcrypt.compare(password, hash);
-      return false;
-    } catch {
-      return false;
-    }
-  }
-
-  private argonOptions(): argon2.Options & { raw?: false } {
-    return {
-      type: argon2.argon2id,
-      memoryCost: 65_536,
-      timeCost: 3,
-      parallelism: 1,
-    };
   }
 
   private hashToken(token: string): string {

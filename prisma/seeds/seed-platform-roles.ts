@@ -94,6 +94,12 @@ export async function seedPlatformRoles(
           });
         }
       },
+      // Default 5s interactive-transaction timeout is fine against local
+      // Postgres (near-zero latency) but too tight for ~150 sequential
+      // upserts' round trips over a remote DB's real network latency
+      // (Neon and similar) — this only widens the ceiling, it never makes
+      // a healthy local run slower.
+      { timeout: 30_000 },
     );
 
     console.log(
