@@ -47,27 +47,19 @@ export class PrismaService
   }
 
   /**
-   * Serverless cold starts (Vercel) sometimes race Neon's pooled/PgBouncer
-   * connection on the very first `$connect()` of a fresh instance — verified
-   * live: the first request to a cold instance intermittently fails while
-   * immediate retries on the now-warm instance succeed reliably. A short
-   * retry-with-backoff here absorbs that one-time cold-start hiccup without
-   * masking a genuinely unreachable database (still throws after 3 tries).
+   * Reverted the retry-loop experiment from earlier this session — verified
+   * live that retrying `$connect()` on an already-failed PrismaClient
+   * instance does NOT behave like a clean fresh attempt (the underlying
+   * adapter/pool is left in a bad state after the first failure), so more
+   * retries made cold-start reliability measurably worse, not better,
+   * turning an occasional single-request flake into a sustained outage.
+   * A single `$connect()` call — this project's original design — is the
+   * correct behavior; NestJS/Vercel's own request lifecycle already
+   * retries a failed function invocation on the client side (a fresh
+   * request gets a fresh instance).
    */
   async onModuleInit(): Promise<void> {
-    const maxAttempts = 6;
-    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-      try {
-        await this.$connect();
-        return;
-      } catch (error) {
-        if (attempt === maxAttempts) throw error;
-        // No artificial backoff — the failed $connect() attempt itself
-        // already takes real time on a cold container; adding delay on
-        // top of that risks exceeding the serverless function's own
-        // execution timeout before enough attempts land.
-      }
-    }
+    await this.$connect();
   }
 
   async onModuleDestroy(): Promise<void> {
