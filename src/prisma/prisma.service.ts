@@ -55,14 +55,17 @@ export class PrismaService
    * masking a genuinely unreachable database (still throws after 3 tries).
    */
   async onModuleInit(): Promise<void> {
-    const maxAttempts = 3;
+    const maxAttempts = 6;
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
       try {
         await this.$connect();
         return;
       } catch (error) {
         if (attempt === maxAttempts) throw error;
-        await new Promise((resolve) => setTimeout(resolve, attempt * 500));
+        // No artificial backoff — the failed $connect() attempt itself
+        // already takes real time on a cold container; adding delay on
+        // top of that risks exceeding the serverless function's own
+        // execution timeout before enough attempts land.
       }
     }
   }
