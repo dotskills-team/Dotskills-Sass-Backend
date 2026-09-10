@@ -46,8 +46,25 @@ export class PrismaService
     super({ adapter });
   }
 
+  /**
+   * Serverless cold starts (Vercel) sometimes race Neon's pooled/PgBouncer
+   * connection on the very first `$connect()` of a fresh instance — verified
+   * live: the first request to a cold instance intermittently fails while
+   * immediate retries on the now-warm instance succeed reliably. A short
+   * retry-with-backoff here absorbs that one-time cold-start hiccup without
+   * masking a genuinely unreachable database (still throws after 3 tries).
+   */
   async onModuleInit(): Promise<void> {
-    await this.$connect();
+    const maxAttempts = 3;
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      try {
+        await this.$connect();
+        return;
+      } catch (error) {
+        if (attempt === maxAttempts) throw error;
+        await new Promise((resolve) => setTimeout(resolve, attempt * 500));
+      }
+    }
   }
 
   async onModuleDestroy(): Promise<void> {
