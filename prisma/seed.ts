@@ -730,6 +730,7 @@ async function seedPlans(
       description: 'Basic package for small businesses',
       trialDays: 14,
       isPublic: true,
+      isDefaultTrial: true,
       status: 'ACTIVE',
     },
     create: {
@@ -738,6 +739,7 @@ async function seedPlans(
       description: 'Basic package for small businesses',
       trialDays: 14,
       isPublic: true,
+      isDefaultTrial: true,
       status: 'ACTIVE',
     },
   });
