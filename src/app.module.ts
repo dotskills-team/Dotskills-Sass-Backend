@@ -32,6 +32,7 @@ import { ThrottlerModule, ThrottlerGuard, seconds } from '@nestjs/throttler';
 
 import { AppController } from './app.controller';
 import { PrismaModule } from './prisma/prisma.module';
+import { HealthModule } from './health/health.module';
 import { LocationAccessModule } from './common/services/location-access.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { StorageModule } from './modules/storage/storage.module';
@@ -91,6 +92,7 @@ import { ReportingModule } from './modules/reporting/reporting.module';
     ]),
 
     PrismaModule,
+    HealthModule,
     LocationAccessModule,
     NotificationModule,
     StorageModule,
