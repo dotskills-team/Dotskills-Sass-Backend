@@ -438,7 +438,6 @@
 //     await prisma.$disconnect();
 //   });
 import 'dotenv/config';
-import { hash } from 'bcrypt';
 
 import { PrismaPg } from '@prisma/adapter-pg';
 import {
@@ -446,6 +445,7 @@ import {
   Prisma,
   PrismaClient,
 } from '../src/generated/phase-1-prisma/client';
+import { hashPassword } from '../src/common/utils/password.util';
 import { seedPermissions } from './seeds/seed-permissions';
 import { seedPlatformRoles } from './seeds/seed-platform-roles';
 
@@ -601,7 +601,7 @@ const features: SeedFeature[] = [
 ];
 
 async function seedSuperAdmin(platformRoleId: string) {
-  const passwordHash: string = await hash(superAdminPassword, 12);
+  const passwordHash: string = await hashPassword(superAdminPassword);
   const now = new Date();
 
   const user = await prisma.user.upsert({

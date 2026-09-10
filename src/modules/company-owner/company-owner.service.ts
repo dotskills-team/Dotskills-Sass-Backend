@@ -5,8 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import * as bcrypt from 'bcrypt';
-
+import { hashPassword } from '../../common/utils/password.util';
 import { PrismaService } from '../../prisma/prisma.service';
 
 import { CreateCompanyOwnerDto } from './dto/create-company-owner.dto';
@@ -103,7 +102,7 @@ export class CompanyOwnerService {
        * ========================================================
        */
       if (!user) {
-        const passwordHash = await bcrypt.hash(dto.password, 12);
+        const passwordHash = await hashPassword(dto.password);
 
         user = await tx.user.create({
           data: {
