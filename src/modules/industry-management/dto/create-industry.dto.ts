@@ -26,3 +26,15 @@ export class CreateIndustryDto {
   @Length(0, 2000)
   description?: string;
 }
+//   code!: string;
+
+//   @IsString()
+//   @IsNotEmpty()
+//   @Length(2, 120)
+//   name!: string;
+
+//   @IsOptional()
+//   @IsString()
+//   @Length(0, 2000)
+//   description?: string;
+// }
