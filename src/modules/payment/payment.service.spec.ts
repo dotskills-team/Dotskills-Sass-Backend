@@ -15,6 +15,7 @@ import { Prisma } from '../../generated/phase-1-prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { InvoiceService } from '../invoice/invoice.service';
 import { BillingService } from '../billing/billing.service';
+import { SubscriptionRenewalService } from '../subscription/subscription-renewal.service';
 import { PaymentService } from './payment.service';
 import { PAYMENT_GATEWAY_ADAPTERS } from './gateways/payment-gateway.tokens';
 
@@ -62,6 +63,16 @@ describe('PaymentService', () => {
     verifyTransaction: jest.fn(),
   };
 
+  const mockManualAdapter = {
+    provider: 'MANUAL',
+    initiate: jest.fn(),
+    verifyTransaction: jest.fn(),
+  };
+
+  const mockSubscriptionRenewalService = {
+    requestSubscriptionCheckout: jest.fn(),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
 
@@ -72,8 +83,12 @@ describe('PaymentService', () => {
         { provide: InvoiceService, useValue: mockInvoiceService },
         { provide: BillingService, useValue: mockBillingService },
         {
+          provide: SubscriptionRenewalService,
+          useValue: mockSubscriptionRenewalService,
+        },
+        {
           provide: PAYMENT_GATEWAY_ADAPTERS,
-          useValue: { SSLCOMMERZ: mockAdapter },
+          useValue: { SSLCOMMERZ: mockAdapter, MANUAL: mockManualAdapter },
         },
       ],
     }).compile();
@@ -520,6 +535,94 @@ describe('PaymentService', () => {
           data: expect.objectContaining({ actorType: 'SYSTEM' }),
         }),
       );
+    });
+  });
+
+  describe('recordManualPayment', () => {
+    it('checks out via SubscriptionRenewalService, creates a MANUAL payment, and settles it end to end', async () => {
+      mockSubscriptionRenewalService.requestSubscriptionCheckout.mockResolvedValue(
+        { billing: { id: 'billing-1' }, invoice: { id: 'invoice-1' } },
+      );
+      mockInvoiceService.findOne.mockResolvedValue(baseInvoice);
+      mockPrisma.payment.findFirst.mockResolvedValue(null);
+      mockBillingService.process.mockResolvedValue({ attemptCount: 1 });
+      mockTx.payment.create.mockImplementation(({ data }: any) =>
+        Promise.resolve({ id: 'payment-manual-1', ...data }),
+      );
+      mockPrisma.payment.update.mockImplementation(({ data }: any) =>
+        Promise.resolve({
+          id: 'payment-manual-1',
+          tenantId: 'tenant-1',
+          companyId: 'company-1',
+          invoiceId: 'invoice-1',
+          providerTransactionId: 'DS-MANUAL',
+          ...data,
+        }),
+      );
+      mockManualAdapter.initiate.mockResolvedValue({
+        gatewayPageUrl: '',
+        rawResponse: { source: 'MANUAL' },
+      });
+
+      mockPrisma.payment.findUnique.mockResolvedValue({
+        id: 'payment-manual-1',
+        invoiceId: 'invoice-1',
+        status: PaymentStatus.PROCESSING,
+        providerTransactionId: 'DS-MANUAL',
+        amount: baseInvoice.totalAmount,
+        currencyCode: baseInvoice.currencyCode,
+        provider: 'MANUAL',
+        metadata: { initiatedByUserId: 'user-1' },
+      });
+      mockPrisma.invoice.findUniqueOrThrow.mockResolvedValue({
+        billingId: 'billing-1',
+      });
+      mockManualAdapter.verifyTransaction.mockResolvedValue({
+        verified: true,
+        amount: baseInvoice.totalAmount.toString(),
+        currencyCode: baseInvoice.currencyCode,
+        gatewayReference: 'MANUAL-DS-MANUAL',
+        rawResponse: { source: 'MANUAL' },
+      });
+      mockTx.payment.update.mockResolvedValue({
+        id: 'payment-manual-1',
+        status: PaymentStatus.SUCCEEDED,
+      });
+
+      const result = await service.recordManualPayment(
+        { subscriptionId: 'sub-1', note: 'Paid by bank transfer' },
+        actor,
+      );
+
+      expect(
+        mockSubscriptionRenewalService.requestSubscriptionCheckout,
+      ).toHaveBeenCalledWith(
+        'sub-1',
+        { planId: undefined, billingCycle: undefined },
+        'user-1',
+      );
+
+      const createArgs = mockTx.payment.create.mock.calls[0][0].data;
+      expect(createArgs.provider).toBe('MANUAL');
+      expect(createArgs.metadata).toEqual(
+        expect.objectContaining({
+          method: 'MANUAL',
+          recordedByUserId: 'user-1',
+          note: 'Paid by bank transfer',
+        }),
+      );
+
+      expect(mockInvoiceService.markPaid).toHaveBeenCalledWith(
+        'invoice-1',
+        'user-1',
+        mockTx,
+      );
+      expect(mockBillingService.markSucceeded).toHaveBeenCalledWith(
+        'billing-1',
+        'user-1',
+        mockTx,
+      );
+      expect(result.status).toBe(PaymentStatus.SUCCEEDED);
     });
   });
 

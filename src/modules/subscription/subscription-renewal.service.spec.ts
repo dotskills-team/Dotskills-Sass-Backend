@@ -12,6 +12,7 @@ import { BillingService } from '../billing/billing.service';
 import { InvoiceService } from '../invoice/invoice.service';
 import { SubscriptionLifecycleService } from './subscription-lifecycle.service';
 import { SubscriptionRenewalService } from './subscription-renewal.service';
+import { SubscriptionService } from './subscription.service';
 
 describe('SubscriptionRenewalService.renewSubscription', () => {
   let service: SubscriptionRenewalService;
@@ -35,6 +36,7 @@ describe('SubscriptionRenewalService.renewSubscription', () => {
       (start: Date) => new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000),
     ),
   };
+  const mockSubscriptionService = { getPlan: jest.fn(), getPrice: jest.fn() };
 
   const subscription = {
     id: 'sub-1',
@@ -55,6 +57,7 @@ describe('SubscriptionRenewalService.renewSubscription', () => {
         { provide: BillingService, useValue: mockBillingService },
         { provide: InvoiceService, useValue: mockInvoiceService },
         { provide: SubscriptionLifecycleService, useValue: mockLifecycle },
+        { provide: SubscriptionService, useValue: mockSubscriptionService },
       ],
     }).compile();
 
@@ -106,6 +109,7 @@ describe('SubscriptionRenewalService.renewSubscription', () => {
       expect.objectContaining({ subscriptionId: 'sub-1' }),
       'admin-1',
       mockTx,
+      expect.objectContaining({ metadata: { intent: 'RENEWAL' } }),
     );
     expect(mockInvoiceService.create).toHaveBeenCalledWith(
       { billingId: 'billing-1' },

@@ -10,8 +10,10 @@ import { randomBytes } from 'crypto';
 
 import {
   AuditActorType,
+  BillingCycle,
   BillingStatus,
   InvoiceStatus,
+  PaymentProvider,
   PaymentStatus,
 } from '../../generated/phase-1-prisma/enums';
 import { Payment, Prisma } from '../../generated/phase-1-prisma/client';
@@ -20,6 +22,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 import { InvoiceService } from '../invoice/invoice.service';
 import { BillingService } from '../billing/billing.service';
+import { SubscriptionRenewalService } from '../subscription/subscription-renewal.service';
 
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { QueryPaymentDto } from './dto/query-payment.dto';
@@ -58,6 +61,7 @@ export class PaymentService {
     private readonly prisma: PrismaService,
     private readonly invoiceService: InvoiceService,
     private readonly billingService: BillingService,
+    private readonly subscriptionRenewalService: SubscriptionRenewalService,
     @Inject(PAYMENT_GATEWAY_ADAPTERS)
     private readonly adapters: Record<string, PaymentGatewayAdapter>,
   ) {}
@@ -66,7 +70,13 @@ export class PaymentService {
   // CREATE + INITIATE
   // ============================================================
 
-  async create(dto: CreatePaymentDto, scope: CompanyScope, actor: Actor) {
+  async create(
+    dto: CreatePaymentDto,
+    scope: CompanyScope | undefined,
+    actor: Actor,
+    provider: PaymentProvider = PaymentProvider.SSLCOMMERZ,
+    extraMetadata?: Record<string, unknown>,
+  ) {
     const invoice = await this.invoiceService.findOne(dto.invoiceId, scope);
 
     if (invoice.status !== InvoiceStatus.ISSUED) {
@@ -122,7 +132,7 @@ export class PaymentService {
             subscriptionId: invoice.subscriptionId,
             invoiceId: invoice.id,
 
-            provider: 'SSLCOMMERZ',
+            provider,
             status: PaymentStatus.PENDING,
 
             currencyCode: invoice.currencyCode,
@@ -131,7 +141,7 @@ export class PaymentService {
             providerTransactionId: tranId,
             idempotencyKey: `payment:${invoice.id}:attempt:${advancedBilling.attemptCount}`,
 
-            metadata: { initiatedByUserId: actor.userId },
+            metadata: { initiatedByUserId: actor.userId, ...extraMetadata },
           },
         });
 
@@ -228,6 +238,44 @@ export class PaymentService {
 
       throw error;
     }
+  }
+
+  /**
+   * Platform Owner-initiated payment (cash, bank transfer, etc.) for a
+   * company's subscription — the manual counterpart to the online
+   * checkout→pay flow, walking the same Billing/Invoice/Payment chain
+   * through the exact same create()/verifyAndSettle() calls, just against
+   * the MANUAL adapter and invoked in one request instead of two (no
+   * gateway redirect to wait on). Never mutates Subscription/Billing
+   * directly — SubscriptionRenewalService.requestSubscriptionCheckout()
+   * generates the same system-owned Billing/Invoice a company would get,
+   * so manual and online payment share one settlement path end to end.
+   */
+  async recordManualPayment(
+    dto: {
+      subscriptionId: string;
+      planId?: string;
+      billingCycle?: BillingCycle;
+      note?: string;
+    },
+    actor: Actor,
+  ) {
+    const { invoice } =
+      await this.subscriptionRenewalService.requestSubscriptionCheckout(
+        dto.subscriptionId,
+        { planId: dto.planId, billingCycle: dto.billingCycle },
+        actor.userId,
+      );
+
+    const { payment } = await this.create(
+      { invoiceId: invoice.id },
+      undefined,
+      actor,
+      PaymentProvider.MANUAL,
+      { method: 'MANUAL', recordedByUserId: actor.userId, note: dto.note },
+    );
+
+    return this.verifyAndSettle(payment.id, '', actor.userId);
   }
 
   // ============================================================

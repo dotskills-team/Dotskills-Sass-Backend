@@ -4,7 +4,10 @@ import { BillingModule } from '../billing/billing.module';
 import { InvoiceModule } from '../invoice/invoice.module';
 import { SubscriptionModule } from './subscription.module';
 
-import { SubscriptionRenewalController } from './subscription-renewal.controller';
+import {
+  CompanySubscriptionCheckoutController,
+  SubscriptionRenewalController,
+} from './subscription-renewal.controller';
 import { SubscriptionRenewalScheduler } from './subscription-renewal.scheduler';
 import { SubscriptionRenewalService } from './subscription-renewal.service';
 

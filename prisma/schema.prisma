@@ -152,6 +152,7 @@ enum InvoiceStatus {
 
 enum PaymentProvider {
   SSLCOMMERZ
+  MANUAL
 }
 
 enum PaymentStatus {

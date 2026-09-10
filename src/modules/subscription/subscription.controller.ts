@@ -24,7 +24,6 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { CancelSubscriptionDto } from './dto/cancel-subscription.dto';
-import { ChangeSubscriptionPlanDto } from './dto/change-subscription-plan.dto';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateAutoRenewDto } from './dto/update-auto-renew.dto';
 import { SubscriptionService } from './subscription.service';
@@ -112,16 +111,6 @@ export class SubscriptionController {
     @Req() req: AuthenticatedRequest,
   ) {
     return this.service.updateAutoRenew(id, dto, this.context(req));
-  }
-  @Patch(':id/plan')
-  @UseGuards(SubscriptionStatusGuard)
-  @RequireCompanyPermissions(COMPANY_PERMISSIONS.SUBSCRIPTION_CHANGE_PLAN)
-  plan(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: ChangeSubscriptionPlanDto,
-    @Req() req: AuthenticatedRequest,
-  ) {
-    return this.service.changePlan(id, dto, this.context(req));
   }
   @Post(':id/cancel')
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.SUBSCRIPTION_CANCEL)

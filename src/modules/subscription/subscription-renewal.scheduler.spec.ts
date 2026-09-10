@@ -57,14 +57,12 @@ describe('SubscriptionRenewalScheduler.autoRenewDue', () => {
     scheduler = module.get(SubscriptionRenewalScheduler);
   });
 
-  it('queries only ACTIVE/PAST_DUE subscriptions past their currentPeriodEnd', async () => {
+  it('queries only ACTIVE subscriptions past their currentPeriodEnd', async () => {
     await scheduler.autoRenewDue();
 
     expect(mockPrisma.subscription.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({
-          status: { in: ['ACTIVE', 'PAST_DUE'] },
-        }),
+        where: expect.objectContaining({ status: SubscriptionStatus.ACTIVE }),
       }),
     );
   });
@@ -118,13 +116,14 @@ describe('SubscriptionRenewalScheduler.autoRenewDue', () => {
   });
 
   /**
-   * Core fail-safe requirement: a technical failure while renewing an
-   * ACTIVE subscription must demote it to PAST_DUE with the identical
-   * patch shape runDueTransitions()'s own ACTIVE->PAST_DUE branch uses, so
-   * the existing PAST_DUE->GRACE timer picks up correctly — and it must
-   * never crash the batch for the other subscriptions in it.
+   * PAST_DUE fail-safe removed (business decision: a renewal-generation
+   * failure no longer degrades subscription status) — the subscription
+   * stays ACTIVE; only the AUDIT_LOG entry + error log record the failure
+   * for alerting. If the period genuinely ends before the next successful
+   * attempt, runDueTransitions()'s own ACTIVE→EXPIRED check handles that
+   * independently.
    */
-  it('demotes an ACTIVE subscription to PAST_DUE when renewal fails, and logs AUTO_RENEWAL_FAILED', async () => {
+  it('logs AUTO_RENEWAL_FAILED without touching subscription status when renewal fails', async () => {
     mockPrisma.subscription.findMany.mockResolvedValue([dueSubscription]);
     mockPrisma.billing.findUnique.mockResolvedValue(null);
     mockRenewalService.renewSubscription.mockRejectedValue(
@@ -142,45 +141,24 @@ describe('SubscriptionRenewalScheduler.autoRenewDue', () => {
         }),
       }),
     );
-    expect(mockLifecycle.transition).toHaveBeenCalledWith(
-      dueSubscription,
-      SubscriptionStatus.PAST_DUE,
-      expect.objectContaining({ actorType: 'SYSTEM' }),
-      expect.objectContaining({
-        reason: 'AUTO_RENEWAL_FAILED',
-        source: 'SCHEDULER',
-        patch: expect.objectContaining({ pastDueEndsAt: expect.any(Date) }),
-      }),
-    );
+    expect(mockLifecycle.transition).not.toHaveBeenCalled();
     expect(result.failed).toBe(1);
   });
 
-  it('does not attempt a transition when renewal fails for an already-PAST_DUE subscription', async () => {
+  it('continues processing the rest of the batch when one subscription in it fails to renew', async () => {
+    const secondSubscription = { ...dueSubscription, id: 'sub-2' };
     mockPrisma.subscription.findMany.mockResolvedValue([
-      { ...dueSubscription, status: SubscriptionStatus.PAST_DUE },
+      dueSubscription,
+      secondSubscription,
     ]);
     mockPrisma.billing.findUnique.mockResolvedValue(null);
-    mockRenewalService.renewSubscription.mockRejectedValue(new Error('boom'));
+    mockRenewalService.renewSubscription
+      .mockRejectedValueOnce(new Error('boom'))
+      .mockResolvedValueOnce({});
 
     const result = await scheduler.autoRenewDue();
 
-    expect(mockLifecycle.transition).not.toHaveBeenCalled();
-    expect(mockPrisma.auditLog.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({ action: 'AUTO_RENEWAL_FAILED' }),
-      }),
-    );
     expect(result.failed).toBe(1);
-  });
-
-  it('continues processing the rest of the batch when the fail-safe transition itself throws', async () => {
-    mockPrisma.subscription.findMany.mockResolvedValue([dueSubscription]);
-    mockPrisma.billing.findUnique.mockResolvedValue(null);
-    mockRenewalService.renewSubscription.mockRejectedValue(new Error('boom'));
-    mockLifecycle.transition.mockRejectedValueOnce(
-      new Error('transition also failed'),
-    );
-
-    await expect(scheduler.autoRenewDue()).resolves.toBeDefined();
+    expect(result.renewed).toBe(1);
   });
 });

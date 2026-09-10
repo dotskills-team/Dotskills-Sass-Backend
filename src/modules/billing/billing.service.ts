@@ -7,6 +7,7 @@ import {
 
 import {
   AuditActorType,
+  BillingCycle,
   SubscriptionStatus,
   BillingAttemptStatus,
   BillingStatus,
@@ -37,10 +38,27 @@ export class BillingService {
   // CREATE BILLING
   // ============================================================
 
+  /**
+   * `options` is deliberately NOT part of `CreateBillingDto` — a
+   * client-supplied price/cycle override would let a request name its own
+   * billing amount, a real security/business risk. It exists only for
+   * trusted internal callers (SubscriptionRenewalService's checkout
+   * orchestration) that already resolved a real Plan/Price server-side —
+   * e.g. a Plan change needs the *new* plan's price/cycle here, not the
+   * subscription's still-current (old) priceSnapshot this method reads by
+   * default. Omitted entirely (the public `platform/billings` controller
+   * never passes it), behavior is 100% unchanged from before this option
+   * existed.
+   */
   async create(
     dto: CreateBillingDto,
     actorUserId?: string,
     tx?: Prisma.TransactionClient,
+    options?: {
+      priceSnapshot?: Record<string, unknown>;
+      billingCycle?: BillingCycle;
+      metadata?: Record<string, unknown>;
+    },
   ) {
     const run = async (tx: Prisma.TransactionClient) => {
       const subscription = await tx.subscription.findUnique({
@@ -98,10 +116,13 @@ export class BillingService {
       }
 
       /**
-       * Subscription priceSnapshot is the source
-       * of truth for historical billing.
+       * Subscription priceSnapshot is the source of truth for historical
+       * billing by default — overridable (options.priceSnapshot) only by
+       * a trusted internal caller that already resolved a *different*
+       * Plan/Price server-side (a Plan change bills the new plan, not the
+       * subscription's still-current one).
        */
-      const rawSnapshot = subscription.priceSnapshot;
+      const rawSnapshot = options?.priceSnapshot ?? subscription.priceSnapshot;
 
       if (
         typeof rawSnapshot !== 'object' ||
@@ -131,7 +152,7 @@ export class BillingService {
 
           status: BillingStatus.PENDING,
 
-          billingCycle: subscription.billingCycle,
+          billingCycle: options?.billingCycle ?? subscription.billingCycle,
 
           currencyCode,
 
@@ -150,6 +171,7 @@ export class BillingService {
           metadata: {
             source: 'SUBSCRIPTION',
             actorUserId: actorUserId ?? null,
+            ...options?.metadata,
           },
         },
         include: {
@@ -826,20 +848,45 @@ export class BillingService {
       const now = new Date();
 
       /**
-       * Subscription-side transition একই transaction (tx) দিয়ে
-       * চালানো হয় — এটা ব্যর্থ হলে (যেমন Subscription অসামঞ্জস্যপূর্ণ
-       * status-এ থাকলে) পুরো Billing/BillingAttempt update rollback
-       * হয়ে যাবে, partial settlement ঘটবে না।
+       * Subscription-side transition একই transaction (tx) দিয়ে চালানো হয়
+       * — এটা ব্যর্থ হলে পুরো Billing/BillingAttempt update rollback হয়ে
+       * যাবে, partial settlement ঘটবে না। Which SubscriptionLifecycleService
+       * method to call is decided by this Billing's own declared intent
+       * (SubscriptionRenewalService.ensureBillingAndInvoice() stamps it at
+       * creation time) — a Plan-change Billing needs the plan/cycle/price
+       * swap applied atomically with the period reset, everything else
+       * (renewal, first subscription, manual payment) uses the existing
+       * paymentSucceeded() path unchanged. Pre-existing rows with no
+       * `intent` key (created before this branching existed) fall through
+       * to the default — today's exact behavior, nothing breaks for them.
        */
-      await this.subscriptionLifecycleService.paymentSucceeded(
-        billing.subscriptionId,
-        {
-          userId: actorUserId,
-          actorType: AuditActorType.PLATFORM_MEMBER,
-        },
-        attempt.idempotencyKey,
-        tx,
-      );
+      const metadata = (billing.metadata as Record<string, unknown> | null) ?? {};
+      if (metadata.intent === 'PLAN_CHANGE') {
+        const targetPlanId = metadata.targetPlanId as string;
+        const targetBillingCycle = metadata.targetBillingCycle as BillingCycle;
+        const targetPriceSnapshot = metadata.targetPriceSnapshot as Prisma.InputJsonValue;
+
+        await this.subscriptionLifecycleService.planChangeSucceeded(
+          billing.subscriptionId,
+          {
+            userId: actorUserId,
+            actorType: AuditActorType.PLATFORM_MEMBER,
+          },
+          attempt.idempotencyKey,
+          { id: targetPlanId, billingCycle: targetBillingCycle, priceSnapshot: targetPriceSnapshot },
+          tx,
+        );
+      } else {
+        await this.subscriptionLifecycleService.paymentSucceeded(
+          billing.subscriptionId,
+          {
+            userId: actorUserId,
+            actorType: AuditActorType.PLATFORM_MEMBER,
+          },
+          attempt.idempotencyKey,
+          tx,
+        );
+      }
 
       const updated = await tx.billing.update({
         where: {
@@ -940,8 +987,11 @@ export class BillingService {
       const now = new Date();
 
       /**
-       * Subscription-side transition একই transaction (tx) দিয়ে
-       * চালানো হয় — ব্যর্থ হলে পুরো operation rollback হয়ে যাবে।
+       * No subscription-status transition on a failed payment anymore
+       * (PAST_DUE/GRACE removed) — this call is now just a scope check
+       * (throws if the Billing's subscriptionId is somehow invalid), kept
+       * so a genuinely broken reference still surfaces loudly here rather
+       * than silently proceeding to write BILLING_FAILED against it.
        */
       await this.subscriptionLifecycleService.paymentFailed(
         billing.subscriptionId,
@@ -949,8 +999,6 @@ export class BillingService {
           userId: actorUserId,
           actorType: AuditActorType.PLATFORM_MEMBER,
         },
-        attempt.idempotencyKey,
-        tx,
       );
 
       const updated = await tx.billing.update({

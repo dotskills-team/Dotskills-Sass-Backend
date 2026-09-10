@@ -13,13 +13,13 @@ import { SubscriptionRenewalService } from './subscription-renewal.service';
 
 /**
  * Closes the gap found while building this: runDueTransitions() already
- * demotes ACTIVE -> PAST_DUE -> GRACE -> SUSPENDED -> EXPIRED purely on a
- * time clock, entirely independent of whether the next period's Billing/
- * Invoice was ever generated — so a company could slide toward suspension
- * having never even been given an Invoice to pay. This runs on the same
- * 10-minute cadence (own @Cron — SubscriptionModule structurally can't
- * depend on BillingModule, so this can't live in the existing
- * SubscriptionScheduler) and generates it proactively.
+ * expires an ACTIVE subscription purely on a time clock, entirely
+ * independent of whether the next period's Billing/Invoice was ever
+ * generated — so a company could slide toward expiry having never even
+ * been given an Invoice to pay. This runs on the same 10-minute cadence
+ * (own @Cron — SubscriptionModule structurally can't depend on
+ * BillingModule, so this can't live in the existing SubscriptionScheduler)
+ * and generates it proactively.
  */
 @Injectable()
 export class SubscriptionRenewalScheduler {
@@ -41,9 +41,7 @@ export class SubscriptionRenewalScheduler {
 
     const candidates = await this.prisma.subscription.findMany({
       where: {
-        status: {
-          in: [SubscriptionStatus.ACTIVE, SubscriptionStatus.PAST_DUE],
-        },
+        status: SubscriptionStatus.ACTIVE,
         currentPeriodEnd: { lte: now },
         autoRenew: true,
       },
@@ -110,54 +108,20 @@ export class SubscriptionRenewalScheduler {
             afterData: { message },
           },
         });
+        /**
+         * No fail-safe status transition anymore (PAST_DUE removed) — a
+         * renewal-generation failure just logs (AUDIT_LOG entry above,
+         * plus this error log for alerting). The subscription stays
+         * ACTIVE; if its period genuinely ends before the next successful
+         * renewal attempt, runDueTransitions()'s own ACTIVE→EXPIRED check
+         * handles that independently, same as if this scheduler never ran
+         * at all.
+         */
         this.logger.error({
           event: 'auto_renewal_failed',
           subscriptionId: subscription.id,
           message,
         });
-
-        /**
-         * Fail-safe: an ACTIVE subscription whose renewal generation itself
-         * failed is treated the same as a failed payment — moved to
-         * PAST_DUE with the identical patch shape runDueTransitions()'s own
-         * ACTIVE->PAST_DUE branch already uses, so the existing PAST_DUE->
-         * GRACE timer starts correctly. If it's already PAST_DUE, there's
-         * no valid PAST_DUE->PAST_DUE transition and no need for one — the
-         * GRACE timer from the original demotion is already running; only
-         * the audit record above matters here, for Part 7 to alert on.
-         */
-        if (subscription.status === SubscriptionStatus.ACTIVE) {
-          try {
-            await this.lifecycle.transition(
-              subscription,
-              SubscriptionStatus.PAST_DUE,
-              {
-                tenantId: subscription.tenantId,
-                companyId: subscription.companyId,
-                actorType: AuditActorType.SYSTEM,
-              },
-              {
-                reason: 'AUTO_RENEWAL_FAILED',
-                source: 'SCHEDULER',
-                patch: {
-                  pastDueEndsAt: this.lifecycle.addDays(
-                    now,
-                    SUBSCRIPTION_CONSTANTS.DEFAULT_PAST_DUE_DAYS,
-                  ),
-                },
-              },
-            );
-          } catch (transitionError) {
-            this.logger.error({
-              event: 'auto_renewal_failsafe_transition_failed',
-              subscriptionId: subscription.id,
-              message:
-                transitionError instanceof Error
-                  ? transitionError.message
-                  : 'Unknown transition error',
-            });
-          }
-        }
       }
     }
 

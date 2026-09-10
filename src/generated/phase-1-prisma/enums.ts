@@ -206,7 +206,8 @@ export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus]
 
 
 export const PaymentProvider = {
-  SSLCOMMERZ: 'SSLCOMMERZ'
+  SSLCOMMERZ: 'SSLCOMMERZ',
+  MANUAL: 'MANUAL'
 } as const
 
 export type PaymentProvider = (typeof PaymentProvider)[keyof typeof PaymentProvider]

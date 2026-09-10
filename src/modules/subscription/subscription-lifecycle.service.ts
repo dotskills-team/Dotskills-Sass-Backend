@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 
 import {
   AuditActorType,
+  BillingCycle,
   InvoiceStatus,
   SubscriptionStatus,
   NotificationType,
@@ -40,12 +41,6 @@ export class SubscriptionLifecycleService {
     private readonly notificationService: NotificationService,
   ) {}
 
-  private static readonly STRUGGLING_STATUSES: readonly SubscriptionStatus[] = [
-    SubscriptionStatus.PAST_DUE,
-    SubscriptionStatus.GRACE,
-    SubscriptionStatus.SUSPENDED,
-  ];
-
   async paymentSucceeded(
     id: string,
     context: ActorContext,
@@ -59,36 +54,35 @@ export class SubscriptionLifecycleService {
     if (replay) return replay;
 
     /**
-     * ACTIVE/TRIALING subscription-এর normal billing cycle payment সফল
-     * হওয়া কোনো "recovery" transition না (PAST_DUE/GRACE/SUSPENDED থেকে
-     * ফেরা না) — এটাই একটা fresh subscription-এর সবচেয়ে সাধারণ, প্রথম
-     * successful-payment case। আগে এই branch না থাকায় এটা সবসময় নিচের
-     * "recoverableStatuses" guard-এ গিয়ে throw করত, এবং যেহেতু এই method
-     * BillingService.markSucceeded()-এর একই transaction-এ চলে, পুরো
-     * settlement (Payment→SUCCEEDED, Billing→SUCCEEDED, Invoice→PAID)
-     * rollback হয়ে যেত — গেটওয়ে সত্যিই টাকা confirm করলেও।
-     * renewInPlace() ইচ্ছাকৃতভাবে transition()/ALLOWED_SUBSCRIPTION_
-     * TRANSITIONS ব্যবহার করে না (ACTIVE→ACTIVE কোনো status-এর নিজের
-     * allowed-list-এ নেই, আর সেই shared map পরিবর্তন করলে transition()-এর
-     * অন্য সব caller-ও প্রভাবিত হতো) — শুধু billing period refresh করে,
-     * status অপরিবর্তিত রাখে, একই audit/event shape বজায় রেখে।
+     * ACTIVE subscription-এর normal billing cycle payment সফল হওয়া কোনো
+     * "recovery" transition না — এটাই একটা fresh subscription-এর সবচেয়ে
+     * সাধারণ, প্রথম successful-payment case। renewInPlace()
+     * ইচ্ছাকৃতভাবে transition()/ALLOWED_SUBSCRIPTION_TRANSITIONS ব্যবহার
+     * করে না (ACTIVE→ACTIVE কোনো status-এর নিজের allowed-list-এ নেই, আর
+     * সেই shared map পরিবর্তন করলে transition()-এর অন্য সব caller-ও
+     * প্রভাবিত হতো) — শুধু billing period refresh করে, status
+     * অপরিবর্তিত রাখে, একই audit/event shape বজায় রেখে।
      */
-    if (
-      subscription.status === SubscriptionStatus.ACTIVE ||
-      subscription.status === SubscriptionStatus.TRIALING
-    ) {
+    if (subscription.status === SubscriptionStatus.ACTIVE) {
       return this.renewInPlace(subscription, context, idempotencyKey, tx);
     }
 
+    /**
+     * TRIALING subscription-এ payment সফল হলে (trial শেষ হওয়ার আগেই
+     * company pay করে ফেলেছে) — renewInPlace() ব্যবহার করা যাবে না,
+     * কারণ সেটা status অপরিবর্তিত রাখে (TRIALING-ই থেকে যাবে)। এখানে
+     * সত্যিকারের transition() লাগবে: ACTIVE-এ যাওয়া + trialEndsAt
+     * clear করা, ঠিক নিচের EXPIRED-recovery path-এর মতোই non-backdated
+     * period reset সহ।
+     */
     const recoverableStatuses: readonly SubscriptionStatus[] = [
-      SubscriptionStatus.PAST_DUE,
-      SubscriptionStatus.GRACE,
-      SubscriptionStatus.SUSPENDED,
+      SubscriptionStatus.TRIALING,
+      SubscriptionStatus.EXPIRED,
     ];
 
     if (!recoverableStatuses.includes(subscription.status)) {
       throw new BadRequestException(
-        'Payment recovery is allowed only for PAST_DUE, GRACE or SUSPENDED subscriptions.',
+        'Payment can only activate a TRIALING or EXPIRED subscription (or renew an already-ACTIVE one).',
       );
     }
     const now = new Date();
@@ -106,10 +100,7 @@ export class SubscriptionLifecycleService {
             now,
             subscription.billingCycle,
           ),
-          graceEndsAt: null,
-          pastDueEndsAt: null,
-          suspendedAt: null,
-          suspensionExpiresAt: null,
+          trialEndsAt: null,
           cancelledAt: null,
         },
       },
@@ -117,11 +108,79 @@ export class SubscriptionLifecycleService {
     );
   }
 
+  /**
+   * Mirrors paymentSucceeded()'s own ACTIVE-vs-TRIALING/EXPIRED split (see
+   * its comments) — plan change requires the exact same branching, since
+   * "already ACTIVE, paying to switch plans" is the most common case and
+   * ACTIVE→ACTIVE is not a valid transition() target. Either way the new
+   * plan/cycle/price and the period reset are applied together, atomically,
+   * so a subscription is never left ACTIVE on a half-applied plan.
+   */
+  async planChangeSucceeded(
+    id: string,
+    context: ActorContext,
+    idempotencyKey: string,
+    newPlan: { id: string; billingCycle: BillingCycle; priceSnapshot: Prisma.InputJsonValue },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const subscription = await this.getScoped(id, context);
+
+    const replay = await this.findIdempotentResult(id, idempotencyKey);
+    if (replay) return replay;
+
+    const planPatch = {
+      planId: newPlan.id,
+      billingCycle: newPlan.billingCycle,
+      priceSnapshot: newPlan.priceSnapshot,
+    };
+
+    if (subscription.status === SubscriptionStatus.ACTIVE) {
+      return this.renewInPlace(
+        subscription,
+        context,
+        idempotencyKey,
+        tx,
+        'PLAN_CHANGE_PAYMENT_SUCCEEDED',
+        planPatch,
+      );
+    }
+
+    const now = new Date();
+    return this.transition(
+      subscription,
+      SubscriptionStatus.ACTIVE,
+      context,
+      {
+        reason: 'PLAN_CHANGE_PAYMENT_SUCCEEDED',
+        source: 'PAYMENT',
+        idempotencyKey,
+        patch: {
+          ...planPatch,
+          currentPeriodStart: now,
+          currentPeriodEnd: this.calculatePeriodEnd(now, newPlan.billingCycle),
+          trialEndsAt: null,
+          cancelledAt: null,
+        },
+      },
+      tx,
+    );
+  }
+
+  /**
+   * Status-unchanged period refresh — deliberately bypasses transition()/
+   * ALLOWED_SUBSCRIPTION_TRANSITIONS entirely (ACTIVE→ACTIVE isn't, and was
+   * never meant to be, a valid entry in that map). `extraPatch` lets
+   * planChangeSucceeded() reuse this exact same in-place path for an
+   * already-ACTIVE subscription paying to change plans — same period
+   * reset, plus the plan/cycle/price swap applied in the same update.
+   */
   private async renewInPlace(
     subscription: Subscription,
     context: ActorContext,
     idempotencyKey: string,
     tx?: Prisma.TransactionClient,
+    reason: string = 'PAYMENT_SUCCEEDED',
+    extraPatch: Record<string, unknown> = {},
   ) {
     const run = async (tx: Prisma.TransactionClient) => {
       const prior = await tx.subscriptionEvent.findUnique({
@@ -141,13 +200,14 @@ export class SubscriptionLifecycleService {
           currentPeriodStart: now,
           currentPeriodEnd: this.calculatePeriodEnd(
             now,
-            subscription.billingCycle,
+            (extraPatch.billingCycle as BillingCycle) ?? subscription.billingCycle,
           ),
           graceEndsAt: null,
           pastDueEndsAt: null,
           suspendedAt: null,
           suspensionExpiresAt: null,
           cancelledAt: null,
+          ...extraPatch,
         },
       });
       if (changed.count !== 1) {
@@ -163,7 +223,7 @@ export class SubscriptionLifecycleService {
           companyId: subscription.companyId,
           fromStatus: subscription.status,
           toStatus: subscription.status,
-          reason: 'PAYMENT_SUCCEEDED',
+          reason,
           source: 'PAYMENT',
           actorUserId: 'userId' in context ? context.userId : null,
           idempotencyKey,
@@ -182,7 +242,7 @@ export class SubscriptionLifecycleService {
           beforeData: { status: subscription.status },
           afterData: {
             status: subscription.status,
-            reason: 'PAYMENT_SUCCEEDED',
+            reason,
           },
         },
       });
@@ -196,92 +256,21 @@ export class SubscriptionLifecycleService {
     return this.prisma.$transaction(run);
   }
 
-  async paymentFailed(
-    id: string,
-    context: ActorContext,
-    idempotencyKey: string,
-    tx?: Prisma.TransactionClient,
-  ) {
-    // Scope validation must happen before returning an idempotent replay.
-    const subscription = await this.getScoped(id, context);
-
-    const replay = await this.findIdempotentResult(id, idempotencyKey);
-    if (replay) return replay;
-    if (subscription.status === SubscriptionStatus.ACTIVE) {
-      return this.transition(
-        subscription,
-        SubscriptionStatus.PAST_DUE,
-        context,
-        {
-          reason: 'PAYMENT_FAILED',
-          source: 'PAYMENT',
-          idempotencyKey,
-          patch: {
-            pastDueEndsAt: this.addDays(
-              new Date(),
-              SUBSCRIPTION_CONSTANTS.DEFAULT_PAST_DUE_DAYS,
-            ),
-          },
-        },
-        tx,
-      );
-    }
-    if (subscription.status === SubscriptionStatus.PAST_DUE) {
-      return this.transition(
-        subscription,
-        SubscriptionStatus.GRACE,
-        context,
-        {
-          reason: 'PAYMENT_RETRY_FAILED',
-          source: 'PAYMENT',
-          idempotencyKey,
-          patch: {
-            graceEndsAt: this.addDays(
-              new Date(),
-              SUBSCRIPTION_CONSTANTS.DEFAULT_GRACE_DAYS,
-            ),
-          },
-        },
-        tx,
-      );
-    }
-    /**
-     * Grace period exhausted by a further failed payment — mirrors the
-     * exact GRACE→SUSPENDED transition `runDueTransitions()` already
-     * applies when `graceEndsAt` elapses on its own (same patch shape),
-     * so a failure-driven suspension and a time-driven one are identical.
-     */
-    if (subscription.status === SubscriptionStatus.GRACE) {
-      const now = new Date();
-      return this.transition(
-        subscription,
-        SubscriptionStatus.SUSPENDED,
-        context,
-        {
-          reason: 'PAYMENT_GRACE_EXHAUSTED',
-          source: 'PAYMENT',
-          idempotencyKey,
-          patch: {
-            suspendedAt: now,
-            suspensionExpiresAt: this.addDays(
-              now,
-              SUBSCRIPTION_CONSTANTS.DEFAULT_SUSPENSION_DAYS,
-            ),
-          },
-        },
-        tx,
-      );
-    }
-    /**
-     * No further payment-failure-driven degradation exists anywhere in this
-     * codebase for SUSPENDED/CANCELLED/EXPIRED/TRIALING (the scheduler only
-     * ever moves these by time, e.g. suspensionExpiresAt → EXPIRED) —
-     * a failed retry against one of them is a safe no-op, not an error.
-     * Throwing here previously rolled back the caller's Billing/BillingAttempt
-     * bookkeeping (both run in the same transaction) and masked the real
-     * gateway failure reason further up the call chain.
-     */
-    return subscription;
+  /**
+   * A failed payment attempt no longer degrades subscription status
+   * (PAST_DUE/GRACE removed — business decision: a subscription simply
+   * expires at its own period end, no intermediate punishment states).
+   * Billing/BillingAttempt/Payment already correctly record FAILED
+   * independently of this call (BillingService.markFailed()), and the
+   * Owner can simply retry payment on the same still-payable Invoice —
+   * there is nothing left for the Subscription row itself to do here.
+   * Kept as a real method (not deleted) since BillingService.markFailed()
+   * already calls it inside its own settlement transaction; removing the
+   * call site there would be a larger, riskier change for no behavioral
+   * gain over simply no-op'ing here.
+   */
+  paymentFailed(id: string, context: ActorContext) {
+    return this.getScoped(id, context);
   }
 
   async transition(
@@ -351,10 +340,16 @@ export class SubscriptionLifecycleService {
         },
       });
 
-      if (
-        subscription.companyId &&
-        SubscriptionLifecycleService.STRUGGLING_STATUSES.includes(to)
-      ) {
+      /**
+       * SUSPENDED is now only reachable via manual Platform-Admin
+       * suspension (the automatic PAST_DUE/GRACE degradation chain that
+       * used to also land here was removed) — the company still needs to
+       * be told. No dedicated "SUBSCRIPTION_SUSPENDED" NotificationType
+       * exists in the schema; reusing SUBSCRIPTION_PAST_DUE (the closest
+       * existing "your subscription needs attention" category) rather
+       * than adding a new enum value for this one case.
+       */
+      if (subscription.companyId && to === SubscriptionStatus.SUSPENDED) {
         await this.notificationService.create(
           tx,
           { tenantId: subscription.tenantId, companyId: subscription.companyId },
@@ -383,10 +378,7 @@ export class SubscriptionLifecycleService {
     const result: LifecycleRunResult = {
       trialsActivated: 0,
       trialsExpired: 0,
-      activeMarkedPastDue: 0,
-      pastDueMovedToGrace: 0,
-      graceSuspended: 0,
-      suspendedExpired: 0,
+      activeExpired: 0,
       cancelledExpired: 0,
       failures: [],
     };
@@ -416,60 +408,20 @@ export class SubscriptionLifecycleService {
       'trialsActivated',
       () => ({ trialEndsAt: null }),
     );
+    /**
+     * A period ending with no successful renewal payment by then simply
+     * expires — no PAST_DUE/GRACE/SUSPENDED staging (business decision).
+     * autoRenew no longer changes this outcome (it still governs whether
+     * SubscriptionRenewalScheduler pre-generates the next Billing ahead of
+     * time, a separate concern) — either way, an unpaid ACTIVE period past
+     * its end date is EXPIRED.
+     */
     await this.processDue(
       SubscriptionStatus.ACTIVE,
-      { currentPeriodEnd: { lte: now }, autoRenew: true },
-      SubscriptionStatus.PAST_DUE,
-      result,
-      'activeMarkedPastDue',
-      () => ({
-        pastDueEndsAt: this.addDays(
-          now,
-          SUBSCRIPTION_CONSTANTS.DEFAULT_PAST_DUE_DAYS,
-        ),
-      }),
-    );
-    await this.processDue(
-      SubscriptionStatus.ACTIVE,
-      { currentPeriodEnd: { lte: now }, autoRenew: false },
+      { currentPeriodEnd: { lte: now } },
       SubscriptionStatus.EXPIRED,
       result,
-      'cancelledExpired',
-    );
-    await this.processDue(
-      SubscriptionStatus.PAST_DUE,
-      { pastDueEndsAt: { lte: now } },
-      SubscriptionStatus.GRACE,
-      result,
-      'pastDueMovedToGrace',
-      () => ({
-        pastDueEndsAt: null,
-        graceEndsAt: this.addDays(
-          now,
-          SUBSCRIPTION_CONSTANTS.DEFAULT_GRACE_DAYS,
-        ),
-      }),
-    );
-    await this.processDue(
-      SubscriptionStatus.GRACE,
-      { graceEndsAt: { lte: now } },
-      SubscriptionStatus.SUSPENDED,
-      result,
-      'graceSuspended',
-      () => ({
-        suspendedAt: now,
-        suspensionExpiresAt: this.addDays(
-          now,
-          SUBSCRIPTION_CONSTANTS.DEFAULT_SUSPENSION_DAYS,
-        ),
-      }),
-    );
-    await this.processDue(
-      SubscriptionStatus.SUSPENDED,
-      { suspensionExpiresAt: { lte: now } },
-      SubscriptionStatus.EXPIRED,
-      result,
-      'suspendedExpired',
+      'activeExpired',
     );
     await this.processDue(
       SubscriptionStatus.CANCELLED,
@@ -566,10 +518,18 @@ export class SubscriptionLifecycleService {
    * is over either way, and Owner recovery goes through the self-service
    * Resubscribe flow with the Plan's *current* price, never the stale one.
    */
+  /**
+   * An ISSUED Invoice under an EXPIRED subscription (no longer
+   * PAST_DUE/GRACE/SUSPENDED — those no longer sit "waiting" the way they
+   * used to) that's gone unpaid for STALE_ISSUED_INVOICE_DAYS auto-VOIDs,
+   * reusing InvoiceService.void() unchanged. There is no further
+   * subscription-status transition to apply — EXPIRED is already the
+   * terminal-until-resubscribe state — so this is now purely Invoice
+   * hygiene, not a lifecycle-driving step.
+   */
   async voidStaleIssuedInvoices(now = new Date()) {
     const result = {
       invoicesVoided: 0,
-      subscriptionsExpired: 0,
       failures: [] as Array<{ invoiceId: string; message: string }>,
     };
 
@@ -582,17 +542,8 @@ export class SubscriptionLifecycleService {
       where: {
         status: InvoiceStatus.ISSUED,
         issuedAt: { lte: cutoff },
-        subscription: {
-          status: {
-            in: [
-              SubscriptionStatus.PAST_DUE,
-              SubscriptionStatus.GRACE,
-              SubscriptionStatus.SUSPENDED,
-            ],
-          },
-        },
+        subscription: { status: SubscriptionStatus.EXPIRED },
       },
-      include: { subscription: true },
       take: SUBSCRIPTION_CONSTANTS.LIFECYCLE_BATCH_SIZE,
       orderBy: { issuedAt: 'asc' },
     });
@@ -601,23 +552,6 @@ export class SubscriptionLifecycleService {
       try {
         await this.invoiceService.void(invoice.id);
         result.invoicesVoided += 1;
-
-        if (invoice.subscription.status === SubscriptionStatus.SUSPENDED) {
-          await this.transition(
-            invoice.subscription,
-            SubscriptionStatus.EXPIRED,
-            {
-              tenantId: invoice.subscription.tenantId,
-              companyId: invoice.subscription.companyId,
-              actorType: AuditActorType.SYSTEM,
-            },
-            {
-              reason: 'STALE_ISSUED_INVOICE_VOIDED',
-              source: 'SCHEDULER',
-            },
-          );
-          result.subscriptionsExpired += 1;
-        }
       } catch (error) {
         const message =
           error instanceof Error ? error.message : 'Unknown lifecycle error';
@@ -739,367 +673,3 @@ export class SubscriptionLifecycleService {
     return result;
   }
 }
-
-// import {
-//   BadRequestException,
-//   Injectable,
-//   Logger,
-//   NotFoundException,
-// } from "@nestjs/common";
-// // import {
-// //   AuditActorType,
-// //   Prisma,
-// //   Subscription,
-// //   SubscriptionStatus,
-// // } from "../../generated/phase-1-prisma";
-// import { PrismaService } from "../../prisma/prisma.service";
-// import {
-//   ALLOWED_SUBSCRIPTION_TRANSITIONS,
-//   SUBSCRIPTION_CONSTANTS,
-// } from "./subscription.constants";
-// import {
-//   LifecycleRunResult,
-//   SubscriptionContext,
-//   SystemSubscriptionContext,
-//   TransitionOptions,
-// } from "./subscription.types";
-// import { AuditActorType, SubscriptionStatus } from "src/generated/phase-1-prisma/enums";
-// import { Prisma, Subscription } from "src/generated/phase-1-prisma/client";
-
-// type ActorContext = SubscriptionContext | SystemSubscriptionContext;
-
-// @Injectable()
-// export class SubscriptionLifecycleService {
-//   private readonly logger = new Logger(SubscriptionLifecycleService.name);
-
-//   constructor(private readonly prisma: PrismaService) { }
-
-//   async paymentSucceeded(
-//     id: string,
-//     context: ActorContext,
-//     idempotencyKey: string,
-//   ) {
-//     const replay = await this.findIdempotentResult(id, idempotencyKey);
-//     if (replay) return replay;
-//     // const subscription = await this.getScoped(id, context);
-//     // if (
-//     //   ![
-//     //     SubscriptionStatus.PAST_DUE,
-//     //     SubscriptionStatus.GRACE,
-//     //     SubscriptionStatus.SUSPENDED,
-//     //   ].includes(subscription.status)
-//     // ) {
-//     //   throw new BadRequestException(
-//     //     "Payment recovery is allowed only for PAST_DUE, GRACE or SUSPENDED subscriptions.",
-//     //   );
-//     // }
-//     const subscription = await this.getScoped(id, context);
-
-//     const recoverableStatuses: readonly SubscriptionStatus[] = [
-//       SubscriptionStatus.PAST_DUE,
-//       SubscriptionStatus.GRACE,
-//       SubscriptionStatus.SUSPENDED,
-//     ];
-
-//     if (!recoverableStatuses.includes(subscription.status)) {
-//       throw new BadRequestException(
-//         "Payment recovery is allowed only for PAST_DUE, GRACE or SUSPENDED subscriptions.",
-//       );
-//     }
-//     const now = new Date();
-//     return this.transition(subscription, SubscriptionStatus.ACTIVE, context, {
-//       reason: "PAYMENT_SUCCEEDED",
-//       source: "PAYMENT",
-//       idempotencyKey,
-//       patch: {
-//         currentPeriodStart: now,
-//         currentPeriodEnd: this.calculatePeriodEnd(
-//           now,
-//           subscription.billingCycle,
-//         ),
-//         graceEndsAt: null,
-//         pastDueEndsAt: null,
-//         suspendedAt: null,
-//         suspensionExpiresAt: null,
-//         cancelledAt: null,
-//       },
-//     });
-//   }
-
-//   async paymentFailed(
-//     id: string,
-//     context: ActorContext,
-//     idempotencyKey: string,
-//   ) {
-//     const replay = await this.findIdempotentResult(id, idempotencyKey);
-//     if (replay) return replay;
-//     const subscription = await this.getScoped(id, context);
-//     if (subscription.status === SubscriptionStatus.ACTIVE) {
-//       return this.transition(
-//         subscription,
-//         SubscriptionStatus.PAST_DUE,
-//         context,
-//         {
-//           reason: "PAYMENT_FAILED",
-//           source: "PAYMENT",
-//           idempotencyKey,
-//           patch: {
-//             pastDueEndsAt: this.addDays(
-//               new Date(),
-//               SUBSCRIPTION_CONSTANTS.DEFAULT_PAST_DUE_DAYS,
-//             ),
-//           },
-//         },
-//       );
-//     }
-//     if (subscription.status === SubscriptionStatus.PAST_DUE) {
-//       return this.transition(subscription, SubscriptionStatus.GRACE, context, {
-//         reason: "PAYMENT_RETRY_FAILED",
-//         source: "PAYMENT",
-//         idempotencyKey,
-//         patch: {
-//           graceEndsAt: this.addDays(
-//             new Date(),
-//             SUBSCRIPTION_CONSTANTS.DEFAULT_GRACE_DAYS,
-//           ),
-//         },
-//       });
-//     }
-//     throw new BadRequestException(
-//       "Payment failure can only move ACTIVE→PAST_DUE or PAST_DUE→GRACE.",
-//     );
-//   }
-
-//   async transition(
-//     subscription: Subscription,
-//     to: SubscriptionStatus,
-//     context: ActorContext,
-//     options: TransitionOptions,
-//   ) {
-//     if (!ALLOWED_SUBSCRIPTION_TRANSITIONS[subscription.status].includes(to)) {
-//       throw new BadRequestException(
-//         `Transition ${subscription.status} → ${to} is not allowed.`,
-//       );
-//     }
-
-//     return this.prisma.$transaction(async (tx) => {
-//       if (options.idempotencyKey) {
-//         const prior = await tx.subscriptionEvent.findUnique({
-//           where: { idempotencyKey: options.idempotencyKey },
-//         });
-//         if (prior)
-//           return tx.subscription.findUniqueOrThrow({
-//             where: { id: subscription.id },
-//           });
-//       }
-
-//       // Optimistic compare-and-set prevents two workers from applying the same state change.
-//       const changed = await tx.subscription.updateMany({
-//         where: { id: subscription.id, status: subscription.status },
-//         data: {
-//           status: to,
-//           ...(options.patch as
-//             | Prisma.SubscriptionUpdateManyMutationInput
-//             | undefined),
-//         },
-//       });
-//       if (changed.count !== 1)
-//         throw new BadRequestException(
-//           "Subscription changed concurrently; retry the operation.",
-//         );
-
-//       await tx.subscriptionEvent.create({
-//         data: {
-//           subscriptionId: subscription.id,
-//           tenantId: subscription.tenantId,
-//           companyId: subscription.companyId,
-//           fromStatus: subscription.status,
-//           toStatus: to,
-//           reason: options.reason,
-//           source: options.source,
-//           actorUserId: "userId" in context ? context.userId : null,
-//           idempotencyKey: options.idempotencyKey,
-//           metadata: options.metadata as Prisma.InputJsonValue | undefined,
-//         },
-//       });
-
-//       await tx.auditLog.create({
-//         data: {
-//           tenantId: subscription.tenantId,
-//           companyId: subscription.companyId,
-//           actorUserId: "userId" in context ? context.userId : null,
-//           actorType: context.actorType ?? AuditActorType.COMPANY_MEMBER,
-//           action: `SUBSCRIPTION_${to}`,
-//           entityType: "Subscription",
-//           entityId: subscription.id,
-//           beforeData: { status: subscription.status },
-//           afterData: { status: to, reason: options.reason },
-//         },
-//       });
-//       return tx.subscription.findUniqueOrThrow({
-//         where: { id: subscription.id },
-//       });
-//     });
-//   }
-
-//   async runDueTransitions(now = new Date()): Promise<LifecycleRunResult> {
-//     const result: LifecycleRunResult = {
-//       trialsActivated: 0,
-//       activeMarkedPastDue: 0,
-//       pastDueMovedToGrace: 0,
-//       graceSuspended: 0,
-//       suspendedExpired: 0,
-//       cancelledExpired: 0,
-//       failures: [],
-//     };
-//     await this.processDue(
-//       SubscriptionStatus.TRIALING,
-//       { trialEndsAt: { lte: now } },
-//       SubscriptionStatus.ACTIVE,
-//       result,
-//       "trialsActivated",
-//       () => ({ trialEndsAt: null }),
-//     );
-//     await this.processDue(
-//       SubscriptionStatus.ACTIVE,
-//       { currentPeriodEnd: { lte: now }, autoRenew: true },
-//       SubscriptionStatus.PAST_DUE,
-//       result,
-//       "activeMarkedPastDue",
-//       () => ({
-//         pastDueEndsAt: this.addDays(
-//           now,
-//           SUBSCRIPTION_CONSTANTS.DEFAULT_PAST_DUE_DAYS,
-//         ),
-//       }),
-//     );
-//     await this.processDue(
-//       SubscriptionStatus.ACTIVE,
-//       { currentPeriodEnd: { lte: now }, autoRenew: false },
-//       SubscriptionStatus.EXPIRED,
-//       result,
-//       "cancelledExpired",
-//     );
-//     await this.processDue(
-//       SubscriptionStatus.PAST_DUE,
-//       { pastDueEndsAt: { lte: now } },
-//       SubscriptionStatus.GRACE,
-//       result,
-//       "pastDueMovedToGrace",
-//       () => ({
-//         pastDueEndsAt: null,
-//         graceEndsAt: this.addDays(
-//           now,
-//           SUBSCRIPTION_CONSTANTS.DEFAULT_GRACE_DAYS,
-//         ),
-//       }),
-//     );
-//     await this.processDue(
-//       SubscriptionStatus.GRACE,
-//       { graceEndsAt: { lte: now } },
-//       SubscriptionStatus.SUSPENDED,
-//       result,
-//       "graceSuspended",
-//       () => ({
-//         suspendedAt: now,
-//         suspensionExpiresAt: this.addDays(
-//           now,
-//           SUBSCRIPTION_CONSTANTS.DEFAULT_SUSPENSION_DAYS,
-//         ),
-//       }),
-//     );
-//     await this.processDue(
-//       SubscriptionStatus.SUSPENDED,
-//       { suspensionExpiresAt: { lte: now } },
-//       SubscriptionStatus.EXPIRED,
-//       result,
-//       "suspendedExpired",
-//     );
-//     await this.processDue(
-//       SubscriptionStatus.CANCELLED,
-//       { currentPeriodEnd: { lte: now } },
-//       SubscriptionStatus.EXPIRED,
-//       result,
-//       "cancelledExpired",
-//     );
-//     return result;
-//   }
-
-//   private async processDue(
-//     from: SubscriptionStatus,
-//     due: Prisma.SubscriptionWhereInput,
-//     to: SubscriptionStatus,
-//     result: LifecycleRunResult,
-//     counter: keyof Omit<LifecycleRunResult, "failures">,
-//     patch: (subscription: Subscription) => Record<string, unknown> = () => ({}),
-//   ) {
-//     const rows = await this.prisma.subscription.findMany({
-//       where: { status: from, ...due },
-//       take: SUBSCRIPTION_CONSTANTS.LIFECYCLE_BATCH_SIZE,
-//       orderBy: { updatedAt: "asc" },
-//     });
-//     for (const row of rows) {
-//       try {
-//         await this.transition(
-//           row,
-//           to,
-//           {
-//             tenantId: row.tenantId,
-//             companyId: row.companyId,
-//             actorType: AuditActorType.SYSTEM,
-//           },
-//           {
-//             reason: "SCHEDULED_LIFECYCLE",
-//             source: "SCHEDULER",
-//             patch: patch(row),
-//           },
-//         );
-//         result[counter] += 1;
-//       } catch (error) {
-//         const message =
-//           error instanceof Error ? error.message : "Unknown lifecycle error";
-//         result.failures.push({ subscriptionId: row.id, from, message });
-//         this.logger.error({ subscriptionId: row.id, from, to, message });
-//       }
-//     }
-//   }
-
-//   private async getScoped(id: string, context: ActorContext) {
-//     const subscription = await this.prisma.subscription.findFirst({
-//       where: { id, tenantId: context.tenantId, companyId: context.companyId },
-//     });
-//     if (!subscription) throw new NotFoundException("Subscription not found.");
-//     return subscription;
-//   }
-
-//   private async findIdempotentResult(
-//     subscriptionId: string,
-//     idempotencyKey: string,
-//   ) {
-//     const event = await this.prisma.subscriptionEvent.findUnique({
-//       where: { idempotencyKey },
-//     });
-//     if (!event) return null;
-//     if (event.subscriptionId !== subscriptionId) {
-//       throw new BadRequestException(
-//         "Idempotency key was already used for another subscription.",
-//       );
-//     }
-//     return this.prisma.subscription.findUniqueOrThrow({
-//       where: { id: subscriptionId },
-//     });
-//   }
-
-//   calculatePeriodEnd(start: Date, cycle: "MONTHLY" | "YEARLY") {
-//     const result = new Date(start);
-//     if (cycle === "MONTHLY") result.setUTCMonth(result.getUTCMonth() + 1);
-//     else result.setUTCFullYear(result.getUTCFullYear() + 1);
-//     return result;
-//   }
-
-//   private addDays(date: Date, days: number) {
-//     const result = new Date(date);
-//     result.setUTCDate(result.getUTCDate() + days);
-//     return result;
-//   }
-// }

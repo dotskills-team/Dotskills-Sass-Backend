@@ -56,10 +56,7 @@ export interface TransitionOptions {
 export interface LifecycleRunResult {
   trialsActivated: number;
   trialsExpired: number;
-  activeMarkedPastDue: number;
-  pastDueMovedToGrace: number;
-  graceSuspended: number;
-  suspendedExpired: number;
+  activeExpired: number;
   cancelledExpired: number;
   failures: Array<{
     subscriptionId: string;

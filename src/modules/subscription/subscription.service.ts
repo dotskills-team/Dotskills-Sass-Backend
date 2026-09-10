@@ -13,7 +13,6 @@ import {
 // } from "../../generated/phase-1-prisma";
 import { PrismaService } from '../../prisma/prisma.service';
 import { CancelSubscriptionDto } from './dto/cancel-subscription.dto';
-import { ChangeSubscriptionPlanDto } from './dto/change-subscription-plan.dto';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateAutoRenewDto } from './dto/update-auto-renew.dto';
 import { SUBSCRIPTION_CONSTANTS } from './subscription.constants';
@@ -372,50 +371,6 @@ export class SubscriptionService {
     });
   }
 
-  async changePlan(
-    id: string,
-    dto: ChangeSubscriptionPlanDto,
-    context: SubscriptionContext,
-  ) {
-    const row = await this.scoped(id, context);
-    // if (
-    //   [SubscriptionStatus.CANCELLED, SubscriptionStatus.EXPIRED].includes(
-    //     row.status,
-    //   )
-    // )
-    if (
-      row.status === SubscriptionStatus.CANCELLED ||
-      row.status === SubscriptionStatus.EXPIRED
-    )
-      throw new BadRequestException('Plan cannot be changed in this state.');
-    const plan = await this.getPlan(dto.planId);
-    const company = await this.prisma.company.findUniqueOrThrow({
-      where: { id: context.companyId },
-    });
-    const price = await this.getPrice(
-      plan.id,
-      dto.billingCycle,
-      company.baseCurrencyCode,
-    );
-    const snapshot: PriceSnapshot = {
-      planId: plan.id,
-      planCode: plan.code,
-      planName: plan.name,
-      billingCycle: dto.billingCycle,
-      currencyCode: price.currencyCode,
-      amount: price.amount.toString(),
-      capturedAt: new Date().toISOString(),
-    };
-    return this.prisma.subscription.update({
-      where: { id },
-      data: {
-        planId: plan.id,
-        billingCycle: dto.billingCycle,
-        priceSnapshot: snapshot as unknown as Prisma.InputJsonValue,
-      },
-    });
-  }
-
   async cancel(
     id: string,
     dto: CancelSubscriptionDto,
@@ -698,7 +653,13 @@ export class SubscriptionService {
     return row;
   }
 
-  private async getPlan(id: string) {
+  /**
+   * Public (not private) — reused as-is by SubscriptionRenewalService's
+   * checkout orchestration for Plan-change price resolution, so the
+   * eligibility rule (ACTIVE plan, currently-effective price in the
+   * company's own currency) is never duplicated.
+   */
+  async getPlan(id: string) {
     const plan = await this.prisma.plan.findFirst({
       where: { id, status: PlanStatus.ACTIVE },
     });
@@ -706,7 +667,7 @@ export class SubscriptionService {
     return plan;
   }
 
-  private async getPrice(
+  async getPrice(
     planId: string,
     billingCycle: BillingCycle,
     currencyCode: string,
