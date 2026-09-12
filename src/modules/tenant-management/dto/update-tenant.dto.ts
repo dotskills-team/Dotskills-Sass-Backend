@@ -1,16 +1,13 @@
-import { IsOptional, IsString, Length, Matches } from 'class-validator';
+import { IsOptional, IsString, Length } from 'class-validator';
 
+/**
+ * `code` and `slug` are system-generated at creation and never user-editable
+ * — including on update, so a name edit can never accidentally reference a
+ * changed slug elsewhere. Only `name` may be updated.
+ */
 export class UpdateTenantDto {
   @IsOptional()
   @IsString()
   @Length(2, 160)
   name?: string;
-
-  @IsOptional()
-  @IsString()
-  @Length(2, 120)
-  @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
-    message: 'slug must contain lowercase letters, numbers and hyphens only',
-  })
-  slug?: string;
 }

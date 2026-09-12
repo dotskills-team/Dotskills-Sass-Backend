@@ -159,19 +159,6 @@ describe('InvoiceService', () => {
     });
   });
 
-  describe('cancel', () => {
-    it('rejects cancelling a non-DRAFT invoice', async () => {
-      mockTx.invoice.findUnique.mockResolvedValue({
-        ...baseInvoice,
-        status: InvoiceStatus.ISSUED,
-      });
-
-      await expect(service.cancel('invoice-1')).rejects.toThrow(
-        BadRequestException,
-      );
-    });
-  });
-
   describe('void', () => {
     it('rejects voiding a non-ISSUED invoice', async () => {
       mockTx.invoice.findUnique.mockResolvedValue(baseInvoice); // DRAFT

@@ -16,6 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { UserProfileService } from './user-profile.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateNameDto } from './dto/update-name.dto';
 
 /**
  * Deliberately guarded by JwtAuthGuard only — no company/platform scope
@@ -47,6 +48,14 @@ export class UserProfileController {
     file: Express.Multer.File,
   ) {
     return this.service.uploadProfileImage(actor, file);
+  }
+
+  @Patch('name')
+  updateName(
+    @CurrentUser() actor: AuthenticatedUser,
+    @Body() dto: UpdateNameDto,
+  ) {
+    return this.service.updateName(actor, dto);
   }
 
   @Patch('password')

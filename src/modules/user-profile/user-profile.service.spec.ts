@@ -57,7 +57,12 @@ describe('UserProfileService', () => {
 
       expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
         where: { id: 'user-1' },
-        select: { id: true, fullName: true, email: true, profileImageUrl: true },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          profileImageUrl: true,
+        },
       });
       expect(result.data.userId).toBe('user-1');
     });
@@ -65,15 +70,22 @@ describe('UserProfileService', () => {
     it('throws NotFoundException when the user row is missing', async () => {
       mockPrisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.getProfile(actor)).rejects.toThrow(NotFoundException);
+      await expect(service.getProfile(actor)).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('uploadProfileImage', () => {
     it('rejects a non-PNG/JPEG file before ever calling storage or touching the database', async () => {
-      const file = { buffer: Buffer.from('x'), mimetype: 'image/gif' } as Express.Multer.File;
+      const file = {
+        buffer: Buffer.from('x'),
+        mimetype: 'image/gif',
+      } as Express.Multer.File;
 
-      await expect(service.uploadProfileImage(actor, file)).rejects.toThrow(BadRequestException);
+      await expect(service.uploadProfileImage(actor, file)).rejects.toThrow(
+        BadRequestException,
+      );
       expect(mockStorageService.uploadFile).not.toHaveBeenCalled();
       expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
     });
@@ -92,10 +104,14 @@ describe('UserProfileService', () => {
         id: 'user-1',
         fullName: 'Test User',
         email: 'test@example.com',
-        profileImageUrl: 'https://res.cloudinary.com/test/user-avatars/user-1/new.png',
+        profileImageUrl:
+          'https://res.cloudinary.com/test/user-avatars/user-1/new.png',
       });
 
-      const file = { buffer: Buffer.from('fake-png'), mimetype: 'image/png' } as Express.Multer.File;
+      const file = {
+        buffer: Buffer.from('fake-png'),
+        mimetype: 'image/png',
+      } as Express.Multer.File;
       const result = await service.uploadProfileImage(actor, file);
 
       expect(mockStorageService.uploadFile).toHaveBeenCalledWith(
@@ -105,8 +121,16 @@ describe('UserProfileService', () => {
       );
       expect(mockTx.user.update).toHaveBeenCalledWith({
         where: { id: 'user-1' },
-        data: { profileImageUrl: 'https://res.cloudinary.com/test/user-avatars/user-1/new.png' },
-        select: { id: true, fullName: true, email: true, profileImageUrl: true },
+        data: {
+          profileImageUrl:
+            'https://res.cloudinary.com/test/user-avatars/user-1/new.png',
+        },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          profileImageUrl: true,
+        },
       });
       expect(result.data.profileImageUrl).toBe(
         'https://res.cloudinary.com/test/user-avatars/user-1/new.png',
@@ -118,7 +142,8 @@ describe('UserProfileService', () => {
         id: 'user-1',
         fullName: 'Test User',
         email: 'test@example.com',
-        profileImageUrl: 'https://res.cloudinary.com/test/user-avatars/user-1/old.png',
+        profileImageUrl:
+          'https://res.cloudinary.com/test/user-avatars/user-1/old.png',
       });
       mockStorageService.uploadFile.mockResolvedValue(
         'https://res.cloudinary.com/test/user-avatars/user-1/new.jpg',
@@ -127,20 +152,62 @@ describe('UserProfileService', () => {
         id: 'user-1',
         fullName: 'Test User',
         email: 'test@example.com',
-        profileImageUrl: 'https://res.cloudinary.com/test/user-avatars/user-1/new.jpg',
+        profileImageUrl:
+          'https://res.cloudinary.com/test/user-avatars/user-1/new.jpg',
       });
 
-      const file = { buffer: Buffer.from('fake-jpeg'), mimetype: 'image/jpeg' } as Express.Multer.File;
+      const file = {
+        buffer: Buffer.from('fake-jpeg'),
+        mimetype: 'image/jpeg',
+      } as Express.Multer.File;
       await service.uploadProfileImage(actor, file);
 
-      expect(mockStorageService.deleteFile).toHaveBeenCalledWith('user-avatars/user-1/old.png');
+      expect(mockStorageService.deleteFile).toHaveBeenCalledWith(
+        'user-avatars/user-1/old.png',
+      );
+    });
+  });
+
+  describe('updateName', () => {
+    it('rejects a blank/whitespace-only name without touching the database', async () => {
+      await expect(
+        service.updateName(actor, { fullName: '   ' }),
+      ).rejects.toThrow(BadRequestException);
+      expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
+    });
+
+    it('updates fullName scoped by actor.userId and returns the refreshed profile', async () => {
+      mockPrisma.user.findUnique.mockResolvedValue({
+        id: 'user-1',
+        fullName: 'Old Name',
+        email: 'test@example.com',
+        profileImageUrl: null,
+      });
+      mockTx.user.update.mockResolvedValue({
+        id: 'user-1',
+        fullName: 'New Name',
+        email: 'test@example.com',
+        profileImageUrl: null,
+      });
+
+      const result = await service.updateName(actor, { fullName: '  New Name  ' });
+
+      expect(mockTx.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        data: { fullName: 'New Name' },
+        select: { id: true, fullName: true, email: true, profileImageUrl: true },
+      });
+      expect(result.data.fullName).toBe('New Name');
     });
   });
 
   describe('changePassword', () => {
     it('rejects a wrong current password without ever hashing/writing the new one', async () => {
       const existingHash = await hashPassword('the-real-current-password');
-      mockPrisma.user.findUnique.mockResolvedValue({ id: 'user-1', passwordHash: existingHash });
+      mockPrisma.user.findUnique.mockResolvedValue({
+        id: 'user-1',
+        passwordHash: existingHash,
+      });
 
       await expect(
         service.changePassword(actor, {
@@ -155,7 +222,10 @@ describe('UserProfileService', () => {
 
     it('accepts the correct current password, updates the hash, and revokes every OTHER session but leaves the current one untouched', async () => {
       const existingHash = await hashPassword('the-real-current-password');
-      mockPrisma.user.findUnique.mockResolvedValue({ id: 'user-1', passwordHash: existingHash });
+      mockPrisma.user.findUnique.mockResolvedValue({
+        id: 'user-1',
+        passwordHash: existingHash,
+      });
 
       const result = await service.changePassword(actor, {
         currentPassword: 'the-real-current-password',
@@ -164,7 +234,10 @@ describe('UserProfileService', () => {
 
       expect(mockTx.user.update).toHaveBeenCalledWith({
         where: { id: 'user-1' },
-        data: { passwordHash: expect.any(String), passwordChangedAt: expect.any(Date) },
+        data: {
+          passwordHash: expect.any(String),
+          passwordChangedAt: expect.any(Date),
+        },
       });
       expect(mockPrisma.authSession.updateMany).toHaveBeenCalledWith({
         where: { userId: 'user-1', id: { not: 'session-1' }, revokedAt: null },

@@ -329,6 +329,7 @@ export type UserWhereInput = {
   sentInvitations?: Prisma.InvitationListRelationFilter
   ownershipAssigned?: Prisma.CompanyOwnershipListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  platformSettingsUpdates?: Prisma.PlatformSettingsListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -359,6 +360,7 @@ export type UserOrderByWithRelationInput = {
   sentInvitations?: Prisma.InvitationOrderByRelationAggregateInput
   ownershipAssigned?: Prisma.CompanyOwnershipOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -392,6 +394,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   sentInvitations?: Prisma.InvitationListRelationFilter
   ownershipAssigned?: Prisma.CompanyOwnershipListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  platformSettingsUpdates?: Prisma.PlatformSettingsListRelationFilter
 }, "id" | "email" | "phone">
 
 export type UserOrderByWithAggregationInput = {
@@ -472,6 +475,7 @@ export type UserCreateInput = {
   sentInvitations?: Prisma.InvitationCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -502,6 +506,7 @@ export type UserUncheckedCreateInput = {
   sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUpdateInput = {
@@ -532,6 +537,7 @@ export type UserUpdateInput = {
   sentInvitations?: Prisma.InvitationUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -562,6 +568,7 @@ export type UserUncheckedUpdateInput = {
   sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -874,6 +881,22 @@ export type UserUpdateOneWithoutAuditLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.UserUpdateWithoutAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
 }
 
+export type UserCreateNestedOneWithoutPlatformSettingsUpdatesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPlatformSettingsUpdatesInput, Prisma.UserUncheckedCreateWithoutPlatformSettingsUpdatesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPlatformSettingsUpdatesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutPlatformSettingsUpdatesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPlatformSettingsUpdatesInput, Prisma.UserUncheckedCreateWithoutPlatformSettingsUpdatesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPlatformSettingsUpdatesInput
+  upsert?: Prisma.UserUpsertWithoutPlatformSettingsUpdatesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPlatformSettingsUpdatesInput, Prisma.UserUpdateWithoutPlatformSettingsUpdatesInput>, Prisma.UserUncheckedUpdateWithoutPlatformSettingsUpdatesInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id?: string
   email?: string | null
@@ -901,6 +924,7 @@ export type UserCreateWithoutSessionsInput = {
   sentInvitations?: Prisma.InvitationCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -930,6 +954,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -975,6 +1000,7 @@ export type UserUpdateWithoutSessionsInput = {
   sentInvitations?: Prisma.InvitationUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1004,6 +1030,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserCreateWithoutLoginEventsInput = {
@@ -1033,6 +1060,7 @@ export type UserCreateWithoutLoginEventsInput = {
   sentInvitations?: Prisma.InvitationCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUncheckedCreateWithoutLoginEventsInput = {
@@ -1062,6 +1090,7 @@ export type UserUncheckedCreateWithoutLoginEventsInput = {
   sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserCreateOrConnectWithoutLoginEventsInput = {
@@ -1107,6 +1136,7 @@ export type UserUpdateWithoutLoginEventsInput = {
   sentInvitations?: Prisma.InvitationUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLoginEventsInput = {
@@ -1136,6 +1166,7 @@ export type UserUncheckedUpdateWithoutLoginEventsInput = {
   sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserCreateWithoutPlatformMemberInput = {
@@ -1165,6 +1196,7 @@ export type UserCreateWithoutPlatformMemberInput = {
   sentInvitations?: Prisma.InvitationCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUncheckedCreateWithoutPlatformMemberInput = {
@@ -1194,6 +1226,7 @@ export type UserUncheckedCreateWithoutPlatformMemberInput = {
   sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserCreateOrConnectWithoutPlatformMemberInput = {
@@ -1239,6 +1272,7 @@ export type UserUpdateWithoutPlatformMemberInput = {
   sentInvitations?: Prisma.InvitationUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPlatformMemberInput = {
@@ -1268,6 +1302,7 @@ export type UserUncheckedUpdateWithoutPlatformMemberInput = {
   sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserCreateWithoutCreatedCompaniesInput = {
@@ -1297,6 +1332,7 @@ export type UserCreateWithoutCreatedCompaniesInput = {
   sentInvitations?: Prisma.InvitationCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUncheckedCreateWithoutCreatedCompaniesInput = {
@@ -1326,6 +1362,7 @@ export type UserUncheckedCreateWithoutCreatedCompaniesInput = {
   sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserCreateOrConnectWithoutCreatedCompaniesInput = {
@@ -1371,6 +1408,7 @@ export type UserUpdateWithoutCreatedCompaniesInput = {
   sentInvitations?: Prisma.InvitationUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedCompaniesInput = {
@@ -1400,6 +1438,7 @@ export type UserUncheckedUpdateWithoutCreatedCompaniesInput = {
   sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserCreateWithoutCompanyMembershipsInput = {
@@ -1429,6 +1468,7 @@ export type UserCreateWithoutCompanyMembershipsInput = {
   sentInvitations?: Prisma.InvitationCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUncheckedCreateWithoutCompanyMembershipsInput = {
@@ -1458,6 +1498,7 @@ export type UserUncheckedCreateWithoutCompanyMembershipsInput = {
   sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserCreateOrConnectWithoutCompanyMembershipsInput = {
@@ -1503,6 +1544,7 @@ export type UserUpdateWithoutCompanyMembershipsInput = {
   sentInvitations?: Prisma.InvitationUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCompanyMembershipsInput = {
@@ -1532,6 +1574,7 @@ export type UserUncheckedUpdateWithoutCompanyMembershipsInput = {
   sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserCreateWithoutOwnershipAssignedInput = {
@@ -1561,6 +1604,7 @@ export type UserCreateWithoutOwnershipAssignedInput = {
   ownerInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedUserInput
   sentInvitations?: Prisma.InvitationCreateNestedManyWithoutSentByInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUncheckedCreateWithoutOwnershipAssignedInput = {
@@ -1590,6 +1634,7 @@ export type UserUncheckedCreateWithoutOwnershipAssignedInput = {
   ownerInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedUserInput
   sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutSentByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserCreateOrConnectWithoutOwnershipAssignedInput = {
@@ -1635,6 +1680,7 @@ export type UserUpdateWithoutOwnershipAssignedInput = {
   ownerInvitations?: Prisma.InvitationUpdateManyWithoutInvitedUserNestedInput
   sentInvitations?: Prisma.InvitationUpdateManyWithoutSentByNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnershipAssignedInput = {
@@ -1664,6 +1710,7 @@ export type UserUncheckedUpdateWithoutOwnershipAssignedInput = {
   ownerInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedUserNestedInput
   sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutSentByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserCreateWithoutOwnerInvitationsInput = {
@@ -1693,6 +1740,7 @@ export type UserCreateWithoutOwnerInvitationsInput = {
   sentInvitations?: Prisma.InvitationCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUncheckedCreateWithoutOwnerInvitationsInput = {
@@ -1722,6 +1770,7 @@ export type UserUncheckedCreateWithoutOwnerInvitationsInput = {
   sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserCreateOrConnectWithoutOwnerInvitationsInput = {
@@ -1756,6 +1805,7 @@ export type UserCreateWithoutSentInvitationsInput = {
   ownerInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedUserInput
   ownershipAssigned?: Prisma.CompanyOwnershipCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUncheckedCreateWithoutSentInvitationsInput = {
@@ -1785,6 +1835,7 @@ export type UserUncheckedCreateWithoutSentInvitationsInput = {
   ownerInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedUserInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutAssignedByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserCreateOrConnectWithoutSentInvitationsInput = {
@@ -1830,6 +1881,7 @@ export type UserUpdateWithoutOwnerInvitationsInput = {
   sentInvitations?: Prisma.InvitationUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnerInvitationsInput = {
@@ -1859,6 +1911,7 @@ export type UserUncheckedUpdateWithoutOwnerInvitationsInput = {
   sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUpsertWithoutSentInvitationsInput = {
@@ -1899,6 +1952,7 @@ export type UserUpdateWithoutSentInvitationsInput = {
   ownerInvitations?: Prisma.InvitationUpdateManyWithoutInvitedUserNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSentInvitationsInput = {
@@ -1928,6 +1982,7 @@ export type UserUncheckedUpdateWithoutSentInvitationsInput = {
   ownerInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedUserNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutAssignedByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserCreateWithoutAuditLogsInput = {
@@ -1957,6 +2012,7 @@ export type UserCreateWithoutAuditLogsInput = {
   ownerInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedUserInput
   sentInvitations?: Prisma.InvitationCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipCreateNestedManyWithoutAssignedByInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -1986,6 +2042,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   ownerInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedUserInput
   sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutSentByInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutAssignedByInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedCreateNestedManyWithoutUpdatedByInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -2031,6 +2088,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   ownerInvitations?: Prisma.InvitationUpdateManyWithoutInvitedUserNestedInput
   sentInvitations?: Prisma.InvitationUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUpdateManyWithoutAssignedByNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUpdateManyWithoutUpdatedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -2060,6 +2118,143 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   ownerInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedUserNestedInput
   sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutSentByNestedInput
   ownershipAssigned?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutAssignedByNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedUpdateManyWithoutUpdatedByNestedInput
+}
+
+export type UserCreateWithoutPlatformSettingsUpdatesInput = {
+  id?: string
+  email?: string | null
+  phone?: string | null
+  passwordHash?: string | null
+  fullName: string
+  profileImageUrl?: string | null
+  preferredLocale?: string
+  timezone?: string
+  status?: $Enums.AccountStatus
+  emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
+  passwordChangedAt?: Date | string | null
+  failedLoginCount?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  sessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  loginEvents?: Prisma.LoginEventCreateNestedManyWithoutUserInput
+  platformMember?: Prisma.PlatformMemberCreateNestedOneWithoutUserInput
+  companyMemberships?: Prisma.CompanyMemberCreateNestedManyWithoutUserInput
+  createdCompanies?: Prisma.CompanyCreateNestedManyWithoutCreatedByInput
+  ownerInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutSentByInput
+  ownershipAssigned?: Prisma.CompanyOwnershipCreateNestedManyWithoutAssignedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+}
+
+export type UserUncheckedCreateWithoutPlatformSettingsUpdatesInput = {
+  id?: string
+  email?: string | null
+  phone?: string | null
+  passwordHash?: string | null
+  fullName: string
+  profileImageUrl?: string | null
+  preferredLocale?: string
+  timezone?: string
+  status?: $Enums.AccountStatus
+  emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
+  passwordChangedAt?: Date | string | null
+  failedLoginCount?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  sessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  loginEvents?: Prisma.LoginEventUncheckedCreateNestedManyWithoutUserInput
+  platformMember?: Prisma.PlatformMemberUncheckedCreateNestedOneWithoutUserInput
+  companyMemberships?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutUserInput
+  createdCompanies?: Prisma.CompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  ownerInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutSentByInput
+  ownershipAssigned?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutAssignedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+}
+
+export type UserCreateOrConnectWithoutPlatformSettingsUpdatesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPlatformSettingsUpdatesInput, Prisma.UserUncheckedCreateWithoutPlatformSettingsUpdatesInput>
+}
+
+export type UserUpsertWithoutPlatformSettingsUpdatesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPlatformSettingsUpdatesInput, Prisma.UserUncheckedUpdateWithoutPlatformSettingsUpdatesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPlatformSettingsUpdatesInput, Prisma.UserUncheckedCreateWithoutPlatformSettingsUpdatesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPlatformSettingsUpdatesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPlatformSettingsUpdatesInput, Prisma.UserUncheckedUpdateWithoutPlatformSettingsUpdatesInput>
+}
+
+export type UserUpdateWithoutPlatformSettingsUpdatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  loginEvents?: Prisma.LoginEventUpdateManyWithoutUserNestedInput
+  platformMember?: Prisma.PlatformMemberUpdateOneWithoutUserNestedInput
+  companyMemberships?: Prisma.CompanyMemberUpdateManyWithoutUserNestedInput
+  createdCompanies?: Prisma.CompanyUpdateManyWithoutCreatedByNestedInput
+  ownerInvitations?: Prisma.InvitationUpdateManyWithoutInvitedUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutSentByNestedInput
+  ownershipAssigned?: Prisma.CompanyOwnershipUpdateManyWithoutAssignedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPlatformSettingsUpdatesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  loginEvents?: Prisma.LoginEventUncheckedUpdateManyWithoutUserNestedInput
+  platformMember?: Prisma.PlatformMemberUncheckedUpdateOneWithoutUserNestedInput
+  companyMemberships?: Prisma.CompanyMemberUncheckedUpdateManyWithoutUserNestedInput
+  createdCompanies?: Prisma.CompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  ownerInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutSentByNestedInput
+  ownershipAssigned?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutAssignedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
 }
 
 
@@ -2076,6 +2271,7 @@ export type UserCountOutputType = {
   sentInvitations: number
   ownershipAssigned: number
   auditLogs: number
+  platformSettingsUpdates: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2087,6 +2283,7 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   sentInvitations?: boolean | UserCountOutputTypeCountSentInvitationsArgs
   ownershipAssigned?: boolean | UserCountOutputTypeCountOwnershipAssignedArgs
   auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
+  platformSettingsUpdates?: boolean | UserCountOutputTypeCountPlatformSettingsUpdatesArgs
 }
 
 /**
@@ -2155,6 +2352,13 @@ export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.
   where?: Prisma.AuditLogWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPlatformSettingsUpdatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlatformSettingsWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2184,6 +2388,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   sentInvitations?: boolean | Prisma.User$sentInvitationsArgs<ExtArgs>
   ownershipAssigned?: boolean | Prisma.User$ownershipAssignedArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
+  platformSettingsUpdates?: boolean | Prisma.User$platformSettingsUpdatesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -2261,6 +2466,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   sentInvitations?: boolean | Prisma.User$sentInvitationsArgs<ExtArgs>
   ownershipAssigned?: boolean | Prisma.User$ownershipAssignedArgs<ExtArgs>
   auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
+  platformSettingsUpdates?: boolean | Prisma.User$platformSettingsUpdatesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2278,6 +2484,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     sentInvitations: Prisma.$InvitationPayload<ExtArgs>[]
     ownershipAssigned: Prisma.$CompanyOwnershipPayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+    platformSettingsUpdates: Prisma.$PlatformSettingsPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2701,6 +2908,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   sentInvitations<T extends Prisma.User$sentInvitationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentInvitationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ownershipAssigned<T extends Prisma.User$ownershipAssignedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownershipAssignedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanyOwnershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  platformSettingsUpdates<T extends Prisma.User$platformSettingsUpdatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$platformSettingsUpdatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformSettingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3349,6 +3557,30 @@ export type User$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+}
+
+/**
+ * User.platformSettingsUpdates
+ */
+export type User$platformSettingsUpdatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlatformSettings
+   */
+  select?: Prisma.PlatformSettingsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlatformSettings
+   */
+  omit?: Prisma.PlatformSettingsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlatformSettingsInclude<ExtArgs> | null
+  where?: Prisma.PlatformSettingsWhereInput
+  orderBy?: Prisma.PlatformSettingsOrderByWithRelationInput | Prisma.PlatformSettingsOrderByWithRelationInput[]
+  cursor?: Prisma.PlatformSettingsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlatformSettingsScalarFieldEnum | Prisma.PlatformSettingsScalarFieldEnum[]
 }
 
 /**

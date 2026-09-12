@@ -53,8 +53,8 @@ describe('NotificationService', () => {
         mockTx as any,
         { tenantId: 'tenant-1', companyId: 'company-1' },
         {
-          type: 'LOW_STOCK' as any,
-          relatedEntityType: 'PRODUCT' as any,
+          type: 'LOW_STOCK',
+          relatedEntityType: 'PRODUCT',
           relatedEntityId: 'product-1',
           locationId: 'loc-1',
           metadata: { sku: 'SKU-1' },
@@ -109,7 +109,7 @@ describe('NotificationService', () => {
   });
 
   describe('getUnreadCount', () => {
-    it('counts only this company\'s unread notifications', async () => {
+    it("counts only this company's unread notifications", async () => {
       mockPrisma.notification.count.mockResolvedValue(4);
 
       const result = await service.getUnreadCount(context);

@@ -9,7 +9,6 @@ import {
   IndustryStatus,
 } from 'src/generated/phase-1-prisma/enums';
 import { PrismaService } from '../../prisma/prisma.service';
-import { SubscriptionService } from '../subscription/subscription.service';
 
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
@@ -18,10 +17,7 @@ import { UpdateCompanyStatusDto } from './dto/update-company-status.dto';
 
 @Injectable()
 export class CompanyManagementService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly subscriptionService: SubscriptionService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateCompanyDto, createdByUserId: string) {
     const creator = await this.prisma.user.findUnique({
@@ -87,12 +83,14 @@ export class CompanyManagementService {
     }
 
     /**
-     * A Company is never created without a real Subscription behind it —
-     * if no Plan is currently marked isDefaultTrial (or it has no active
-     * MONTHLY price in the company's currency), createTrialForNewCompany()
-     * throws and this whole transaction rolls back, so Company creation
-     * fails loudly with an actionable message instead of silently
-     * producing a subscription-less company.
+     * Company creation only ever creates the Company row (+ its default
+     * CompanySettings) — no Subscription, Billing, Invoice, or Payment is
+     * created here. Subscription creation is a separate, explicit
+     * Super Admin action taken afterwards (SubscriptionService.create(),
+     * via `POST /platform/subscriptions`) — either "Start Trial" (a plan
+     * with real trial days) or "Select Paid Plan" (which requires payment
+     * before the subscription activates). See buildSubscription()'s own
+     * doc comment for how that activation gating works.
      */
     return this.prisma.$transaction(async (tx) => {
       const company = await tx.company.create({
@@ -112,12 +110,6 @@ export class CompanyManagementService {
           timezone: dto.timezone,
         },
       });
-
-      await this.subscriptionService.createTrialForNewCompany(
-        company,
-        createdByUserId,
-        tx,
-      );
 
       /**
        * Business Ops module reads this row from day one (defaults chosen
@@ -411,6 +403,16 @@ export class CompanyManagementService {
   //   },
   // });
   //   }
+  /**
+   * A Company only ever goes LIVE as a side effect of a real payment
+   * settlement (SubscriptionLifecycleService.transition()) or an explicit
+   * complimentary grant (SubscriptionService.buildSubscription()) — never
+   * as a standalone Platform-Admin action, since that would let a company
+   * skip the mandatory first-payment requirement entirely. This endpoint
+   * is kept only as an idempotent "confirm" for a company whose
+   * subscription has already earned LIVE status through one of those real
+   * paths; it can no longer force LIVE on its own.
+   */
   async activate(id: string) {
     const company = await this.prisma.company.findUnique({
       where: { id },
@@ -430,6 +432,20 @@ export class CompanyManagementService {
 
     if (company.status === CompanyStatus.LIVE) {
       return company;
+    }
+
+    const activeSubscription = await this.prisma.subscription.findFirst({
+      where: {
+        companyId: id,
+        status: { in: ['ACTIVE'] },
+      },
+      select: { id: true },
+    });
+
+    if (!activeSubscription) {
+      throw new BadRequestException(
+        'Company cannot go LIVE until its first subscription payment succeeds (or a complimentary subscription is granted).',
+      );
     }
 
     return this.prisma.company.update({

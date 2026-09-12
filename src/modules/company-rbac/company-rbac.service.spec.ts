@@ -76,16 +76,20 @@ describe('CompanyRbacService — STAFF_ACTIVITY notification', () => {
         fullName: 'Karim Uddin',
         password: 'a-strong-password',
         roleCodes: ['CASHIER'],
-      } as any,
+      },
       actor,
     );
 
-    expect(mockNotificationService.create).toHaveBeenCalledWith(mockTx, context, {
-      type: NotificationType.STAFF_ACTIVITY,
-      relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
-      relatedEntityId: 'member-2',
-      metadata: { memberName: 'Karim Uddin', action: 'MEMBER_CREATED' },
-    });
+    expect(mockNotificationService.create).toHaveBeenCalledWith(
+      mockTx,
+      context,
+      {
+        type: NotificationType.STAFF_ACTIVITY,
+        relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
+        relatedEntityId: 'member-2',
+        metadata: { memberName: 'Karim Uddin', action: 'MEMBER_CREATED' },
+      },
+    );
   });
 
   it('replaceMemberRoles fires STAFF_ACTIVITY with action MEMBER_ROLES_UPDATED', async () => {
@@ -106,16 +110,20 @@ describe('CompanyRbacService — STAFF_ACTIVITY notification', () => {
     await service.replaceMemberRoles(
       context,
       'member-1',
-      { roleCodes: ['MANAGER'] } as any,
+      { roleCodes: ['MANAGER'] },
       actor,
     );
 
-    expect(mockNotificationService.create).toHaveBeenCalledWith(mockTx, context, {
-      type: NotificationType.STAFF_ACTIVITY,
-      relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
-      relatedEntityId: 'member-1',
-      metadata: { memberName: 'Rahim Uddin', action: 'MEMBER_ROLES_UPDATED' },
-    });
+    expect(mockNotificationService.create).toHaveBeenCalledWith(
+      mockTx,
+      context,
+      {
+        type: NotificationType.STAFF_ACTIVITY,
+        relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
+        relatedEntityId: 'member-1',
+        metadata: { memberName: 'Rahim Uddin', action: 'MEMBER_ROLES_UPDATED' },
+      },
+    );
   });
 
   it('replaceMemberLocations fires STAFF_ACTIVITY with action MEMBER_LOCATIONS_UPDATED', async () => {
@@ -134,15 +142,22 @@ describe('CompanyRbacService — STAFF_ACTIVITY notification', () => {
     await service.replaceMemberLocations(
       context,
       'member-1',
-      { locationIds: ['location-1'] } as any,
+      { locationIds: ['location-1'] },
       actor,
     );
 
-    expect(mockNotificationService.create).toHaveBeenCalledWith(mockTx, context, {
-      type: NotificationType.STAFF_ACTIVITY,
-      relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
-      relatedEntityId: 'member-1',
-      metadata: { memberName: 'Rahim Uddin', action: 'MEMBER_LOCATIONS_UPDATED' },
-    });
+    expect(mockNotificationService.create).toHaveBeenCalledWith(
+      mockTx,
+      context,
+      {
+        type: NotificationType.STAFF_ACTIVITY,
+        relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
+        relatedEntityId: 'member-1',
+        metadata: {
+          memberName: 'Rahim Uddin',
+          action: 'MEMBER_LOCATIONS_UPDATED',
+        },
+      },
+    );
   });
 });

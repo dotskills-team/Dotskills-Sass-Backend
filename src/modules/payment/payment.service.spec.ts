@@ -12,10 +12,13 @@ import {
 } from '../../generated/phase-1-prisma/enums';
 import { Prisma } from '../../generated/phase-1-prisma/client';
 
+import { ConfigService } from '@nestjs/config';
+
 import { PrismaService } from '../../prisma/prisma.service';
 import { InvoiceService } from '../invoice/invoice.service';
 import { BillingService } from '../billing/billing.service';
 import { SubscriptionRenewalService } from '../subscription/subscription-renewal.service';
+import { MailService } from '../mail/mail.service';
 import { PaymentService } from './payment.service';
 import { PAYMENT_GATEWAY_ADAPTERS } from './gateways/payment-gateway.tokens';
 
@@ -41,8 +44,12 @@ describe('PaymentService', () => {
       update: jest.fn(),
     },
     invoice: { findUniqueOrThrow: jest.fn() },
+    company: { findUnique: jest.fn() },
     auditLog: { create: jest.fn() },
   };
+
+  const mockMailService = { send: jest.fn() };
+  const mockConfigService = { get: jest.fn() };
 
   const mockInvoiceService = {
     findOne: jest.fn(),
@@ -86,6 +93,8 @@ describe('PaymentService', () => {
           provide: SubscriptionRenewalService,
           useValue: mockSubscriptionRenewalService,
         },
+        { provide: MailService, useValue: mockMailService },
+        { provide: ConfigService, useValue: mockConfigService },
         {
           provide: PAYMENT_GATEWAY_ADAPTERS,
           useValue: { SSLCOMMERZ: mockAdapter, MANUAL: mockManualAdapter },
@@ -645,6 +654,60 @@ describe('PaymentService', () => {
 
       await expect(
         service.cancelFromGateway('unknown-tran-id'),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('getReceipt', () => {
+    it('returns the payment when it has SUCCEEDED', async () => {
+      mockPrisma.payment.findUnique.mockResolvedValue({
+        id: 'payment-1',
+        tenantId: 'tenant-1',
+        companyId: 'company-1',
+        status: PaymentStatus.SUCCEEDED,
+        invoice: { id: 'invoice-1', invoiceNumber: 'INV-2026-000001' },
+      });
+
+      const result = await service.getReceipt('payment-1');
+
+      expect(result.status).toBe(PaymentStatus.SUCCEEDED);
+      expect(result.invoice.invoiceNumber).toBe('INV-2026-000001');
+    });
+
+    it.each([
+      PaymentStatus.PENDING,
+      PaymentStatus.PROCESSING,
+      PaymentStatus.FAILED,
+      PaymentStatus.CANCELLED,
+    ])(
+      'rejects when the payment status is %s (not yet a completed payment)',
+      async (status) => {
+        mockPrisma.payment.findUnique.mockResolvedValue({
+          id: 'payment-1',
+          tenantId: 'tenant-1',
+          companyId: 'company-1',
+          status,
+        });
+
+        await expect(service.getReceipt('payment-1')).rejects.toThrow(
+          BadRequestException,
+        );
+      },
+    );
+
+    it('rejects with NotFoundException (not leaking existence) when the payment belongs to a different company scope', async () => {
+      mockPrisma.payment.findUnique.mockResolvedValue({
+        id: 'payment-1',
+        tenantId: 'tenant-1',
+        companyId: 'company-1',
+        status: PaymentStatus.SUCCEEDED,
+      });
+
+      await expect(
+        service.getReceipt('payment-1', {
+          tenantId: 'tenant-2',
+          companyId: 'company-2',
+        }),
       ).rejects.toThrow(NotFoundException);
     });
   });

@@ -109,7 +109,11 @@ export class StockAdjustmentService {
         action: 'STOCK_ADJUSTMENT_CREATED',
         entityType: 'StockAdjustment',
         entityId: batch.id,
-        afterData: { lines, appliedCount, errorCount } as unknown as Prisma.InputJsonValue,
+        afterData: {
+          lines,
+          appliedCount,
+          errorCount,
+        } as unknown as Prisma.InputJsonValue,
       },
     });
 
@@ -126,7 +130,11 @@ export class StockAdjustmentService {
     line: StockAdjustmentLineDto,
     actor: AuthenticatedUser,
   ): Promise<LineResult> {
-    const base = { index, productId: line.productId, locationId: line.locationId };
+    const base = {
+      index,
+      productId: line.productId,
+      locationId: line.locationId,
+    };
 
     const hasNew = line.newQuantity !== undefined;
     const hasChange = line.changeQuantity !== undefined;
@@ -134,7 +142,8 @@ export class StockAdjustmentService {
       return {
         ...base,
         status: 'ERROR',
-        errorMessage: 'exactly one of newQuantity or changeQuantity must be provided',
+        errorMessage:
+          'exactly one of newQuantity or changeQuantity must be provided',
       };
     }
 
@@ -162,19 +171,35 @@ export class StockAdjustmentService {
     try {
       return await this.prisma.$transaction(async (tx) => {
         const product = await tx.product.findFirst({
-          where: { id: line.productId, tenantId: context.tenantId, companyId: context.companyId },
+          where: {
+            id: line.productId,
+            tenantId: context.tenantId,
+            companyId: context.companyId,
+          },
           select: { id: true, costPrice: true },
         });
         if (!product) {
-          return { ...base, status: 'ERROR' as const, errorMessage: 'product was not found' };
+          return {
+            ...base,
+            status: 'ERROR' as const,
+            errorMessage: 'product was not found',
+          };
         }
 
         const location = await tx.location.findFirst({
-          where: { id: line.locationId, tenantId: context.tenantId, companyId: context.companyId },
+          where: {
+            id: line.locationId,
+            tenantId: context.tenantId,
+            companyId: context.companyId,
+          },
           select: { id: true },
         });
         if (!location) {
-          return { ...base, status: 'ERROR' as const, errorMessage: 'location was not found' };
+          return {
+            ...base,
+            status: 'ERROR' as const,
+            errorMessage: 'location was not found',
+          };
         }
 
         const inventory = await tx.inventory.findUnique({
@@ -195,7 +220,11 @@ export class StockAdjustmentService {
           : new Prisma.Decimal(line.changeQuantity!);
 
         if (delta.isZero()) {
-          return { ...base, status: 'ERROR' as const, errorMessage: 'no change to apply' };
+          return {
+            ...base,
+            status: 'ERROR' as const,
+            errorMessage: 'no change to apply',
+          };
         }
 
         const movement = delta.isPositive()
@@ -241,14 +270,18 @@ export class StockAdjustmentService {
         return {
           ...base,
           status: 'ERROR',
-          errorMessage: 'INSUFFICIENT_STOCK: not enough stock to apply this adjustment',
+          errorMessage:
+            'INSUFFICIENT_STOCK: not enough stock to apply this adjustment',
         };
       }
       throw error;
     }
   }
 
-  async list(context: CompanyContext, query: ListStockAdjustmentsQueryDto = {}) {
+  async list(
+    context: CompanyContext,
+    query: ListStockAdjustmentsQueryDto = {},
+  ) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 50;
     const skip = (page - 1) * limit;
@@ -275,7 +308,11 @@ export class StockAdjustmentService {
         select: { referenceId: true },
         distinct: ['referenceId'],
       });
-      where.id = { in: matchingBatchIds.map((m) => m.referenceId).filter((id): id is string => !!id) };
+      where.id = {
+        in: matchingBatchIds
+          .map((m) => m.referenceId)
+          .filter((id): id is string => !!id),
+      };
     }
 
     const [batches, total] = await this.prisma.$transaction([
@@ -310,7 +347,10 @@ export class StockAdjustmentService {
    */
   private async getValueLostSummary(
     context: CompanyContext,
-    query: Pick<ListStockAdjustmentsQueryDto, 'locationId' | 'productId' | 'reason'>,
+    query: Pick<
+      ListStockAdjustmentsQueryDto,
+      'locationId' | 'productId' | 'reason'
+    >,
   ) {
     const rows = await this.prisma.$queryRaw<ValueLostRow[]>(Prisma.sql`
       SELECT reason, SUM(ABS("changeQty") * COALESCE("unitCost", 0))::numeric(20,4) AS value_lost
@@ -326,14 +366,18 @@ export class StockAdjustmentService {
       GROUP BY reason
     `);
 
-    const valueLostByReason: Record<(typeof LOSS_REASONS)[number], Prisma.Decimal> = {
+    const valueLostByReason: Record<
+      (typeof LOSS_REASONS)[number],
+      Prisma.Decimal
+    > = {
       DAMAGE: new Prisma.Decimal(0),
       THEFT_SHRINKAGE: new Prisma.Decimal(0),
       EXPIRED: new Prisma.Decimal(0),
     };
     for (const row of rows) {
       if ((LOSS_REASONS as readonly string[]).includes(row.reason)) {
-        valueLostByReason[row.reason as (typeof LOSS_REASONS)[number]] = toDecimal(row.value_lost);
+        valueLostByReason[row.reason as (typeof LOSS_REASONS)[number]] =
+          toDecimal(row.value_lost);
       }
     }
     const totalValueLost = LOSS_REASONS.reduce(
@@ -344,7 +388,11 @@ export class StockAdjustmentService {
     return { totalValueLost, valueLostByReason };
   }
 
-  async findOne(context: CompanyContext, id: string, query: ListStockAdjustmentsQueryDto = {}) {
+  async findOne(
+    context: CompanyContext,
+    id: string,
+    query: ListStockAdjustmentsQueryDto = {},
+  ) {
     const batch = await this.prisma.stockAdjustment.findFirst({
       where: { id, tenantId: context.tenantId, companyId: context.companyId },
     });

@@ -74,6 +74,8 @@ import { SaleModule } from './modules/sales/sale/sale.module';
 import { CustomerPaymentModule } from './modules/sales/customer-payment/customer-payment.module';
 import { CashDrawerSessionModule } from './modules/sales/cash-drawer/cash-drawer.module';
 import { ReportingModule } from './modules/reporting/reporting.module';
+import { MailModule } from './modules/mail/mail.module';
+import { PlatformSettingsModule } from './modules/platform-settings/platform-settings.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -93,6 +95,7 @@ import { ReportingModule } from './modules/reporting/reporting.module';
 
     PrismaModule,
     HealthModule,
+    MailModule,
     LocationAccessModule,
     NotificationModule,
     StorageModule,
@@ -100,6 +103,7 @@ import { ReportingModule } from './modules/reporting/reporting.module';
     UserProfileModule,
     AccessControlSetupModule,
     PlatformStaffModule,
+    PlatformSettingsModule,
     PlatformRoleModule,
     CompanyRbacModule,
     CompanyManagementModule,

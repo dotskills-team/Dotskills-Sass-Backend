@@ -83,7 +83,9 @@ describe('UserProfileService — user scoping', () => {
       email: 'a@example.com',
       profileImageUrl: null,
     });
-    mockStorageService.uploadFile.mockResolvedValue('https://cdn.test/user-avatars/user-A/x.png');
+    mockStorageService.uploadFile.mockResolvedValue(
+      'https://cdn.test/user-avatars/user-A/x.png',
+    );
     mockTx.user.update.mockResolvedValue({
       id: 'user-A',
       fullName: 'A',
@@ -91,7 +93,10 @@ describe('UserProfileService — user scoping', () => {
       profileImageUrl: 'https://cdn.test/user-avatars/user-A/x.png',
     });
 
-    const file = { buffer: Buffer.from('x'), mimetype: 'image/png' } as Express.Multer.File;
+    const file = {
+      buffer: Buffer.from('x'),
+      mimetype: 'image/png',
+    } as Express.Multer.File;
     await service.uploadProfileImage(userA, file);
 
     expect(mockStorageService.uploadFile).toHaveBeenCalledWith(
@@ -112,7 +117,10 @@ describe('UserProfileService — user scoping', () => {
 
   it('changePassword verifies and updates only the calling actor own passwordHash, and revokes sessions scoped to that same userId', async () => {
     const hashA = await hashPassword('user-a-current-password');
-    mockPrisma.user.findUnique.mockResolvedValue({ id: 'user-A', passwordHash: hashA });
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: 'user-A',
+      passwordHash: hashA,
+    });
 
     await service.changePassword(userA, {
       currentPassword: 'user-a-current-password',
@@ -128,7 +136,10 @@ describe('UserProfileService — user scoping', () => {
     );
     expect(mockPrisma.authSession.updateMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ userId: 'user-A', id: { not: 'session-A' } }),
+        where: expect.objectContaining({
+          userId: 'user-A',
+          id: { not: 'session-A' },
+        }),
       }),
     );
   });
@@ -138,7 +149,10 @@ describe('UserProfileService — user scoping', () => {
     // Even if userA somehow knew userB's real password string, calling
     // changePassword as userA only ever reads/writes user-A's own row —
     // there is no field anywhere for a caller to name a different user.
-    mockPrisma.user.findUnique.mockResolvedValue({ id: 'user-A', passwordHash: hashB });
+    mockPrisma.user.findUnique.mockResolvedValue({
+      id: 'user-A',
+      passwordHash: hashB,
+    });
 
     // user-A's own row is mocked here to have userB's hash only to prove
     // the lookup key itself (not the DTO) is what determines whose

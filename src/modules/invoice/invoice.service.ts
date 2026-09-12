@@ -20,6 +20,7 @@ import {
   INVOICE_DEFAULTS,
   INVOICE_NUMBER_PREFIX,
 } from './constants/invoice.constants';
+import { companyWithOwnerSelect } from '../../common/prisma/company-with-owner.select';
 
 type CompanyScope = {
   tenantId: string;
@@ -197,16 +198,22 @@ export class InvoiceService {
         take: safeLimit,
         orderBy: { createdAt: 'desc' },
         include: {
+          company: { select: companyWithOwnerSelect },
           billing: {
             select: {
               id: true,
               status: true,
+              billingCycle: true,
               periodStart: true,
               periodEnd: true,
             },
           },
           subscription: {
-            select: { id: true, status: true, planId: true },
+            select: {
+              id: true,
+              status: true,
+              plan: { select: { id: true, name: true, code: true } },
+            },
           },
         },
       }),
@@ -232,6 +239,7 @@ export class InvoiceService {
     const invoice = await this.prisma.invoice.findUnique({
       where: { id },
       include: {
+        company: { select: companyWithOwnerSelect },
         billing: true,
         subscription: { include: { plan: true } },
       },
@@ -303,49 +311,6 @@ export class InvoiceService {
 
     if (tx) return run(tx);
     return this.prisma.$transaction(run);
-  }
-
-  // ============================================================
-  // CANCEL (pre-issue correction: DRAFT -> CANCELLED)
-  // ============================================================
-
-  async cancel(id: string, actorUserId?: string) {
-    return this.prisma.$transaction(async (tx) => {
-      const invoice = await tx.invoice.findUnique({ where: { id } });
-
-      if (!invoice) {
-        throw new NotFoundException('Invoice not found');
-      }
-
-      if (invoice.status !== InvoiceStatus.DRAFT) {
-        throw new BadRequestException(
-          `Only DRAFT invoices can be cancelled (current state: ${invoice.status})`,
-        );
-      }
-
-      const now = new Date();
-
-      const updated = await tx.invoice.update({
-        where: { id },
-        data: { status: InvoiceStatus.CANCELLED, cancelledAt: now },
-      });
-
-      await tx.auditLog.create({
-        data: {
-          tenantId: invoice.tenantId,
-          companyId: invoice.companyId,
-          actorUserId: actorUserId ?? null,
-          actorType: AuditActorType.PLATFORM_MEMBER,
-          action: 'INVOICE_CANCELLED',
-          entityType: 'Invoice',
-          entityId: invoice.id,
-          beforeData: { status: invoice.status },
-          afterData: { status: updated.status, cancelledAt: now.toISOString() },
-        },
-      });
-
-      return updated;
-    });
   }
 
   // ============================================================

@@ -6,12 +6,14 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { randomBytes } from 'crypto';
 
 import {
   AuditActorType,
   BillingCycle,
   BillingStatus,
+  CompanyStatus,
   InvoiceStatus,
   PaymentProvider,
   PaymentStatus,
@@ -23,6 +25,11 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { InvoiceService } from '../invoice/invoice.service';
 import { BillingService } from '../billing/billing.service';
 import { SubscriptionRenewalService } from '../subscription/subscription-renewal.service';
+import { MailService } from '../mail/mail.service';
+import {
+  accountActivationEmailHtml,
+  paymentReceiptEmailHtml,
+} from '../mail/mail.templates';
 
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { QueryPaymentDto } from './dto/query-payment.dto';
@@ -30,6 +37,7 @@ import { PAYMENT_DEFAULTS } from './constants/payment.constants';
 
 import { PaymentGatewayAdapter } from './gateways/payment-gateway.interface';
 import { PAYMENT_GATEWAY_ADAPTERS } from './gateways/payment-gateway.tokens';
+import { companyWithOwnerSelect } from '../../common/prisma/company-with-owner.select';
 
 type CompanyScope = {
   tenantId: string;
@@ -62,6 +70,8 @@ export class PaymentService {
     private readonly invoiceService: InvoiceService,
     private readonly billingService: BillingService,
     private readonly subscriptionRenewalService: SubscriptionRenewalService,
+    private readonly mailService: MailService,
+    private readonly configService: ConfigService,
     @Inject(PAYMENT_GATEWAY_ADAPTERS)
     private readonly adapters: Record<string, PaymentGatewayAdapter>,
   ) {}
@@ -310,7 +320,15 @@ export class PaymentService {
         take: safeLimit,
         orderBy: { createdAt: 'desc' },
         include: {
+          company: { select: companyWithOwnerSelect },
           invoice: { select: { id: true, invoiceNumber: true, status: true } },
+          subscription: {
+            select: {
+              id: true,
+              billingCycle: true,
+              plan: { select: { id: true, name: true, code: true } },
+            },
+          },
         },
       }),
       this.prisma.payment.count({ where }),
@@ -330,7 +348,11 @@ export class PaymentService {
   async findOne(id: string, scope?: CompanyScope) {
     const payment = await this.prisma.payment.findUnique({
       where: { id },
-      include: { invoice: true },
+      include: {
+        invoice: true,
+        company: { select: companyWithOwnerSelect },
+        subscription: { include: { plan: true } },
+      },
     });
 
     if (!payment) {
@@ -343,6 +365,26 @@ export class PaymentService {
         payment.companyId !== scope.companyId)
     ) {
       throw new NotFoundException('Payment not found');
+    }
+
+    return payment;
+  }
+
+  // ============================================================
+  // RECEIPT — read-only, no settlement logic. Only ever returns data for
+  // an already-SUCCEEDED payment; everything a printable receipt needs
+  // (Company/Owner, Plan/billing cycle, Invoice, amounts) is data that
+  // already exists from the real settlement flow — nothing is invented
+  // or recomputed here.
+  // ============================================================
+
+  async getReceipt(id: string, scope?: CompanyScope) {
+    const payment = await this.findOne(id, scope);
+
+    if (payment.status !== PaymentStatus.SUCCEEDED) {
+      throw new BadRequestException(
+        'A receipt is only available for a successfully completed payment.',
+      );
     }
 
     return payment;
@@ -467,10 +509,22 @@ export class PaymentService {
       select: { billingId: true },
     });
 
-    return this.prisma.$transaction(async (tx) => {
+    // Read Company state before settlement so we can tell, after the
+    // transaction commits, whether this exact payment is what just brought
+    // the company LIVE for the first time (no cross-layer plumbing needed —
+    // SubscriptionLifecycleService.transition() is the only writer of
+    // Company.status → LIVE, always inside this same settlement tx).
+    const companyBefore = payment.companyId
+      ? await this.prisma.company.findUnique({
+          where: { id: payment.companyId },
+          select: { status: true },
+        })
+      : null;
+
+    const updated = await this.prisma.$transaction(async (tx) => {
       const now = new Date();
 
-      const updated = await tx.payment.update({
+      const updatedPayment = await tx.payment.update({
         where: { id: payment.id },
         data: {
           status: PaymentStatus.SUCCEEDED,
@@ -489,20 +543,104 @@ export class PaymentService {
 
       await tx.auditLog.create({
         data: {
-          tenantId: updated.tenantId,
-          companyId: updated.companyId,
+          tenantId: updatedPayment.tenantId,
+          companyId: updatedPayment.companyId,
           actorUserId: actorUserId ?? null,
           actorType: AuditActorType.SYSTEM,
           action: 'PAYMENT_SUCCEEDED',
           entityType: 'Payment',
-          entityId: updated.id,
+          entityId: updatedPayment.id,
           beforeData: { status: payment.status },
-          afterData: { status: updated.status },
+          afterData: { status: updatedPayment.status },
         },
       });
 
-      return updated;
+      return updatedPayment;
     });
+
+    const companyAfter = payment.companyId
+      ? await this.prisma.company.findUnique({
+          where: { id: payment.companyId },
+          select: { status: true },
+        })
+      : null;
+    const companyJustWentLive =
+      companyBefore?.status !== CompanyStatus.LIVE &&
+      companyAfter?.status === CompanyStatus.LIVE;
+
+    // Email delivery is a side effect of an already-committed settlement —
+    // never let it fail or delay the payment response itself.
+    this.sendPostSettlementEmails(updated.id, companyJustWentLive).catch(
+      (error) => {
+        this.logger.error({
+          event: 'post_settlement_email_failed',
+          paymentId: updated.id,
+          error: error instanceof Error ? error.message : error,
+        });
+      },
+    );
+
+    return updated;
+  }
+
+  /**
+   * Fired exactly once per successful settlement (online or manual — both
+   * funnel through this same method). Reuses the already-enriched
+   * `findOne()` read (same shape the receipt endpoint/PDF download use) so
+   * the emailed receipt and the downloadable one never disagree.
+   */
+  private async sendPostSettlementEmails(
+    paymentId: string,
+    companyJustWentLive: boolean,
+  ) {
+    const payment = await this.findOne(paymentId);
+    const owner = payment.company?.ownerships[0]?.companyMember.user;
+
+    if (!owner?.email) {
+      this.logger.warn({
+        event: 'post_settlement_email_skipped_no_owner',
+        paymentId,
+      });
+      return;
+    }
+
+    const companyName =
+      payment.company?.tradeName ??
+      payment.company?.legalName ??
+      'your company';
+    const frontendUrl =
+      this.configService.get<string>('FRONTEND_URL') ?? 'http://localhost:3000';
+
+    const receiptNumber = `RCPT-${payment.invoice.invoiceNumber.replace(/^INV-/, '')}`;
+    const receipt = paymentReceiptEmailHtml({
+      companyName,
+      ownerName: owner.fullName,
+      invoiceNumber: payment.invoice.invoiceNumber,
+      receiptNumber,
+      planName: payment.subscription.plan.name,
+      billingCycle: payment.subscription.billingCycle,
+      amount: payment.amount.toString(),
+      currencyCode: payment.currencyCode,
+      paymentMethod:
+        payment.provider === PaymentProvider.MANUAL
+          ? 'Manual payment'
+          : payment.provider,
+      transactionId: payment.providerTransactionId,
+      paidAt: (payment.succeededAt ?? new Date()).toLocaleString('en-US'),
+      receiptUrl: `${frontendUrl}/platform/payments/${payment.id}/receipt`,
+    });
+
+    await this.mailService.send({ to: owner.email, ...receipt });
+
+    if (companyJustWentLive) {
+      const activation = accountActivationEmailHtml({
+        ownerName: owner.fullName,
+        companyName,
+        loginUrl: `${frontendUrl}/login`,
+      });
+
+      await this.mailService.send({ to: owner.email, ...activation });
+    }
   }
 
   private async settleFailed(

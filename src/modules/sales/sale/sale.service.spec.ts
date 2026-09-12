@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, ConflictException, ForbiddenException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+} from '@nestjs/common';
 
 import {
   SalePaymentMethod,
@@ -140,10 +144,9 @@ describe('SaleService', () => {
         actor,
       );
 
-      expect(mockLocationAccessService.assertHasLocationAccess).toHaveBeenCalledWith(
-        context,
-        'loc-1',
-      );
+      expect(
+        mockLocationAccessService.assertHasLocationAccess,
+      ).toHaveBeenCalledWith(context, 'loc-1');
     });
 
     it('propagates ForbiddenException from LocationAccessService and never writes a Sale', async () => {

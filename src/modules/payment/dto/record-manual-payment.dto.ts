@@ -1,4 +1,10 @@
-import { IsEnum, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import {
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+} from 'class-validator';
 
 import { BillingCycle } from '../../../generated/phase-1-prisma/enums';
 

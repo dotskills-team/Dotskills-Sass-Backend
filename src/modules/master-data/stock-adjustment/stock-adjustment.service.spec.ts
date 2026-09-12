@@ -49,10 +49,15 @@ describe('StockAdjustmentService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     mockPrisma.stockAdjustment.create.mockResolvedValue({ id: 'batch-1' });
-    mockTx.product.findFirst.mockResolvedValue({ id: 'p-1', costPrice: new Prisma.Decimal(50) });
+    mockTx.product.findFirst.mockResolvedValue({
+      id: 'p-1',
+      costPrice: new Prisma.Decimal(50),
+    });
     mockTx.location.findFirst.mockResolvedValue({ id: 'loc-1' });
     mockPrisma.$queryRaw.mockResolvedValue([]);
-    mockLocationAccessService.assertHasLocationAccess.mockResolvedValue(undefined);
+    mockLocationAccessService.assertHasLocationAccess.mockResolvedValue(
+      undefined,
+    );
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -71,7 +76,9 @@ describe('StockAdjustmentService', () => {
 
   describe('create — single line, newQuantity mode', () => {
     it('resolves the delta against the current balance and calls increaseStock when the target is higher', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({ quantity: new Prisma.Decimal(10) });
+      mockTx.inventory.findUnique.mockResolvedValue({
+        quantity: new Prisma.Decimal(10),
+      });
       mockInventoryService.increaseStock.mockResolvedValue({
         id: 'move-1',
         balanceAfter: new Prisma.Decimal(42),
@@ -87,7 +94,7 @@ describe('StockAdjustmentService', () => {
               locationId: 'loc-1',
               newQuantity: 42,
               reason: StockAdjustmentReason.COUNT_MISMATCH,
-            } as any,
+            },
           ],
         },
         actor,
@@ -125,7 +132,9 @@ describe('StockAdjustmentService', () => {
     });
 
     it('calls decreaseStock with allowNegative:false when the target is lower', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({ quantity: new Prisma.Decimal(50) });
+      mockTx.inventory.findUnique.mockResolvedValue({
+        quantity: new Prisma.Decimal(50),
+      });
       mockInventoryService.decreaseStock.mockResolvedValue({
         id: 'move-2',
         balanceAfter: new Prisma.Decimal(8),
@@ -141,7 +150,7 @@ describe('StockAdjustmentService', () => {
               locationId: 'loc-1',
               newQuantity: 8,
               reason: StockAdjustmentReason.DAMAGE,
-            } as any,
+            },
           ],
         },
         actor,
@@ -149,14 +158,19 @@ describe('StockAdjustmentService', () => {
 
       expect(mockInventoryService.decreaseStock).toHaveBeenCalledWith(
         mockTx,
-        expect.objectContaining({ allowNegative: false, movementType: StockMovementType.ADJUSTMENT }),
+        expect.objectContaining({
+          allowNegative: false,
+          movementType: StockMovementType.ADJUSTMENT,
+        }),
       );
     });
   });
 
   describe('create — changeQuantity mode', () => {
     it('applies a signed delta directly without reading it against a target', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({ quantity: new Prisma.Decimal(20) });
+      mockTx.inventory.findUnique.mockResolvedValue({
+        quantity: new Prisma.Decimal(20),
+      });
       mockInventoryService.decreaseStock.mockResolvedValue({
         id: 'move-3',
         balanceAfter: new Prisma.Decimal(17),
@@ -172,7 +186,7 @@ describe('StockAdjustmentService', () => {
               locationId: 'loc-1',
               changeQuantity: -3,
               reason: StockAdjustmentReason.THEFT_SHRINKAGE,
-            } as any,
+            },
           ],
         },
         actor,
@@ -196,7 +210,7 @@ describe('StockAdjustmentService', () => {
               changeQuantity: 5,
               reason: StockAdjustmentReason.OTHER,
               note: 'x',
-            } as any,
+            },
           ],
         },
         actor,
@@ -209,7 +223,16 @@ describe('StockAdjustmentService', () => {
     it('rejects a line with neither newQuantity nor changeQuantity', async () => {
       const result = await service.create(
         context,
-        { items: [{ productId: 'p-1', locationId: 'loc-1', reason: StockAdjustmentReason.OTHER, note: 'x' } as any] },
+        {
+          items: [
+            {
+              productId: 'p-1',
+              locationId: 'loc-1',
+              reason: StockAdjustmentReason.OTHER,
+              note: 'x',
+            },
+          ],
+        },
         actor,
       );
       expect(result.data.lines[0]).toMatchObject({ status: 'ERROR' });
@@ -219,10 +242,22 @@ describe('StockAdjustmentService', () => {
       mockTx.product.findFirst.mockResolvedValue(null);
       const result = await service.create(
         context,
-        { items: [{ productId: 'foreign', locationId: 'loc-1', changeQuantity: 5, reason: StockAdjustmentReason.OPENING_STOCK } as any] },
+        {
+          items: [
+            {
+              productId: 'foreign',
+              locationId: 'loc-1',
+              changeQuantity: 5,
+              reason: StockAdjustmentReason.OPENING_STOCK,
+            },
+          ],
+        },
         actor,
       );
-      expect(result.data.lines[0]).toMatchObject({ status: 'ERROR', errorMessage: expect.stringContaining('product') });
+      expect(result.data.lines[0]).toMatchObject({
+        status: 'ERROR',
+        errorMessage: expect.stringContaining('product'),
+      });
       expect(mockInventoryService.increaseStock).not.toHaveBeenCalled();
     });
 
@@ -230,20 +265,46 @@ describe('StockAdjustmentService', () => {
       mockTx.location.findFirst.mockResolvedValue(null);
       const result = await service.create(
         context,
-        { items: [{ productId: 'p-1', locationId: 'foreign', changeQuantity: 5, reason: StockAdjustmentReason.OPENING_STOCK } as any] },
+        {
+          items: [
+            {
+              productId: 'p-1',
+              locationId: 'foreign',
+              changeQuantity: 5,
+              reason: StockAdjustmentReason.OPENING_STOCK,
+            },
+          ],
+        },
         actor,
       );
-      expect(result.data.lines[0]).toMatchObject({ status: 'ERROR', errorMessage: expect.stringContaining('location') });
+      expect(result.data.lines[0]).toMatchObject({
+        status: 'ERROR',
+        errorMessage: expect.stringContaining('location'),
+      });
     });
 
     it('rejects a newQuantity line that resolves to zero delta, as "no change to apply"', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({ quantity: new Prisma.Decimal(15) });
+      mockTx.inventory.findUnique.mockResolvedValue({
+        quantity: new Prisma.Decimal(15),
+      });
       const result = await service.create(
         context,
-        { items: [{ productId: 'p-1', locationId: 'loc-1', newQuantity: 15, reason: StockAdjustmentReason.COUNT_MISMATCH } as any] },
+        {
+          items: [
+            {
+              productId: 'p-1',
+              locationId: 'loc-1',
+              newQuantity: 15,
+              reason: StockAdjustmentReason.COUNT_MISMATCH,
+            },
+          ],
+        },
         actor,
       );
-      expect(result.data.lines[0]).toMatchObject({ status: 'ERROR', errorMessage: expect.stringContaining('no change') });
+      expect(result.data.lines[0]).toMatchObject({
+        status: 'ERROR',
+        errorMessage: expect.stringContaining('no change'),
+      });
       expect(mockInventoryService.increaseStock).not.toHaveBeenCalled();
       expect(mockInventoryService.decreaseStock).not.toHaveBeenCalled();
     });
@@ -251,7 +312,9 @@ describe('StockAdjustmentService', () => {
 
   describe('create — Location-Based Access Control', () => {
     it("checks Location access for each line's own locationId", async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({ quantity: new Prisma.Decimal(10) });
+      mockTx.inventory.findUnique.mockResolvedValue({
+        quantity: new Prisma.Decimal(10),
+      });
       mockInventoryService.decreaseStock.mockResolvedValue({
         id: 'move-loc',
         balanceAfter: new Prisma.Decimal(5),
@@ -262,19 +325,30 @@ describe('StockAdjustmentService', () => {
         context,
         {
           items: [
-            { productId: 'p-1', locationId: 'loc-1', changeQuantity: -5, reason: StockAdjustmentReason.DAMAGE } as any,
+            {
+              productId: 'p-1',
+              locationId: 'loc-1',
+              changeQuantity: -5,
+              reason: StockAdjustmentReason.DAMAGE,
+            },
           ],
         },
         actor,
       );
 
-      expect(mockLocationAccessService.assertHasLocationAccess).toHaveBeenCalledWith(context, 'loc-1');
+      expect(
+        mockLocationAccessService.assertHasLocationAccess,
+      ).toHaveBeenCalledWith(context, 'loc-1');
     });
 
     it('turns a ForbiddenException from LocationAccessService into a per-line ERROR result, not a whole-request failure — sibling lines still apply', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({ quantity: new Prisma.Decimal(10) });
+      mockTx.inventory.findUnique.mockResolvedValue({
+        quantity: new Prisma.Decimal(10),
+      });
       mockLocationAccessService.assertHasLocationAccess
-        .mockRejectedValueOnce(new ForbiddenException('You do not have access to this location'))
+        .mockRejectedValueOnce(
+          new ForbiddenException('You do not have access to this location'),
+        )
         .mockResolvedValueOnce(undefined);
       mockInventoryService.decreaseStock.mockResolvedValue({
         id: 'move-loc-2',
@@ -286,14 +360,27 @@ describe('StockAdjustmentService', () => {
         context,
         {
           items: [
-            { productId: 'p-1', locationId: 'unassigned-loc', changeQuantity: -5, reason: StockAdjustmentReason.DAMAGE } as any,
-            { productId: 'p-1', locationId: 'loc-1', changeQuantity: -5, reason: StockAdjustmentReason.DAMAGE } as any,
+            {
+              productId: 'p-1',
+              locationId: 'unassigned-loc',
+              changeQuantity: -5,
+              reason: StockAdjustmentReason.DAMAGE,
+            },
+            {
+              productId: 'p-1',
+              locationId: 'loc-1',
+              changeQuantity: -5,
+              reason: StockAdjustmentReason.DAMAGE,
+            },
           ],
         },
         actor,
       );
 
-      expect(result.data.lines[0]).toMatchObject({ status: 'ERROR', errorMessage: expect.stringContaining('access') });
+      expect(result.data.lines[0]).toMatchObject({
+        status: 'ERROR',
+        errorMessage: expect.stringContaining('access'),
+      });
       expect(result.data.lines[1]).toMatchObject({ status: 'APPLIED' });
       expect(result.data.summary).toEqual({ appliedCount: 1, errorCount: 1 });
       expect(mockInventoryService.decreaseStock).toHaveBeenCalledTimes(1);
@@ -302,7 +389,9 @@ describe('StockAdjustmentService', () => {
 
   describe('create — partial success across multiple lines', () => {
     it('a race-caused INSUFFICIENT_STOCK on one line does not block the other lines from applying', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({ quantity: new Prisma.Decimal(10) });
+      mockTx.inventory.findUnique.mockResolvedValue({
+        quantity: new Prisma.Decimal(10),
+      });
       mockInventoryService.decreaseStock
         .mockRejectedValueOnce(new ConflictException('INSUFFICIENT_STOCK'))
         .mockResolvedValueOnce({
@@ -315,14 +404,27 @@ describe('StockAdjustmentService', () => {
         context,
         {
           items: [
-            { productId: 'p-1', locationId: 'loc-1', changeQuantity: -50, reason: StockAdjustmentReason.DAMAGE } as any,
-            { productId: 'p-1', locationId: 'loc-1', changeQuantity: -5, reason: StockAdjustmentReason.DAMAGE } as any,
+            {
+              productId: 'p-1',
+              locationId: 'loc-1',
+              changeQuantity: -50,
+              reason: StockAdjustmentReason.DAMAGE,
+            },
+            {
+              productId: 'p-1',
+              locationId: 'loc-1',
+              changeQuantity: -5,
+              reason: StockAdjustmentReason.DAMAGE,
+            },
           ],
         },
         actor,
       );
 
-      expect(result.data.lines[0]).toMatchObject({ status: 'ERROR', errorMessage: expect.stringContaining('INSUFFICIENT_STOCK') });
+      expect(result.data.lines[0]).toMatchObject({
+        status: 'ERROR',
+        errorMessage: expect.stringContaining('INSUFFICIENT_STOCK'),
+      });
       expect(result.data.lines[1]).toMatchObject({ status: 'APPLIED' });
       expect(result.data.summary).toEqual({ appliedCount: 1, errorCount: 1 });
       // exactly one audit entry for the whole batch, not one per line
@@ -339,7 +441,10 @@ describe('StockAdjustmentService', () => {
 
       expect(mockPrisma.stockMovement.findMany).not.toHaveBeenCalled();
       const [findManyArgs] = mockPrisma.stockAdjustment.findMany.mock.calls[0];
-      expect(findManyArgs.where).toEqual({ tenantId: 'tenant-1', companyId: 'company-1' });
+      expect(findManyArgs.where).toEqual({
+        tenantId: 'tenant-1',
+        companyId: 'company-1',
+      });
     });
 
     it('resolves locationId/reason to "batches containing a matching line" via StockMovement first', async () => {
@@ -350,11 +455,17 @@ describe('StockAdjustmentService', () => {
       mockPrisma.stockAdjustment.findMany.mockResolvedValue([]);
       mockPrisma.stockAdjustment.count.mockResolvedValue(0);
 
-      await service.list(context, { locationId: 'loc-1', reason: StockAdjustmentReason.DAMAGE } as any);
+      await service.list(context, {
+        locationId: 'loc-1',
+        reason: StockAdjustmentReason.DAMAGE,
+      });
 
       expect(mockPrisma.stockMovement.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: expect.objectContaining({ locationId: 'loc-1', reason: StockAdjustmentReason.DAMAGE }),
+          where: expect.objectContaining({
+            locationId: 'loc-1',
+            reason: StockAdjustmentReason.DAMAGE,
+          }),
         }),
       );
       const [findManyArgs] = mockPrisma.stockAdjustment.findMany.mock.calls[0];
@@ -373,7 +484,9 @@ describe('StockAdjustmentService', () => {
 
       expect(result.summary.valueLostByReason.DAMAGE.toString()).toBe('150');
       expect(result.summary.valueLostByReason.EXPIRED.toString()).toBe('25.5');
-      expect(result.summary.valueLostByReason.THEFT_SHRINKAGE.toString()).toBe('0'); // never returned by the query -> defaults to 0, not undefined
+      expect(result.summary.valueLostByReason.THEFT_SHRINKAGE.toString()).toBe(
+        '0',
+      ); // never returned by the query -> defaults to 0, not undefined
       expect(result.summary.totalValueLost.toString()).toBe('175.5');
     });
 
@@ -385,7 +498,7 @@ describe('StockAdjustmentService', () => {
 
       const [sqlArg] = mockPrisma.$queryRaw.mock.calls[0];
       const sqlText = sqlArg.sql ?? sqlArg.strings?.join('');
-      expect(sqlText).toContain("movementType");
+      expect(sqlText).toContain('movementType');
       expect(sqlText).toContain('DAMAGE');
       expect(sqlText).toContain('THEFT_SHRINKAGE');
       expect(sqlText).toContain('EXPIRED');
@@ -396,7 +509,9 @@ describe('StockAdjustmentService', () => {
 
   describe('OTHER reason requires a note (DTO-level, spot-checked at the service boundary)', () => {
     it('does not itself enforce the note — confirms that responsibility stays with the DTO validation pipe, not duplicated in the service', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({ quantity: new Prisma.Decimal(0) });
+      mockTx.inventory.findUnique.mockResolvedValue({
+        quantity: new Prisma.Decimal(0),
+      });
       mockInventoryService.increaseStock.mockResolvedValue({
         id: 'move-5',
         balanceAfter: new Prisma.Decimal(5),
@@ -404,7 +519,16 @@ describe('StockAdjustmentService', () => {
       });
       const result = await service.create(
         context,
-        { items: [{ productId: 'p-1', locationId: 'loc-1', changeQuantity: 5, reason: StockAdjustmentReason.OTHER } as any] },
+        {
+          items: [
+            {
+              productId: 'p-1',
+              locationId: 'loc-1',
+              changeQuantity: 5,
+              reason: StockAdjustmentReason.OTHER,
+            },
+          ],
+        },
         actor,
       );
       expect(result.data.lines[0]).toMatchObject({ status: 'APPLIED' });

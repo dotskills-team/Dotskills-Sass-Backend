@@ -5,6 +5,7 @@ import {
   BillingStatus,
   BillingAttemptStatus,
   PaymentStatus,
+  SubscriptionStatus,
 } from '../../generated/phase-1-prisma/enums';
 
 import { PrismaService } from '../../prisma/prisma.service';
@@ -136,14 +137,12 @@ describe('BillingService.markFailed', () => {
   });
 
   /**
-   * Regression: a subscription already in GRACE used to make
-   * `subscriptionLifecycleService.paymentFailed()` throw, which — running
-   * inside this same transaction — rolled back before Billing/BillingAttempt
-   * were ever marked FAILED, leaving them stuck at PROCESSING/STARTED. Now
-   * `paymentFailed()` handles GRACE (→ SUSPENDED) instead of throwing, so
-   * this transaction always completes.
+   * `paymentFailed()` is a pure scope-check-and-return (no status
+   * transition, never throws for a valid subscription reference) — so
+   * this transaction always completes regardless of the subscription's
+   * current status, and Billing/BillingAttempt always get marked FAILED.
    */
-  it('still completes and marks Billing/BillingAttempt FAILED when the subscription is in GRACE', async () => {
+  it('completes and marks Billing/BillingAttempt FAILED even when the subscription is SUSPENDED', async () => {
     mockTx.billing.findUnique.mockResolvedValue(processingBilling);
     mockTx.billingAttempt.findFirst.mockResolvedValue(startedAttempt);
     mockSubscriptionLifecycleService.paymentFailed.mockResolvedValue({
@@ -233,6 +232,299 @@ describe('BillingService.markFailed', () => {
     await service.markFailed('billing-1', {}, 'user-1');
 
     expect(mockTx.payment.updateMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('BillingService.create', () => {
+  let service: BillingService;
+
+  const mockTx = {
+    subscription: { findUnique: jest.fn() },
+    billing: { findFirst: jest.fn(), create: jest.fn() },
+    auditLog: { create: jest.fn() },
+  };
+
+  const mockPrisma = {
+    $transaction: jest.fn((arg: any) => {
+      if (typeof arg === 'function') return arg(mockTx);
+      return Promise.all(arg);
+    }),
+  };
+
+  const mockSubscriptionLifecycleService = {};
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        BillingService,
+        { provide: PrismaService, useValue: mockPrisma },
+        {
+          provide: SubscriptionLifecycleService,
+          useValue: mockSubscriptionLifecycleService,
+        },
+      ],
+    }).compile();
+
+    service = module.get(BillingService);
+  });
+
+  const baseDto = {
+    subscriptionId: 'sub-1',
+    periodStart: '2026-09-12T00:00:00.000Z',
+    periodEnd: '2026-10-12T00:00:00.000Z',
+    dueAt: '2026-09-12T00:00:00.000Z',
+  };
+
+  it('rejects creating a Billing for a CANCELLED subscription', async () => {
+    mockTx.subscription.findUnique.mockResolvedValue({
+      id: 'sub-1',
+      status: SubscriptionStatus.CANCELLED,
+    });
+
+    await expect(service.create(baseDto)).rejects.toThrow(BadRequestException);
+    expect(mockTx.billing.create).not.toHaveBeenCalled();
+  });
+
+  /**
+   * Regression: resubscribing after expiry (SubscriptionRenewalService.
+   * requestSubscriptionCheckout()) must be able to generate a Billing for an
+   * EXPIRED subscription — EXPIRED is no longer terminal under the new
+   * lifecycle rules. This guard used to block CANCELLED *and* EXPIRED,
+   * which silently broke the resubscribe flow even though the lifecycle
+   * transition table itself already allowed EXPIRED → ACTIVE.
+   */
+  it.each([
+    SubscriptionStatus.EXPIRED,
+    SubscriptionStatus.TRIALING,
+    SubscriptionStatus.ACTIVE,
+  ])('allows creating a Billing for a %s subscription', async (status) => {
+    mockTx.subscription.findUnique.mockResolvedValue({
+      id: 'sub-1',
+      tenantId: 'tenant-1',
+      companyId: 'company-1',
+      status,
+      billingCycle: 'MONTHLY',
+      priceSnapshot: { amount: '999.0000', currencyCode: 'BDT' },
+    });
+    mockTx.billing.findFirst.mockResolvedValue(null);
+    mockTx.billing.create.mockResolvedValue({
+      id: 'billing-1',
+      tenantId: 'tenant-1',
+      companyId: 'company-1',
+      status: 'PENDING',
+      periodStart: new Date(baseDto.periodStart),
+      periodEnd: new Date(baseDto.periodEnd),
+      amount: { toString: () => '999.0000' },
+    });
+
+    await expect(service.create(baseDto)).resolves.toBeDefined();
+    expect(mockTx.billing.create).toHaveBeenCalled();
+  });
+});
+
+describe('BillingService.markSucceeded', () => {
+  let service: BillingService;
+
+  const mockTx = {
+    billing: { findUnique: jest.fn(), update: jest.fn() },
+    billingAttempt: { findFirst: jest.fn(), update: jest.fn() },
+    auditLog: { create: jest.fn() },
+  };
+
+  const mockPrisma = {
+    $transaction: jest.fn((arg: any) => {
+      if (typeof arg === 'function') return arg(mockTx);
+      return Promise.all(arg);
+    }),
+  };
+
+  const mockSubscriptionLifecycleService = {
+    paymentSucceeded: jest.fn(),
+    planChangeSucceeded: jest.fn(),
+  };
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        BillingService,
+        { provide: PrismaService, useValue: mockPrisma },
+        {
+          provide: SubscriptionLifecycleService,
+          useValue: mockSubscriptionLifecycleService,
+        },
+      ],
+    }).compile();
+
+    service = module.get(BillingService);
+  });
+
+  const startedAttempt = {
+    id: 'attempt-1',
+    billingId: 'billing-1',
+    attemptNumber: 1,
+    status: BillingAttemptStatus.STARTED,
+    idempotencyKey: 'billing:sub-1:attempt:1',
+  };
+
+  function mockSettlementWrites() {
+    mockTx.billingAttempt.findFirst.mockResolvedValue(startedAttempt);
+    mockTx.billing.update.mockResolvedValue({
+      id: 'billing-1',
+      subscriptionId: 'sub-1',
+      status: BillingStatus.SUCCEEDED,
+    });
+  }
+
+  it('routes to paymentSucceeded() when the Billing has no intent metadata (pre-existing rows)', async () => {
+    mockTx.billing.findUnique.mockResolvedValue({
+      id: 'billing-1',
+      subscriptionId: 'sub-1',
+      status: BillingStatus.PROCESSING,
+      attemptCount: 1,
+      metadata: null,
+    });
+    mockSettlementWrites();
+
+    await service.markSucceeded('billing-1', 'user-1');
+
+    expect(
+      mockSubscriptionLifecycleService.paymentSucceeded,
+    ).toHaveBeenCalledWith(
+      'sub-1',
+      { userId: 'user-1', actorType: 'PLATFORM_MEMBER' },
+      'billing:sub-1:attempt:1',
+      mockTx,
+    );
+    expect(
+      mockSubscriptionLifecycleService.planChangeSucceeded,
+    ).not.toHaveBeenCalled();
+  });
+
+  it.each(['RENEWAL', 'FIRST_SUBSCRIPTION', 'MANUAL_PAYMENT'])(
+    'routes to paymentSucceeded() for intent=%s',
+    async (intent) => {
+      mockTx.billing.findUnique.mockResolvedValue({
+        id: 'billing-1',
+        subscriptionId: 'sub-1',
+        status: BillingStatus.PROCESSING,
+        attemptCount: 1,
+        metadata: { intent },
+      });
+      mockSettlementWrites();
+
+      await service.markSucceeded('billing-1', 'user-1');
+
+      expect(
+        mockSubscriptionLifecycleService.paymentSucceeded,
+      ).toHaveBeenCalled();
+      expect(
+        mockSubscriptionLifecycleService.planChangeSucceeded,
+      ).not.toHaveBeenCalled();
+    },
+  );
+
+  it('routes to planChangeSucceeded() with the target plan read back out of Billing.metadata when intent=PLAN_CHANGE', async () => {
+    mockTx.billing.findUnique.mockResolvedValue({
+      id: 'billing-1',
+      subscriptionId: 'sub-1',
+      status: BillingStatus.PROCESSING,
+      attemptCount: 1,
+      metadata: {
+        intent: 'PLAN_CHANGE',
+        targetPlanId: 'plan-2',
+        targetBillingCycle: 'ANNUAL',
+        targetPriceSnapshot: { planId: 'plan-2', amount: '999.0000' },
+      },
+    });
+    mockSettlementWrites();
+
+    await service.markSucceeded('billing-1', 'user-1');
+
+    expect(
+      mockSubscriptionLifecycleService.planChangeSucceeded,
+    ).toHaveBeenCalledWith(
+      'sub-1',
+      { userId: 'user-1', actorType: 'PLATFORM_MEMBER' },
+      'billing:sub-1:attempt:1',
+      {
+        id: 'plan-2',
+        billingCycle: 'ANNUAL',
+        priceSnapshot: { planId: 'plan-2', amount: '999.0000' },
+      },
+      mockTx,
+    );
+    expect(
+      mockSubscriptionLifecycleService.paymentSucceeded,
+    ).not.toHaveBeenCalled();
+  });
+
+  it('marks Billing/BillingAttempt SUCCEEDED and writes an audit log entry', async () => {
+    mockTx.billing.findUnique.mockResolvedValue({
+      id: 'billing-1',
+      subscriptionId: 'sub-1',
+      status: BillingStatus.PROCESSING,
+      attemptCount: 1,
+      metadata: null,
+    });
+    mockSettlementWrites();
+
+    await service.markSucceeded('billing-1', 'user-1');
+
+    expect(mockTx.billing.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'billing-1' },
+        data: expect.objectContaining({ status: BillingStatus.SUCCEEDED }),
+      }),
+    );
+    expect(mockTx.billingAttempt.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'attempt-1' },
+        data: expect.objectContaining({
+          status: BillingAttemptStatus.SUCCEEDED,
+        }),
+      }),
+    );
+    expect(mockTx.auditLog.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          action: 'BILLING_SUCCEEDED',
+          entityType: 'Billing',
+        }),
+      }),
+    );
+  });
+
+  it('rejects marking a non-PROCESSING billing as succeeded', async () => {
+    mockTx.billing.findUnique.mockResolvedValue({
+      id: 'billing-1',
+      subscriptionId: 'sub-1',
+      status: BillingStatus.PENDING,
+      attemptCount: 1,
+      metadata: null,
+    });
+
+    await expect(service.markSucceeded('billing-1', 'user-1')).rejects.toThrow(
+      BadRequestException,
+    );
+  });
+
+  it('rejects when there is no active STARTED attempt to settle', async () => {
+    mockTx.billing.findUnique.mockResolvedValue({
+      id: 'billing-1',
+      subscriptionId: 'sub-1',
+      status: BillingStatus.PROCESSING,
+      attemptCount: 1,
+      metadata: null,
+    });
+    mockTx.billingAttempt.findFirst.mockResolvedValue(null);
+
+    await expect(service.markSucceeded('billing-1', 'user-1')).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });
 

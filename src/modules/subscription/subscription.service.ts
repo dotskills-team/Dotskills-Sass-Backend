@@ -27,10 +27,12 @@ import {
 import {
   AuditActorType,
   BillingCycle,
+  CompanyStatus,
   PlanStatus,
   SubscriptionStatus,
 } from 'src/generated/phase-1-prisma/enums';
 import { Prisma } from 'src/generated/phase-1-prisma/client';
+import { companyWithOwnerSelect } from '../../common/prisma/company-with-owner.select';
 
 @Injectable()
 export class SubscriptionService {
@@ -115,13 +117,12 @@ export class SubscriptionService {
   }
 
   /**
-   * Shared row-creation core for `create()` (self-service) and
-   * `createTrialForNewCompany()` (auto-trial on Company creation) — same
-   * TRIALING/ACTIVE-by-trialDays logic, same price-snapshot shape, same
-   * SubscriptionEvent/AuditLog pair, just parameterized on who/why. Always
-   * takes an externally-owned `tx` so the caller controls the transaction
-   * boundary (Company creation needs this row created atomically with the
-   * Company row itself).
+   * Row-creation core for `create()` — the explicit, Super-Admin-initiated
+   * "Start Trial" / "Select Paid Plan" action (`POST /platform/subscriptions`).
+   * Never called from Company creation any more — a new Company has no
+   * Subscription at all until this is explicitly invoked afterwards.
+   * Always takes an externally-owned `tx` so the caller controls the
+   * transaction boundary.
    */
   private async buildSubscription(
     tx: Prisma.TransactionClient,
@@ -151,6 +152,30 @@ export class SubscriptionService {
     const trialEndsAt =
       plan.trialDays > 0 ? this.addDays(now, plan.trialDays) : null;
     const periodStart = trialEndsAt ?? now;
+    const isComplimentary = params.isComplimentary ?? false;
+
+    /**
+     * A plan with real trial days (trialDays > 0) starts TRIALING and is
+     * usable immediately, unpaid, until the trial ends — that's the
+     * "Start Trial" action. A plan with no trial (trialDays === 0, i.e. a
+     * paid plan picked directly) must NOT become usable before payment —
+     * so it starts EXPIRED, which SubscriptionStatusGuard already blocks
+     * and which SubscriptionRenewalService.requestSubscriptionCheckout()
+     * already treats as a valid FIRST_SUBSCRIPTION checkout target. Paying
+     * that Invoice runs it through the exact same
+     * SubscriptionLifecycleService.paymentSucceeded() EXPIRED→ACTIVE
+     * recovery path already used for resubscribing — no new status, no
+     * new activation mechanism, this is the "Select Paid Plan" action.
+     * Complimentary grants bypass this entirely (SubscriptionStatusGuard
+     * already lets isComplimentary through regardless of status), so they
+     * still start ACTIVE and usable immediately.
+     */
+    const status = isComplimentary
+      ? SubscriptionStatus.ACTIVE
+      : trialEndsAt
+        ? SubscriptionStatus.TRIALING
+        : SubscriptionStatus.EXPIRED;
+
     const snapshot: PriceSnapshot = {
       planId: plan.id,
       planCode: plan.code,
@@ -166,9 +191,7 @@ export class SubscriptionService {
         tenantId: company.tenantId,
         companyId: company.id,
         planId: plan.id,
-        status: trialEndsAt
-          ? SubscriptionStatus.TRIALING
-          : SubscriptionStatus.ACTIVE,
+        status,
         billingCycle,
         startsAt: now,
         trialEndsAt,
@@ -178,10 +201,26 @@ export class SubscriptionService {
           billingCycle,
         ),
         autoRenew: true,
-        isComplimentary: params.isComplimentary ?? false,
+        isComplimentary,
         priceSnapshot: snapshot as unknown as Prisma.InputJsonValue,
       },
     });
+    /**
+     * A complimentary grant starts ACTIVE immediately with no payment ever
+     * collected — the admin's decision to waive payment is itself the
+     * activation event, so the company goes LIVE right here, mirroring the
+     * exact same guard used by SubscriptionLifecycleService.transition()
+     * (no-op once already LIVE). TRIALING/EXPIRED starts are intentionally
+     * excluded — those still require the real payment-settlement path
+     * (SubscriptionLifecycleService.transition()) to bring the company LIVE.
+     */
+    if (isComplimentary) {
+      await tx.company.updateMany({
+        where: { id: company.id, status: { not: CompanyStatus.LIVE } },
+        data: { status: CompanyStatus.LIVE, goLiveAt: now },
+      });
+    }
+
     await tx.subscriptionEvent.create({
       data: {
         subscriptionId: subscription.id,
@@ -207,57 +246,6 @@ export class SubscriptionService {
       },
     });
     return subscription;
-  }
-
-  /**
-   * Auto-trial on Company creation. Always uses the Plan currently marked
-   * `isDefaultTrial: true` and a MONTHLY price in the company's currency —
-   * if either is missing, this throws (NotFoundException), and
-   * CompanyManagementService.create() lets that fail the whole Company
-   * creation loudly rather than create a subscription-less company.
-   */
-  async createTrialForNewCompany(
-    company: { id: string; tenantId: string; baseCurrencyCode: string },
-    actorUserId: string,
-    tx: Prisma.TransactionClient,
-  ) {
-    const plan = await tx.plan.findFirst({
-      where: { isDefaultTrial: true, status: PlanStatus.ACTIVE },
-    });
-    if (!plan) {
-      throw new NotFoundException(
-        'No default-trial Plan is configured (Plan.isDefaultTrial) — cannot create a Company without one.',
-      );
-    }
-
-    const now = new Date();
-    const price = await tx.planPrice.findFirst({
-      where: {
-        planId: plan.id,
-        billingCycle: BillingCycle.MONTHLY,
-        currencyCode: company.baseCurrencyCode,
-        isActive: true,
-        effectiveFrom: { lte: now },
-        OR: [{ effectiveTo: null }, { effectiveTo: { gt: now } }],
-      },
-      orderBy: { effectiveFrom: 'desc' },
-    });
-    if (!price) {
-      throw new NotFoundException(
-        `Default-trial Plan "${plan.code}" has no active MONTHLY price in ${company.baseCurrencyCode} — cannot create a Company without one.`,
-      );
-    }
-
-    return this.buildSubscription(tx, {
-      company,
-      plan,
-      billingCycle: BillingCycle.MONTHLY,
-      price,
-      actorUserId,
-      actorType: AuditActorType.SYSTEM,
-      reason: 'AUTO_TRIAL_ON_COMPANY_CREATE',
-      source: 'SYSTEM',
-    });
   }
 
   getCurrent(context: SubscriptionContext) {
@@ -410,6 +398,7 @@ export class SubscriptionService {
     return this.prisma.subscription.findMany({
       include: {
         plan: true,
+        company: { select: companyWithOwnerSelect },
       },
       orderBy: {
         createdAt: 'desc',

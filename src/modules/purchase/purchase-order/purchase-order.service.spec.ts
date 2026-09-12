@@ -98,7 +98,7 @@ describe('PurchaseOrderService', () => {
           supplierId: 'supplier-1',
           locationId: 'loc-1',
           items: [{ productId: 'product-1', orderedQty: 1, unitCost: 10 }],
-        } as any,
+        },
         actor,
       );
 

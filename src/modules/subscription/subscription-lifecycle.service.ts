@@ -5,6 +5,7 @@ import { Injectable } from '@nestjs/common';
 import {
   AuditActorType,
   BillingCycle,
+  CompanyStatus,
   InvoiceStatus,
   SubscriptionStatus,
   NotificationType,
@@ -120,7 +121,11 @@ export class SubscriptionLifecycleService {
     id: string,
     context: ActorContext,
     idempotencyKey: string,
-    newPlan: { id: string; billingCycle: BillingCycle; priceSnapshot: Prisma.InputJsonValue },
+    newPlan: {
+      id: string;
+      billingCycle: BillingCycle;
+      priceSnapshot: Prisma.InputJsonValue;
+    },
     tx?: Prisma.TransactionClient,
   ) {
     const subscription = await this.getScoped(id, context);
@@ -200,7 +205,8 @@ export class SubscriptionLifecycleService {
           currentPeriodStart: now,
           currentPeriodEnd: this.calculatePeriodEnd(
             now,
-            (extraPatch.billingCycle as BillingCycle) ?? subscription.billingCycle,
+            (extraPatch.billingCycle as BillingCycle) ??
+              subscription.billingCycle,
           ),
           graceEndsAt: null,
           pastDueEndsAt: null,
@@ -311,6 +317,26 @@ export class SubscriptionLifecycleService {
           'Subscription changed concurrently; retry the operation.',
         );
 
+      /**
+       * A Company only ever goes LIVE the moment its subscription first
+       * becomes ACTIVE via a real payment — this is the single place that
+       * happens (paymentSucceeded()/planChangeSucceeded() both funnel a
+       * TRIALING/EXPIRED→ACTIVE recovery through this exact transition()).
+       * Guarded by `status: { not: LIVE }` so it's a no-op (no extra write,
+       * no re-triggered activation email) once a company has already gone
+       * live — an already-LIVE company simply stays LIVE across renewals,
+       * plan changes, or resubscribes.
+       */
+      if (subscription.companyId && to === SubscriptionStatus.ACTIVE) {
+        await tx.company.updateMany({
+          where: {
+            id: subscription.companyId,
+            status: { not: CompanyStatus.LIVE },
+          },
+          data: { status: CompanyStatus.LIVE, goLiveAt: new Date() },
+        });
+      }
+
       await tx.subscriptionEvent.create({
         data: {
           subscriptionId: subscription.id,
@@ -352,7 +378,10 @@ export class SubscriptionLifecycleService {
       if (subscription.companyId && to === SubscriptionStatus.SUSPENDED) {
         await this.notificationService.create(
           tx,
-          { tenantId: subscription.tenantId, companyId: subscription.companyId },
+          {
+            tenantId: subscription.tenantId,
+            companyId: subscription.companyId,
+          },
           {
             type: NotificationType.SUBSCRIPTION_PAST_DUE,
             relatedEntityType: NotificationRelatedEntityType.SUBSCRIPTION,
@@ -489,7 +518,10 @@ export class SubscriptionLifecycleService {
 
         await this.notificationService.create(
           tx,
-          { tenantId: subscription.tenantId, companyId: subscription.companyId! },
+          {
+            tenantId: subscription.tenantId,
+            companyId: subscription.companyId!,
+          },
           {
             type: NotificationType.SUBSCRIPTION_EXPIRING_SOON,
             relatedEntityType: NotificationRelatedEntityType.SUBSCRIPTION,
@@ -508,24 +540,11 @@ export class SubscriptionLifecycleService {
   }
 
   /**
-   * An ISSUED Invoice sitting under a struggling (PAST_DUE/GRACE/SUSPENDED)
-   * Subscription for more than STALE_ISSUED_INVOICE_DAYS (fixed at 30, not
-   * configurable) auto-VOIDs — reuses the existing InvoiceService.void(),
-   * never reimplements it. If the Subscription is still SUSPENDED at that
-   * exact moment, it's moved straight to EXPIRED (via the existing
-   * transition()) instead of waiting out its own independent suspension
-   * timer — there is no longer a payable Invoice for it, so the lifecycle
-   * is over either way, and Owner recovery goes through the self-service
-   * Resubscribe flow with the Plan's *current* price, never the stale one.
-   */
-  /**
-   * An ISSUED Invoice under an EXPIRED subscription (no longer
-   * PAST_DUE/GRACE/SUSPENDED — those no longer sit "waiting" the way they
-   * used to) that's gone unpaid for STALE_ISSUED_INVOICE_DAYS auto-VOIDs,
-   * reusing InvoiceService.void() unchanged. There is no further
-   * subscription-status transition to apply — EXPIRED is already the
-   * terminal-until-resubscribe state — so this is now purely Invoice
-   * hygiene, not a lifecycle-driving step.
+   * An ISSUED Invoice under an EXPIRED subscription that's gone unpaid for
+   * STALE_ISSUED_INVOICE_DAYS auto-VOIDs, reusing InvoiceService.void()
+   * unchanged. There is no further subscription-status transition to
+   * apply — EXPIRED is already the terminal-until-resubscribe state — so
+   * this is purely Invoice hygiene, not a lifecycle-driving step.
    */
   async voidStaleIssuedInvoices(now = new Date()) {
     const result = {

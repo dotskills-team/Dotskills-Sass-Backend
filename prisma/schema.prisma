@@ -86,6 +86,14 @@ enum BillingCycle {
   YEARLY
 }
 
+/**
+ * PAST_DUE and GRACE are retained here solely because real historical
+ * SubscriptionEvent audit rows already reference them (fromStatus/
+ * toStatus) — removing the enum values would make that audit trail
+ * un-representable. No current code path can ever produce a Subscription
+ * row in either state any more (verified: no service/guard/scheduler
+ * transitions into them); they exist purely for historical-data integrity.
+ */
 enum SubscriptionStatus {
   TRIALING
   ACTIVE
@@ -132,8 +140,6 @@ enum BillingStatus {
   PROCESSING
   SUCCEEDED
   FAILED
-  CANCELLED
-  SKIPPED
 }
 enum BillingAttemptStatus {
   STARTED
@@ -146,7 +152,6 @@ enum InvoiceStatus {
   DRAFT
   ISSUED
   PAID
-  CANCELLED
   VOID
 }
 
@@ -193,6 +198,7 @@ model User {
   sentInvitations    Invitation[]       @relation("InvitationSentBy")
   ownershipAssigned  CompanyOwnership[] @relation("OwnershipAssignedBy")
   auditLogs          AuditLog[]
+  platformSettingsUpdates PlatformSettings[]
 
   @@index([status, deletedAt])
   @@map("users")
@@ -1653,4 +1659,22 @@ model CompanyRolePermission {
   @@id([companyRoleId, permissionId])
   @@index([permissionId, effect])
   @@map("company_role_permissions")
+}
+
+/**
+ * Platform-wide branding — a genuine singleton (always `id = 1`, enforced
+ * app-side by always upserting that fixed id, never letting the client
+ * choose one). Mirrors `Company.logoUrl` exactly, just not company-scoped:
+ * this is the one logo shown in the Super Admin/Platform Staff shell
+ * (sidebar/navbar), not any individual company's own branding.
+ */
+model PlatformSettings {
+  id              Int      @id @default(1)
+  logoUrl         String?  @db.VarChar(500)
+  updatedAt       DateTime @updatedAt @db.Timestamptz(6)
+  updatedByUserId String?  @db.Uuid
+
+  updatedBy User? @relation(fields: [updatedByUserId], references: [id], onDelete: SetNull)
+
+  @@map("platform_settings")
 }

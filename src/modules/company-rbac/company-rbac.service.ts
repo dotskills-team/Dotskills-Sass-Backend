@@ -605,7 +605,10 @@ export class CompanyRbacService {
           type: NotificationType.STAFF_ACTIVITY,
           relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
           relatedEntityId: created.id,
-          metadata: { memberName: created.user.fullName, action: 'MEMBER_CREATED' },
+          metadata: {
+            memberName: created.user.fullName,
+            action: 'MEMBER_CREATED',
+          },
         });
         return created;
       });
@@ -674,7 +677,10 @@ export class CompanyRbacService {
         type: NotificationType.STAFF_ACTIVITY,
         relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
         relatedEntityId: memberId,
-        metadata: { memberName: result.user.fullName, action: 'MEMBER_ROLES_UPDATED' },
+        metadata: {
+          memberName: result.user.fullName,
+          action: 'MEMBER_ROLES_UPDATED',
+        },
       });
       return result;
     });
@@ -838,7 +844,10 @@ export class CompanyRbacService {
         type: NotificationType.STAFF_ACTIVITY,
         relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
         relatedEntityId: memberId,
-        metadata: { memberName: result.user.fullName, action: 'MEMBER_LOCATIONS_UPDATED' },
+        metadata: {
+          memberName: result.user.fullName,
+          action: 'MEMBER_LOCATIONS_UPDATED',
+        },
       });
       return result;
     });

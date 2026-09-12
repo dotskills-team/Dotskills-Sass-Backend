@@ -10,9 +10,17 @@ import { UnitService } from '../unit/unit.service';
 import { ProductService } from '../product/product.service';
 import { InventoryService } from '../inventory/inventory.service';
 import { StockAdjustmentService } from './stock-adjustment.service';
-import { StockAdjustmentReason, StockMovementType } from '../../../generated/phase-1-prisma/enums';
+import {
+  StockAdjustmentReason,
+  StockMovementType,
+} from '../../../generated/phase-1-prisma/enums';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
+import {
+  createIsolationTenantFixtures,
+  cleanupIsolationTenantFixtures,
+  type IsolationTenantFixtures,
+} from '../../../test-utils/isolation-tenant-fixtures';
 
 /**
  * Extends the Phase 1–5 multi-tenant isolation proof to Manual Stock
@@ -23,9 +31,10 @@ import type { AuthenticatedUser } from '../../../common/types/authenticated-user
  * id, rather than silently writing an Inventory row against it.
  */
 describe('Business Ops Stock Adjustment — multi-tenant isolation (integration)', () => {
-  const TENANT_1 = '65b4d86b-9ce6-4d78-901c-440b0c0fd721';
-  const TENANT_2 = '632bb8a8-f9f9-4093-a903-351e3614fc88';
-  const INDUSTRY_ID = '5c961a18-af13-4638-b93d-b7faa4c502b7';
+  let TENANT_1: string;
+  let TENANT_2: string;
+  let INDUSTRY_ID: string;
+  let tenantFixtures: IsolationTenantFixtures;
   const CREATOR_USER_ID = '774bb094-6628-422a-beaf-dc0ae9e50984';
 
   let moduleRef: TestingModule;
@@ -65,6 +74,11 @@ describe('Business Ops Stock Adjustment — multi-tenant isolation (integration)
     productService = moduleRef.get(ProductService);
     inventoryService = moduleRef.get(InventoryService);
     stockAdjustmentService = moduleRef.get(StockAdjustmentService);
+
+    tenantFixtures = await createIsolationTenantFixtures(prisma, 'stkadj');
+    TENANT_1 = tenantFixtures.tenantAId;
+    TENANT_2 = tenantFixtures.tenantBId;
+    INDUSTRY_ID = tenantFixtures.industryId;
 
     const companyA = await companyManagementService.create(
       {
@@ -142,15 +156,30 @@ describe('Business Ops Stock Adjustment — multi-tenant isolation (integration)
       await prisma.companyRole.deleteMany({ where: { companyId } });
       await prisma.company.delete({ where: { id: companyId } });
     }
+    await cleanupIsolationTenantFixtures(prisma, tenantFixtures);
     await moduleRef.close();
   }, 30000);
 
   it("Company A submitting a line against Company B's real productId/locationId is rejected per-line, never writes into Company A's inventory against a foreign id", async () => {
-    const locB = await locationService.create(contextB, { name: 'B Only Location', locationType: 'BRANCH' as any }, actor);
-    const unitB = await unitService.create(contextB, { name: 'Piece', code: 'PCS' }, actor);
+    const locB = await locationService.create(
+      contextB,
+      { name: 'B Only Location', locationType: 'BRANCH' },
+      actor,
+    );
+    const unitB = await unitService.create(
+      contextB,
+      { name: 'Piece', code: 'PCS' },
+      actor,
+    );
     const productB = await productService.create(
       contextB,
-      { sku: 'CROSS-ADJ-SKU', name: 'Cross Adjustment Product', baseUnitId: unitB.data.id, salePrice: 10, costPrice: 5 },
+      {
+        sku: 'CROSS-ADJ-SKU',
+        name: 'Cross Adjustment Product',
+        baseUnitId: unitB.data.id,
+        salePrice: 10,
+        costPrice: 5,
+      },
       actor,
     );
 
@@ -163,7 +192,7 @@ describe('Business Ops Stock Adjustment — multi-tenant isolation (integration)
             locationId: locB.data.id,
             changeQuantity: 10,
             reason: StockAdjustmentReason.OPENING_STOCK,
-          } as any,
+          },
         ],
       },
       actor,
@@ -179,49 +208,101 @@ describe('Business Ops Stock Adjustment — multi-tenant isolation (integration)
     expect(leakedInventory).toBeNull();
 
     // Confirm Company B's own product stock is untouched by the rejected cross-tenant attempt.
-    const stillB = await inventoryService.getBalance(contextB, productB.data.id, locB.data.id);
+    const stillB = await inventoryService.getBalance(
+      contextB,
+      productB.data.id,
+      locB.data.id,
+    );
     expect(stillB.data.quantity.toString()).toBe('0');
   }, 30000);
 
   it("Company A cannot read Company B's StockAdjustment batch by id, and per-company data with identically-shaped setups never bleeds across", async () => {
     const [locA, unitA] = await Promise.all([
-      locationService.create(contextA, { name: 'Shared-Name Location 2', locationType: 'BRANCH' as any }, actor),
+      locationService.create(
+        contextA,
+        { name: 'Shared-Name Location 2', locationType: 'BRANCH' as any },
+        actor,
+      ),
       unitService.create(contextA, { name: 'Box', code: 'BOX' }, actor),
     ]);
     const productA = await productService.create(
       contextA,
-      { sku: 'SHARED-ADJ-SKU', name: 'Shared Adjustment Product', baseUnitId: unitA.data.id, salePrice: 10, costPrice: 5 },
+      {
+        sku: 'SHARED-ADJ-SKU',
+        name: 'Shared Adjustment Product',
+        baseUnitId: unitA.data.id,
+        salePrice: 10,
+        costPrice: 5,
+      },
       actor,
     );
 
     const [locB, unitB] = await Promise.all([
-      locationService.create(contextB, { name: 'Shared-Name Location 2', locationType: 'BRANCH' as any }, actor),
+      locationService.create(
+        contextB,
+        { name: 'Shared-Name Location 2', locationType: 'BRANCH' as any },
+        actor,
+      ),
       unitService.create(contextB, { name: 'Box', code: 'BOX' }, actor),
     ]);
     const productB = await productService.create(
       contextB,
-      { sku: 'SHARED-ADJ-SKU', name: 'Shared Adjustment Product', baseUnitId: unitB.data.id, salePrice: 10, costPrice: 5 },
+      {
+        sku: 'SHARED-ADJ-SKU',
+        name: 'Shared Adjustment Product',
+        baseUnitId: unitB.data.id,
+        salePrice: 10,
+        costPrice: 5,
+      },
       actor,
     );
 
     const batchA = await stockAdjustmentService.create(
       contextA,
-      { items: [{ productId: productA.data.id, locationId: locA.data.id, changeQuantity: 25, reason: StockAdjustmentReason.OPENING_STOCK } as any] },
+      {
+        items: [
+          {
+            productId: productA.data.id,
+            locationId: locA.data.id,
+            changeQuantity: 25,
+            reason: StockAdjustmentReason.OPENING_STOCK,
+          },
+        ],
+      },
       actor,
     );
     const batchB = await stockAdjustmentService.create(
       contextB,
-      { items: [{ productId: productB.data.id, locationId: locB.data.id, changeQuantity: 99, reason: StockAdjustmentReason.OPENING_STOCK } as any] },
+      {
+        items: [
+          {
+            productId: productB.data.id,
+            locationId: locB.data.id,
+            changeQuantity: 99,
+            reason: StockAdjustmentReason.OPENING_STOCK,
+          },
+        ],
+      },
       actor,
     );
 
     expect(batchA.data.lines[0]).toMatchObject({ status: 'APPLIED' });
     expect(batchB.data.lines[0]).toMatchObject({ status: 'APPLIED' });
 
-    await expect(stockAdjustmentService.findOne(contextA, batchB.data.batchId)).rejects.toThrow(NotFoundException);
+    await expect(
+      stockAdjustmentService.findOne(contextA, batchB.data.batchId),
+    ).rejects.toThrow(NotFoundException);
 
-    const balanceA = await inventoryService.getBalance(contextA, productA.data.id, locA.data.id);
-    const balanceB = await inventoryService.getBalance(contextB, productB.data.id, locB.data.id);
+    const balanceA = await inventoryService.getBalance(
+      contextA,
+      productA.data.id,
+      locA.data.id,
+    );
+    const balanceB = await inventoryService.getBalance(
+      contextB,
+      productB.data.id,
+      locB.data.id,
+    );
     expect(balanceA.data.quantity.toString()).toBe('25');
     expect(balanceB.data.quantity.toString()).toBe('99');
 

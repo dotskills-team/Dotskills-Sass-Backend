@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary, type UploadApiErrorResponse } from 'cloudinary';
 
@@ -36,7 +40,11 @@ export class StorageService {
 
   constructor(private readonly configService: ConfigService) {}
 
-  async uploadFile(buffer: Buffer, key: string, contentType: string): Promise<string> {
+  async uploadFile(
+    buffer: Buffer,
+    key: string,
+    contentType: string,
+  ): Promise<string> {
     this.ensureConfigured();
     const publicId = this.stripExtension(key);
     const dataUri = `data:${contentType};base64,${buffer.toString('base64')}`;
@@ -55,12 +63,18 @@ export class StorageService {
     const publicId = this.stripExtension(key);
 
     try {
-      const result = await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+      const result = await cloudinary.uploader.destroy(publicId, {
+        resource_type: 'image',
+      });
       if (result.result !== 'ok' && result.result !== 'not found') {
         throw new Error(`Cloudinary destroy returned "${result.result}"`);
       }
     } catch (error) {
-      const message = this.isUploadApiError(error) ? error.message : error instanceof Error ? error.message : 'Unknown error';
+      const message = this.isUploadApiError(error)
+        ? error.message
+        : error instanceof Error
+          ? error.message
+          : 'Unknown error';
       this.logger.warn({ event: 'storage_delete_failed', key, message });
       throw error;
     }
@@ -90,10 +104,15 @@ export class StorageService {
     this.configured = true;
   }
 
-  private requireConfig(key: 'CLOUDINARY_CLOUD_NAME' | 'CLOUDINARY_API_KEY' | 'CLOUDINARY_API_SECRET'): string {
+  private requireConfig(
+    key:
+      'CLOUDINARY_CLOUD_NAME' | 'CLOUDINARY_API_KEY' | 'CLOUDINARY_API_SECRET',
+  ): string {
     const value = this.configService.get<string>(key);
     if (!value) {
-      throw new InternalServerErrorException(`${key} is not configured — cloud storage is unavailable`);
+      throw new InternalServerErrorException(
+        `${key} is not configured — cloud storage is unavailable`,
+      );
     }
     return value;
   }

@@ -51,11 +51,7 @@ describe('SubscriptionStatusGuard', () => {
     ).rejects.toThrow(ForbiddenException);
   });
 
-  it.each([
-    SubscriptionStatus.TRIALING,
-    SubscriptionStatus.ACTIVE,
-    SubscriptionStatus.PAST_DUE,
-  ])(
+  it.each([SubscriptionStatus.TRIALING, SubscriptionStatus.ACTIVE])(
     'allows full access (any HTTP method) when status is %s',
     async (status) => {
       mockPrisma.subscription.findFirst.mockResolvedValue({
@@ -72,34 +68,20 @@ describe('SubscriptionStatusGuard', () => {
     },
   );
 
-  describe('GRACE', () => {
-    beforeEach(() => {
-      mockPrisma.subscription.findFirst.mockResolvedValue({
-        status: SubscriptionStatus.GRACE,
-        isComplimentary: false,
-      });
-    });
-
-    it('allows safe (read) methods', async () => {
-      await expect(
-        guard.canActivate(contextWith('GET', 'company-1')),
-      ).resolves.toBe(true);
-    });
-
-    it('blocks mutating methods', async () => {
-      await expect(
-        guard.canActivate(contextWith('POST', 'company-1')),
-      ).rejects.toThrow(ForbiddenException);
-      await expect(
-        guard.canActivate(contextWith('PATCH', 'company-1')),
-      ).rejects.toThrow(ForbiddenException);
-    });
-  });
-
+  /**
+   * PAST_DUE/GRACE are no longer reachable by any code path — nothing
+   * transitions a Subscription into them any more — but the enum values
+   * still exist (kept for historical SubscriptionEvent audit rows, see
+   * schema.prisma). A legacy row somehow still sitting in one of these
+   * states must be blocked exactly like EXPIRED/CANCELLED/SUSPENDED, not
+   * given the old special-cased full/read-only access.
+   */
   it.each([
     SubscriptionStatus.SUSPENDED,
     SubscriptionStatus.EXPIRED,
     SubscriptionStatus.CANCELLED,
+    SubscriptionStatus.PAST_DUE,
+    SubscriptionStatus.GRACE,
   ])('blocks everything (including GET) when status is %s', async (status) => {
     mockPrisma.subscription.findFirst.mockResolvedValue({
       status,

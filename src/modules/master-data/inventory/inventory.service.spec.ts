@@ -102,7 +102,9 @@ describe('InventoryService', () => {
           sku: 'RICE-10-05',
           reorderLevel: new Prisma.Decimal(5),
         });
-        mockTx.inventory.upsert.mockResolvedValue({ quantity: new Prisma.Decimal(3) }); // after = 3
+        mockTx.inventory.upsert.mockResolvedValue({
+          quantity: new Prisma.Decimal(3),
+        }); // after = 3
 
         await service.increaseStock(mockTx as any, {
           ...baseInput,
@@ -118,7 +120,10 @@ describe('InventoryService', () => {
             relatedEntityType: 'PRODUCT',
             relatedEntityId: 'product-1',
             locationId: 'location-1',
-            metadata: expect.objectContaining({ productName: 'Kalijira Rice 5KG', quantity: '3' }),
+            metadata: expect.objectContaining({
+              productName: 'Kalijira Rice 5KG',
+              quantity: '3',
+            }),
           }),
         );
       });
@@ -129,7 +134,9 @@ describe('InventoryService', () => {
           sku: 'RICE-1',
           reorderLevel: new Prisma.Decimal(5),
         });
-        mockTx.inventory.upsert.mockResolvedValue({ quantity: new Prisma.Decimal(15) }); // after = 15
+        mockTx.inventory.upsert.mockResolvedValue({
+          quantity: new Prisma.Decimal(15),
+        }); // after = 15
 
         await service.increaseStock(mockTx as any, {
           ...baseInput,
@@ -146,7 +153,9 @@ describe('InventoryService', () => {
           sku: 'RICE-1',
           reorderLevel: new Prisma.Decimal(5),
         });
-        mockTx.inventory.upsert.mockResolvedValue({ quantity: new Prisma.Decimal(20) }); // after = 20
+        mockTx.inventory.upsert.mockResolvedValue({
+          quantity: new Prisma.Decimal(20),
+        }); // after = 20
 
         await service.increaseStock(mockTx as any, {
           ...baseInput,
@@ -163,7 +172,9 @@ describe('InventoryService', () => {
           sku: 'RICE-1',
           reorderLevel: new Prisma.Decimal(5),
         });
-        mockTx.inventory.upsert.mockResolvedValue({ quantity: new Prisma.Decimal(4) }); // after = 4
+        mockTx.inventory.upsert.mockResolvedValue({
+          quantity: new Prisma.Decimal(4),
+        }); // after = 4
 
         await service.increaseStock(mockTx as any, {
           ...baseInput,
@@ -176,7 +187,9 @@ describe('InventoryService', () => {
 
       it('does not throw and does not notify when the product cannot be found', async () => {
         mockTx.product.findUnique.mockResolvedValue(null);
-        mockTx.inventory.upsert.mockResolvedValue({ quantity: new Prisma.Decimal(3) });
+        mockTx.inventory.upsert.mockResolvedValue({
+          quantity: new Prisma.Decimal(3),
+        });
 
         await expect(
           service.increaseStock(mockTx as any, {
@@ -194,7 +207,9 @@ describe('InventoryService', () => {
   describe('decreaseStock', () => {
     it('uses a conditional gte updateMany (not check-then-update) when allowNegative is false', async () => {
       mockTx.inventory.updateMany.mockResolvedValue({ count: 1 });
-      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(5) });
+      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+        quantity: new Prisma.Decimal(5),
+      });
       mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-2' });
 
       await service.decreaseStock(mockTx as any, {
@@ -217,7 +232,9 @@ describe('InventoryService', () => {
 
     it('omits the gte guard entirely when allowNegative is true', async () => {
       mockTx.inventory.updateMany.mockResolvedValue({ count: 1 });
-      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(-5) });
+      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+        quantity: new Prisma.Decimal(-5),
+      });
       mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-3' });
 
       await service.decreaseStock(mockTx as any, {
@@ -261,7 +278,9 @@ describe('InventoryService', () => {
 
     it('writes changeQty as the negated quantity on success', async () => {
       mockTx.inventory.updateMany.mockResolvedValue({ count: 1 });
-      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(0) });
+      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+        quantity: new Prisma.Decimal(0),
+      });
       mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-4' });
 
       await service.decreaseStock(mockTx as any, {
@@ -288,7 +307,9 @@ describe('InventoryService', () => {
           sku: 'RICE-1',
           reorderLevel: new Prisma.Decimal(10),
         });
-        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(0) }); // after = 0
+        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+          quantity: new Prisma.Decimal(0),
+        }); // after = 0
 
         await service.decreaseStock(mockTx as any, {
           ...baseInput,
@@ -305,7 +326,10 @@ describe('InventoryService', () => {
             relatedEntityType: 'PRODUCT',
             relatedEntityId: 'product-1',
             locationId: 'location-1',
-            metadata: expect.objectContaining({ productName: 'Rice', locationName: 'Main Branch' }),
+            metadata: expect.objectContaining({
+              productName: 'Rice',
+              locationName: 'Main Branch',
+            }),
           }),
         );
       });
@@ -316,7 +340,9 @@ describe('InventoryService', () => {
           sku: 'RICE-1',
           reorderLevel: new Prisma.Decimal(10),
         });
-        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(8) }); // after = 8
+        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+          quantity: new Prisma.Decimal(8),
+        }); // after = 8
 
         await service.decreaseStock(mockTx as any, {
           ...baseInput,
@@ -338,7 +364,9 @@ describe('InventoryService', () => {
           sku: 'RICE-1',
           reorderLevel: new Prisma.Decimal(10),
         });
-        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(4) }); // after = 4
+        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+          quantity: new Prisma.Decimal(4),
+        }); // after = 4
 
         await service.decreaseStock(mockTx as any, {
           ...baseInput,
@@ -352,7 +380,9 @@ describe('InventoryService', () => {
 
       it('does not throw and does not notify when the product cannot be found', async () => {
         mockTx.product.findUnique.mockResolvedValue(null);
-        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({ quantity: new Prisma.Decimal(0) });
+        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+          quantity: new Prisma.Decimal(0),
+        });
 
         await expect(
           service.decreaseStock(mockTx as any, {

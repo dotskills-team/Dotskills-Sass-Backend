@@ -214,7 +214,10 @@ export class AccessControlSetupService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     try {
       const result = await this.reconcileOwnerAdminPermissions();
-      const log = { event: 'rbac_permission_reconciliation_completed', ...result };
+      const log = {
+        event: 'rbac_permission_reconciliation_completed',
+        ...result,
+      };
       if (result.rolesUpdated > 0 || result.failures.length > 0) {
         this.logger.warn(log);
       } else {

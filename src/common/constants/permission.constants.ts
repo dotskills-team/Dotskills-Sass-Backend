@@ -314,29 +314,22 @@ export const PLATFORM_PERMISSIONS = {
   // Feature archive
   FEATURE_ARCHIVE: 'platform.feature.archive',
 
-  BILLING_CREATE: 'billing.create',
   BILLING_READ: 'billing.read',
   BILLING_PROCESS: 'billing.process',
   BILLING_RETRY: 'billing.retry',
-  BILLING_CANCEL: 'billing.cancel',
-  BILLING_SKIP: 'billing.skip',
-  BILLING_MARK_SUCCEEDED: 'billing.mark_succeeded',
-  BILLING_MARK_FAILED: 'billing.mark_failed',
 
   /**
    * ----------------------------------------------------------
    * INVOICE MANAGEMENT
    * ----------------------------------------------------------
    *
-   * Billing period-এর জন্য formal Invoice তৈরি, issue,
-   * cancel, void এবং settle (mark-paid) করার জন্য।
+   * Billing/Invoice are system-generated only — no manual create/cancel/
+   * mark-paid actions exist any more. `issue`/`void` remain as Platform
+   * Admin correction tools for an Invoice the system already generated.
    */
-  INVOICE_CREATE: 'invoice.create',
   INVOICE_READ: 'invoice.read',
   INVOICE_ISSUE: 'invoice.issue',
-  INVOICE_CANCEL: 'invoice.cancel',
   INVOICE_VOID: 'invoice.void',
-  INVOICE_MARK_PAID: 'invoice.mark_paid',
 
   /**
    * ----------------------------------------------------------
@@ -393,6 +386,21 @@ export const PLATFORM_PERMISSIONS = {
 
   // Plan থেকে feature remove করা
   PLAN_FEATURE_REMOVE: 'platform.plan.feature.remove',
+
+  /**
+   * ----------------------------------------------------------
+   * PLATFORM SETTINGS (branding)
+   * ----------------------------------------------------------
+   *
+   * Platform-wide branding (logo) — Company Settings-এর সাথে সাদৃশ্যপূর্ণ,
+   * কিন্তু company-scoped নয়; পুরো platform-এর জন্য একটাই singleton row।
+   */
+
+  // Platform branding settings দেখা
+  SETTINGS_READ: 'platform.settings.read',
+
+  // Platform logo আপলোড/পরিবর্তন
+  SETTINGS_UPDATE: 'platform.settings.update',
 } as const;
 
 /**

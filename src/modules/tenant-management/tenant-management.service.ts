@@ -18,88 +18,191 @@ import { UpdateTenantDto } from './dto/update-tenant.dto';
 import { UpdateTenantStatusDto } from './dto/update-tenant-status.dto';
 import { TenantQueryDto } from './dto/tenant-query.dto';
 
+/**
+ * Trailing legal-entity tokens stripped only from the *code* base (never
+ * the slug) — matches the required example (`ABC Trading Ltd` →
+ * `ABC-TRADING-001`, `LTD` dropped) while the slug keeps the full name
+ * (`abc-trading-ltd`). Only trailing tokens are stripped, one at a time, so
+ * a legitimate business name that merely contains one of these words mid-
+ * name (not as a suffix) is never mangled.
+ */
+const CODE_SUFFIX_STOPWORDS = new Set([
+  'LTD',
+  'LIMITED',
+  'INC',
+  'INCORPORATED',
+  'LLC',
+  'LLP',
+  'CORP',
+  'CORPORATION',
+  'CO',
+  'COMPANY',
+  'PLC',
+  'PVT',
+  'PRIVATE',
+]);
+
+const MAX_GENERATION_ATTEMPTS = 5;
+
 @Injectable()
 export class TenantManagementService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
    * CREATE TENANT
+   *
+   * `code` and `slug` are always system-generated from `name` — never
+   * accepted from the client (see CreateTenantDto). Uniqueness is decided
+   * from current rows (readable, sequential `-001`/`-2` suffixes) and then
+   * enforced for real by the DB's own unique constraints: if a concurrent
+   * request wins the same candidate, Prisma raises P2002 and this retries
+   * with a freshly-computed next candidate — no duplicate can ever persist,
+   * race or not.
    */
   async create(dto: CreateTenantDto, actorUserId: string) {
-    const code = dto.code.trim().toUpperCase();
     const name = dto.name.trim();
-    const slug = dto.slug.trim().toLowerCase();
 
-    /**
-     * Check duplicate code / slug
-     */
-    const existing = await this.prisma.tenant.findFirst({
-      where: {
-        OR: [
-          {
-            code,
-          },
-          {
-            slug,
-          },
-        ],
-      },
-      select: {
-        id: true,
-        code: true,
-        slug: true,
-      },
-    });
+    if (!name) {
+      throw new BadRequestException('Tenant name is required');
+    }
 
-    if (existing) {
-      if (existing.code === code) {
-        throw new ConflictException('Tenant code already exists');
-      }
+    const codeBase = this.buildCodeBase(name);
+    const slugBase = this.buildSlugBase(name);
 
-      if (existing.slug === slug) {
-        throw new ConflictException('Tenant slug already exists');
+    let lastError: unknown;
+
+    for (let attempt = 0; attempt < MAX_GENERATION_ATTEMPTS; attempt += 1) {
+      const [code, slug] = await Promise.all([
+        this.generateUniqueCode(codeBase),
+        this.generateUniqueSlug(slugBase),
+      ]);
+
+      try {
+        const tenant = await this.prisma.$transaction(async (tx) => {
+          const created = await tx.tenant.create({
+            data: {
+              code,
+              name,
+              slug,
+              status: TenantStatus.DRAFT,
+            },
+          });
+
+          await tx.auditLog.create({
+            data: {
+              tenantId: created.id,
+              actorUserId,
+              actorType: AuditActorType.PLATFORM_MEMBER,
+              action: 'TENANT_CREATED',
+              entityType: 'TENANT',
+              entityId: created.id,
+              afterData: {
+                id: created.id,
+                code: created.code,
+                name: created.name,
+                slug: created.slug,
+                status: created.status,
+              },
+            },
+          });
+
+          return created;
+        });
+
+        return {
+          success: true,
+          message: 'Tenant created successfully',
+          data: tenant,
+        };
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2002'
+        ) {
+          lastError = error;
+          continue;
+        }
+
+        throw error;
       }
     }
 
-    /**
-     * Create tenant + audit log
-     */
-    const tenant = await this.prisma.$transaction(async (tx) => {
-      const created = await tx.tenant.create({
-        data: {
-          code,
-          name,
-          slug,
-          status: TenantStatus.DRAFT,
-        },
-      });
+    throw new ConflictException(
+      'Could not generate a unique tenant code/slug after several attempts, please retry.',
+      { cause: lastError },
+    );
+  }
 
-      await tx.auditLog.create({
-        data: {
-          tenantId: created.id,
-          actorUserId,
-          actorType: AuditActorType.PLATFORM_MEMBER,
-          action: 'TENANT_CREATED',
-          entityType: 'TENANT',
-          entityId: created.id,
-          afterData: {
-            id: created.id,
-            code: created.code,
-            name: created.name,
-            slug: created.slug,
-            status: created.status,
-          },
-        },
-      });
+  /**
+   * Readable, uppercase, dash-joined base for the code (e.g. "ABC TRADING
+   * LTD" → "ABC-TRADING"). Trailing legal-entity words are stripped one at
+   * a time so a name that's *entirely* a stopword (rare) still yields a
+   * base rather than an empty string. Truncated to leave room for the
+   * "-NNN" suffix within the schema's 40-char limit.
+   */
+  private buildCodeBase(name: string): string {
+    const tokens = name
+      .toUpperCase()
+      .replace(/[^A-Z0-9\s-]/g, ' ')
+      .split(/[\s-]+/)
+      .filter(Boolean);
 
-      return created;
+    while (tokens.length > 1 && CODE_SUFFIX_STOPWORDS.has(tokens[tokens.length - 1])) {
+      tokens.pop();
+    }
+
+    const base = tokens.join('-').slice(0, 30);
+    return base || 'TENANT';
+  }
+
+  /** Lowercase, URL-safe base for the slug — keeps the full name (no suffix stripping). */
+  private buildSlugBase(name: string): string {
+    const slug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 100);
+
+    return slug || 'tenant';
+  }
+
+  private async generateUniqueCode(base: string): Promise<string> {
+    const rows = await this.prisma.tenant.findMany({
+      where: { code: { startsWith: `${base}-` } },
+      select: { code: true },
     });
 
-    return {
-      success: true,
-      message: 'Tenant created successfully',
-      data: tenant,
-    };
+    let max = 0;
+    for (const row of rows) {
+      const suffix = row.code.slice(base.length + 1);
+      const num = Number(suffix);
+      if (Number.isInteger(num) && num > max) max = num;
+    }
+
+    return `${base}-${String(max + 1).padStart(3, '0')}`;
+  }
+
+  private async generateUniqueSlug(base: string): Promise<string> {
+    const [baseTaken, numberedRows] = await Promise.all([
+      this.prisma.tenant.findFirst({ where: { slug: base }, select: { id: true } }),
+      this.prisma.tenant.findMany({
+        where: { slug: { startsWith: `${base}-` } },
+        select: { slug: true },
+      }),
+    ]);
+
+    if (!baseTaken && numberedRows.length === 0) {
+      return base;
+    }
+
+    let max = 1;
+    for (const row of numberedRows) {
+      const suffix = row.slug.slice(base.length + 1);
+      const num = Number(suffix);
+      if (Number.isInteger(num) && num > max) max = num;
+    }
+
+    return `${base}-${max + 1}`;
   }
 
   /**
@@ -235,7 +338,10 @@ export class TenantManagementService {
     const data: Prisma.TenantUpdateInput = {};
 
     /**
-     * Update name
+     * Update name — `code`/`slug` are never touched here. `code` stays
+     * stable for the tenant's lifetime by design; `slug` is likewise left
+     * untouched on a name edit (no auto-regeneration) since it may already
+     * be referenced elsewhere — only `name` itself is user-editable.
      */
     if (dto.name !== undefined) {
       const name = dto.name.trim();
@@ -245,35 +351,6 @@ export class TenantManagementService {
       }
 
       data.name = name;
-    }
-
-    /**
-     * Update slug
-     */
-    if (dto.slug !== undefined) {
-      const slug = dto.slug.trim().toLowerCase();
-
-      if (!slug) {
-        throw new BadRequestException('Tenant slug cannot be empty');
-      }
-
-      const slugExists = await this.prisma.tenant.findFirst({
-        where: {
-          slug,
-          NOT: {
-            id,
-          },
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      if (slugExists) {
-        throw new ConflictException('Tenant slug already exists');
-      }
-
-      data.slug = slug;
     }
 
     if (Object.keys(data).length === 0) {

@@ -41,6 +41,13 @@ export class PaymentController {
     return this.paymentService.findOne(id);
   }
 
+  /** Only ever returns data for an already-SUCCEEDED payment (BadRequestException otherwise). */
+  @Get(':id/receipt')
+  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.PAYMENT_READ)
+  getReceipt(@Param('id', ParseUUIDPipe) id: string) {
+    return this.paymentService.getReceipt(id);
+  }
+
   @Post(':id/verify')
   @RequirePlatformPermissions(PLATFORM_PERMISSIONS.PAYMENT_VERIFY)
   verify(

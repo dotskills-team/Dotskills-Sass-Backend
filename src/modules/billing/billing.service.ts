@@ -19,13 +19,13 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 import { CreateBillingDto } from './dto/create-billing.dto';
 import { QueryBillingDto } from './dto/query-billing.dto';
-import { CancelBillingDto } from './dto/cancel-billing.dto';
 import { MarkFailedBillingDto } from './dto/mark-failed-billing.dto';
 
 import { BILLING_DEFAULTS } from './constants/billing.constants';
 import { Prisma } from 'src/generated/phase-1-prisma/client';
 
 import { SubscriptionLifecycleService } from '../subscription/subscription-lifecycle.service';
+import { companyWithOwnerSelect } from '../../common/prisma/company-with-owner.select';
 
 @Injectable()
 export class BillingService {
@@ -74,12 +74,16 @@ export class BillingService {
         throw new NotFoundException('Subscription not found');
       }
 
-      if (
-        subscription.status === SubscriptionStatus.CANCELLED ||
-        subscription.status === SubscriptionStatus.EXPIRED
-      ) {
+      /**
+       * EXPIRED is deliberately allowed through — resubscribing after expiry
+       * is a supported checkout target (SubscriptionRenewalService.
+       * requestSubscriptionCheckout() already rejects CANCELLED earlier and
+       * lets TRIALING/ACTIVE/EXPIRED reach here). Only CANCELLED is blocked:
+       * that subscription must be reactivated first before it can be billed.
+       */
+      if (subscription.status === SubscriptionStatus.CANCELLED) {
         throw new BadRequestException(
-          'Billing cannot be created for cancelled or expired subscription',
+          'Billing cannot be created for a cancelled subscription',
         );
       }
 
@@ -134,7 +138,7 @@ export class BillingService {
         );
       }
 
-      const priceSnapshot = rawSnapshot as Record<string, unknown>;
+      const priceSnapshot = rawSnapshot;
 
       const amount = this.extractAmount(priceSnapshot);
 
@@ -290,14 +294,16 @@ export class BillingService {
         },
 
         include: {
+          company: { select: companyWithOwnerSelect },
+
           subscription: {
             select: {
               id: true,
               status: true,
               billingCycle: true,
-              planId: true,
               currentPeriodStart: true,
               currentPeriodEnd: true,
+              plan: { select: { id: true, name: true, code: true } },
             },
           },
 
@@ -348,6 +354,8 @@ export class BillingService {
       },
 
       include: {
+        company: { select: companyWithOwnerSelect },
+
         subscription: {
           include: {
             plan: true,
@@ -564,16 +572,14 @@ export class BillingService {
   // RELEASE ATTEMPT — customer abandoned/cancelled checkout at the
   // gateway. This is deliberately NOT the same as markFailed(): a
   // cancellation is not a gateway decline, so it must never trigger
-  // SubscriptionLifecycleService.paymentFailed() (no PAST_DUE/GRACE/
-  // SUSPENDED degradation) and must never be recorded as BillingStatus
-  // FAILED (that label is reserved for real declines) or CANCELLED
-  // (that's the Platform Admin's own deliberate whole-billing-period
-  // cancel() below — a different business event). Billing returns to
-  // PENDING — the same "awaiting a successful attempt" state a brand
-  // new Billing starts in — so the next Pay Now flows through create()'s
-  // existing PENDING → process() branch unchanged. attemptCount is left
-  // untouched, so MAX_ATTEMPTS keeps counting the customer's real
-  // attempts across a cancellation exactly as it does across a failure.
+  // SubscriptionLifecycleService.paymentFailed() and must never be
+  // recorded as BillingStatus FAILED (that label is reserved for real
+  // declines). Billing returns to PENDING — the same "awaiting a
+  // successful attempt" state a brand new Billing starts in — so the
+  // next Pay Now flows through create()'s existing PENDING → process()
+  // branch unchanged. attemptCount is left untouched, so MAX_ATTEMPTS
+  // keeps counting the customer's real attempts across a cancellation
+  // exactly as it does across a failure.
   // ============================================================
 
   async releaseCancelledAttempt(
@@ -662,145 +668,6 @@ export class BillingService {
   }
 
   // ============================================================
-  // CANCEL
-  // ============================================================
-
-  async cancel(id: string, dto: CancelBillingDto, actorUserId?: string) {
-    return this.prisma.$transaction(async (tx) => {
-      const billing = await tx.billing.findUnique({
-        where: {
-          id,
-        },
-      });
-
-      if (!billing) {
-        throw new NotFoundException('Billing not found');
-      }
-
-      if (
-        billing.status === BillingStatus.SUCCEEDED ||
-        billing.status === BillingStatus.CANCELLED ||
-        billing.status === BillingStatus.SKIPPED
-      ) {
-        throw new BadRequestException(
-          `Billing cannot be cancelled from ${billing.status} state`,
-        );
-      }
-
-      const now = new Date();
-
-      const updated = await tx.billing.update({
-        where: {
-          id,
-        },
-
-        data: {
-          status: BillingStatus.CANCELLED,
-
-          cancelledAt: now,
-
-          metadata: {
-            ...((billing.metadata as object) ?? {}),
-            cancelledBy: actorUserId ?? null,
-            cancellationReason: dto.reason ?? null,
-          },
-        },
-      });
-
-      /**
-       * If a processing attempt exists,
-       * close the latest STARTED attempt.
-       */
-      await tx.billingAttempt.updateMany({
-        where: {
-          billingId: id,
-          status: BillingAttemptStatus.STARTED,
-        },
-
-        data: {
-          status: BillingAttemptStatus.CANCELLED,
-
-          completedAt: now,
-        },
-      });
-
-      await tx.auditLog.create({
-        data: {
-          tenantId: updated.tenantId,
-          companyId: updated.companyId,
-          actorUserId: actorUserId ?? null,
-          actorType: actorUserId
-            ? AuditActorType.PLATFORM_MEMBER
-            : AuditActorType.SYSTEM,
-          action: 'BILLING_CANCELLED',
-          entityType: 'Billing',
-          entityId: updated.id,
-          beforeData: { status: billing.status },
-          afterData: { status: updated.status, reason: dto.reason ?? null },
-        },
-      });
-
-      return updated;
-    });
-  }
-
-  // ============================================================
-  // SKIP
-  // ============================================================
-
-  async skip(id: string, actorUserId?: string) {
-    return this.prisma.$transaction(async (tx) => {
-      const billing = await tx.billing.findUnique({
-        where: {
-          id,
-        },
-      });
-
-      if (!billing) {
-        throw new NotFoundException('Billing not found');
-      }
-
-      if (billing.status !== BillingStatus.PENDING) {
-        throw new BadRequestException(`Only pending billing can be skipped`);
-      }
-
-      const updated = await tx.billing.update({
-        where: {
-          id,
-        },
-
-        data: {
-          status: BillingStatus.SKIPPED,
-
-          metadata: {
-            ...((billing.metadata as object) ?? {}),
-            skippedBy: actorUserId ?? null,
-            skippedAt: new Date().toISOString(),
-          },
-        },
-      });
-
-      await tx.auditLog.create({
-        data: {
-          tenantId: updated.tenantId,
-          companyId: updated.companyId,
-          actorUserId: actorUserId ?? null,
-          actorType: actorUserId
-            ? AuditActorType.PLATFORM_MEMBER
-            : AuditActorType.SYSTEM,
-          action: 'BILLING_SKIPPED',
-          entityType: 'Billing',
-          entityId: updated.id,
-          beforeData: { status: BillingStatus.PENDING },
-          afterData: { status: updated.status },
-        },
-      });
-
-      return updated;
-    });
-  }
-
-  // ============================================================
   // MARK SUCCEEDED
   // ============================================================
 
@@ -860,11 +727,13 @@ export class BillingService {
        * `intent` key (created before this branching existed) fall through
        * to the default — today's exact behavior, nothing breaks for them.
        */
-      const metadata = (billing.metadata as Record<string, unknown> | null) ?? {};
+      const metadata =
+        (billing.metadata as Record<string, unknown> | null) ?? {};
       if (metadata.intent === 'PLAN_CHANGE') {
         const targetPlanId = metadata.targetPlanId as string;
         const targetBillingCycle = metadata.targetBillingCycle as BillingCycle;
-        const targetPriceSnapshot = metadata.targetPriceSnapshot as Prisma.InputJsonValue;
+        const targetPriceSnapshot =
+          metadata.targetPriceSnapshot as Prisma.InputJsonValue;
 
         await this.subscriptionLifecycleService.planChangeSucceeded(
           billing.subscriptionId,
@@ -873,7 +742,11 @@ export class BillingService {
             actorType: AuditActorType.PLATFORM_MEMBER,
           },
           attempt.idempotencyKey,
-          { id: targetPlanId, billingCycle: targetBillingCycle, priceSnapshot: targetPriceSnapshot },
+          {
+            id: targetPlanId,
+            billingCycle: targetBillingCycle,
+            priceSnapshot: targetPriceSnapshot,
+          },
           tx,
         );
       } else {

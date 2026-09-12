@@ -53,11 +53,11 @@ describe('SubscriptionLifecycleService.paymentFailed', () => {
   });
 
   /**
-   * PAST_DUE/GRACE degradation removed (business decision: a payment
-   * failure no longer changes subscription status — the Billing/Payment
-   * rows already record FAILED independently, and the period simply
-   * expires on its own clock if never paid). paymentFailed() is now a
-   * pure scope-check-and-return, for every status.
+   * PAST_DUE/GRACE removed entirely (business decision: a payment failure
+   * no longer changes subscription status — the Billing/Payment rows
+   * already record FAILED independently, and the period simply expires on
+   * its own clock if never paid). paymentFailed() is now a pure
+   * scope-check-and-return, for every remaining status.
    */
   it.each([
     SubscriptionStatus.ACTIVE,
@@ -65,16 +65,17 @@ describe('SubscriptionLifecycleService.paymentFailed', () => {
     SubscriptionStatus.EXPIRED,
     SubscriptionStatus.CANCELLED,
     SubscriptionStatus.SUSPENDED,
-    SubscriptionStatus.PAST_DUE,
-    SubscriptionStatus.GRACE,
-  ])('is a no-op (never throws, status unchanged) when payment fails while %s', async (status) => {
-    const subscription = subscriptionWith(status);
-    mockPrisma.subscription.findUnique.mockResolvedValue(subscription);
+  ])(
+    'is a no-op (never throws, status unchanged) when payment fails while %s',
+    async (status) => {
+      const subscription = subscriptionWith(status);
+      mockPrisma.subscription.findUnique.mockResolvedValue(subscription);
 
-    const result = await service.paymentFailed('sub-1', context);
+      const result = await service.paymentFailed('sub-1', context);
 
-    expect(result.status).toBe(status);
-  });
+      expect(result.status).toBe(status);
+    },
+  );
 
   it('throws NotFoundException when the subscription does not exist', async () => {
     mockPrisma.subscription.findUnique.mockResolvedValue(null);
@@ -91,6 +92,7 @@ describe('SubscriptionLifecycleService.transition — SUSPENDED notification', (
   const mockTx = {
     subscriptionEvent: { findUnique: jest.fn(), create: jest.fn() },
     subscription: { updateMany: jest.fn(), findUniqueOrThrow: jest.fn() },
+    company: { updateMany: jest.fn() },
     auditLog: { create: jest.fn() },
   };
 
@@ -108,7 +110,10 @@ describe('SubscriptionLifecycleService.transition — SUSPENDED notification', (
     actorType: AuditActorType.PLATFORM_MEMBER,
   };
 
-  function subscriptionWith(status: SubscriptionStatus, companyId: string | null = 'company-1') {
+  function subscriptionWith(
+    status: SubscriptionStatus,
+    companyId: string | null = 'company-1',
+  ) {
     return {
       id: 'sub-1',
       tenantId: 'tenant-1',
@@ -148,10 +153,15 @@ describe('SubscriptionLifecycleService.transition — SUSPENDED notification', (
       status: SubscriptionStatus.SUSPENDED,
     });
 
-    await service.transition(subscription as any, SubscriptionStatus.SUSPENDED, context, {
-      reason: 'PLATFORM_ADMIN_SUSPENDED',
-      source: 'API',
-    });
+    await service.transition(
+      subscription as any,
+      SubscriptionStatus.SUSPENDED,
+      context,
+      {
+        reason: 'PLATFORM_ADMIN_SUSPENDED',
+        source: 'API',
+      },
+    );
 
     expect(mockNotificationService.create).toHaveBeenCalledWith(
       mockTx,
@@ -160,7 +170,10 @@ describe('SubscriptionLifecycleService.transition — SUSPENDED notification', (
         type: NotificationType.SUBSCRIPTION_PAST_DUE,
         relatedEntityType: NotificationRelatedEntityType.SUBSCRIPTION,
         relatedEntityId: 'sub-1',
-        metadata: { status: SubscriptionStatus.SUSPENDED, reason: 'PLATFORM_ADMIN_SUSPENDED' },
+        metadata: {
+          status: SubscriptionStatus.SUSPENDED,
+          reason: 'PLATFORM_ADMIN_SUSPENDED',
+        },
       },
     );
   });
@@ -172,10 +185,15 @@ describe('SubscriptionLifecycleService.transition — SUSPENDED notification', (
       status: SubscriptionStatus.ACTIVE,
     });
 
-    await service.transition(subscription as any, SubscriptionStatus.ACTIVE, context, {
-      reason: 'PAYMENT_SUCCEEDED',
-      source: 'PAYMENT',
-    });
+    await service.transition(
+      subscription as any,
+      SubscriptionStatus.ACTIVE,
+      context,
+      {
+        reason: 'PAYMENT_SUCCEEDED',
+        source: 'PAYMENT',
+      },
+    );
 
     expect(mockNotificationService.create).not.toHaveBeenCalled();
   });
@@ -187,27 +205,39 @@ describe('SubscriptionLifecycleService.transition — SUSPENDED notification', (
       status: SubscriptionStatus.SUSPENDED,
     });
 
-    await service.transition(subscription as any, SubscriptionStatus.SUSPENDED, context, {
-      reason: 'PLATFORM_ADMIN_SUSPENDED',
-      source: 'API',
-    });
+    await service.transition(
+      subscription as any,
+      SubscriptionStatus.SUSPENDED,
+      context,
+      {
+        reason: 'PLATFORM_ADMIN_SUSPENDED',
+        source: 'API',
+      },
+    );
 
     expect(mockNotificationService.create).not.toHaveBeenCalled();
   });
 
   it('does not fire again on an idempotent replay of an already-applied transition', async () => {
     const subscription = subscriptionWith(SubscriptionStatus.ACTIVE);
-    mockTx.subscriptionEvent.findUnique.mockResolvedValue({ id: 'event-1' } as any);
+    mockTx.subscriptionEvent.findUnique.mockResolvedValue({
+      id: 'event-1',
+    } as any);
     mockTx.subscription.findUniqueOrThrow.mockResolvedValue({
       ...subscription,
       status: SubscriptionStatus.SUSPENDED,
     });
 
-    await service.transition(subscription as any, SubscriptionStatus.SUSPENDED, context, {
-      reason: 'PLATFORM_ADMIN_SUSPENDED',
-      source: 'API',
-      idempotencyKey: 'already-used-key',
-    });
+    await service.transition(
+      subscription as any,
+      SubscriptionStatus.SUSPENDED,
+      context,
+      {
+        reason: 'PLATFORM_ADMIN_SUSPENDED',
+        source: 'API',
+        idempotencyKey: 'already-used-key',
+      },
+    );
 
     expect(mockTx.subscription.updateMany).not.toHaveBeenCalled();
     expect(mockNotificationService.create).not.toHaveBeenCalled();
@@ -220,6 +250,7 @@ describe('SubscriptionLifecycleService.paymentSucceeded', () => {
   const mockTx = {
     subscriptionEvent: { findUnique: jest.fn(), create: jest.fn() },
     subscription: { updateMany: jest.fn(), findUniqueOrThrow: jest.fn() },
+    company: { updateMany: jest.fn() },
     auditLog: { create: jest.fn() },
   };
 
@@ -353,26 +384,28 @@ describe('SubscriptionLifecycleService.paymentSucceeded', () => {
     expect(result.status).toBe(SubscriptionStatus.ACTIVE);
     const patch = mockTx.subscription.updateMany.mock.calls[0][0].data;
     expect(patch.status).toBe(SubscriptionStatus.ACTIVE);
-    expect(patch.currentPeriodStart.getTime()).toBeGreaterThanOrEqual(before.getTime());
-    expect(patch.currentPeriodStart.getTime()).toBeLessThanOrEqual(after.getTime());
-  });
-
-  it.each([
-    SubscriptionStatus.CANCELLED,
-    SubscriptionStatus.PAST_DUE,
-    SubscriptionStatus.GRACE,
-    SubscriptionStatus.SUSPENDED,
-  ])('rejects payment success while %s (not a renewable or activatable state)', async (status) => {
-    const subscription = subscriptionWith(status);
-    mockPrisma.subscription.findUnique.mockResolvedValue(subscription);
-
-    await expect(
-      service.paymentSucceeded('sub-1', context, 'key-4'),
-    ).rejects.toThrow(
-      'Payment can only activate a TRIALING or EXPIRED subscription (or renew an already-ACTIVE one).',
+    expect(patch.currentPeriodStart.getTime()).toBeGreaterThanOrEqual(
+      before.getTime(),
     );
-    expect(mockTx.subscription.updateMany).not.toHaveBeenCalled();
+    expect(patch.currentPeriodStart.getTime()).toBeLessThanOrEqual(
+      after.getTime(),
+    );
   });
+
+  it.each([SubscriptionStatus.CANCELLED, SubscriptionStatus.SUSPENDED])(
+    'rejects payment success while %s (not a renewable or activatable state)',
+    async (status) => {
+      const subscription = subscriptionWith(status);
+      mockPrisma.subscription.findUnique.mockResolvedValue(subscription);
+
+      await expect(
+        service.paymentSucceeded('sub-1', context, 'key-4'),
+      ).rejects.toThrow(
+        'Payment can only activate a TRIALING or EXPIRED subscription (or renew an already-ACTIVE one).',
+      );
+      expect(mockTx.subscription.updateMany).not.toHaveBeenCalled();
+    },
+  );
 });
 
 describe('SubscriptionLifecycleService.planChangeSucceeded', () => {
@@ -381,6 +414,7 @@ describe('SubscriptionLifecycleService.planChangeSucceeded', () => {
   const mockTx = {
     subscriptionEvent: { findUnique: jest.fn(), create: jest.fn() },
     subscription: { updateMany: jest.fn(), findUniqueOrThrow: jest.fn() },
+    company: { updateMany: jest.fn() },
     auditLog: { create: jest.fn() },
   };
 
@@ -444,7 +478,12 @@ describe('SubscriptionLifecycleService.planChangeSucceeded', () => {
 
     const result = await service.planChangeSucceeded(
       'sub-1',
-      { userId: 'user-1', tenantId: 'tenant-1', companyId: 'company-1', actorType: AuditActorType.COMPANY_MEMBER },
+      {
+        userId: 'user-1',
+        tenantId: 'tenant-1',
+        companyId: 'company-1',
+        actorType: AuditActorType.COMPANY_MEMBER,
+      },
       'plan-change-key-1',
       newPlan,
     );
@@ -468,7 +507,9 @@ describe('SubscriptionLifecycleService.planChangeSucceeded', () => {
     ).toBeUndefined();
     expect(mockTx.subscriptionEvent.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ reason: 'PLAN_CHANGE_PAYMENT_SUCCEEDED' }),
+        data: expect.objectContaining({
+          reason: 'PLAN_CHANGE_PAYMENT_SUCCEEDED',
+        }),
       }),
     );
   });
@@ -487,7 +528,12 @@ describe('SubscriptionLifecycleService.planChangeSucceeded', () => {
 
     await service.planChangeSucceeded(
       'sub-1',
-      { userId: 'user-1', tenantId: 'tenant-1', companyId: 'company-1', actorType: AuditActorType.COMPANY_MEMBER },
+      {
+        userId: 'user-1',
+        tenantId: 'tenant-1',
+        companyId: 'company-1',
+        actorType: AuditActorType.COMPANY_MEMBER,
+      },
       'already-used-key',
       newPlan,
     );
@@ -660,7 +706,9 @@ describe('SubscriptionLifecycleService.checkExpiringSoon', () => {
     };
     mockPrisma.subscription.findMany.mockResolvedValue([subscription]);
 
-    const result = await service.checkExpiringSoon(new Date('2026-09-05T00:00:00Z'));
+    const result = await service.checkExpiringSoon(
+      new Date('2026-09-05T00:00:00Z'),
+    );
 
     expect(mockNotificationService.create).toHaveBeenCalledWith(
       mockNotifyTx,
@@ -669,7 +717,9 @@ describe('SubscriptionLifecycleService.checkExpiringSoon', () => {
         type: NotificationType.SUBSCRIPTION_EXPIRING_SOON,
         relatedEntityType: NotificationRelatedEntityType.SUBSCRIPTION,
         relatedEntityId: 'sub-1',
-        metadata: expect.objectContaining({ status: SubscriptionStatus.TRIALING }),
+        metadata: expect.objectContaining({
+          status: SubscriptionStatus.TRIALING,
+        }),
       }),
     );
     expect(result.notified).toBe(1);
@@ -688,7 +738,9 @@ describe('SubscriptionLifecycleService.checkExpiringSoon', () => {
     };
     mockPrisma.subscription.findMany.mockResolvedValue([subscription]);
 
-    const result = await service.checkExpiringSoon(new Date('2026-09-05T00:00:00Z'));
+    const result = await service.checkExpiringSoon(
+      new Date('2026-09-05T00:00:00Z'),
+    );
 
     expect(mockNotificationService.create).toHaveBeenCalledWith(
       mockNotifyTx,
@@ -696,7 +748,9 @@ describe('SubscriptionLifecycleService.checkExpiringSoon', () => {
       expect.objectContaining({
         type: NotificationType.SUBSCRIPTION_EXPIRING_SOON,
         relatedEntityId: 'sub-2',
-        metadata: expect.objectContaining({ status: SubscriptionStatus.ACTIVE }),
+        metadata: expect.objectContaining({
+          status: SubscriptionStatus.ACTIVE,
+        }),
       }),
     );
     expect(result.notified).toBe(1);
@@ -714,9 +768,13 @@ describe('SubscriptionLifecycleService.checkExpiringSoon', () => {
       currentPeriodEnd: new Date('2026-09-07T00:00:00Z'),
     };
     mockPrisma.subscription.findMany.mockResolvedValue([subscription]);
-    mockNotifyTx.notification.findFirst.mockResolvedValue({ id: 'existing-notification' });
+    mockNotifyTx.notification.findFirst.mockResolvedValue({
+      id: 'existing-notification',
+    });
 
-    const result = await service.checkExpiringSoon(new Date('2026-09-05T00:00:00Z'));
+    const result = await service.checkExpiringSoon(
+      new Date('2026-09-05T00:00:00Z'),
+    );
 
     expect(mockNotificationService.create).not.toHaveBeenCalled();
     expect(result.notified).toBe(0);
@@ -736,7 +794,9 @@ describe('SubscriptionLifecycleService.checkExpiringSoon', () => {
       },
     ]);
 
-    const result = await service.checkExpiringSoon(new Date('2026-09-05T00:00:00Z'));
+    const result = await service.checkExpiringSoon(
+      new Date('2026-09-05T00:00:00Z'),
+    );
 
     expect(mockNotificationService.create).not.toHaveBeenCalled();
     expect(result.notified).toBe(0);

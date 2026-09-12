@@ -11,6 +11,11 @@ import { InventoryService } from './inventory.service';
 import { StockMovementType } from '../../../generated/phase-1-prisma/enums';
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
+import {
+  createIsolationTenantFixtures,
+  cleanupIsolationTenantFixtures,
+  type IsolationTenantFixtures,
+} from '../../../test-utils/isolation-tenant-fixtures';
 
 /**
  * Extends the Phase 1 multi-tenant isolation proof (master-data-isolation.spec.ts)
@@ -20,9 +25,10 @@ import type { AuthenticatedUser } from '../../../common/types/authenticated-user
  * must never read, write, or be blocked by Company B's balances.
  */
 describe('Business Ops Inventory Ledger — multi-tenant isolation (integration)', () => {
-  const TENANT_1 = '65b4d86b-9ce6-4d78-901c-440b0c0fd721';
-  const TENANT_2 = '632bb8a8-f9f9-4093-a903-351e3614fc88';
-  const INDUSTRY_ID = '5c961a18-af13-4638-b93d-b7faa4c502b7';
+  let TENANT_1: string;
+  let TENANT_2: string;
+  let INDUSTRY_ID: string;
+  let tenantFixtures: IsolationTenantFixtures;
   const CREATOR_USER_ID = '774bb094-6628-422a-beaf-dc0ae9e50984';
 
   let moduleRef: TestingModule;
@@ -59,6 +65,11 @@ describe('Business Ops Inventory Ledger — multi-tenant isolation (integration)
     unitService = moduleRef.get(UnitService);
     productService = moduleRef.get(ProductService);
     inventoryService = moduleRef.get(InventoryService);
+
+    tenantFixtures = await createIsolationTenantFixtures(prisma, 'inv');
+    TENANT_1 = tenantFixtures.tenantAId;
+    TENANT_2 = tenantFixtures.tenantBId;
+    INDUSTRY_ID = tenantFixtures.industryId;
 
     const companyA = await companyManagementService.create(
       {
@@ -156,6 +167,7 @@ describe('Business Ops Inventory Ledger — multi-tenant isolation (integration)
       await prisma.subscription.deleteMany({ where: { companyId } });
       await prisma.company.delete({ where: { id: companyId } });
     }
+    await cleanupIsolationTenantFixtures(prisma, tenantFixtures);
     await moduleRef.close();
   }, 30000);
 

@@ -71,19 +71,31 @@ describe('CompanySettingsService.uploadLogo', () => {
   });
 
   it('rejects a non-PNG/JPEG file before ever calling storage or touching the database', async () => {
-    const file = { buffer: Buffer.from('x'), mimetype: 'image/gif' } as Express.Multer.File;
+    const file = {
+      buffer: Buffer.from('x'),
+      mimetype: 'image/gif',
+    } as Express.Multer.File;
 
-    await expect(service.uploadLogo(context, file, actor)).rejects.toThrow(BadRequestException);
+    await expect(service.uploadLogo(context, file, actor)).rejects.toThrow(
+      BadRequestException,
+    );
     expect(mockStorageService.uploadFile).not.toHaveBeenCalled();
     expect(mockPrisma.companySettings.findFirst).not.toHaveBeenCalled();
   });
 
   it('uploads under a company-namespaced key with the correct extension/content-type, and updates Company.logoUrl', async () => {
     mockPrisma.companySettings.findFirst.mockResolvedValue(settingsRow(null));
-    mockStorageService.uploadFile.mockResolvedValue('https://pub-test.r2.dev/company-logos/company-1/new.png');
-    mockTx.companySettings.findUniqueOrThrow.mockResolvedValue(settingsRow('https://pub-test.r2.dev/company-logos/company-1/new.png'));
+    mockStorageService.uploadFile.mockResolvedValue(
+      'https://pub-test.r2.dev/company-logos/company-1/new.png',
+    );
+    mockTx.companySettings.findUniqueOrThrow.mockResolvedValue(
+      settingsRow('https://pub-test.r2.dev/company-logos/company-1/new.png'),
+    );
 
-    const file = { buffer: Buffer.from('fake-png'), mimetype: 'image/png' } as Express.Multer.File;
+    const file = {
+      buffer: Buffer.from('fake-png'),
+      mimetype: 'image/png',
+    } as Express.Multer.File;
     const result = await service.uploadLogo(context, file, actor);
 
     expect(mockStorageService.uploadFile).toHaveBeenCalledWith(
@@ -93,30 +105,50 @@ describe('CompanySettingsService.uploadLogo', () => {
     );
     expect(mockTx.company.update).toHaveBeenCalledWith({
       where: { id: 'company-1' },
-      data: { logoUrl: 'https://pub-test.r2.dev/company-logos/company-1/new.png' },
+      data: {
+        logoUrl: 'https://pub-test.r2.dev/company-logos/company-1/new.png',
+      },
     });
-    expect(result.data.logoUrl).toBe('https://pub-test.r2.dev/company-logos/company-1/new.png');
+    expect(result.data.logoUrl).toBe(
+      'https://pub-test.r2.dev/company-logos/company-1/new.png',
+    );
   });
 
   it('deletes the previous logo object when one existed', async () => {
     mockPrisma.companySettings.findFirst.mockResolvedValue(
       settingsRow('https://pub-test.r2.dev/company-logos/company-1/old.png'),
     );
-    mockStorageService.uploadFile.mockResolvedValue('https://pub-test.r2.dev/company-logos/company-1/new.jpg');
-    mockTx.companySettings.findUniqueOrThrow.mockResolvedValue(settingsRow('https://pub-test.r2.dev/company-logos/company-1/new.jpg'));
+    mockStorageService.uploadFile.mockResolvedValue(
+      'https://pub-test.r2.dev/company-logos/company-1/new.jpg',
+    );
+    mockTx.companySettings.findUniqueOrThrow.mockResolvedValue(
+      settingsRow('https://pub-test.r2.dev/company-logos/company-1/new.jpg'),
+    );
 
-    const file = { buffer: Buffer.from('fake-jpeg'), mimetype: 'image/jpeg' } as Express.Multer.File;
+    const file = {
+      buffer: Buffer.from('fake-jpeg'),
+      mimetype: 'image/jpeg',
+    } as Express.Multer.File;
     await service.uploadLogo(context, file, actor);
 
-    expect(mockStorageService.deleteFile).toHaveBeenCalledWith('company-logos/company-1/old.png');
+    expect(mockStorageService.deleteFile).toHaveBeenCalledWith(
+      'company-logos/company-1/old.png',
+    );
   });
 
   it('does not call deleteFile when there was no previous logo', async () => {
     mockPrisma.companySettings.findFirst.mockResolvedValue(settingsRow(null));
-    mockStorageService.uploadFile.mockResolvedValue('https://pub-test.r2.dev/company-logos/company-1/new.png');
-    mockTx.companySettings.findUniqueOrThrow.mockResolvedValue(settingsRow('https://pub-test.r2.dev/company-logos/company-1/new.png'));
+    mockStorageService.uploadFile.mockResolvedValue(
+      'https://pub-test.r2.dev/company-logos/company-1/new.png',
+    );
+    mockTx.companySettings.findUniqueOrThrow.mockResolvedValue(
+      settingsRow('https://pub-test.r2.dev/company-logos/company-1/new.png'),
+    );
 
-    const file = { buffer: Buffer.from('fake-png'), mimetype: 'image/png' } as Express.Multer.File;
+    const file = {
+      buffer: Buffer.from('fake-png'),
+      mimetype: 'image/png',
+    } as Express.Multer.File;
     await service.uploadLogo(context, file, actor);
 
     expect(mockStorageService.deleteFile).not.toHaveBeenCalled();

@@ -16,16 +16,13 @@ type CompanyRequest = Request & {
   companyContext: CompanyContext;
 };
 
-const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
-
 /**
  * Runs after CompanyContextGuard (needs request.companyContext.companyId
  * already resolved). Never deletes or touches any business data — this
  * only allows/blocks the current request:
  *
- *   isComplimentary        -> always allowed (VIP/demo override)
- *   TRIALING/ACTIVE/PAST_DUE -> full access
- *   GRACE                  -> read-only (safe HTTP methods only)
+ *   isComplimentary  -> always allowed (VIP/demo override)
+ *   TRIALING/ACTIVE  -> full access
  *   SUSPENDED/EXPIRED/CANCELLED/no subscription -> blocked
  *
  * Payment and Invoice controllers must never be wrapped with this guard —
@@ -66,16 +63,7 @@ export class SubscriptionStatusGuard implements CanActivate {
     switch (subscription.status) {
       case SubscriptionStatus.TRIALING:
       case SubscriptionStatus.ACTIVE:
-      case SubscriptionStatus.PAST_DUE:
         return true;
-
-      case SubscriptionStatus.GRACE:
-        if (SAFE_METHODS.has(request.method.toUpperCase())) {
-          return true;
-        }
-        throw new ForbiddenException(
-          'Subscription is in its grace period — read-only access until payment is resolved.',
-        );
 
       default:
         throw new ForbiddenException(

@@ -61,11 +61,15 @@ describe('AccessControlSetupService.reconcileOwnerAdminPermissions', () => {
 
   it('adds exactly the one missing permission code to a COMPANY_OWNER role, leaving everything else untouched', async () => {
     const missingCode = COMPANY_PERMISSIONS.NOTIFICATION_READ;
-    const existingPermissions = ALL_COMPANY_CODES.filter((code) => code !== missingCode).map(
-      (code) => ({ permissionId: permissionIdFor(code) }),
-    );
+    const existingPermissions = ALL_COMPANY_CODES.filter(
+      (code) => code !== missingCode,
+    ).map((code) => ({ permissionId: permissionIdFor(code) }));
     mockPrisma.companyRole.findMany.mockResolvedValue([
-      { id: 'role-owner-1', companyId: 'company-1', permissions: existingPermissions },
+      {
+        id: 'role-owner-1',
+        companyId: 'company-1',
+        permissions: existingPermissions,
+      },
     ]);
 
     const result = await service.reconcileOwnerAdminPermissions();
@@ -91,7 +95,9 @@ describe('AccessControlSetupService.reconcileOwnerAdminPermissions', () => {
       {
         id: 'role-admin-1',
         companyId: 'company-2',
-        permissions: ALL_COMPANY_CODES.map((code) => ({ permissionId: permissionIdFor(code) })),
+        permissions: ALL_COMPANY_CODES.map((code) => ({
+          permissionId: permissionIdFor(code),
+        })),
       },
     ]);
 
@@ -126,7 +132,9 @@ describe('AccessControlSetupService.reconcileOwnerAdminPermissions', () => {
 
     const result = await service.reconcileOwnerAdminPermissions();
 
-    expect(mockPrisma.companyRolePermission.createMany).toHaveBeenCalledTimes(2);
+    expect(mockPrisma.companyRolePermission.createMany).toHaveBeenCalledTimes(
+      2,
+    );
     expect(result.rolesUpdated).toBe(1);
     expect(result.failures).toEqual([
       { companyId: 'company-fail', roleId: 'role-fail', message: 'DB hiccup' },

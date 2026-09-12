@@ -42,7 +42,9 @@ export class StockAdjustmentLineDto {
   @IsEnum(StockAdjustmentReason)
   reason!: StockAdjustmentReason;
 
-  @ValidateIf((o: StockAdjustmentLineDto) => o.reason === StockAdjustmentReason.OTHER)
+  @ValidateIf(
+    (o: StockAdjustmentLineDto) => o.reason === StockAdjustmentReason.OTHER,
+  )
   @IsNotEmpty({ message: 'note is required when reason is OTHER' })
   @IsOptional()
   @MaxLength(2000)

@@ -1,4 +1,11 @@
-import { Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 
 import { COMPANY_PERMISSIONS } from '../../common/constants/permission.constants';
 import { CurrentCompany } from '../../common/decorators/current-company.decorator';
@@ -38,10 +45,7 @@ export class NotificationController {
 
   @Patch(':id/read')
   @RequireCompanyPermissions(COMPANY_PERMISSIONS.NOTIFICATION_READ)
-  markRead(
-    @CurrentCompany() context: CompanyContext,
-    @Param('id') id: string,
-  ) {
+  markRead(@CurrentCompany() context: CompanyContext, @Param('id') id: string) {
     return this.service.markRead(context, id);
   }
 }

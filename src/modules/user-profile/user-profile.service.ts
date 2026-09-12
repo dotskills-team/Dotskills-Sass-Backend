@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
 import { PrismaService } from '../../prisma/prisma.service';
@@ -6,6 +10,7 @@ import { StorageService } from '../storage/storage.service';
 import { hashPassword, verifyPassword } from '../../common/utils/password.util';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateNameDto } from './dto/update-name.dto';
 
 const AVATAR_CONTENT_TYPE_EXTENSION: Record<string, string> = {
   'image/png': 'png',
@@ -44,10 +49,15 @@ export class UserProfileService {
    * commits, so a failed delete never blocks the new avatar from taking
    * effect.
    */
-  async uploadProfileImage(actor: AuthenticatedUser, file: Express.Multer.File) {
+  async uploadProfileImage(
+    actor: AuthenticatedUser,
+    file: Express.Multer.File,
+  ) {
     const extension = AVATAR_CONTENT_TYPE_EXTENSION[file.mimetype];
     if (!extension) {
-      throw new BadRequestException('Profile image must be a PNG or JPEG image');
+      throw new BadRequestException(
+        'Profile image must be a PNG or JPEG image',
+      );
     }
 
     const before = await this.requireUser(actor.userId);
@@ -64,12 +74,19 @@ export class UserProfileService {
       const user = await tx.user.update({
         where: { id: actor.userId },
         data: { profileImageUrl },
-        select: { id: true, fullName: true, email: true, profileImageUrl: true },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          profileImageUrl: true,
+        },
       });
       await tx.auditLog.create({
         data: {
           actorUserId: actor.userId,
-          actorType: actor.platformMemberId ? 'PLATFORM_MEMBER' : 'COMPANY_MEMBER',
+          actorType: actor.platformMemberId
+            ? 'PLATFORM_MEMBER'
+            : 'COMPANY_MEMBER',
           action: 'USER_PROFILE_IMAGE_UPDATED',
           entityType: 'User',
           entityId: actor.userId,
@@ -84,6 +101,57 @@ export class UserProfileService {
       const previousKey = this.extractKeyFromUrl(previousImageUrl);
       if (previousKey) await this.storageService.deleteFile(previousKey);
     }
+
+    return {
+      success: true,
+      data: {
+        userId: updated.id,
+        fullName: updated.fullName,
+        email: updated.email,
+        profileImageUrl: updated.profileImageUrl,
+      },
+    };
+  }
+
+  /**
+   * Mirrors uploadProfileImage()'s shape (before/after audit log, fresh
+   * DB read scoped by actor.userId) — a display-name edit, nothing else;
+   * email/credentials/roles are untouched and unreachable from this route.
+   */
+  async updateName(actor: AuthenticatedUser, dto: UpdateNameDto) {
+    const fullName = dto.fullName.trim();
+    if (!fullName) {
+      throw new BadRequestException('Full name cannot be empty');
+    }
+
+    const before = await this.requireUser(actor.userId);
+
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.update({
+        where: { id: actor.userId },
+        data: { fullName },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          profileImageUrl: true,
+        },
+      });
+      await tx.auditLog.create({
+        data: {
+          actorUserId: actor.userId,
+          actorType: actor.platformMemberId
+            ? 'PLATFORM_MEMBER'
+            : 'COMPANY_MEMBER',
+          action: 'USER_PROFILE_NAME_UPDATED',
+          entityType: 'User',
+          entityId: actor.userId,
+          beforeData: { fullName: before.fullName },
+          afterData: { fullName: user.fullName },
+        },
+      });
+      return user;
+    });
 
     return {
       success: true,
@@ -129,7 +197,9 @@ export class UserProfileService {
       await tx.auditLog.create({
         data: {
           actorUserId: actor.userId,
-          actorType: actor.platformMemberId ? 'PLATFORM_MEMBER' : 'COMPANY_MEMBER',
+          actorType: actor.platformMemberId
+            ? 'PLATFORM_MEMBER'
+            : 'COMPANY_MEMBER',
           action: 'USER_PASSWORD_CHANGED',
           entityType: 'User',
           entityId: actor.userId,

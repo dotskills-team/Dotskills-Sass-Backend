@@ -29,12 +29,16 @@ export const SUBSCRIPTION_CONSTANTS = {
 /**
  * Allowed subscription status transitions.
  *
- * PAST_DUE/GRACE are no longer reachable (business decision: a payment
- * failure no longer degrades a subscription in stages — an unpaid period
- * simply expires) but keep their Record key (TypeScript exhaustiveness)
- * and a recovery-only outgoing list, so a pre-existing row already sitting
- * in one of these states (e.g. older local data) can still be manually
- * recovered or force-expired rather than being permanently stuck.
+ * PAST_DUE and GRACE are no longer reachable by any code path (business
+ * decision: a payment failure no longer degrades a subscription in
+ * stages — an unpaid period simply expires) but still exist as
+ * SubscriptionStatus enum members, kept solely because real historical
+ * SubscriptionEvent audit rows reference them — see the enum's own doc
+ * comment in schema.prisma. TypeScript's `Record<SubscriptionStatus, ...>`
+ * requires every enum key present, so they keep a recovery-only outgoing
+ * list here (force back to ACTIVE, or terminate) purely so the type
+ * compiles and a pre-existing row would never be silently stuck if one
+ * were ever found — nothing produces new rows in these states.
  *
  * SUSPENDED is still reachable — but only via SubscriptionService's manual
  * Platform-Admin suspendForPlatform() (policy/abuse suspension), never
@@ -77,7 +81,8 @@ export const ALLOWED_SUBSCRIPTION_TRANSITIONS: Record<
     SubscriptionStatus.EXPIRED,
   ],
 
-  // Legacy/unreachable-going-forward — recovery or force-expiry only
+  // Unreachable going forward — recovery or force-expiry only, for a
+  // pre-existing row (see doc comment above).
   [SubscriptionStatus.PAST_DUE]: [
     SubscriptionStatus.ACTIVE,
     SubscriptionStatus.CANCELLED,

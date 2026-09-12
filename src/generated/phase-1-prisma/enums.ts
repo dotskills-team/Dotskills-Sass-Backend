@@ -176,9 +176,7 @@ export const BillingStatus = {
   PENDING: 'PENDING',
   PROCESSING: 'PROCESSING',
   SUCCEEDED: 'SUCCEEDED',
-  FAILED: 'FAILED',
-  CANCELLED: 'CANCELLED',
-  SKIPPED: 'SKIPPED'
+  FAILED: 'FAILED'
 } as const
 
 export type BillingStatus = (typeof BillingStatus)[keyof typeof BillingStatus]
@@ -198,7 +196,6 @@ export const InvoiceStatus = {
   DRAFT: 'DRAFT',
   ISSUED: 'ISSUED',
   PAID: 'PAID',
-  CANCELLED: 'CANCELLED',
   VOID: 'VOID'
 } as const
 

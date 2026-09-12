@@ -20,10 +20,7 @@ import { SubscriptionService } from './subscription.service';
 import { PriceSnapshot } from './subscription.types';
 
 type CheckoutIntent =
-  | 'RENEWAL'
-  | 'FIRST_SUBSCRIPTION'
-  | 'PLAN_CHANGE'
-  | 'MANUAL_PAYMENT';
+  'RENEWAL' | 'FIRST_SUBSCRIPTION' | 'PLAN_CHANGE' | 'MANUAL_PAYMENT';
 
 interface PlanOverride {
   planId: string;
@@ -161,12 +158,18 @@ export class SubscriptionRenewalService {
 
     return this.prisma.$transaction(async (tx) => {
       const existingBilling = await tx.billing.findFirst({
-        where: { subscriptionId: subscription.id, status: BillingStatus.PENDING },
+        where: {
+          subscriptionId: subscription.id,
+          status: BillingStatus.PENDING,
+        },
         include: { invoice: true },
         orderBy: { createdAt: 'desc' },
       });
 
-      if (existingBilling && this.matchesIntent(existingBilling, intent, planOverride)) {
+      if (
+        existingBilling &&
+        this.matchesIntent(existingBilling, intent, planOverride)
+      ) {
         let invoice = existingBilling.invoice;
         if (!invoice) {
           invoice = await this.invoiceService.create(
@@ -176,7 +179,11 @@ export class SubscriptionRenewalService {
           );
         }
         if (invoice.status === InvoiceStatus.DRAFT) {
-          invoice = await this.invoiceService.issue(invoice.id, actorUserId, tx);
+          invoice = await this.invoiceService.issue(
+            invoice.id,
+            actorUserId,
+            tx,
+          );
         }
         return { billing: existingBilling, invoice };
       }

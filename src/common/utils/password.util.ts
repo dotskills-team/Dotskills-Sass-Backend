@@ -24,7 +24,10 @@ export async function hashPassword(password: string): Promise<string> {
   return argon2.hash(password, argonOptions());
 }
 
-export async function verifyPassword(hash: string, password: string): Promise<boolean> {
+export async function verifyPassword(
+  hash: string,
+  password: string,
+): Promise<boolean> {
   try {
     if (hash.startsWith('$argon2')) return await argon2.verify(hash, password);
     if (/^\$2[aby]\$/.test(hash)) return await bcrypt.compare(password, hash);

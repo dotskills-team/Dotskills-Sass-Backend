@@ -29,7 +29,11 @@ describe('CashDrawerSessionService', () => {
 
   const mockPrisma = {
     location: { findFirst: jest.fn() },
-    cashDrawerSession: { findFirst: jest.fn(), findMany: jest.fn(), count: jest.fn() },
+    cashDrawerSession: {
+      findFirst: jest.fn(),
+      findMany: jest.fn(),
+      count: jest.fn(),
+    },
     companyMemberRole: { findMany: jest.fn() },
     $transaction: jest.fn((arg: any) =>
       typeof arg === 'function' ? arg(mockTx) : Promise.all(arg),
@@ -328,7 +332,7 @@ describe('CashDrawerSessionService', () => {
       });
     });
 
-    it('rejects closing another cashier\'s session when the actor lacks CASH_DRAWER_SESSION_MANAGE_ALL', async () => {
+    it("rejects closing another cashier's session when the actor lacks CASH_DRAWER_SESSION_MANAGE_ALL", async () => {
       mockPrisma.cashDrawerSession.findFirst.mockResolvedValue({
         ...openSessionRow,
         cashierId: 'other-cashier',
@@ -345,13 +349,15 @@ describe('CashDrawerSessionService', () => {
       expect(mockTx.cashDrawerSession.update).not.toHaveBeenCalled();
     });
 
-    it('allows closing another cashier\'s session when the actor holds CASH_DRAWER_SESSION_MANAGE_ALL (Manager tier)', async () => {
+    it("allows closing another cashier's session when the actor holds CASH_DRAWER_SESSION_MANAGE_ALL (Manager tier)", async () => {
       mockPrisma.cashDrawerSession.findFirst.mockResolvedValue({
         ...openSessionRow,
         cashierId: 'other-cashier',
       });
       mockManageAll(true);
-      mockTx.salePayment.aggregate.mockResolvedValue({ _sum: { amount: null } });
+      mockTx.salePayment.aggregate.mockResolvedValue({
+        _sum: { amount: null },
+      });
 
       const result = await service.closeSession(
         context,
@@ -365,7 +371,9 @@ describe('CashDrawerSessionService', () => {
     });
 
     it("checks Location access for the loaded session's own locationId", async () => {
-      mockTx.salePayment.aggregate.mockResolvedValue({ _sum: { amount: null } });
+      mockTx.salePayment.aggregate.mockResolvedValue({
+        _sum: { amount: null },
+      });
 
       await service.closeSession(
         context,
@@ -407,15 +415,15 @@ describe('CashDrawerSessionService', () => {
       expect(result.success).toBe(true);
     });
 
-    it('a non-elevated actor cannot read another cashier\'s session', async () => {
+    it("a non-elevated actor cannot read another cashier's session", async () => {
       mockPrisma.cashDrawerSession.findFirst.mockResolvedValue({
         id: 'session-1',
         cashierId: 'other-cashier',
       });
 
-      await expect(service.findOne(context, 'session-1', actor)).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expect(
+        service.findOne(context, 'session-1', actor),
+      ).rejects.toThrow(ForbiddenException);
     });
 
     it('an actor with CASH_DRAWER_SESSION_MANAGE_ALL can read any session', async () => {
@@ -453,50 +461,56 @@ describe('CashDrawerSessionService', () => {
         new ForbiddenException('You do not have access to this location'),
       );
 
-      await expect(service.findOne(context, 'session-1', actor)).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expect(
+        service.findOne(context, 'session-1', actor),
+      ).rejects.toThrow(ForbiddenException);
     });
   });
 
   describe('list — ownership scoping', () => {
     beforeEach(() => {
       mockPrisma.cashDrawerSession.findMany.mockResolvedValue([]);
-      (mockPrisma.cashDrawerSession as any).count = jest.fn().mockResolvedValue(0);
+      (mockPrisma.cashDrawerSession as any).count = jest
+        .fn()
+        .mockResolvedValue(0);
     });
 
-    it('force-scopes to the actor\'s own cashierId when not elevated, ignoring any client-supplied cashierId', async () => {
-      await service.list(context, { cashierId: 'someone-else' } as any, actor);
+    it("force-scopes to the actor's own cashierId when not elevated, ignoring any client-supplied cashierId", async () => {
+      await service.list(context, { cashierId: 'someone-else' }, actor);
 
-      const [findManyArgs] = mockPrisma.cashDrawerSession.findMany.mock.calls[0];
+      const [findManyArgs] =
+        mockPrisma.cashDrawerSession.findMany.mock.calls[0];
       expect(findManyArgs.where.cashierId).toBe('cashier-1');
     });
 
     it('respects the client-supplied cashierId (or shows all) when the actor holds CASH_DRAWER_SESSION_MANAGE_ALL', async () => {
       mockManageAll(true);
 
-      await service.list(context, { cashierId: 'someone-else' } as any, actor);
+      await service.list(context, { cashierId: 'someone-else' }, actor);
 
-      const [findManyArgs] = mockPrisma.cashDrawerSession.findMany.mock.calls[0];
+      const [findManyArgs] =
+        mockPrisma.cashDrawerSession.findMany.mock.calls[0];
       expect(findManyArgs.where.cashierId).toBe('someone-else');
     });
 
-    it('an elevated actor with no cashierId filter sees every cashier\'s sessions', async () => {
+    it("an elevated actor with no cashierId filter sees every cashier's sessions", async () => {
       mockManageAll(true);
 
-      await service.list(context, {} as any, actor);
+      await service.list(context, {}, actor);
 
-      const [findManyArgs] = mockPrisma.cashDrawerSession.findMany.mock.calls[0];
+      const [findManyArgs] =
+        mockPrisma.cashDrawerSession.findMany.mock.calls[0];
       expect(findManyArgs.where.cashierId).toBeUndefined();
     });
 
     it('checks Location access when an explicit locationId filter is given', async () => {
-      await service.list(context, { locationId: 'loc-1' } as any, actor);
+      await service.list(context, { locationId: 'loc-1' }, actor);
 
       expect(
         mockLocationAccessService.assertHasLocationAccess,
       ).toHaveBeenCalledWith(context, 'loc-1');
-      const [findManyArgs] = mockPrisma.cashDrawerSession.findMany.mock.calls[0];
+      const [findManyArgs] =
+        mockPrisma.cashDrawerSession.findMany.mock.calls[0];
       expect(findManyArgs.where.locationId).toBe('loc-1');
     });
 
@@ -517,18 +531,20 @@ describe('CashDrawerSessionService', () => {
         'loc-2',
       ]);
 
-      await service.list(context, {} as any, actor);
+      await service.list(context, {}, actor);
 
-      const [findManyArgs] = mockPrisma.cashDrawerSession.findMany.mock.calls[0];
+      const [findManyArgs] =
+        mockPrisma.cashDrawerSession.findMany.mock.calls[0];
       expect(findManyArgs.where.locationId).toEqual({ in: ['loc-1', 'loc-2'] });
     });
 
     it('applies no location filter at all when the actor holds LOCATION_ACCESS_ALL and no locationId was given', async () => {
       mockLocationAccessService.getAssignedLocationIds.mockResolvedValue('ALL');
 
-      await service.list(context, {} as any, actor);
+      await service.list(context, {}, actor);
 
-      const [findManyArgs] = mockPrisma.cashDrawerSession.findMany.mock.calls[0];
+      const [findManyArgs] =
+        mockPrisma.cashDrawerSession.findMany.mock.calls[0];
       expect(findManyArgs.where.locationId).toBeUndefined();
     });
   });

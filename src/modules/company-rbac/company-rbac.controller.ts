@@ -84,7 +84,8 @@ export class CompanyRbacController {
    */
   @Get('my-location-access')
   async getMyLocationAccess(@CurrentCompany() context: CompanyContext) {
-    const assigned = await this.locationAccessService.getAssignedLocationIds(context);
+    const assigned =
+      await this.locationAccessService.getAssignedLocationIds(context);
     return {
       success: true,
       data:

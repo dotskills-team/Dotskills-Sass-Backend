@@ -291,13 +291,6 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
   // Billing Management
   // =====================================================
   {
-    code: PLATFORM_PERMISSIONS.BILLING_CREATE,
-    moduleCode: 'billing_management',
-    resource: 'billing',
-    action: 'create',
-    name: 'Create billing records',
-  },
-  {
     code: PLATFORM_PERMISSIONS.BILLING_READ,
     moduleCode: 'billing_management',
     resource: 'billing',
@@ -318,45 +311,9 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
     action: 'retry',
     name: 'Retry failed billing charges',
   },
-  {
-    code: PLATFORM_PERMISSIONS.BILLING_CANCEL,
-    moduleCode: 'billing_management',
-    resource: 'billing',
-    action: 'cancel',
-    name: 'Cancel billing records',
-  },
-  {
-    code: PLATFORM_PERMISSIONS.BILLING_SKIP,
-    moduleCode: 'billing_management',
-    resource: 'billing',
-    action: 'skip',
-    name: 'Skip billing records',
-  },
-  {
-    code: PLATFORM_PERMISSIONS.BILLING_MARK_SUCCEEDED,
-    moduleCode: 'billing_management',
-    resource: 'billing',
-    action: 'mark_succeeded',
-    name: 'Mark billing as succeeded',
-  },
-  {
-    code: PLATFORM_PERMISSIONS.BILLING_MARK_FAILED,
-    moduleCode: 'billing_management',
-    resource: 'billing',
-    action: 'mark_failed',
-    name: 'Mark billing as failed',
-  },
-
   // =====================================================
   // Invoice Management
   // =====================================================
-  {
-    code: PLATFORM_PERMISSIONS.INVOICE_CREATE,
-    moduleCode: 'invoice_management',
-    resource: 'invoice',
-    action: 'create',
-    name: 'Create invoices',
-  },
   {
     code: PLATFORM_PERMISSIONS.INVOICE_READ,
     moduleCode: 'invoice_management',
@@ -372,25 +329,11 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
     name: 'Issue invoices',
   },
   {
-    code: PLATFORM_PERMISSIONS.INVOICE_CANCEL,
-    moduleCode: 'invoice_management',
-    resource: 'invoice',
-    action: 'cancel',
-    name: 'Cancel invoices',
-  },
-  {
     code: PLATFORM_PERMISSIONS.INVOICE_VOID,
     moduleCode: 'invoice_management',
     resource: 'invoice',
     action: 'void',
     name: 'Void invoices',
-  },
-  {
-    code: PLATFORM_PERMISSIONS.INVOICE_MARK_PAID,
-    moduleCode: 'invoice_management',
-    resource: 'invoice',
-    action: 'mark_paid',
-    name: 'Mark invoices as paid',
   },
 
   // =====================================================
@@ -1129,7 +1072,7 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
     moduleCode: 'company_sales',
     resource: 'cash-drawer-session',
     action: 'manage-all',
-    name: 'View or close any cashier\'s cash drawer session',
+    name: "View or close any cashier's cash drawer session",
   },
   {
     code: COMPANY_PERMISSIONS.REPORT_READ,
@@ -1165,6 +1108,23 @@ export const PERMISSION_CATALOG: PermissionDefinition[] = [
     resource: 'notification',
     action: 'read',
     name: 'Read dashboard notifications',
+  },
+  // =====================================================
+  // Platform Settings (branding)
+  // =====================================================
+  {
+    code: PLATFORM_PERMISSIONS.SETTINGS_READ,
+    moduleCode: 'platform_settings',
+    resource: 'settings',
+    action: 'read',
+    name: 'Read platform branding settings',
+  },
+  {
+    code: PLATFORM_PERMISSIONS.SETTINGS_UPDATE,
+    moduleCode: 'platform_settings',
+    resource: 'settings',
+    action: 'update',
+    name: 'Update platform branding (logo)',
   },
 ];
 

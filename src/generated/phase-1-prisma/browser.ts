@@ -338,3 +338,13 @@ export type PlatformRolePermission = Prisma.PlatformRolePermissionModel
  * 
  */
 export type CompanyRolePermission = Prisma.CompanyRolePermissionModel
+/**
+ * Model PlatformSettings
+ * *
+ *  * Platform-wide branding — a genuine singleton (always `id = 1`, enforced
+ *  * app-side by always upserting that fixed id, never letting the client
+ *  * choose one). Mirrors `Company.logoUrl` exactly, just not company-scoped:
+ *  * this is the one logo shown in the Super Admin/Platform Staff shell
+ *  * (sidebar/navbar), not any individual company's own branding.
+ */
+export type PlatformSettings = Prisma.PlatformSettingsModel

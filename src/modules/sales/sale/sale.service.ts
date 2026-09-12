@@ -161,7 +161,11 @@ export class SaleService {
         'A customerId is required when any payment uses the DUE method',
       );
     }
-    let customer: { id: string; name: string; dueBalance: Prisma.Decimal } | null = null;
+    let customer: {
+      id: string;
+      name: string;
+      dueBalance: Prisma.Decimal;
+    } | null = null;
     if (dto.customerId) {
       const found = await this.prisma.customer.findFirst({
         where: {

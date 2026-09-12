@@ -19,7 +19,10 @@ import { SubscriptionRenewalService } from './subscription-renewal.service';
  */
 @Module({
   imports: [SubscriptionModule, BillingModule, InvoiceModule],
-  controllers: [SubscriptionRenewalController],
+  controllers: [
+    SubscriptionRenewalController,
+    CompanySubscriptionCheckoutController,
+  ],
   providers: [SubscriptionRenewalService, SubscriptionRenewalScheduler],
   exports: [SubscriptionRenewalService],
 })

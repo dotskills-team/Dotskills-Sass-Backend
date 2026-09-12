@@ -147,9 +147,9 @@ describe('SaleRegisterService', () => {
         dateTo: '2026-01-31',
       });
 
-      expect(mockPrisma.sale.findMany.mock.calls[0][0].where.locationId).toEqual(
-        { in: ['loc-1', 'loc-2'] },
-      );
+      expect(
+        mockPrisma.sale.findMany.mock.calls[0][0].where.locationId,
+      ).toEqual({ in: ['loc-1', 'loc-2'] });
     });
 
     it('applies no location filter when the actor holds LOCATION_ACCESS_ALL and no locationId was given', async () => {

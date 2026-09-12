@@ -190,7 +190,8 @@ describe('StockReportService', () => {
       await service.getStockReport(context, { belowReorderOnly: true });
 
       const [rowsQuery] = mockPrisma.$queryRaw.mock.calls[0];
-      const sqlText = rowsQuery.sql ?? rowsQuery.text ?? JSON.stringify(rowsQuery);
+      const sqlText =
+        rowsQuery.sql ?? rowsQuery.text ?? JSON.stringify(rowsQuery);
       expect(sqlText).toContain('AND FALSE');
       expect(sqlText).not.toContain('IN ()');
     });

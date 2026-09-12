@@ -106,7 +106,8 @@ export const ModelName = {
   AuditLog: 'AuditLog',
   Permission: 'Permission',
   PlatformRolePermission: 'PlatformRolePermission',
-  CompanyRolePermission: 'CompanyRolePermission'
+  CompanyRolePermission: 'CompanyRolePermission',
+  PlatformSettings: 'PlatformSettings'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1055,6 +1056,16 @@ export const CompanyRolePermissionScalarFieldEnum = {
 } as const
 
 export type CompanyRolePermissionScalarFieldEnum = (typeof CompanyRolePermissionScalarFieldEnum)[keyof typeof CompanyRolePermissionScalarFieldEnum]
+
+
+export const PlatformSettingsScalarFieldEnum = {
+  id: 'id',
+  logoUrl: 'logoUrl',
+  updatedAt: 'updatedAt',
+  updatedByUserId: 'updatedByUserId'
+} as const
+
+export type PlatformSettingsScalarFieldEnum = (typeof PlatformSettingsScalarFieldEnum)[keyof typeof PlatformSettingsScalarFieldEnum]
 
 
 export const SortOrder = {

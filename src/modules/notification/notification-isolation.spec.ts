@@ -17,6 +17,11 @@ import {
 } from '../../generated/phase-1-prisma/enums';
 import type { CompanyContext } from '../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
+import {
+  createIsolationTenantFixtures,
+  cleanupIsolationTenantFixtures,
+  type IsolationTenantFixtures,
+} from '../../test-utils/isolation-tenant-fixtures';
 
 /**
  * Mandatory multi-tenant isolation proof for the Notification Bell feature
@@ -28,9 +33,10 @@ import type { AuthenticatedUser } from '../../common/types/authenticated-user.ty
  * product/location setup in both companies.
  */
 describe('Notification — multi-tenant isolation (integration)', () => {
-  const TENANT_1 = '65b4d86b-9ce6-4d78-901c-440b0c0fd721';
-  const TENANT_2 = '632bb8a8-f9f9-4093-a903-351e3614fc88';
-  const INDUSTRY_ID = '5c961a18-af13-4638-b93d-b7faa4c502b7';
+  let TENANT_1: string;
+  let TENANT_2: string;
+  let INDUSTRY_ID: string;
+  let tenantFixtures: IsolationTenantFixtures;
   const CREATOR_USER_ID = '774bb094-6628-422a-beaf-dc0ae9e50984';
 
   let moduleRef: TestingModule;
@@ -70,6 +76,11 @@ describe('Notification — multi-tenant isolation (integration)', () => {
     productService = moduleRef.get(ProductService);
     inventoryService = moduleRef.get(InventoryService);
     notificationService = moduleRef.get(NotificationService);
+
+    tenantFixtures = await createIsolationTenantFixtures(prisma, 'notif');
+    TENANT_1 = tenantFixtures.tenantAId;
+    TENANT_2 = tenantFixtures.tenantBId;
+    INDUSTRY_ID = tenantFixtures.industryId;
 
     const companyA = await companyManagementService.create(
       {
@@ -145,6 +156,7 @@ describe('Notification — multi-tenant isolation (integration)', () => {
       await prisma.companyRole.deleteMany({ where: { companyId } });
       await prisma.company.delete({ where: { id: companyId } });
     }
+    await cleanupIsolationTenantFixtures(prisma, tenantFixtures);
     await moduleRef.close();
   }, 30000);
 
@@ -153,7 +165,7 @@ describe('Notification — multi-tenant isolation (integration)', () => {
       notificationService.create(tx, contextB, {
         type: NotificationType.STAFF_ACTIVITY,
         relatedEntityType: NotificationRelatedEntityType.COMPANY_MEMBER,
-        relatedEntityId: contextB.companyMemberId!,
+        relatedEntityId: contextB.companyMemberId,
         metadata: { memberName: 'B Owner', action: 'MEMBER_CREATED' },
       }),
     );
@@ -171,17 +183,28 @@ describe('Notification — multi-tenant isolation (integration)', () => {
     });
     expect(stillUnread.isRead).toBe(false);
 
-    const marked = await notificationService.markRead(contextB, notificationB.id);
+    const marked = await notificationService.markRead(
+      contextB,
+      notificationB.id,
+    );
     expect(marked.data.isRead).toBe(true);
   }, 30000);
 
   it('a real Out-of-Stock event triggered in Company A never creates a Notification row in Company B, even with an identically-shaped product/location setup', async () => {
     const [locA, unitA] = await Promise.all([
-      locationService.create(contextA, { name: 'A Counter', locationType: 'BRANCH' as any }, actor),
+      locationService.create(
+        contextA,
+        { name: 'A Counter', locationType: 'BRANCH' as any },
+        actor,
+      ),
       unitService.create(contextA, { name: 'Piece', code: 'PCS' }, actor),
     ]);
     const [locB, unitB] = await Promise.all([
-      locationService.create(contextB, { name: 'A Counter', locationType: 'BRANCH' as any }, actor),
+      locationService.create(
+        contextB,
+        { name: 'A Counter', locationType: 'BRANCH' as any },
+        actor,
+      ),
       unitService.create(contextB, { name: 'Piece', code: 'PCS' }, actor),
     ]);
 

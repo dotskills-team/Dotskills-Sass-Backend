@@ -21,7 +21,9 @@ export class LocationAccessService {
   ) {}
 
   /** `'ALL'` for an unrestricted actor, otherwise the exact list of Location ids this actor may act on. */
-  async getAssignedLocationIds(context: CompanyContext): Promise<string[] | 'ALL'> {
+  async getAssignedLocationIds(
+    context: CompanyContext,
+  ): Promise<string[] | 'ALL'> {
     const hasAll = await this.permissionResolver.hasPermission(
       context,
       COMPANY_PERMISSIONS.LOCATION_ACCESS_ALL,
@@ -46,9 +48,7 @@ export class LocationAccessService {
     const assigned = await this.getAssignedLocationIds(context);
     if (assigned === 'ALL') return;
     if (!assigned.includes(locationId)) {
-      throw new ForbiddenException(
-        'You do not have access to this location',
-      );
+      throw new ForbiddenException('You do not have access to this location');
     }
   }
 }

@@ -1,4 +1,12 @@
-import { Body, Controller, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import type { Request } from 'express';
 
 import { PLATFORM_PERMISSIONS } from '../../common/constants/permission.constants';

@@ -65,6 +65,16 @@ export class CompanyPaymentController {
     return this.paymentService.findOne(id, this.scope(req));
   }
 
+  /** Only ever returns data for an already-SUCCEEDED payment (BadRequestException otherwise). */
+  @Get(':id/receipt')
+  @RequireCompanyPermissions(COMPANY_PERMISSIONS.PAYMENT_READ)
+  getReceipt(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.paymentService.getReceipt(id, this.scope(req));
+  }
+
   private scope(req: AuthenticatedRequest) {
     return {
       tenantId: req.companyContext.tenantId,

@@ -452,7 +452,8 @@ export const ModelName = {
   AuditLog: 'AuditLog',
   Permission: 'Permission',
   PlatformRolePermission: 'PlatformRolePermission',
-  CompanyRolePermission: 'CompanyRolePermission'
+  CompanyRolePermission: 'CompanyRolePermission',
+  PlatformSettings: 'PlatformSettings'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -468,7 +469,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "authSession" | "loginEvent" | "platformMember" | "platformRole" | "platformMemberRole" | "feature" | "plan" | "planPrice" | "planFeature" | "tenant" | "industry" | "company" | "location" | "category" | "unit" | "product" | "customer" | "supplier" | "inventory" | "stockMovement" | "stockAdjustment" | "purchaseOrderSequence" | "purchaseOrder" | "purchaseOrderItem" | "goodsReceipt" | "purchaseReturn" | "stockTransfer" | "supplierPayableLedger" | "saleSequence" | "sale" | "saleItem" | "salePayment" | "saleReturn" | "customerDueLedger" | "cashDrawerSession" | "companySettings" | "companyMember" | "companyRole" | "companyMemberRole" | "companyMemberScope" | "companyMemberLocation" | "notification" | "companyOwnership" | "subscription" | "billing" | "billingAttempt" | "invoice" | "invoiceSequence" | "payment" | "subscriptionEvent" | "invitation" | "auditLog" | "permission" | "platformRolePermission" | "companyRolePermission"
+    modelProps: "user" | "authSession" | "loginEvent" | "platformMember" | "platformRole" | "platformMemberRole" | "feature" | "plan" | "planPrice" | "planFeature" | "tenant" | "industry" | "company" | "location" | "category" | "unit" | "product" | "customer" | "supplier" | "inventory" | "stockMovement" | "stockAdjustment" | "purchaseOrderSequence" | "purchaseOrder" | "purchaseOrderItem" | "goodsReceipt" | "purchaseReturn" | "stockTransfer" | "supplierPayableLedger" | "saleSequence" | "sale" | "saleItem" | "salePayment" | "saleReturn" | "customerDueLedger" | "cashDrawerSession" | "companySettings" | "companyMember" | "companyRole" | "companyMemberRole" | "companyMemberScope" | "companyMemberLocation" | "notification" | "companyOwnership" | "subscription" | "billing" | "billingAttempt" | "invoice" | "invoiceSequence" | "payment" | "subscriptionEvent" | "invitation" | "auditLog" | "permission" | "platformRolePermission" | "companyRolePermission" | "platformSettings"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4616,6 +4617,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PlatformSettings: {
+      payload: Prisma.$PlatformSettingsPayload<ExtArgs>
+      fields: Prisma.PlatformSettingsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlatformSettingsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlatformSettingsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingsPayload>
+        }
+        findFirst: {
+          args: Prisma.PlatformSettingsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlatformSettingsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingsPayload>
+        }
+        findMany: {
+          args: Prisma.PlatformSettingsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingsPayload>[]
+        }
+        create: {
+          args: Prisma.PlatformSettingsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingsPayload>
+        }
+        createMany: {
+          args: Prisma.PlatformSettingsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlatformSettingsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingsPayload>[]
+        }
+        delete: {
+          args: Prisma.PlatformSettingsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingsPayload>
+        }
+        update: {
+          args: Prisma.PlatformSettingsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingsPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlatformSettingsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlatformSettingsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlatformSettingsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingsPayload>[]
+        }
+        upsert: {
+          args: Prisma.PlatformSettingsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformSettingsPayload>
+        }
+        aggregate: {
+          args: Prisma.PlatformSettingsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlatformSettings>
+        }
+        groupBy: {
+          args: Prisma.PlatformSettingsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformSettingsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlatformSettingsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformSettingsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -5587,6 +5662,16 @@ export const CompanyRolePermissionScalarFieldEnum = {
 export type CompanyRolePermissionScalarFieldEnum = (typeof CompanyRolePermissionScalarFieldEnum)[keyof typeof CompanyRolePermissionScalarFieldEnum]
 
 
+export const PlatformSettingsScalarFieldEnum = {
+  id: 'id',
+  logoUrl: 'logoUrl',
+  updatedAt: 'updatedAt',
+  updatedByUserId: 'updatedByUserId'
+} as const
+
+export type PlatformSettingsScalarFieldEnum = (typeof PlatformSettingsScalarFieldEnum)[keyof typeof PlatformSettingsScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -6512,6 +6597,7 @@ export type GlobalOmitConfig = {
   permission?: Prisma.PermissionOmit
   platformRolePermission?: Prisma.PlatformRolePermissionOmit
   companyRolePermission?: Prisma.CompanyRolePermissionOmit
+  platformSettings?: Prisma.PlatformSettingsOmit
 }
 
 /* Types for Logging */

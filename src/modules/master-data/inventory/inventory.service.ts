@@ -217,7 +217,14 @@ export class InventoryService {
       signedChangeQty: Prisma.Decimal;
     },
   ) {
-    const { tenantId, companyId, productId, locationId, afterQty, signedChangeQty } = params;
+    const {
+      tenantId,
+      companyId,
+      productId,
+      locationId,
+      afterQty,
+      signedChangeQty,
+    } = params;
 
     const product = await tx.product.findUnique({
       where: { id: productId },
@@ -229,7 +236,10 @@ export class InventoryService {
 
     const band = (qty: Prisma.Decimal): 'OUT' | 'LOW' | 'OK' => {
       if (qty.lessThanOrEqualTo(0)) return 'OUT';
-      if (product.reorderLevel.greaterThan(0) && qty.lessThan(product.reorderLevel)) {
+      if (
+        product.reorderLevel.greaterThan(0) &&
+        qty.lessThan(product.reorderLevel)
+      ) {
         return 'LOW';
       }
       return 'OK';
@@ -248,21 +258,25 @@ export class InventoryService {
       select: { name: true },
     });
 
-    await this.notificationService.create(tx, { tenantId, companyId }, {
-      type: crossedIntoOutOfStock
-        ? NotificationType.OUT_OF_STOCK
-        : NotificationType.LOW_STOCK,
-      relatedEntityType: NotificationRelatedEntityType.PRODUCT,
-      relatedEntityId: productId,
-      locationId,
-      metadata: {
-        productName: product.name,
-        sku: product.sku,
-        locationName: location?.name ?? '',
-        quantity: afterQty.toString(),
-        reorderLevel: product.reorderLevel.toString(),
+    await this.notificationService.create(
+      tx,
+      { tenantId, companyId },
+      {
+        type: crossedIntoOutOfStock
+          ? NotificationType.OUT_OF_STOCK
+          : NotificationType.LOW_STOCK,
+        relatedEntityType: NotificationRelatedEntityType.PRODUCT,
+        relatedEntityId: productId,
+        locationId,
+        metadata: {
+          productName: product.name,
+          sku: product.sku,
+          locationName: location?.name ?? '',
+          quantity: afterQty.toString(),
+          reorderLevel: product.reorderLevel.toString(),
+        },
       },
-    });
+    );
   }
 
   async getBalance(

@@ -1,10 +1,8 @@
 import {
-  Body,
   Controller,
   Get,
   Param,
   ParseUUIDPipe,
-  Patch,
   Post,
   Query,
   Req,
@@ -13,12 +11,7 @@ import {
 
 import { Request } from 'express';
 
-// import { BillingService } from './billing.service';
-
-import { CreateBillingDto } from './dto/create-billing.dto';
 import { QueryBillingDto } from './dto/query-billing.dto';
-import { CancelBillingDto } from './dto/cancel-billing.dto';
-import { MarkFailedBillingDto } from './dto/mark-failed-billing.dto';
 
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -29,18 +22,19 @@ import { RequirePlatformPermissions } from '../../common/decorators/require-plat
 import { PLATFORM_PERMISSIONS } from '../../common/constants/permission.constants';
 import { BillingService } from './billing.service';
 
+/**
+ * Billing is system-generated only — there is no manual "create a Billing"
+ * route (SubscriptionRenewalService.ensureBillingAndInvoice() is the only
+ * caller of BillingService.create(), reached via checkout/renewal/manual
+ * payment). `process`/`retry` stay as the Platform Admin's manual
+ * re-attempt tools for a Billing that's already system-generated — they
+ * don't create anything new, just advance an existing row through the
+ * exact same settlement path a real payment attempt uses.
+ */
 @Controller('platform/billings')
 @UseGuards(JwtAuthGuard, PlatformPermissionsGuard)
 export class BillingController {
   constructor(private readonly billingService: BillingService) {}
-
-  @Post()
-  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.BILLING_CREATE)
-  create(@Body() dto: CreateBillingDto, @Req() req: Request) {
-    const user = req.user as any;
-
-    return this.billingService.create(dto, user.userId);
-  }
 
   @Get()
   @RequirePlatformPermissions(PLATFORM_PERMISSIONS.BILLING_READ)
@@ -68,45 +62,5 @@ export class BillingController {
     const user = req.user as any;
 
     return this.billingService.retry(id, user.userId);
-  }
-
-  @Post(':id/cancel')
-  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.BILLING_CANCEL)
-  cancel(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: CancelBillingDto,
-    @Req() req: Request,
-  ) {
-    const user = req.user as any;
-
-    return this.billingService.cancel(id, dto, user.userId);
-  }
-
-  @Post(':id/skip')
-  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.BILLING_SKIP)
-  skip(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
-    const user = req.user as any;
-
-    return this.billingService.skip(id, user.userId);
-  }
-
-  @Post(':id/mark-succeeded')
-  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.BILLING_MARK_SUCCEEDED)
-  markSucceeded(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
-    const user = req.user as any;
-
-    return this.billingService.markSucceeded(id, user.userId);
-  }
-
-  @Post(':id/mark-failed')
-  @RequirePlatformPermissions(PLATFORM_PERMISSIONS.BILLING_MARK_FAILED)
-  markFailed(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: MarkFailedBillingDto,
-    @Req() req: Request,
-  ) {
-    const user = req.user as any;
-
-    return this.billingService.markFailed(id, dto, user.userId);
   }
 }
