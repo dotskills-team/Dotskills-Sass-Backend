@@ -16,6 +16,9 @@ import {
   CompanyMembershipStatus,
   CompanyStatus,
 } from 'src/generated/phase-1-prisma/enums';
+import { COMPANY_PERMISSIONS } from '../../common/constants/permission.constants';
+
+const COMPANY_PERMISSION_CODES = Object.values(COMPANY_PERMISSIONS);
 
 @Injectable()
 export class CompanyOwnerService {
@@ -213,6 +216,35 @@ export class CompanyOwnerService {
             status: 'ACTIVE',
           },
         });
+
+        /**
+         * IMPORTANT — without this, a brand-new COMPANY_OWNER role has zero
+         * CompanyRolePermission rows, and CompanyPermissionsGuard fails
+         * closed: the Owner could log in but every single permission-gated
+         * action (creating a Location, a Product, anything) would 403 with
+         * no clear reason, until someone remembered to separately call
+         * `POST platform/companies/:id/rbac/bootstrap` (a Platform-Admin-
+         * only action, easy to forget). Granting the full COMPANY_PERMISSION_CODES
+         * set here — the exact same set `CompanyRbacService`'s
+         * DEFAULT_ROLES.COMPANY_OWNER definition uses — makes the Owner
+         * immediately functional at creation time. Calling bootstrap()
+         * later is still safe/idempotent: it deletes and recreates this
+         * same role's permissions with the same full set.
+         */
+        const ownerPermissions = await tx.permission.findMany({
+          where: { code: { in: COMPANY_PERMISSION_CODES }, status: 'ACTIVE' },
+          select: { id: true },
+        });
+        if (ownerPermissions.length > 0) {
+          await tx.companyRolePermission.createMany({
+            data: ownerPermissions.map((permission) => ({
+              companyRoleId: ownerRole!.id,
+              permissionId: permission.id,
+              effect: 'ALLOW',
+              assignedByUserId: actorUserId,
+            })),
+          });
+        }
       }
 
       /**

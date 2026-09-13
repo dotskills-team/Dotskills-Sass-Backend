@@ -74,8 +74,11 @@ import { SaleModule } from './modules/sales/sale/sale.module';
 import { CustomerPaymentModule } from './modules/sales/customer-payment/customer-payment.module';
 import { CashDrawerSessionModule } from './modules/sales/cash-drawer/cash-drawer.module';
 import { ReportingModule } from './modules/reporting/reporting.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { PlatformDashboardModule } from './modules/platform-dashboard/platform-dashboard.module';
 import { MailModule } from './modules/mail/mail.module';
 import { PlatformSettingsModule } from './modules/platform-settings/platform-settings.module';
+import { SetupStatusModule } from './modules/setup-status/setup-status.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -126,6 +129,7 @@ import { PlatformSettingsModule } from './modules/platform-settings/platform-set
     CustomerModule,
     SupplierModule,
     CompanySettingsModule,
+    SetupStatusModule,
     InventoryModule,
     StockAdjustmentModule,
     PurchaseOrderModule,
@@ -135,6 +139,8 @@ import { PlatformSettingsModule } from './modules/platform-settings/platform-set
     CustomerPaymentModule,
     CashDrawerSessionModule,
     ReportingModule,
+    DashboardModule,
+    PlatformDashboardModule,
   ],
   controllers: [AppController],
   providers: [

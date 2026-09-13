@@ -16,5 +16,8 @@ import { LedgerSummaryService } from './ledger-summary.service';
     StockReportService,
     LedgerSummaryService,
   ],
+  // Exported so `DashboardModule` can reuse the exact same profit/COGS
+  // calculation instead of re-implementing it — no duplicate business logic.
+  exports: [ProfitReportService],
 })
 export class ReportingModule {}
