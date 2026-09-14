@@ -20,6 +20,8 @@ describe('StockTransferService', () => {
 
   const mockPrisma = {
     stockTransfer: { findFirst: jest.fn(), findMany: jest.fn() },
+    product: { findFirst: jest.fn() },
+    productVariant: { findFirst: jest.fn() },
     $transaction: jest.fn((arg: any) =>
       typeof arg === 'function' ? arg(mockTx) : Promise.all(arg),
     ),
@@ -41,6 +43,12 @@ describe('StockTransferService', () => {
     mockLocationAccessService.assertHasLocationAccess.mockResolvedValue(
       undefined,
     );
+    // Default: the product under test is a plain non-variant product —
+    // matches every existing test's fixtures, which never pass variantId.
+    mockPrisma.product.findFirst.mockResolvedValue({
+      id: 'p-1',
+      hasVariants: false,
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [

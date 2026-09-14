@@ -88,6 +88,51 @@ export function paymentReceiptEmailHtml(data: ReceiptEmailData): {
   };
 }
 
+export function passwordResetEmailHtml(data: {
+  fullName: string;
+  resetUrl: string;
+  expiresInMinutes: number;
+}): { subject: string; html: string } {
+  const body = `
+    <p style="font-size:14px;color:#374151;margin:0 0 16px;">
+      Hi ${data.fullName}, we received a request to reset your DotSkills password.
+    </p>
+    <p style="font-size:14px;color:#374151;margin:0 0 20px;">
+      Click the button below to choose a new password. This link expires in ${data.expiresInMinutes} minutes and can only be used once.
+    </p>
+    <p style="margin:0 0 20px;">
+      <a href="${data.resetUrl}" style="display:inline-block;background:#111827;color:#ffffff;text-decoration:none;padding:10px 18px;border-radius:6px;font-size:13px;">
+        Reset Password
+      </a>
+    </p>
+    <p style="font-size:12px;color:#6b7280;margin:0;">
+      If you didn't request this, you can safely ignore this email — your password won't change.
+    </p>`;
+
+  return {
+    subject: 'Reset your DotSkills password',
+    html: layout('Reset Your Password', body),
+  };
+}
+
+export function passwordChangedEmailHtml(data: { fullName: string }): {
+  subject: string;
+  html: string;
+} {
+  const body = `
+    <p style="font-size:14px;color:#374151;margin:0 0 16px;">
+      Hi ${data.fullName}, your DotSkills password was just changed.
+    </p>
+    <p style="font-size:12px;color:#6b7280;margin:0;">
+      If you didn't make this change, please contact support immediately — every other device has been signed out as a precaution.
+    </p>`;
+
+  return {
+    subject: 'Your DotSkills password was changed',
+    html: layout('Password Changed', body),
+  };
+}
+
 export function accountActivationEmailHtml(data: {
   ownerName: string;
   companyName: string;

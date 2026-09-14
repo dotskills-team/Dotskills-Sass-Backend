@@ -17,7 +17,7 @@ describe('StockAdjustmentService', () => {
   const mockTx = {
     product: { findFirst: jest.fn() },
     location: { findFirst: jest.fn() },
-    inventory: { findUnique: jest.fn() },
+    inventory: { findFirst: jest.fn() },
   };
 
   const mockPrisma = {
@@ -76,7 +76,7 @@ describe('StockAdjustmentService', () => {
 
   describe('create — single line, newQuantity mode', () => {
     it('resolves the delta against the current balance and calls increaseStock when the target is higher', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({
+      mockTx.inventory.findFirst.mockResolvedValue({
         quantity: new Prisma.Decimal(10),
       });
       mockInventoryService.increaseStock.mockResolvedValue({
@@ -132,7 +132,7 @@ describe('StockAdjustmentService', () => {
     });
 
     it('calls decreaseStock with allowNegative:false when the target is lower', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({
+      mockTx.inventory.findFirst.mockResolvedValue({
         quantity: new Prisma.Decimal(50),
       });
       mockInventoryService.decreaseStock.mockResolvedValue({
@@ -168,7 +168,7 @@ describe('StockAdjustmentService', () => {
 
   describe('create — changeQuantity mode', () => {
     it('applies a signed delta directly without reading it against a target', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({
+      mockTx.inventory.findFirst.mockResolvedValue({
         quantity: new Prisma.Decimal(20),
       });
       mockInventoryService.decreaseStock.mockResolvedValue({
@@ -284,7 +284,7 @@ describe('StockAdjustmentService', () => {
     });
 
     it('rejects a newQuantity line that resolves to zero delta, as "no change to apply"', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({
+      mockTx.inventory.findFirst.mockResolvedValue({
         quantity: new Prisma.Decimal(15),
       });
       const result = await service.create(
@@ -312,7 +312,7 @@ describe('StockAdjustmentService', () => {
 
   describe('create — Location-Based Access Control', () => {
     it("checks Location access for each line's own locationId", async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({
+      mockTx.inventory.findFirst.mockResolvedValue({
         quantity: new Prisma.Decimal(10),
       });
       mockInventoryService.decreaseStock.mockResolvedValue({
@@ -342,7 +342,7 @@ describe('StockAdjustmentService', () => {
     });
 
     it('turns a ForbiddenException from LocationAccessService into a per-line ERROR result, not a whole-request failure — sibling lines still apply', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({
+      mockTx.inventory.findFirst.mockResolvedValue({
         quantity: new Prisma.Decimal(10),
       });
       mockLocationAccessService.assertHasLocationAccess
@@ -389,7 +389,7 @@ describe('StockAdjustmentService', () => {
 
   describe('create — partial success across multiple lines', () => {
     it('a race-caused INSUFFICIENT_STOCK on one line does not block the other lines from applying', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({
+      mockTx.inventory.findFirst.mockResolvedValue({
         quantity: new Prisma.Decimal(10),
       });
       mockInventoryService.decreaseStock
@@ -509,7 +509,7 @@ describe('StockAdjustmentService', () => {
 
   describe('OTHER reason requires a note (DTO-level, spot-checked at the service boundary)', () => {
     it('does not itself enforce the note — confirms that responsibility stays with the DTO validation pipe, not duplicated in the service', async () => {
-      mockTx.inventory.findUnique.mockResolvedValue({
+      mockTx.inventory.findFirst.mockResolvedValue({
         quantity: new Prisma.Decimal(0),
       });
       mockInventoryService.increaseStock.mockResolvedValue({

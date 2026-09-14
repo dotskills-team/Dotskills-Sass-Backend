@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Req,
   UseGuards,
@@ -13,13 +14,19 @@ import type { Request } from 'express';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { AuthenticatedUser } from '../../common/types/authenticated-user.type';
 import { AuthService } from './auth.service';
+import { PasswordResetService } from './password-reset.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly passwordResetService: PasswordResetService,
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -46,6 +53,29 @@ export class AuthController {
   async myCompanies(@CurrentUser() user: AuthenticatedUser) {
     const companies = await this.authService.getMyCompanies(user.userId);
     return { success: true, companies };
+  }
+
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  forgotPassword(@Body() dto: ForgotPasswordDto, @Req() request: Request) {
+    return this.passwordResetService.requestReset(
+      dto,
+      this.requestMetadata(request),
+    );
+  }
+
+  @Get('reset-password/:token')
+  @Throttle({ default: { limit: 20, ttl: 60_000 } })
+  validateResetToken(@Param('token') token: string) {
+    return this.passwordResetService.validateToken(token);
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.passwordResetService.reset(dto);
   }
 
   @Post('logout')

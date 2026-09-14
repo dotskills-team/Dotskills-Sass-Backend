@@ -45,8 +45,6 @@ export type CompanySettingsMinAggregateOutputType = {
   enableMultiUnit: boolean | null
   enableCustomerDue: boolean | null
   enableBarcode: boolean | null
-  enableProductVariant: boolean | null
-  enableComboOffer: boolean | null
   enableMultiLocation: boolean | null
   allowNegativeStock: boolean | null
   maxCustomerDueLimit: runtime.Decimal | null
@@ -64,8 +62,6 @@ export type CompanySettingsMaxAggregateOutputType = {
   enableMultiUnit: boolean | null
   enableCustomerDue: boolean | null
   enableBarcode: boolean | null
-  enableProductVariant: boolean | null
-  enableComboOffer: boolean | null
   enableMultiLocation: boolean | null
   allowNegativeStock: boolean | null
   maxCustomerDueLimit: runtime.Decimal | null
@@ -83,8 +79,6 @@ export type CompanySettingsCountAggregateOutputType = {
   enableMultiUnit: number
   enableCustomerDue: number
   enableBarcode: number
-  enableProductVariant: number
-  enableComboOffer: number
   enableMultiLocation: number
   allowNegativeStock: number
   maxCustomerDueLimit: number
@@ -116,8 +110,6 @@ export type CompanySettingsMinAggregateInputType = {
   enableMultiUnit?: true
   enableCustomerDue?: true
   enableBarcode?: true
-  enableProductVariant?: true
-  enableComboOffer?: true
   enableMultiLocation?: true
   allowNegativeStock?: true
   maxCustomerDueLimit?: true
@@ -135,8 +127,6 @@ export type CompanySettingsMaxAggregateInputType = {
   enableMultiUnit?: true
   enableCustomerDue?: true
   enableBarcode?: true
-  enableProductVariant?: true
-  enableComboOffer?: true
   enableMultiLocation?: true
   allowNegativeStock?: true
   maxCustomerDueLimit?: true
@@ -154,8 +144,6 @@ export type CompanySettingsCountAggregateInputType = {
   enableMultiUnit?: true
   enableCustomerDue?: true
   enableBarcode?: true
-  enableProductVariant?: true
-  enableComboOffer?: true
   enableMultiLocation?: true
   allowNegativeStock?: true
   maxCustomerDueLimit?: true
@@ -260,8 +248,6 @@ export type CompanySettingsGroupByOutputType = {
   enableMultiUnit: boolean
   enableCustomerDue: boolean
   enableBarcode: boolean
-  enableProductVariant: boolean
-  enableComboOffer: boolean
   enableMultiLocation: boolean
   allowNegativeStock: boolean
   maxCustomerDueLimit: runtime.Decimal | null
@@ -302,8 +288,6 @@ export type CompanySettingsWhereInput = {
   enableMultiUnit?: Prisma.BoolFilter<"CompanySettings"> | boolean
   enableCustomerDue?: Prisma.BoolFilter<"CompanySettings"> | boolean
   enableBarcode?: Prisma.BoolFilter<"CompanySettings"> | boolean
-  enableProductVariant?: Prisma.BoolFilter<"CompanySettings"> | boolean
-  enableComboOffer?: Prisma.BoolFilter<"CompanySettings"> | boolean
   enableMultiLocation?: Prisma.BoolFilter<"CompanySettings"> | boolean
   allowNegativeStock?: Prisma.BoolFilter<"CompanySettings"> | boolean
   maxCustomerDueLimit?: Prisma.DecimalNullableFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -323,8 +307,6 @@ export type CompanySettingsOrderByWithRelationInput = {
   enableMultiUnit?: Prisma.SortOrder
   enableCustomerDue?: Prisma.SortOrder
   enableBarcode?: Prisma.SortOrder
-  enableProductVariant?: Prisma.SortOrder
-  enableComboOffer?: Prisma.SortOrder
   enableMultiLocation?: Prisma.SortOrder
   allowNegativeStock?: Prisma.SortOrder
   maxCustomerDueLimit?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -347,8 +329,6 @@ export type CompanySettingsWhereUniqueInput = Prisma.AtLeast<{
   enableMultiUnit?: Prisma.BoolFilter<"CompanySettings"> | boolean
   enableCustomerDue?: Prisma.BoolFilter<"CompanySettings"> | boolean
   enableBarcode?: Prisma.BoolFilter<"CompanySettings"> | boolean
-  enableProductVariant?: Prisma.BoolFilter<"CompanySettings"> | boolean
-  enableComboOffer?: Prisma.BoolFilter<"CompanySettings"> | boolean
   enableMultiLocation?: Prisma.BoolFilter<"CompanySettings"> | boolean
   allowNegativeStock?: Prisma.BoolFilter<"CompanySettings"> | boolean
   maxCustomerDueLimit?: Prisma.DecimalNullableFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -368,8 +348,6 @@ export type CompanySettingsOrderByWithAggregationInput = {
   enableMultiUnit?: Prisma.SortOrder
   enableCustomerDue?: Prisma.SortOrder
   enableBarcode?: Prisma.SortOrder
-  enableProductVariant?: Prisma.SortOrder
-  enableComboOffer?: Prisma.SortOrder
   enableMultiLocation?: Prisma.SortOrder
   allowNegativeStock?: Prisma.SortOrder
   maxCustomerDueLimit?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -395,8 +373,6 @@ export type CompanySettingsScalarWhereWithAggregatesInput = {
   enableMultiUnit?: Prisma.BoolWithAggregatesFilter<"CompanySettings"> | boolean
   enableCustomerDue?: Prisma.BoolWithAggregatesFilter<"CompanySettings"> | boolean
   enableBarcode?: Prisma.BoolWithAggregatesFilter<"CompanySettings"> | boolean
-  enableProductVariant?: Prisma.BoolWithAggregatesFilter<"CompanySettings"> | boolean
-  enableComboOffer?: Prisma.BoolWithAggregatesFilter<"CompanySettings"> | boolean
   enableMultiLocation?: Prisma.BoolWithAggregatesFilter<"CompanySettings"> | boolean
   allowNegativeStock?: Prisma.BoolWithAggregatesFilter<"CompanySettings"> | boolean
   maxCustomerDueLimit?: Prisma.DecimalNullableWithAggregatesFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -412,8 +388,6 @@ export type CompanySettingsCreateInput = {
   enableMultiUnit?: boolean
   enableCustomerDue?: boolean
   enableBarcode?: boolean
-  enableProductVariant?: boolean
-  enableComboOffer?: boolean
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -433,8 +407,6 @@ export type CompanySettingsUncheckedCreateInput = {
   enableMultiUnit?: boolean
   enableCustomerDue?: boolean
   enableBarcode?: boolean
-  enableProductVariant?: boolean
-  enableComboOffer?: boolean
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -450,8 +422,6 @@ export type CompanySettingsUpdateInput = {
   enableMultiUnit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableCustomerDue?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableBarcode?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableProductVariant?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableComboOffer?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -471,8 +441,6 @@ export type CompanySettingsUncheckedUpdateInput = {
   enableMultiUnit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableCustomerDue?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableBarcode?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableProductVariant?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableComboOffer?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -490,8 +458,6 @@ export type CompanySettingsCreateManyInput = {
   enableMultiUnit?: boolean
   enableCustomerDue?: boolean
   enableBarcode?: boolean
-  enableProductVariant?: boolean
-  enableComboOffer?: boolean
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -507,8 +473,6 @@ export type CompanySettingsUpdateManyMutationInput = {
   enableMultiUnit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableCustomerDue?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableBarcode?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableProductVariant?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableComboOffer?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -526,8 +490,6 @@ export type CompanySettingsUncheckedUpdateManyInput = {
   enableMultiUnit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableCustomerDue?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableBarcode?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableProductVariant?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableComboOffer?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -560,8 +522,6 @@ export type CompanySettingsCountOrderByAggregateInput = {
   enableMultiUnit?: Prisma.SortOrder
   enableCustomerDue?: Prisma.SortOrder
   enableBarcode?: Prisma.SortOrder
-  enableProductVariant?: Prisma.SortOrder
-  enableComboOffer?: Prisma.SortOrder
   enableMultiLocation?: Prisma.SortOrder
   allowNegativeStock?: Prisma.SortOrder
   maxCustomerDueLimit?: Prisma.SortOrder
@@ -585,8 +545,6 @@ export type CompanySettingsMaxOrderByAggregateInput = {
   enableMultiUnit?: Prisma.SortOrder
   enableCustomerDue?: Prisma.SortOrder
   enableBarcode?: Prisma.SortOrder
-  enableProductVariant?: Prisma.SortOrder
-  enableComboOffer?: Prisma.SortOrder
   enableMultiLocation?: Prisma.SortOrder
   allowNegativeStock?: Prisma.SortOrder
   maxCustomerDueLimit?: Prisma.SortOrder
@@ -604,8 +562,6 @@ export type CompanySettingsMinOrderByAggregateInput = {
   enableMultiUnit?: Prisma.SortOrder
   enableCustomerDue?: Prisma.SortOrder
   enableBarcode?: Prisma.SortOrder
-  enableProductVariant?: Prisma.SortOrder
-  enableComboOffer?: Prisma.SortOrder
   enableMultiLocation?: Prisma.SortOrder
   allowNegativeStock?: Prisma.SortOrder
   maxCustomerDueLimit?: Prisma.SortOrder
@@ -701,8 +657,6 @@ export type CompanySettingsCreateWithoutTenantInput = {
   enableMultiUnit?: boolean
   enableCustomerDue?: boolean
   enableBarcode?: boolean
-  enableProductVariant?: boolean
-  enableComboOffer?: boolean
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -720,8 +674,6 @@ export type CompanySettingsUncheckedCreateWithoutTenantInput = {
   enableMultiUnit?: boolean
   enableCustomerDue?: boolean
   enableBarcode?: boolean
-  enableProductVariant?: boolean
-  enableComboOffer?: boolean
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -768,8 +720,6 @@ export type CompanySettingsScalarWhereInput = {
   enableMultiUnit?: Prisma.BoolFilter<"CompanySettings"> | boolean
   enableCustomerDue?: Prisma.BoolFilter<"CompanySettings"> | boolean
   enableBarcode?: Prisma.BoolFilter<"CompanySettings"> | boolean
-  enableProductVariant?: Prisma.BoolFilter<"CompanySettings"> | boolean
-  enableComboOffer?: Prisma.BoolFilter<"CompanySettings"> | boolean
   enableMultiLocation?: Prisma.BoolFilter<"CompanySettings"> | boolean
   allowNegativeStock?: Prisma.BoolFilter<"CompanySettings"> | boolean
   maxCustomerDueLimit?: Prisma.DecimalNullableFilter<"CompanySettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -785,8 +735,6 @@ export type CompanySettingsCreateWithoutCompanyInput = {
   enableMultiUnit?: boolean
   enableCustomerDue?: boolean
   enableBarcode?: boolean
-  enableProductVariant?: boolean
-  enableComboOffer?: boolean
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -804,8 +752,6 @@ export type CompanySettingsUncheckedCreateWithoutCompanyInput = {
   enableMultiUnit?: boolean
   enableCustomerDue?: boolean
   enableBarcode?: boolean
-  enableProductVariant?: boolean
-  enableComboOffer?: boolean
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -837,8 +783,6 @@ export type CompanySettingsUpdateWithoutCompanyInput = {
   enableMultiUnit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableCustomerDue?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableBarcode?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableProductVariant?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableComboOffer?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -856,8 +800,6 @@ export type CompanySettingsUncheckedUpdateWithoutCompanyInput = {
   enableMultiUnit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableCustomerDue?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableBarcode?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableProductVariant?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableComboOffer?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -874,8 +816,6 @@ export type CompanySettingsCreateManyTenantInput = {
   enableMultiUnit?: boolean
   enableCustomerDue?: boolean
   enableBarcode?: boolean
-  enableProductVariant?: boolean
-  enableComboOffer?: boolean
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -891,8 +831,6 @@ export type CompanySettingsUpdateWithoutTenantInput = {
   enableMultiUnit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableCustomerDue?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableBarcode?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableProductVariant?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableComboOffer?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -910,8 +848,6 @@ export type CompanySettingsUncheckedUpdateWithoutTenantInput = {
   enableMultiUnit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableCustomerDue?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableBarcode?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableProductVariant?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableComboOffer?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -928,8 +864,6 @@ export type CompanySettingsUncheckedUpdateManyWithoutTenantInput = {
   enableMultiUnit?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableCustomerDue?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableBarcode?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableProductVariant?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  enableComboOffer?: Prisma.BoolFieldUpdateOperationsInput | boolean
   enableMultiLocation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   allowNegativeStock?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxCustomerDueLimit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
@@ -949,8 +883,6 @@ export type CompanySettingsSelect<ExtArgs extends runtime.Types.Extensions.Inter
   enableMultiUnit?: boolean
   enableCustomerDue?: boolean
   enableBarcode?: boolean
-  enableProductVariant?: boolean
-  enableComboOffer?: boolean
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: boolean
@@ -970,8 +902,6 @@ export type CompanySettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   enableMultiUnit?: boolean
   enableCustomerDue?: boolean
   enableBarcode?: boolean
-  enableProductVariant?: boolean
-  enableComboOffer?: boolean
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: boolean
@@ -991,8 +921,6 @@ export type CompanySettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   enableMultiUnit?: boolean
   enableCustomerDue?: boolean
   enableBarcode?: boolean
-  enableProductVariant?: boolean
-  enableComboOffer?: boolean
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: boolean
@@ -1012,8 +940,6 @@ export type CompanySettingsSelectScalar = {
   enableMultiUnit?: boolean
   enableCustomerDue?: boolean
   enableBarcode?: boolean
-  enableProductVariant?: boolean
-  enableComboOffer?: boolean
   enableMultiLocation?: boolean
   allowNegativeStock?: boolean
   maxCustomerDueLimit?: boolean
@@ -1024,7 +950,7 @@ export type CompanySettingsSelectScalar = {
   updatedAt?: boolean
 }
 
-export type CompanySettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "companyId" | "enableMultiUnit" | "enableCustomerDue" | "enableBarcode" | "enableProductVariant" | "enableComboOffer" | "enableMultiLocation" | "allowNegativeStock" | "maxCustomerDueLimit" | "maxSupplierPayableLimit" | "enableTax" | "defaultTaxRate" | "createdAt" | "updatedAt", ExtArgs["result"]["companySettings"]>
+export type CompanySettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "companyId" | "enableMultiUnit" | "enableCustomerDue" | "enableBarcode" | "enableMultiLocation" | "allowNegativeStock" | "maxCustomerDueLimit" | "maxSupplierPayableLimit" | "enableTax" | "defaultTaxRate" | "createdAt" | "updatedAt", ExtArgs["result"]["companySettings"]>
 export type CompanySettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
@@ -1051,8 +977,6 @@ export type $CompanySettingsPayload<ExtArgs extends runtime.Types.Extensions.Int
     enableMultiUnit: boolean
     enableCustomerDue: boolean
     enableBarcode: boolean
-    enableProductVariant: boolean
-    enableComboOffer: boolean
     enableMultiLocation: boolean
     allowNegativeStock: boolean
     maxCustomerDueLimit: runtime.Decimal | null
@@ -1492,8 +1416,6 @@ export interface CompanySettingsFieldRefs {
   readonly enableMultiUnit: Prisma.FieldRef<"CompanySettings", 'Boolean'>
   readonly enableCustomerDue: Prisma.FieldRef<"CompanySettings", 'Boolean'>
   readonly enableBarcode: Prisma.FieldRef<"CompanySettings", 'Boolean'>
-  readonly enableProductVariant: Prisma.FieldRef<"CompanySettings", 'Boolean'>
-  readonly enableComboOffer: Prisma.FieldRef<"CompanySettings", 'Boolean'>
   readonly enableMultiLocation: Prisma.FieldRef<"CompanySettings", 'Boolean'>
   readonly allowNegativeStock: Prisma.FieldRef<"CompanySettings", 'Boolean'>
   readonly maxCustomerDueLimit: Prisma.FieldRef<"CompanySettings", 'Decimal'>

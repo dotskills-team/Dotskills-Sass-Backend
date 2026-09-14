@@ -37,6 +37,8 @@ describe('PurchaseOrderService', () => {
     purchaseOrder: { findFirst: jest.fn(), findMany: jest.fn() },
     purchaseReturn: { findMany: jest.fn() },
     companySettings: { findUniqueOrThrow: jest.fn() },
+    product: { findMany: jest.fn() },
+    productVariant: { findMany: jest.fn() },
     $transaction: jest.fn((arg: any) =>
       typeof arg === 'function' ? arg(mockTx) : Promise.all(arg),
     ),
@@ -67,6 +69,15 @@ describe('PurchaseOrderService', () => {
       name: 'Test Supplier',
       payableBalance: 0,
     });
+    // Default: every requested productId is a plain non-variant product —
+    // matches every existing test's fixtures, which never pass variantId.
+    mockPrisma.product.findMany.mockImplementation(
+      ({ where }: any) =>
+        Promise.resolve(
+          where.id.in.map((id: string) => ({ id, hasVariants: false })),
+        ),
+    );
+    mockPrisma.productVariant.findMany.mockResolvedValue([]);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -269,11 +280,13 @@ describe('PurchaseOrderService', () => {
         'product-1',
         4,
         50,
+        undefined,
       );
       expect(mockInventoryService.increaseStock).toHaveBeenCalledWith(
         mockTx,
         expect.objectContaining({
           productId: 'product-1',
+          variantId: undefined,
           locationId: 'location-1',
           quantity: 4,
           movementType: StockMovementType.PURCHASE,

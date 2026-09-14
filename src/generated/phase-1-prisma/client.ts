@@ -50,6 +50,17 @@ export type User = Prisma.UserModel
  */
 export type AuthSession = Prisma.AuthSessionModel
 /**
+ * Model PasswordResetToken
+ * *
+ *  * Only the SHA-256 hash of the reset token is ever stored — the plaintext
+ *  * token exists only in the email link and in memory for the duration of
+ *  * one request. `usedAt` doubles as both "successfully consumed" and
+ *  * "superseded by a newer request" (a fresh forgot-password request stamps
+ *  * every prior unused row for that user), so a single column covers both
+ *  * single-use and invalidate-on-reissue without a second status field.
+ */
+export type PasswordResetToken = Prisma.PasswordResetTokenModel
+/**
  * Model LoginEvent
  * 
  */
@@ -124,6 +135,26 @@ export type Unit = Prisma.UnitModel
  * 
  */
 export type Product = Prisma.ProductModel
+/**
+ * Model VariantAttribute
+ * 
+ */
+export type VariantAttribute = Prisma.VariantAttributeModel
+/**
+ * Model VariantAttributeValue
+ * 
+ */
+export type VariantAttributeValue = Prisma.VariantAttributeValueModel
+/**
+ * Model ProductVariant
+ * 
+ */
+export type ProductVariant = Prisma.ProductVariantModel
+/**
+ * Model ProductVariantAttributeValue
+ * 
+ */
+export type ProductVariantAttributeValue = Prisma.ProductVariantAttributeValueModel
 /**
  * Model Customer
  * 

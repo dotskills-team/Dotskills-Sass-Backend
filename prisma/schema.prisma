@@ -190,6 +190,7 @@ model User {
   deletedAt         DateTime?     @db.Timestamptz(6)
 
   sessions           AuthSession[]
+  passwordResetTokens PasswordResetToken[]
   loginEvents        LoginEvent[]
   platformMember     PlatformMember?
   companyMemberships CompanyMember[]
@@ -222,6 +223,28 @@ model AuthSession {
   @@index([userId, revokedAt, expiresAt])
   @@index([expiresAt])
   @@map("auth_sessions")
+}
+
+/**
+ * Only the SHA-256 hash of the reset token is ever stored — the plaintext
+ * token exists only in the email link and in memory for the duration of
+ * one request. `usedAt` doubles as both "successfully consumed" and
+ * "superseded by a newer request" (a fresh forgot-password request stamps
+ * every prior unused row for that user), so a single column covers both
+ * single-use and invalidate-on-reissue without a second status field.
+ */
+model PasswordResetToken {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @db.Uuid
+  tokenHash String    @unique @db.Char(64)
+  requestIp String?   @db.Inet
+  expiresAt DateTime  @db.Timestamptz(6)
+  usedAt    DateTime? @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, usedAt])
+  @@map("password_reset_tokens")
 }
 
 model LoginEvent {
@@ -397,6 +420,8 @@ model Tenant {
   stockAdjustments  StockAdjustment[]
   companyMemberLocations CompanyMemberLocation[]
   notifications     Notification[]
+  variantAttributes VariantAttribute[]
+  productVariants   ProductVariant[]
 
   @@index([status, trialEndsAt])
   @@map("tenants")
@@ -469,6 +494,8 @@ model Company {
   stockAdjustments  StockAdjustment[]
   companyMemberLocations CompanyMemberLocation[]
   notifications     Notification[]
+  variantAttributes VariantAttribute[]
+  productVariants   ProductVariant[]
 
   @@unique([tenantId, code])
   @@unique([tenantId, id])
@@ -589,6 +616,7 @@ model Product {
   salePrice    Decimal       @default(0) @db.Decimal(20, 4)
   reorderLevel Decimal       @default(0) @db.Decimal(14, 4)
   sellByWeight Boolean       @default(false)
+  hasVariants  Boolean       @default(false)
   status       ProductStatus @default(ACTIVE)
   createdAt    DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt    DateTime      @updatedAt @db.Timestamptz(6)
@@ -601,12 +629,81 @@ model Product {
   purchaseOrderItems PurchaseOrderItem[]
   stockTransfers     StockTransfer[]
   saleItems          SaleItem[]
+  variants           ProductVariant[]
 
   @@unique([tenantId, companyId, sku])
   @@unique([tenantId, companyId, barcode])
   @@index([tenantId, companyId, status])
   @@index([categoryId])
   @@map("products")
+}
+
+// ============================================================
+// BUSINESS OPERATIONS — PRODUCT VARIANTS (Retail Extension)
+// ============================================================
+
+model VariantAttribute {
+  id        String                    @id @default(uuid()) @db.Uuid
+  tenantId  String                    @db.Uuid
+  companyId String                    @db.Uuid
+  name      String                    @db.VarChar(80)
+  createdAt DateTime                  @default(now()) @db.Timestamptz(6)
+  tenant    Tenant                    @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company   Company                   @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  values    VariantAttributeValue[]
+
+  @@unique([tenantId, companyId, name])
+  @@map("variant_attributes")
+}
+
+model VariantAttributeValue {
+  id          String                        @id @default(uuid()) @db.Uuid
+  attributeId String                        @db.Uuid
+  value       String                        @db.VarChar(80)
+  attribute   VariantAttribute              @relation(fields: [attributeId], references: [id], onDelete: Restrict)
+  variantLinks ProductVariantAttributeValue[]
+
+  @@unique([attributeId, value])
+  @@map("variant_attribute_values")
+}
+
+model ProductVariant {
+  id         String        @id @default(uuid()) @db.Uuid
+  tenantId   String        @db.Uuid
+  companyId  String        @db.Uuid
+  productId  String        @db.Uuid
+  sku        String        @db.VarChar(60)
+  barcode    String?       @db.VarChar(64)
+  costPrice  Decimal       @db.Decimal(20, 4)
+  salePrice  Decimal       @db.Decimal(20, 4)
+  status     ProductStatus @default(ACTIVE)
+  createdAt  DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime      @updatedAt @db.Timestamptz(6)
+  tenant     Tenant        @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company    Company       @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  product    Product       @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  attributeValues    ProductVariantAttributeValue[]
+  inventoryBalances  Inventory[]
+  stockMovements     StockMovement[]
+  purchaseOrderItems PurchaseOrderItem[]
+  stockTransfers     StockTransfer[]
+  saleItems          SaleItem[]
+
+  @@unique([tenantId, companyId, sku])
+  @@unique([tenantId, companyId, barcode])
+  @@index([tenantId, companyId, productId, status])
+  @@map("product_variants")
+}
+
+model ProductVariantAttributeValue {
+  variantId       String                 @db.Uuid
+  attributeValueId String               @db.Uuid
+  variant         ProductVariant         @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  attributeValue  VariantAttributeValue  @relation(fields: [attributeValueId], references: [id], onDelete: Restrict)
+
+  @@id([variantId, attributeValueId])
+  @@map("product_variant_attribute_values")
 }
 
 enum CustomerType {
@@ -674,20 +771,28 @@ model Supplier {
 // ============================================================
 
 model Inventory {
-  id         String   @id @default(uuid()) @db.Uuid
-  tenantId   String   @db.Uuid
-  companyId  String   @db.Uuid
-  productId  String   @db.Uuid
-  locationId String   @db.Uuid
-  quantity   Decimal  @default(0) @db.Decimal(14, 4)
-  createdAt  DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
-  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
-  company    Company  @relation(fields: [companyId], references: [id], onDelete: Restrict)
-  product    Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
-  location   Location @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  id         String          @id @default(uuid()) @db.Uuid
+  tenantId   String          @db.Uuid
+  companyId  String          @db.Uuid
+  productId  String          @db.Uuid
+  variantId  String?         @db.Uuid
+  locationId String          @db.Uuid
+  quantity   Decimal         @default(0) @db.Decimal(14, 4)
+  createdAt  DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime        @updatedAt @db.Timestamptz(6)
+  tenant     Tenant          @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  company    Company         @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  product    Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant    ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Restrict)
+  location   Location        @relation(fields: [locationId], references: [id], onDelete: Restrict)
 
-  @@unique([tenantId, companyId, locationId, productId])
+  // NOTE: Postgres unique indexes treat NULL as distinct from every other
+  // NULL, so a plain @@unique here would NOT stop duplicate rows for
+  // non-variant products (variantId always null). Real uniqueness for both
+  // cases is enforced via two partial unique indexes added by raw SQL in
+  // this migration (see migration.sql) — this @@index is for query
+  // performance only, not the uniqueness guarantee.
+  @@index([tenantId, companyId, locationId, productId, variantId])
   @@index([tenantId, companyId, productId])
   @@map("inventory")
 }
@@ -708,6 +813,7 @@ model StockMovement {
   tenantId      String                 @db.Uuid
   companyId     String                 @db.Uuid
   productId     String                 @db.Uuid
+  variantId     String?                @db.Uuid
   locationId    String                 @db.Uuid
   movementType  StockMovementType
   changeQty     Decimal                @db.Decimal(14, 4)
@@ -722,6 +828,7 @@ model StockMovement {
   tenant        Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Restrict)
   company       Company                @relation(fields: [companyId], references: [id], onDelete: Restrict)
   product       Product                @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant       ProductVariant?        @relation(fields: [variantId], references: [id], onDelete: Restrict)
   location      Location               @relation(fields: [locationId], references: [id], onDelete: Restrict)
 
   @@index([tenantId, companyId, productId, locationId, createdAt])
@@ -816,14 +923,16 @@ model PurchaseOrder {
 }
 
 model PurchaseOrderItem {
-  id              String        @id @default(uuid()) @db.Uuid
-  purchaseOrderId String        @db.Uuid
-  productId       String        @db.Uuid
-  orderedQty      Decimal       @db.Decimal(14, 4)
-  receivedQty     Decimal       @default(0) @db.Decimal(14, 4)
-  unitCost        Decimal       @db.Decimal(20, 4)
-  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
-  product         Product       @relation(fields: [productId], references: [id], onDelete: Restrict)
+  id              String          @id @default(uuid()) @db.Uuid
+  purchaseOrderId String          @db.Uuid
+  productId       String          @db.Uuid
+  variantId       String?         @db.Uuid
+  orderedQty      Decimal         @db.Decimal(14, 4)
+  receivedQty     Decimal         @default(0) @db.Decimal(14, 4)
+  unitCost        Decimal         @db.Decimal(20, 4)
+  purchaseOrder   PurchaseOrder   @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  product         Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant         ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Restrict)
 
   @@index([purchaseOrderId])
   @@map("purchase_order_items")
@@ -878,6 +987,7 @@ model StockTransfer {
   fromLocationId String               @db.Uuid
   toLocationId   String               @db.Uuid
   productId      String               @db.Uuid
+  variantId      String?              @db.Uuid
   quantity       Decimal              @db.Decimal(14, 4)
   status         StockTransferStatus  @default(PENDING)
   dispatchedAt   DateTime?            @db.Timestamptz(6)
@@ -890,6 +1000,7 @@ model StockTransfer {
   fromLocation   Location             @relation("TransferFromLocation", fields: [fromLocationId], references: [id], onDelete: Restrict)
   toLocation     Location             @relation("TransferToLocation", fields: [toLocationId], references: [id], onDelete: Restrict)
   product        Product              @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant        ProductVariant?      @relation(fields: [variantId], references: [id], onDelete: Restrict)
 
   @@index([tenantId, companyId, status])
   @@map("stock_transfers")
@@ -977,17 +1088,19 @@ model Sale {
 }
 
 model SaleItem {
-  id             String  @id @default(uuid()) @db.Uuid
-  saleId         String  @db.Uuid
-  productId      String  @db.Uuid
-  productName    String  @db.VarChar(200)
-  quantity       Decimal @db.Decimal(14, 4)
-  unitPrice      Decimal @db.Decimal(20, 4)
-  unitCost       Decimal @db.Decimal(20, 4)
-  discountAmount Decimal @default(0) @db.Decimal(20, 4)
-  subtotal       Decimal @db.Decimal(20, 4)
-  sale           Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  product        Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  id             String          @id @default(uuid()) @db.Uuid
+  saleId         String          @db.Uuid
+  productId      String          @db.Uuid
+  variantId      String?         @db.Uuid
+  productName    String          @db.VarChar(200)
+  quantity       Decimal         @db.Decimal(14, 4)
+  unitPrice      Decimal         @db.Decimal(20, 4)
+  unitCost       Decimal         @db.Decimal(20, 4)
+  discountAmount Decimal         @default(0) @db.Decimal(20, 4)
+  subtotal       Decimal         @db.Decimal(20, 4)
+  sale           Sale            @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product        Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant        ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Restrict)
 
   @@index([saleId])
   @@map("sale_items")
@@ -1103,8 +1216,6 @@ model CompanySettings {
   enableMultiUnit      Boolean  @default(true)
   enableCustomerDue    Boolean  @default(true)
   enableBarcode        Boolean  @default(true)
-  enableProductVariant Boolean  @default(false)
-  enableComboOffer     Boolean  @default(false)
   enableMultiLocation  Boolean  @default(false)
   allowNegativeStock   Boolean  @default(false)
   maxCustomerDueLimit  Decimal? @db.Decimal(20, 4)

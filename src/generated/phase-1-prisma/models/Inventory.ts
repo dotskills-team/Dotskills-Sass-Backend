@@ -39,6 +39,7 @@ export type InventoryMinAggregateOutputType = {
   tenantId: string | null
   companyId: string | null
   productId: string | null
+  variantId: string | null
   locationId: string | null
   quantity: runtime.Decimal | null
   createdAt: Date | null
@@ -50,6 +51,7 @@ export type InventoryMaxAggregateOutputType = {
   tenantId: string | null
   companyId: string | null
   productId: string | null
+  variantId: string | null
   locationId: string | null
   quantity: runtime.Decimal | null
   createdAt: Date | null
@@ -61,6 +63,7 @@ export type InventoryCountAggregateOutputType = {
   tenantId: number
   companyId: number
   productId: number
+  variantId: number
   locationId: number
   quantity: number
   createdAt: number
@@ -82,6 +85,7 @@ export type InventoryMinAggregateInputType = {
   tenantId?: true
   companyId?: true
   productId?: true
+  variantId?: true
   locationId?: true
   quantity?: true
   createdAt?: true
@@ -93,6 +97,7 @@ export type InventoryMaxAggregateInputType = {
   tenantId?: true
   companyId?: true
   productId?: true
+  variantId?: true
   locationId?: true
   quantity?: true
   createdAt?: true
@@ -104,6 +109,7 @@ export type InventoryCountAggregateInputType = {
   tenantId?: true
   companyId?: true
   productId?: true
+  variantId?: true
   locationId?: true
   quantity?: true
   createdAt?: true
@@ -202,6 +208,7 @@ export type InventoryGroupByOutputType = {
   tenantId: string
   companyId: string
   productId: string
+  variantId: string | null
   locationId: string
   quantity: runtime.Decimal
   createdAt: Date
@@ -236,6 +243,7 @@ export type InventoryWhereInput = {
   tenantId?: Prisma.UuidFilter<"Inventory"> | string
   companyId?: Prisma.UuidFilter<"Inventory"> | string
   productId?: Prisma.UuidFilter<"Inventory"> | string
+  variantId?: Prisma.UuidNullableFilter<"Inventory"> | string | null
   locationId?: Prisma.UuidFilter<"Inventory"> | string
   quantity?: Prisma.DecimalFilter<"Inventory"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"Inventory"> | Date | string
@@ -243,6 +251,7 @@ export type InventoryWhereInput = {
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
+  variant?: Prisma.XOR<Prisma.ProductVariantNullableScalarRelationFilter, Prisma.ProductVariantWhereInput> | null
   location?: Prisma.XOR<Prisma.LocationScalarRelationFilter, Prisma.LocationWhereInput>
 }
 
@@ -251,6 +260,7 @@ export type InventoryOrderByWithRelationInput = {
   tenantId?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
+  variantId?: Prisma.SortOrderInput | Prisma.SortOrder
   locationId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -258,18 +268,19 @@ export type InventoryOrderByWithRelationInput = {
   tenant?: Prisma.TenantOrderByWithRelationInput
   company?: Prisma.CompanyOrderByWithRelationInput
   product?: Prisma.ProductOrderByWithRelationInput
+  variant?: Prisma.ProductVariantOrderByWithRelationInput
   location?: Prisma.LocationOrderByWithRelationInput
 }
 
 export type InventoryWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  tenantId_companyId_locationId_productId?: Prisma.InventoryTenantIdCompanyIdLocationIdProductIdCompoundUniqueInput
   AND?: Prisma.InventoryWhereInput | Prisma.InventoryWhereInput[]
   OR?: Prisma.InventoryWhereInput[]
   NOT?: Prisma.InventoryWhereInput | Prisma.InventoryWhereInput[]
   tenantId?: Prisma.UuidFilter<"Inventory"> | string
   companyId?: Prisma.UuidFilter<"Inventory"> | string
   productId?: Prisma.UuidFilter<"Inventory"> | string
+  variantId?: Prisma.UuidNullableFilter<"Inventory"> | string | null
   locationId?: Prisma.UuidFilter<"Inventory"> | string
   quantity?: Prisma.DecimalFilter<"Inventory"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"Inventory"> | Date | string
@@ -277,14 +288,16 @@ export type InventoryWhereUniqueInput = Prisma.AtLeast<{
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
+  variant?: Prisma.XOR<Prisma.ProductVariantNullableScalarRelationFilter, Prisma.ProductVariantWhereInput> | null
   location?: Prisma.XOR<Prisma.LocationScalarRelationFilter, Prisma.LocationWhereInput>
-}, "id" | "tenantId_companyId_locationId_productId">
+}, "id">
 
 export type InventoryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
+  variantId?: Prisma.SortOrderInput | Prisma.SortOrder
   locationId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -304,6 +317,7 @@ export type InventoryScalarWhereWithAggregatesInput = {
   tenantId?: Prisma.UuidWithAggregatesFilter<"Inventory"> | string
   companyId?: Prisma.UuidWithAggregatesFilter<"Inventory"> | string
   productId?: Prisma.UuidWithAggregatesFilter<"Inventory"> | string
+  variantId?: Prisma.UuidNullableWithAggregatesFilter<"Inventory"> | string | null
   locationId?: Prisma.UuidWithAggregatesFilter<"Inventory"> | string
   quantity?: Prisma.DecimalWithAggregatesFilter<"Inventory"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Inventory"> | Date | string
@@ -318,6 +332,7 @@ export type InventoryCreateInput = {
   tenant: Prisma.TenantCreateNestedOneWithoutInventoryBalancesInput
   company: Prisma.CompanyCreateNestedOneWithoutInventoryBalancesInput
   product: Prisma.ProductCreateNestedOneWithoutInventoryBalancesInput
+  variant?: Prisma.ProductVariantCreateNestedOneWithoutInventoryBalancesInput
   location: Prisma.LocationCreateNestedOneWithoutInventoryBalancesInput
 }
 
@@ -326,6 +341,7 @@ export type InventoryUncheckedCreateInput = {
   tenantId: string
   companyId: string
   productId: string
+  variantId?: string | null
   locationId: string
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -340,6 +356,7 @@ export type InventoryUpdateInput = {
   tenant?: Prisma.TenantUpdateOneRequiredWithoutInventoryBalancesNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutInventoryBalancesNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutInventoryBalancesNestedInput
+  variant?: Prisma.ProductVariantUpdateOneWithoutInventoryBalancesNestedInput
   location?: Prisma.LocationUpdateOneRequiredWithoutInventoryBalancesNestedInput
 }
 
@@ -348,6 +365,7 @@ export type InventoryUncheckedUpdateInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -359,6 +377,7 @@ export type InventoryCreateManyInput = {
   tenantId: string
   companyId: string
   productId: string
+  variantId?: string | null
   locationId: string
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -377,6 +396,7 @@ export type InventoryUncheckedUpdateManyInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -393,18 +413,12 @@ export type InventoryOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type InventoryTenantIdCompanyIdLocationIdProductIdCompoundUniqueInput = {
-  tenantId: string
-  companyId: string
-  locationId: string
-  productId: string
-}
-
 export type InventoryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   tenantId?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
+  variantId?: Prisma.SortOrder
   locationId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -420,6 +434,7 @@ export type InventoryMaxOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
+  variantId?: Prisma.SortOrder
   locationId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -431,6 +446,7 @@ export type InventoryMinOrderByAggregateInput = {
   tenantId?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
+  variantId?: Prisma.SortOrder
   locationId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -609,6 +625,48 @@ export type InventoryUncheckedUpdateManyWithoutProductNestedInput = {
   deleteMany?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
 }
 
+export type InventoryCreateNestedManyWithoutVariantInput = {
+  create?: Prisma.XOR<Prisma.InventoryCreateWithoutVariantInput, Prisma.InventoryUncheckedCreateWithoutVariantInput> | Prisma.InventoryCreateWithoutVariantInput[] | Prisma.InventoryUncheckedCreateWithoutVariantInput[]
+  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutVariantInput | Prisma.InventoryCreateOrConnectWithoutVariantInput[]
+  createMany?: Prisma.InventoryCreateManyVariantInputEnvelope
+  connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+}
+
+export type InventoryUncheckedCreateNestedManyWithoutVariantInput = {
+  create?: Prisma.XOR<Prisma.InventoryCreateWithoutVariantInput, Prisma.InventoryUncheckedCreateWithoutVariantInput> | Prisma.InventoryCreateWithoutVariantInput[] | Prisma.InventoryUncheckedCreateWithoutVariantInput[]
+  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutVariantInput | Prisma.InventoryCreateOrConnectWithoutVariantInput[]
+  createMany?: Prisma.InventoryCreateManyVariantInputEnvelope
+  connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+}
+
+export type InventoryUpdateManyWithoutVariantNestedInput = {
+  create?: Prisma.XOR<Prisma.InventoryCreateWithoutVariantInput, Prisma.InventoryUncheckedCreateWithoutVariantInput> | Prisma.InventoryCreateWithoutVariantInput[] | Prisma.InventoryUncheckedCreateWithoutVariantInput[]
+  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutVariantInput | Prisma.InventoryCreateOrConnectWithoutVariantInput[]
+  upsert?: Prisma.InventoryUpsertWithWhereUniqueWithoutVariantInput | Prisma.InventoryUpsertWithWhereUniqueWithoutVariantInput[]
+  createMany?: Prisma.InventoryCreateManyVariantInputEnvelope
+  set?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  disconnect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  delete?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  update?: Prisma.InventoryUpdateWithWhereUniqueWithoutVariantInput | Prisma.InventoryUpdateWithWhereUniqueWithoutVariantInput[]
+  updateMany?: Prisma.InventoryUpdateManyWithWhereWithoutVariantInput | Prisma.InventoryUpdateManyWithWhereWithoutVariantInput[]
+  deleteMany?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
+}
+
+export type InventoryUncheckedUpdateManyWithoutVariantNestedInput = {
+  create?: Prisma.XOR<Prisma.InventoryCreateWithoutVariantInput, Prisma.InventoryUncheckedCreateWithoutVariantInput> | Prisma.InventoryCreateWithoutVariantInput[] | Prisma.InventoryUncheckedCreateWithoutVariantInput[]
+  connectOrCreate?: Prisma.InventoryCreateOrConnectWithoutVariantInput | Prisma.InventoryCreateOrConnectWithoutVariantInput[]
+  upsert?: Prisma.InventoryUpsertWithWhereUniqueWithoutVariantInput | Prisma.InventoryUpsertWithWhereUniqueWithoutVariantInput[]
+  createMany?: Prisma.InventoryCreateManyVariantInputEnvelope
+  set?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  disconnect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  delete?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  connect?: Prisma.InventoryWhereUniqueInput | Prisma.InventoryWhereUniqueInput[]
+  update?: Prisma.InventoryUpdateWithWhereUniqueWithoutVariantInput | Prisma.InventoryUpdateWithWhereUniqueWithoutVariantInput[]
+  updateMany?: Prisma.InventoryUpdateManyWithWhereWithoutVariantInput | Prisma.InventoryUpdateManyWithWhereWithoutVariantInput[]
+  deleteMany?: Prisma.InventoryScalarWhereInput | Prisma.InventoryScalarWhereInput[]
+}
+
 export type InventoryCreateWithoutTenantInput = {
   id?: string
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -616,6 +674,7 @@ export type InventoryCreateWithoutTenantInput = {
   updatedAt?: Date | string
   company: Prisma.CompanyCreateNestedOneWithoutInventoryBalancesInput
   product: Prisma.ProductCreateNestedOneWithoutInventoryBalancesInput
+  variant?: Prisma.ProductVariantCreateNestedOneWithoutInventoryBalancesInput
   location: Prisma.LocationCreateNestedOneWithoutInventoryBalancesInput
 }
 
@@ -623,6 +682,7 @@ export type InventoryUncheckedCreateWithoutTenantInput = {
   id?: string
   companyId: string
   productId: string
+  variantId?: string | null
   locationId: string
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -663,6 +723,7 @@ export type InventoryScalarWhereInput = {
   tenantId?: Prisma.UuidFilter<"Inventory"> | string
   companyId?: Prisma.UuidFilter<"Inventory"> | string
   productId?: Prisma.UuidFilter<"Inventory"> | string
+  variantId?: Prisma.UuidNullableFilter<"Inventory"> | string | null
   locationId?: Prisma.UuidFilter<"Inventory"> | string
   quantity?: Prisma.DecimalFilter<"Inventory"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFilter<"Inventory"> | Date | string
@@ -676,6 +737,7 @@ export type InventoryCreateWithoutCompanyInput = {
   updatedAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutInventoryBalancesInput
   product: Prisma.ProductCreateNestedOneWithoutInventoryBalancesInput
+  variant?: Prisma.ProductVariantCreateNestedOneWithoutInventoryBalancesInput
   location: Prisma.LocationCreateNestedOneWithoutInventoryBalancesInput
 }
 
@@ -683,6 +745,7 @@ export type InventoryUncheckedCreateWithoutCompanyInput = {
   id?: string
   tenantId: string
   productId: string
+  variantId?: string | null
   locationId: string
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -723,6 +786,7 @@ export type InventoryCreateWithoutLocationInput = {
   tenant: Prisma.TenantCreateNestedOneWithoutInventoryBalancesInput
   company: Prisma.CompanyCreateNestedOneWithoutInventoryBalancesInput
   product: Prisma.ProductCreateNestedOneWithoutInventoryBalancesInput
+  variant?: Prisma.ProductVariantCreateNestedOneWithoutInventoryBalancesInput
 }
 
 export type InventoryUncheckedCreateWithoutLocationInput = {
@@ -730,6 +794,7 @@ export type InventoryUncheckedCreateWithoutLocationInput = {
   tenantId: string
   companyId: string
   productId: string
+  variantId?: string | null
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -768,6 +833,7 @@ export type InventoryCreateWithoutProductInput = {
   updatedAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutInventoryBalancesInput
   company: Prisma.CompanyCreateNestedOneWithoutInventoryBalancesInput
+  variant?: Prisma.ProductVariantCreateNestedOneWithoutInventoryBalancesInput
   location: Prisma.LocationCreateNestedOneWithoutInventoryBalancesInput
 }
 
@@ -775,6 +841,7 @@ export type InventoryUncheckedCreateWithoutProductInput = {
   id?: string
   tenantId: string
   companyId: string
+  variantId?: string | null
   locationId: string
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -807,10 +874,59 @@ export type InventoryUpdateManyWithWhereWithoutProductInput = {
   data: Prisma.XOR<Prisma.InventoryUpdateManyMutationInput, Prisma.InventoryUncheckedUpdateManyWithoutProductInput>
 }
 
+export type InventoryCreateWithoutVariantInput = {
+  id?: string
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutInventoryBalancesInput
+  company: Prisma.CompanyCreateNestedOneWithoutInventoryBalancesInput
+  product: Prisma.ProductCreateNestedOneWithoutInventoryBalancesInput
+  location: Prisma.LocationCreateNestedOneWithoutInventoryBalancesInput
+}
+
+export type InventoryUncheckedCreateWithoutVariantInput = {
+  id?: string
+  tenantId: string
+  companyId: string
+  productId: string
+  locationId: string
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type InventoryCreateOrConnectWithoutVariantInput = {
+  where: Prisma.InventoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.InventoryCreateWithoutVariantInput, Prisma.InventoryUncheckedCreateWithoutVariantInput>
+}
+
+export type InventoryCreateManyVariantInputEnvelope = {
+  data: Prisma.InventoryCreateManyVariantInput | Prisma.InventoryCreateManyVariantInput[]
+  skipDuplicates?: boolean
+}
+
+export type InventoryUpsertWithWhereUniqueWithoutVariantInput = {
+  where: Prisma.InventoryWhereUniqueInput
+  update: Prisma.XOR<Prisma.InventoryUpdateWithoutVariantInput, Prisma.InventoryUncheckedUpdateWithoutVariantInput>
+  create: Prisma.XOR<Prisma.InventoryCreateWithoutVariantInput, Prisma.InventoryUncheckedCreateWithoutVariantInput>
+}
+
+export type InventoryUpdateWithWhereUniqueWithoutVariantInput = {
+  where: Prisma.InventoryWhereUniqueInput
+  data: Prisma.XOR<Prisma.InventoryUpdateWithoutVariantInput, Prisma.InventoryUncheckedUpdateWithoutVariantInput>
+}
+
+export type InventoryUpdateManyWithWhereWithoutVariantInput = {
+  where: Prisma.InventoryScalarWhereInput
+  data: Prisma.XOR<Prisma.InventoryUpdateManyMutationInput, Prisma.InventoryUncheckedUpdateManyWithoutVariantInput>
+}
+
 export type InventoryCreateManyTenantInput = {
   id?: string
   companyId: string
   productId: string
+  variantId?: string | null
   locationId: string
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -824,6 +940,7 @@ export type InventoryUpdateWithoutTenantInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutInventoryBalancesNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutInventoryBalancesNestedInput
+  variant?: Prisma.ProductVariantUpdateOneWithoutInventoryBalancesNestedInput
   location?: Prisma.LocationUpdateOneRequiredWithoutInventoryBalancesNestedInput
 }
 
@@ -831,6 +948,7 @@ export type InventoryUncheckedUpdateWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -841,6 +959,7 @@ export type InventoryUncheckedUpdateManyWithoutTenantInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -851,6 +970,7 @@ export type InventoryCreateManyCompanyInput = {
   id?: string
   tenantId: string
   productId: string
+  variantId?: string | null
   locationId: string
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -864,6 +984,7 @@ export type InventoryUpdateWithoutCompanyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutInventoryBalancesNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutInventoryBalancesNestedInput
+  variant?: Prisma.ProductVariantUpdateOneWithoutInventoryBalancesNestedInput
   location?: Prisma.LocationUpdateOneRequiredWithoutInventoryBalancesNestedInput
 }
 
@@ -871,6 +992,7 @@ export type InventoryUncheckedUpdateWithoutCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -881,6 +1003,7 @@ export type InventoryUncheckedUpdateManyWithoutCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -892,6 +1015,7 @@ export type InventoryCreateManyLocationInput = {
   tenantId: string
   companyId: string
   productId: string
+  variantId?: string | null
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -905,6 +1029,7 @@ export type InventoryUpdateWithoutLocationInput = {
   tenant?: Prisma.TenantUpdateOneRequiredWithoutInventoryBalancesNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutInventoryBalancesNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutInventoryBalancesNestedInput
+  variant?: Prisma.ProductVariantUpdateOneWithoutInventoryBalancesNestedInput
 }
 
 export type InventoryUncheckedUpdateWithoutLocationInput = {
@@ -912,6 +1037,7 @@ export type InventoryUncheckedUpdateWithoutLocationInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -922,6 +1048,7 @@ export type InventoryUncheckedUpdateManyWithoutLocationInput = {
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -931,6 +1058,7 @@ export type InventoryCreateManyProductInput = {
   id?: string
   tenantId: string
   companyId: string
+  variantId?: string | null
   locationId: string
   quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
@@ -944,6 +1072,7 @@ export type InventoryUpdateWithoutProductInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutInventoryBalancesNestedInput
   company?: Prisma.CompanyUpdateOneRequiredWithoutInventoryBalancesNestedInput
+  variant?: Prisma.ProductVariantUpdateOneWithoutInventoryBalancesNestedInput
   location?: Prisma.LocationUpdateOneRequiredWithoutInventoryBalancesNestedInput
 }
 
@@ -951,6 +1080,7 @@ export type InventoryUncheckedUpdateWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   locationId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -961,6 +1091,51 @@ export type InventoryUncheckedUpdateManyWithoutProductInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   tenantId?: Prisma.StringFieldUpdateOperationsInput | string
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type InventoryCreateManyVariantInput = {
+  id?: string
+  tenantId: string
+  companyId: string
+  productId: string
+  locationId: string
+  quantity?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type InventoryUpdateWithoutVariantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutInventoryBalancesNestedInput
+  company?: Prisma.CompanyUpdateOneRequiredWithoutInventoryBalancesNestedInput
+  product?: Prisma.ProductUpdateOneRequiredWithoutInventoryBalancesNestedInput
+  location?: Prisma.LocationUpdateOneRequiredWithoutInventoryBalancesNestedInput
+}
+
+export type InventoryUncheckedUpdateWithoutVariantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.StringFieldUpdateOperationsInput | string
+  locationId?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type InventoryUncheckedUpdateManyWithoutVariantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.StringFieldUpdateOperationsInput | string
   locationId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -974,6 +1149,7 @@ export type InventorySelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   tenantId?: boolean
   companyId?: boolean
   productId?: boolean
+  variantId?: boolean
   locationId?: boolean
   quantity?: boolean
   createdAt?: boolean
@@ -981,6 +1157,7 @@ export type InventorySelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  variant?: boolean | Prisma.Inventory$variantArgs<ExtArgs>
   location?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inventory"]>
 
@@ -989,6 +1166,7 @@ export type InventorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   tenantId?: boolean
   companyId?: boolean
   productId?: boolean
+  variantId?: boolean
   locationId?: boolean
   quantity?: boolean
   createdAt?: boolean
@@ -996,6 +1174,7 @@ export type InventorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  variant?: boolean | Prisma.Inventory$variantArgs<ExtArgs>
   location?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inventory"]>
 
@@ -1004,6 +1183,7 @@ export type InventorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   tenantId?: boolean
   companyId?: boolean
   productId?: boolean
+  variantId?: boolean
   locationId?: boolean
   quantity?: boolean
   createdAt?: boolean
@@ -1011,6 +1191,7 @@ export type InventorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  variant?: boolean | Prisma.Inventory$variantArgs<ExtArgs>
   location?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inventory"]>
 
@@ -1019,29 +1200,33 @@ export type InventorySelectScalar = {
   tenantId?: boolean
   companyId?: boolean
   productId?: boolean
+  variantId?: boolean
   locationId?: boolean
   quantity?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type InventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "companyId" | "productId" | "locationId" | "quantity" | "createdAt" | "updatedAt", ExtArgs["result"]["inventory"]>
+export type InventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "companyId" | "productId" | "variantId" | "locationId" | "quantity" | "createdAt" | "updatedAt", ExtArgs["result"]["inventory"]>
 export type InventoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  variant?: boolean | Prisma.Inventory$variantArgs<ExtArgs>
   location?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
 }
 export type InventoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  variant?: boolean | Prisma.Inventory$variantArgs<ExtArgs>
   location?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
 }
 export type InventoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  variant?: boolean | Prisma.Inventory$variantArgs<ExtArgs>
   location?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
 }
 
@@ -1051,6 +1236,7 @@ export type $InventoryPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     tenant: Prisma.$TenantPayload<ExtArgs>
     company: Prisma.$CompanyPayload<ExtArgs>
     product: Prisma.$ProductPayload<ExtArgs>
+    variant: Prisma.$ProductVariantPayload<ExtArgs> | null
     location: Prisma.$LocationPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1058,6 +1244,7 @@ export type $InventoryPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     tenantId: string
     companyId: string
     productId: string
+    variantId: string | null
     locationId: string
     quantity: runtime.Decimal
     createdAt: Date
@@ -1459,6 +1646,7 @@ export interface Prisma__InventoryClient<T, Null = never, ExtArgs extends runtim
   tenant<T extends Prisma.TenantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TenantDefaultArgs<ExtArgs>>): Prisma.Prisma__TenantClient<runtime.Types.Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   product<T extends Prisma.ProductDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProductDefaultArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  variant<T extends Prisma.Inventory$variantArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Inventory$variantArgs<ExtArgs>>): Prisma.Prisma__ProductVariantClient<runtime.Types.Result.GetResult<Prisma.$ProductVariantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   location<T extends Prisma.LocationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LocationDefaultArgs<ExtArgs>>): Prisma.Prisma__LocationClient<runtime.Types.Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1493,6 +1681,7 @@ export interface InventoryFieldRefs {
   readonly tenantId: Prisma.FieldRef<"Inventory", 'String'>
   readonly companyId: Prisma.FieldRef<"Inventory", 'String'>
   readonly productId: Prisma.FieldRef<"Inventory", 'String'>
+  readonly variantId: Prisma.FieldRef<"Inventory", 'String'>
   readonly locationId: Prisma.FieldRef<"Inventory", 'String'>
   readonly quantity: Prisma.FieldRef<"Inventory", 'Decimal'>
   readonly createdAt: Prisma.FieldRef<"Inventory", 'DateTime'>
@@ -1895,6 +2084,25 @@ export type InventoryDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Limit how many Inventories to delete.
    */
   limit?: number
+}
+
+/**
+ * Inventory.variant
+ */
+export type Inventory$variantArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProductVariant
+   */
+  select?: Prisma.ProductVariantSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProductVariant
+   */
+  omit?: Prisma.ProductVariantOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductVariantInclude<ExtArgs> | null
+  where?: Prisma.ProductVariantWhereInput
 }
 
 /**

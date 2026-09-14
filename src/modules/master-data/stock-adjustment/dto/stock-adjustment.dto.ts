@@ -28,6 +28,11 @@ export class StockAdjustmentLineDto {
   @IsUUID()
   productId!: string;
 
+  /** Required when the product has variants (checked in the service, since that depends on Product.hasVariants) — identifies which variant's stock this line adjusts. */
+  @IsOptional()
+  @IsUUID()
+  variantId?: string;
+
   @IsUUID()
   locationId!: string;
 

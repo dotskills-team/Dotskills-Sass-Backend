@@ -8,6 +8,13 @@ export interface SendMailOptions {
   html: string;
 }
 
+/** `a***@gmail.com` — enough to spot in logs which mailbox was targeted without logging a full address. */
+function maskEmail(email: string): string {
+  const [local, domain] = email.split('@');
+  if (!local || !domain) return '***';
+  return `${local[0]}***@${domain}`;
+}
+
 /**
  * Thin SMTP wrapper (nodemailer) — the only place in the backend that
  * sends real emails (payment receipt + account-activation). Reads SMTP_*
@@ -50,27 +57,47 @@ export class MailService {
     if (!this.transporter) {
       this.logger.log({
         event: 'mail_skipped_no_smtp',
-        to: options.to,
+        to: maskEmail(options.to),
         subject: options.subject,
       });
       return;
     }
 
     try {
-      await this.transporter.sendMail({
+      const info = await this.transporter.sendMail({
         from: this.fromAddress,
         to: options.to,
         subject: options.subject,
         html: options.html,
       });
+      // Accepted-by-SMTP-server confirmation only — not a delivered-to-inbox
+      // guarantee (spam filtering, provider-side drops, etc. happen after
+      // this point and are invisible to us). Logged specifically because a
+      // silent success here with no eventual inbox delivery is exactly the
+      // failure mode this diagnostic was added to distinguish from a real
+      // send failure.
+      this.logger.log({
+        event: 'mail_send_accepted',
+        to: maskEmail(options.to),
+        subject: options.subject,
+        messageId: info.messageId,
+        response: info.response,
+      });
     } catch (error) {
       // Email delivery must never fail a payment/subscription flow — log
       // and swallow, the settlement itself has already been recorded.
+      const smtpError = error as NodeJS.ErrnoException & {
+        responseCode?: number;
+        command?: string;
+      };
       this.logger.error({
         event: 'mail_send_failed',
-        to: options.to,
+        to: maskEmail(options.to),
         subject: options.subject,
-        error: error instanceof Error ? error.message : error,
+        error: smtpError instanceof Error ? smtpError.message : smtpError,
+        code: smtpError.code,
+        responseCode: smtpError.responseCode,
+        command: smtpError.command,
       });
     }
   }

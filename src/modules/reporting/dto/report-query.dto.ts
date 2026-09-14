@@ -62,6 +62,11 @@ export class StockReportQueryDto extends PaginationQueryDto {
   @IsUUID()
   productId?: string;
 
+  /** Drill into one specific variant's stock across locations — independent of productId (a variantId already implies its parent product). */
+  @IsOptional()
+  @IsUUID()
+  variantId?: string;
+
   @IsOptional()
   @Type(() => Boolean)
   @IsBoolean()

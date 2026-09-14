@@ -25,6 +25,11 @@ export class SaleItemInputDto {
   @IsUUID()
   productId!: string;
 
+  /** Required when the product has variants — checked against `Product.hasVariants` in the service. */
+  @IsOptional()
+  @IsUUID()
+  variantId?: string;
+
   @IsNumber(
     { maxDecimalPlaces: 4 },
     { message: 'quantity must have maximum 4 decimal places' },
@@ -105,6 +110,10 @@ export class VoidSaleDto {
 export class SaleReturnItemInputDto {
   @IsUUID()
   productId!: string;
+
+  @IsOptional()
+  @IsUUID()
+  variantId?: string;
 
   @IsNumber(
     { maxDecimalPlaces: 4 },

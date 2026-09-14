@@ -62,6 +62,7 @@ import { LocationModule } from './modules/master-data/location/location.module';
 import { CategoryModule } from './modules/master-data/category/category.module';
 import { UnitModule } from './modules/master-data/unit/unit.module';
 import { ProductModule } from './modules/master-data/product/product.module';
+import { VariantAttributeModule } from './modules/master-data/variant-attribute/variant-attribute.module';
 import { CustomerModule } from './modules/master-data/customer/customer.module';
 import { SupplierModule } from './modules/master-data/supplier/supplier.module';
 import { CompanySettingsModule } from './modules/master-data/company-settings/company-settings.module';
@@ -126,6 +127,7 @@ import { SetupStatusModule } from './modules/setup-status/setup-status.module';
     CategoryModule,
     UnitModule,
     ProductModule,
+    VariantAttributeModule,
     CustomerModule,
     SupplierModule,
     CompanySettingsModule,

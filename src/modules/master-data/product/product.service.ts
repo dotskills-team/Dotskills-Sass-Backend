@@ -26,6 +26,7 @@ const PRODUCT_SELECT = {
   salePrice: true,
   reorderLevel: true,
   sellByWeight: true,
+  hasVariants: true,
   status: true,
   createdAt: true,
   updatedAt: true,

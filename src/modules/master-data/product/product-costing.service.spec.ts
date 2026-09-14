@@ -11,6 +11,10 @@ describe('ProductCostingService.applyPurchaseCost', () => {
       findUniqueOrThrow: jest.fn(),
       update: jest.fn(),
     },
+    productVariant: {
+      findUniqueOrThrow: jest.fn(),
+      update: jest.fn(),
+    },
     inventory: {
       aggregate: jest.fn(),
     },
@@ -50,6 +54,7 @@ describe('ProductCostingService.applyPurchaseCost', () => {
         tenantId: 'tenant-1',
         companyId: 'company-1',
         productId: 'product-1',
+        variantId: null,
       },
       _sum: { quantity: true },
     });
@@ -94,5 +99,46 @@ describe('ProductCostingService.applyPurchaseCost', () => {
     );
 
     expect(result.toString()).toBe('40');
+  });
+
+  describe('when a variantId is given', () => {
+    it('averages against the ProductVariant costPrice and Inventory scoped to that variant, not the parent Product', async () => {
+      mockTx.productVariant.findUniqueOrThrow.mockResolvedValue({
+        costPrice: new Prisma.Decimal(100),
+      });
+      mockTx.inventory.aggregate.mockResolvedValue({
+        _sum: { quantity: new Prisma.Decimal(10) },
+      });
+      mockTx.productVariant.update.mockResolvedValue({});
+
+      const result = await service.applyPurchaseCost(
+        mockTx as any,
+        context,
+        'product-1',
+        10,
+        200,
+        'variant-1',
+      );
+
+      expect(mockTx.product.findUniqueOrThrow).not.toHaveBeenCalled();
+      expect(mockTx.productVariant.findUniqueOrThrow).toHaveBeenCalledWith({
+        where: { id: 'variant-1' },
+        select: { costPrice: true },
+      });
+      expect(mockTx.inventory.aggregate).toHaveBeenCalledWith({
+        where: {
+          tenantId: 'tenant-1',
+          companyId: 'company-1',
+          productId: 'product-1',
+          variantId: 'variant-1',
+        },
+        _sum: { quantity: true },
+      });
+      expect(result.toString()).toBe('150');
+      expect(mockTx.product.update).not.toHaveBeenCalled();
+      const updateCall = mockTx.productVariant.update.mock.calls[0][0];
+      expect(updateCall.where).toEqual({ id: 'variant-1' });
+      expect(updateCall.data.costPrice.toString()).toBe('150');
+    });
   });
 });

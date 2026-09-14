@@ -321,6 +321,7 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   sessions?: Prisma.AuthSessionListRelationFilter
+  passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter
   loginEvents?: Prisma.LoginEventListRelationFilter
   platformMember?: Prisma.XOR<Prisma.PlatformMemberNullableScalarRelationFilter, Prisma.PlatformMemberWhereInput> | null
   companyMemberships?: Prisma.CompanyMemberListRelationFilter
@@ -352,6 +353,7 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   sessions?: Prisma.AuthSessionOrderByRelationAggregateInput
+  passwordResetTokens?: Prisma.PasswordResetTokenOrderByRelationAggregateInput
   loginEvents?: Prisma.LoginEventOrderByRelationAggregateInput
   platformMember?: Prisma.PlatformMemberOrderByWithRelationInput
   companyMemberships?: Prisma.CompanyMemberOrderByRelationAggregateInput
@@ -386,6 +388,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   sessions?: Prisma.AuthSessionListRelationFilter
+  passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter
   loginEvents?: Prisma.LoginEventListRelationFilter
   platformMember?: Prisma.XOR<Prisma.PlatformMemberNullableScalarRelationFilter, Prisma.PlatformMemberWhereInput> | null
   companyMemberships?: Prisma.CompanyMemberListRelationFilter
@@ -467,6 +470,7 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberCreateNestedManyWithoutUserInput
@@ -498,6 +502,7 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventUncheckedCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberUncheckedCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutUserInput
@@ -529,6 +534,7 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUpdateManyWithoutUserNestedInput
@@ -560,6 +566,7 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUncheckedUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUncheckedUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -757,6 +764,20 @@ export type UserUpdateOneRequiredWithoutSessionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSessionsInput, Prisma.UserUpdateWithoutSessionsInput>, Prisma.UserUncheckedUpdateWithoutSessionsInput>
 }
 
+export type UserCreateNestedOneWithoutPasswordResetTokensInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPasswordResetTokensNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPasswordResetTokensInput
+  upsert?: Prisma.UserUpsertWithoutPasswordResetTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPasswordResetTokensInput, Prisma.UserUpdateWithoutPasswordResetTokensInput>, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>
+}
+
 export type UserCreateNestedOneWithoutLoginEventsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutLoginEventsInput, Prisma.UserUncheckedCreateWithoutLoginEventsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutLoginEventsInput
@@ -916,6 +937,7 @@ export type UserCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberCreateNestedManyWithoutUserInput
@@ -946,6 +968,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventUncheckedCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberUncheckedCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutUserInput
@@ -992,6 +1015,7 @@ export type UserUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUpdateManyWithoutUserNestedInput
@@ -1022,6 +1046,147 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  loginEvents?: Prisma.LoginEventUncheckedUpdateManyWithoutUserNestedInput
+  platformMember?: Prisma.PlatformMemberUncheckedUpdateOneWithoutUserNestedInput
+  companyMemberships?: Prisma.CompanyMemberUncheckedUpdateManyWithoutUserNestedInput
+  createdCompanies?: Prisma.CompanyUncheckedUpdateManyWithoutCreatedByNestedInput
+  ownerInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutInvitedUserNestedInput
+  sentInvitations?: Prisma.InvitationUncheckedUpdateManyWithoutSentByNestedInput
+  ownershipAssigned?: Prisma.CompanyOwnershipUncheckedUpdateManyWithoutAssignedByNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedUpdateManyWithoutUpdatedByNestedInput
+}
+
+export type UserCreateWithoutPasswordResetTokensInput = {
+  id?: string
+  email?: string | null
+  phone?: string | null
+  passwordHash?: string | null
+  fullName: string
+  profileImageUrl?: string | null
+  preferredLocale?: string
+  timezone?: string
+  status?: $Enums.AccountStatus
+  emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
+  passwordChangedAt?: Date | string | null
+  failedLoginCount?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  sessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  loginEvents?: Prisma.LoginEventCreateNestedManyWithoutUserInput
+  platformMember?: Prisma.PlatformMemberCreateNestedOneWithoutUserInput
+  companyMemberships?: Prisma.CompanyMemberCreateNestedManyWithoutUserInput
+  createdCompanies?: Prisma.CompanyCreateNestedManyWithoutCreatedByInput
+  ownerInvitations?: Prisma.InvitationCreateNestedManyWithoutInvitedUserInput
+  sentInvitations?: Prisma.InvitationCreateNestedManyWithoutSentByInput
+  ownershipAssigned?: Prisma.CompanyOwnershipCreateNestedManyWithoutAssignedByInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsCreateNestedManyWithoutUpdatedByInput
+}
+
+export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
+  id?: string
+  email?: string | null
+  phone?: string | null
+  passwordHash?: string | null
+  fullName: string
+  profileImageUrl?: string | null
+  preferredLocale?: string
+  timezone?: string
+  status?: $Enums.AccountStatus
+  emailVerifiedAt?: Date | string | null
+  phoneVerifiedAt?: Date | string | null
+  passwordChangedAt?: Date | string | null
+  failedLoginCount?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  sessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  loginEvents?: Prisma.LoginEventUncheckedCreateNestedManyWithoutUserInput
+  platformMember?: Prisma.PlatformMemberUncheckedCreateNestedOneWithoutUserInput
+  companyMemberships?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutUserInput
+  createdCompanies?: Prisma.CompanyUncheckedCreateNestedManyWithoutCreatedByInput
+  ownerInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutInvitedUserInput
+  sentInvitations?: Prisma.InvitationUncheckedCreateNestedManyWithoutSentByInput
+  ownershipAssigned?: Prisma.CompanyOwnershipUncheckedCreateNestedManyWithoutAssignedByInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUncheckedCreateNestedManyWithoutUpdatedByInput
+}
+
+export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
+}
+
+export type UserUpsertWithoutPasswordResetTokensInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetTokensInput, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPasswordResetTokensInput, Prisma.UserUncheckedCreateWithoutPasswordResetTokensInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPasswordResetTokensInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPasswordResetTokensInput, Prisma.UserUncheckedUpdateWithoutPasswordResetTokensInput>
+}
+
+export type UserUpdateWithoutPasswordResetTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  loginEvents?: Prisma.LoginEventUpdateManyWithoutUserNestedInput
+  platformMember?: Prisma.PlatformMemberUpdateOneWithoutUserNestedInput
+  companyMemberships?: Prisma.CompanyMemberUpdateManyWithoutUserNestedInput
+  createdCompanies?: Prisma.CompanyUpdateManyWithoutCreatedByNestedInput
+  ownerInvitations?: Prisma.InvitationUpdateManyWithoutInvitedUserNestedInput
+  sentInvitations?: Prisma.InvitationUpdateManyWithoutSentByNestedInput
+  ownershipAssigned?: Prisma.CompanyOwnershipUpdateManyWithoutAssignedByNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  platformSettingsUpdates?: Prisma.PlatformSettingsUpdateManyWithoutUpdatedByNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredLocale?: Prisma.StringFieldUpdateOperationsInput | string
+  timezone?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumAccountStatusFieldUpdateOperationsInput | $Enums.AccountStatus
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  phoneVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  passwordChangedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginCount?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  sessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUncheckedUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUncheckedUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -1053,6 +1218,7 @@ export type UserCreateWithoutLoginEventsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberCreateNestedManyWithoutUserInput
   createdCompanies?: Prisma.CompanyCreateNestedManyWithoutCreatedByInput
@@ -1083,6 +1249,7 @@ export type UserUncheckedCreateWithoutLoginEventsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberUncheckedCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutUserInput
   createdCompanies?: Prisma.CompanyUncheckedCreateNestedManyWithoutCreatedByInput
@@ -1129,6 +1296,7 @@ export type UserUpdateWithoutLoginEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUpdateManyWithoutUserNestedInput
   createdCompanies?: Prisma.CompanyUpdateManyWithoutCreatedByNestedInput
@@ -1159,6 +1327,7 @@ export type UserUncheckedUpdateWithoutLoginEventsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUncheckedUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUncheckedUpdateManyWithoutUserNestedInput
   createdCompanies?: Prisma.CompanyUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -1189,6 +1358,7 @@ export type UserCreateWithoutPlatformMemberInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventCreateNestedManyWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberCreateNestedManyWithoutUserInput
   createdCompanies?: Prisma.CompanyCreateNestedManyWithoutCreatedByInput
@@ -1219,6 +1389,7 @@ export type UserUncheckedCreateWithoutPlatformMemberInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventUncheckedCreateNestedManyWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutUserInput
   createdCompanies?: Prisma.CompanyUncheckedCreateNestedManyWithoutCreatedByInput
@@ -1265,6 +1436,7 @@ export type UserUpdateWithoutPlatformMemberInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUpdateManyWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUpdateManyWithoutUserNestedInput
   createdCompanies?: Prisma.CompanyUpdateManyWithoutCreatedByNestedInput
@@ -1295,6 +1467,7 @@ export type UserUncheckedUpdateWithoutPlatformMemberInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUncheckedUpdateManyWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUncheckedUpdateManyWithoutUserNestedInput
   createdCompanies?: Prisma.CompanyUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -1325,6 +1498,7 @@ export type UserCreateWithoutCreatedCompaniesInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberCreateNestedManyWithoutUserInput
@@ -1355,6 +1529,7 @@ export type UserUncheckedCreateWithoutCreatedCompaniesInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventUncheckedCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberUncheckedCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutUserInput
@@ -1401,6 +1576,7 @@ export type UserUpdateWithoutCreatedCompaniesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUpdateManyWithoutUserNestedInput
@@ -1431,6 +1607,7 @@ export type UserUncheckedUpdateWithoutCreatedCompaniesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUncheckedUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUncheckedUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -1461,6 +1638,7 @@ export type UserCreateWithoutCompanyMembershipsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberCreateNestedOneWithoutUserInput
   createdCompanies?: Prisma.CompanyCreateNestedManyWithoutCreatedByInput
@@ -1491,6 +1669,7 @@ export type UserUncheckedCreateWithoutCompanyMembershipsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventUncheckedCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberUncheckedCreateNestedOneWithoutUserInput
   createdCompanies?: Prisma.CompanyUncheckedCreateNestedManyWithoutCreatedByInput
@@ -1537,6 +1716,7 @@ export type UserUpdateWithoutCompanyMembershipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUpdateOneWithoutUserNestedInput
   createdCompanies?: Prisma.CompanyUpdateManyWithoutCreatedByNestedInput
@@ -1567,6 +1747,7 @@ export type UserUncheckedUpdateWithoutCompanyMembershipsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUncheckedUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUncheckedUpdateOneWithoutUserNestedInput
   createdCompanies?: Prisma.CompanyUncheckedUpdateManyWithoutCreatedByNestedInput
@@ -1597,6 +1778,7 @@ export type UserCreateWithoutOwnershipAssignedInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberCreateNestedManyWithoutUserInput
@@ -1627,6 +1809,7 @@ export type UserUncheckedCreateWithoutOwnershipAssignedInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventUncheckedCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberUncheckedCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutUserInput
@@ -1673,6 +1856,7 @@ export type UserUpdateWithoutOwnershipAssignedInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUpdateManyWithoutUserNestedInput
@@ -1703,6 +1887,7 @@ export type UserUncheckedUpdateWithoutOwnershipAssignedInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUncheckedUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUncheckedUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -1733,6 +1918,7 @@ export type UserCreateWithoutOwnerInvitationsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberCreateNestedManyWithoutUserInput
@@ -1763,6 +1949,7 @@ export type UserUncheckedCreateWithoutOwnerInvitationsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventUncheckedCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberUncheckedCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutUserInput
@@ -1798,6 +1985,7 @@ export type UserCreateWithoutSentInvitationsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberCreateNestedManyWithoutUserInput
@@ -1828,6 +2016,7 @@ export type UserUncheckedCreateWithoutSentInvitationsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventUncheckedCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberUncheckedCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutUserInput
@@ -1874,6 +2063,7 @@ export type UserUpdateWithoutOwnerInvitationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUpdateManyWithoutUserNestedInput
@@ -1904,6 +2094,7 @@ export type UserUncheckedUpdateWithoutOwnerInvitationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUncheckedUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUncheckedUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -1945,6 +2136,7 @@ export type UserUpdateWithoutSentInvitationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUpdateManyWithoutUserNestedInput
@@ -1975,6 +2167,7 @@ export type UserUncheckedUpdateWithoutSentInvitationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUncheckedUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUncheckedUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -2005,6 +2198,7 @@ export type UserCreateWithoutAuditLogsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberCreateNestedManyWithoutUserInput
@@ -2035,6 +2229,7 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventUncheckedCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberUncheckedCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutUserInput
@@ -2081,6 +2276,7 @@ export type UserUpdateWithoutAuditLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUpdateManyWithoutUserNestedInput
@@ -2111,6 +2307,7 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUncheckedUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUncheckedUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -2141,6 +2338,7 @@ export type UserCreateWithoutPlatformSettingsUpdatesInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberCreateNestedManyWithoutUserInput
@@ -2171,6 +2369,7 @@ export type UserUncheckedCreateWithoutPlatformSettingsUpdatesInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   sessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
   loginEvents?: Prisma.LoginEventUncheckedCreateNestedManyWithoutUserInput
   platformMember?: Prisma.PlatformMemberUncheckedCreateNestedOneWithoutUserInput
   companyMemberships?: Prisma.CompanyMemberUncheckedCreateNestedManyWithoutUserInput
@@ -2217,6 +2416,7 @@ export type UserUpdateWithoutPlatformSettingsUpdatesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUpdateManyWithoutUserNestedInput
@@ -2247,6 +2447,7 @@ export type UserUncheckedUpdateWithoutPlatformSettingsUpdatesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   sessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
   loginEvents?: Prisma.LoginEventUncheckedUpdateManyWithoutUserNestedInput
   platformMember?: Prisma.PlatformMemberUncheckedUpdateOneWithoutUserNestedInput
   companyMemberships?: Prisma.CompanyMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -2264,6 +2465,7 @@ export type UserUncheckedUpdateWithoutPlatformSettingsUpdatesInput = {
 
 export type UserCountOutputType = {
   sessions: number
+  passwordResetTokens: number
   loginEvents: number
   companyMemberships: number
   createdCompanies: number
@@ -2276,6 +2478,7 @@ export type UserCountOutputType = {
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
+  passwordResetTokens?: boolean | UserCountOutputTypeCountPasswordResetTokensArgs
   loginEvents?: boolean | UserCountOutputTypeCountLoginEventsArgs
   companyMemberships?: boolean | UserCountOutputTypeCountCompanyMembershipsArgs
   createdCompanies?: boolean | UserCountOutputTypeCountCreatedCompaniesArgs
@@ -2301,6 +2504,13 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
  */
 export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AuthSessionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPasswordResetTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PasswordResetTokenWhereInput
 }
 
 /**
@@ -2380,6 +2590,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   deletedAt?: boolean
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>
   loginEvents?: boolean | Prisma.User$loginEventsArgs<ExtArgs>
   platformMember?: boolean | Prisma.User$platformMemberArgs<ExtArgs>
   companyMemberships?: boolean | Prisma.User$companyMembershipsArgs<ExtArgs>
@@ -2458,6 +2669,7 @@ export type UserSelectScalar = {
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "phone" | "passwordHash" | "fullName" | "profileImageUrl" | "preferredLocale" | "timezone" | "status" | "emailVerifiedAt" | "phoneVerifiedAt" | "passwordChangedAt" | "failedLoginCount" | "lockedUntil" | "lastLoginAt" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>
   loginEvents?: boolean | Prisma.User$loginEventsArgs<ExtArgs>
   platformMember?: boolean | Prisma.User$platformMemberArgs<ExtArgs>
   companyMemberships?: boolean | Prisma.User$companyMembershipsArgs<ExtArgs>
@@ -2476,6 +2688,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "User"
   objects: {
     sessions: Prisma.$AuthSessionPayload<ExtArgs>[]
+    passwordResetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
     loginEvents: Prisma.$LoginEventPayload<ExtArgs>[]
     platformMember: Prisma.$PlatformMemberPayload<ExtArgs> | null
     companyMemberships: Prisma.$CompanyMemberPayload<ExtArgs>[]
@@ -2900,6 +3113,7 @@ readonly fields: UserFieldRefs;
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuthSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  passwordResetTokens<T extends Prisma.User$passwordResetTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$passwordResetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   loginEvents<T extends Prisma.User$loginEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$loginEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoginEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   platformMember<T extends Prisma.User$platformMemberArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$platformMemberArgs<ExtArgs>>): Prisma.Prisma__PlatformMemberClient<runtime.Types.Result.GetResult<Prisma.$PlatformMemberPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   companyMemberships<T extends Prisma.User$companyMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$companyMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CompanyMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3370,6 +3584,30 @@ export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.AuthSessionScalarFieldEnum | Prisma.AuthSessionScalarFieldEnum[]
+}
+
+/**
+ * User.passwordResetTokens
+ */
+export type User$passwordResetTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PasswordResetToken
+   */
+  select?: Prisma.PasswordResetTokenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PasswordResetToken
+   */
+  omit?: Prisma.PasswordResetTokenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PasswordResetTokenInclude<ExtArgs> | null
+  where?: Prisma.PasswordResetTokenWhereInput
+  orderBy?: Prisma.PasswordResetTokenOrderByWithRelationInput | Prisma.PasswordResetTokenOrderByWithRelationInput[]
+  cursor?: Prisma.PasswordResetTokenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PasswordResetTokenScalarFieldEnum | Prisma.PasswordResetTokenScalarFieldEnum[]
 }
 
 /**

@@ -16,6 +16,8 @@ interface StockMoveInput {
   tenantId: string;
   companyId: string;
   productId: string;
+  /** Omitted (or undefined) for a non-variant product — every lookup/write below normalizes this to `null`, matching Inventory's partial-unique-index split between variant and non-variant rows. */
+  variantId?: string;
   locationId: string;
   quantity: number | Prisma.Decimal;
   movementType: StockMovementType;
@@ -62,26 +64,43 @@ export class InventoryService {
       note,
       reason,
     } = input;
+    const variantId = input.variantId ?? null;
 
-    const balance = await tx.inventory.upsert({
-      where: {
-        tenantId_companyId_locationId_productId: {
-          tenantId,
-          companyId,
-          locationId,
-          productId,
-        },
-      },
-      create: { tenantId, companyId, productId, locationId, quantity },
-      update: { quantity: { increment: quantity } },
-      select: { quantity: true },
+    // No compound @@unique exists on Inventory any more (variantId is
+    // nullable and Postgres unique indexes treat NULL as distinct from
+    // every other NULL — see the two partial unique indexes added by the
+    // product_variants_and_flag_removal migration), so `upsert` can no
+    // longer target a generated compound-unique key here — a plain
+    // findFirst-then-create/update instead. Scoped by variantId (null for a
+    // non-variant product) so each variant tracks its own balance row.
+    const existing = await tx.inventory.findFirst({
+      where: { tenantId, companyId, productId, locationId, variantId },
+      select: { id: true },
     });
+    const balance = existing
+      ? await tx.inventory.update({
+          where: { id: existing.id },
+          data: { quantity: { increment: quantity } },
+          select: { quantity: true },
+        })
+      : await tx.inventory.create({
+          data: {
+            tenantId,
+            companyId,
+            productId,
+            variantId,
+            locationId,
+            quantity,
+          },
+          select: { quantity: true },
+        });
 
     const movement = await tx.stockMovement.create({
       data: {
         tenantId,
         companyId,
         productId,
+        variantId,
         locationId,
         movementType,
         changeQty: quantity,
@@ -131,6 +150,7 @@ export class InventoryService {
       reason,
       allowNegative,
     } = input;
+    const variantId = input.variantId ?? null;
 
     const result = await tx.inventory.updateMany({
       where: {
@@ -138,6 +158,7 @@ export class InventoryService {
         companyId,
         productId,
         locationId,
+        variantId,
         ...(allowNegative ? {} : { quantity: { gte: quantity } }),
       },
       data: { quantity: { decrement: quantity } },
@@ -147,15 +168,8 @@ export class InventoryService {
       throw new ConflictException('INSUFFICIENT_STOCK');
     }
 
-    const balance = await tx.inventory.findUniqueOrThrow({
-      where: {
-        tenantId_companyId_locationId_productId: {
-          tenantId,
-          companyId,
-          locationId,
-          productId,
-        },
-      },
+    const balance = await tx.inventory.findFirstOrThrow({
+      where: { tenantId, companyId, productId, locationId, variantId },
       select: { quantity: true },
     });
 
@@ -164,6 +178,7 @@ export class InventoryService {
         tenantId,
         companyId,
         productId,
+        variantId,
         locationId,
         movementType,
         changeQty: new Prisma.Decimal(quantity).negated(),
@@ -283,18 +298,19 @@ export class InventoryService {
     context: CompanyContext,
     productId: string,
     locationId: string,
+    variantId?: string,
   ) {
-    const balance = await this.prisma.inventory.findUnique({
+    const balance = await this.prisma.inventory.findFirst({
       where: {
-        tenantId_companyId_locationId_productId: {
-          tenantId: context.tenantId,
-          companyId: context.companyId,
-          locationId,
-          productId,
-        },
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+        locationId,
+        productId,
+        variantId: variantId ?? null,
       },
       select: {
         productId: true,
+        variantId: true,
         locationId: true,
         quantity: true,
         updatedAt: true,
@@ -304,6 +320,7 @@ export class InventoryService {
       success: true,
       data: balance ?? {
         productId,
+        variantId: variantId ?? null,
         locationId,
         quantity: new Prisma.Decimal(0),
         updatedAt: null,
@@ -311,10 +328,30 @@ export class InventoryService {
     };
   }
 
+  /** Every variant of a product, summed across all locations — the "total stock on hand" view for a variant-tracked product. */
+  async listBalancesByProduct(context: CompanyContext, productId: string) {
+    const balances = await this.prisma.inventory.findMany({
+      where: {
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+        productId,
+      },
+      select: {
+        variantId: true,
+        locationId: true,
+        quantity: true,
+        updatedAt: true,
+      },
+      orderBy: [{ variantId: 'asc' }, { locationId: 'asc' }],
+    });
+    return { success: true, count: balances.length, data: balances };
+  }
+
   async listMovements(
     context: CompanyContext,
     productId: string,
     locationId?: string,
+    variantId?: string,
   ) {
     const movements = await this.prisma.stockMovement.findMany({
       where: {
@@ -322,6 +359,7 @@ export class InventoryService {
         companyId: context.companyId,
         productId,
         ...(locationId ? { locationId } : {}),
+        ...(variantId ? { variantId } : {}),
       },
       orderBy: { createdAt: 'desc' },
     });

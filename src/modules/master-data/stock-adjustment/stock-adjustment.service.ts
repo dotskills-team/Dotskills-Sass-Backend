@@ -21,6 +21,7 @@ import {
 export interface AppliedLineResult {
   index: number;
   productId: string;
+  variantId: string | null;
   locationId: string;
   status: 'APPLIED';
   beforeQuantity: string;
@@ -32,6 +33,7 @@ export interface AppliedLineResult {
 export interface ErrorLineResult {
   index: number;
   productId: string;
+  variantId: string | null;
   locationId: string;
   status: 'ERROR';
   errorMessage: string;
@@ -133,6 +135,7 @@ export class StockAdjustmentService {
     const base = {
       index,
       productId: line.productId,
+      variantId: line.variantId ?? null,
       locationId: line.locationId,
     };
 
@@ -176,7 +179,7 @@ export class StockAdjustmentService {
             tenantId: context.tenantId,
             companyId: context.companyId,
           },
-          select: { id: true, costPrice: true },
+          select: { id: true, costPrice: true, hasVariants: true },
         });
         if (!product) {
           return {
@@ -184,6 +187,42 @@ export class StockAdjustmentService {
             status: 'ERROR' as const,
             errorMessage: 'product was not found',
           };
+        }
+
+        if (product.hasVariants && !line.variantId) {
+          return {
+            ...base,
+            status: 'ERROR' as const,
+            errorMessage: 'variantId is required for a product with variants',
+          };
+        }
+        if (!product.hasVariants && line.variantId) {
+          return {
+            ...base,
+            status: 'ERROR' as const,
+            errorMessage: 'this product has no variants — omit variantId',
+          };
+        }
+
+        let unitCost = product.costPrice;
+        if (line.variantId) {
+          const variant = await tx.productVariant.findFirst({
+            where: {
+              id: line.variantId,
+              productId: line.productId,
+              tenantId: context.tenantId,
+              companyId: context.companyId,
+            },
+            select: { costPrice: true },
+          });
+          if (!variant) {
+            return {
+              ...base,
+              status: 'ERROR' as const,
+              errorMessage: 'variant was not found on this product',
+            };
+          }
+          unitCost = variant.costPrice;
         }
 
         const location = await tx.location.findFirst({
@@ -202,14 +241,13 @@ export class StockAdjustmentService {
           };
         }
 
-        const inventory = await tx.inventory.findUnique({
+        const inventory = await tx.inventory.findFirst({
           where: {
-            tenantId_companyId_locationId_productId: {
-              tenantId: context.tenantId,
-              companyId: context.companyId,
-              locationId: line.locationId,
-              productId: line.productId,
-            },
+            tenantId: context.tenantId,
+            companyId: context.companyId,
+            locationId: line.locationId,
+            productId: line.productId,
+            variantId: line.variantId ?? null,
           },
           select: { quantity: true },
         });
@@ -232,6 +270,7 @@ export class StockAdjustmentService {
               tenantId: context.tenantId,
               companyId: context.companyId,
               productId: line.productId,
+              variantId: line.variantId,
               locationId: line.locationId,
               quantity: delta,
               movementType: StockMovementType.ADJUSTMENT,
@@ -239,12 +278,13 @@ export class StockAdjustmentService {
               actorUserId: actor.userId,
               reason: line.reason,
               note: line.note?.trim(),
-              unitCost: product.costPrice,
+              unitCost,
             })
           : await this.inventoryService.decreaseStock(tx, {
               tenantId: context.tenantId,
               companyId: context.companyId,
               productId: line.productId,
+              variantId: line.variantId,
               locationId: line.locationId,
               quantity: delta.abs(),
               movementType: StockMovementType.ADJUSTMENT,
@@ -252,7 +292,7 @@ export class StockAdjustmentService {
               actorUserId: actor.userId,
               reason: line.reason,
               note: line.note?.trim(),
-              unitCost: product.costPrice,
+              unitCost,
               allowNegative: false,
             });
 

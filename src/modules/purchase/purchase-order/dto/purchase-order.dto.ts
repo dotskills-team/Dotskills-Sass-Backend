@@ -21,6 +21,11 @@ export class PurchaseOrderItemInputDto {
   @IsUUID()
   productId!: string;
 
+  /** Required when the product has variants — which variant is being ordered/received. Checked against `Product.hasVariants` in the service, since that can't be expressed as a DTO-level rule. */
+  @IsOptional()
+  @IsUUID()
+  variantId?: string;
+
   @IsNumber(
     { maxDecimalPlaces: 4 },
     { message: 'orderedQty must have maximum 4 decimal places' },
@@ -113,6 +118,10 @@ export class ReceiveGoodsDto {
 export class ReturnGoodsItemDto {
   @IsUUID()
   productId!: string;
+
+  @IsOptional()
+  @IsUUID()
+  variantId?: string;
 
   @IsNumber(
     { maxDecimalPlaces: 4 },

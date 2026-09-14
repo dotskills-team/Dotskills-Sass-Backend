@@ -42,8 +42,6 @@ describe('CompanySettingsService.uploadLogo', () => {
       enableMultiUnit: true,
       enableCustomerDue: true,
       enableBarcode: true,
-      enableProductVariant: false,
-      enableComboOffer: false,
       enableMultiLocation: false,
       allowNegativeStock: false,
       maxCustomerDueLimit: null,

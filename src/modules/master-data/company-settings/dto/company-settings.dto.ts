@@ -15,14 +15,6 @@ export class UpdateCompanySettingsDto {
 
   @IsOptional()
   @IsBoolean()
-  enableProductVariant?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  enableComboOffer?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
   enableMultiLocation?: boolean;
 
   @IsOptional()

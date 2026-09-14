@@ -49,6 +49,7 @@ const SALE_SELECT = {
     select: {
       id: true,
       productId: true,
+      variantId: true,
       productName: true,
       quantity: true,
       unitPrice: true,
@@ -142,14 +143,64 @@ export class SaleService {
         tenantId: context.tenantId,
         companyId: context.companyId,
       },
-      select: { id: true, name: true, salePrice: true, costPrice: true },
+      select: {
+        id: true,
+        name: true,
+        salePrice: true,
+        costPrice: true,
+        hasVariants: true,
+      },
     });
     const productsById = new Map(products.map((p) => [p.id, p]));
     for (const item of dto.items) {
-      if (!productsById.has(item.productId)) {
+      const product = productsById.get(item.productId);
+      if (!product) {
         throw new BadRequestException(
           `productId ${item.productId} does not belong to this company`,
         );
+      }
+      if (product.hasVariants && !item.variantId) {
+        throw new BadRequestException(
+          `variantId is required for product ${item.productId} — it has variants`,
+        );
+      }
+      if (!product.hasVariants && item.variantId) {
+        throw new BadRequestException(
+          `product ${item.productId} has no variants — omit variantId`,
+        );
+      }
+    }
+
+    const variantIds = dto.items
+      .map((item) => item.variantId)
+      .filter((v): v is string => !!v);
+    const variantsById = new Map<
+      string,
+      {
+        id: string;
+        productId: string;
+        salePrice: Prisma.Decimal;
+        costPrice: Prisma.Decimal;
+      }
+    >();
+    if (variantIds.length > 0) {
+      const variants = await this.prisma.productVariant.findMany({
+        where: {
+          id: { in: [...new Set(variantIds)] },
+          tenantId: context.tenantId,
+          companyId: context.companyId,
+        },
+        select: { id: true, productId: true, salePrice: true, costPrice: true },
+      });
+      for (const v of variants) variantsById.set(v.id, v);
+      for (const item of dto.items) {
+        if (!item.variantId) continue;
+        const variant = variantsById.get(item.variantId);
+        if (!variant || variant.productId !== item.productId) {
+          throw new BadRequestException(
+            `variantId ${item.variantId} does not belong to product ${item.productId} in this company`,
+          );
+        }
       }
     }
 
@@ -185,10 +236,25 @@ export class SaleService {
     // --- server-computed money math: item discount -> sale discount -> tax -> round ---
     const lineItems = dto.items.map((item) => {
       const product = productsById.get(item.productId)!;
-      const unitPrice = item.unitPrice ?? Number(product.salePrice);
+      const variant = item.variantId
+        ? variantsById.get(item.variantId)
+        : undefined;
+      const defaultUnitPrice = variant
+        ? Number(variant.salePrice)
+        : Number(product.salePrice);
+      const unitCost = variant ? variant.costPrice : product.costPrice;
+      const unitPrice = item.unitPrice ?? defaultUnitPrice;
       const discountAmount = item.discountAmount ?? 0;
       const lineSubtotal = item.quantity * unitPrice - discountAmount;
-      return { item, product, unitPrice, discountAmount, lineSubtotal };
+      return {
+        item,
+        product,
+        variantId: item.variantId,
+        unitCost,
+        unitPrice,
+        discountAmount,
+        lineSubtotal,
+      };
     });
 
     const subtotal = lineItems.reduce(
@@ -266,10 +332,11 @@ export class SaleService {
             items: {
               create: lineItems.map((l) => ({
                 productId: l.product.id,
+                variantId: l.variantId,
                 productName: l.product.name,
                 quantity: l.item.quantity,
                 unitPrice: l.unitPrice,
-                unitCost: l.product.costPrice,
+                unitCost: l.unitCost,
                 discountAmount: l.discountAmount,
                 subtotal: l.lineSubtotal,
               })),
@@ -289,12 +356,13 @@ export class SaleService {
             tenantId: context.tenantId,
             companyId: context.companyId,
             productId: l.product.id,
+            variantId: l.variantId,
             locationId: dto.locationId,
             quantity: l.item.quantity,
             movementType: StockMovementType.SALE,
             referenceId: created.id,
             actorUserId: actor.userId,
-            unitCost: l.product.costPrice,
+            unitCost: l.unitCost,
             allowNegative: settings.allowNegativeStock,
           });
         }
@@ -395,6 +463,7 @@ export class SaleService {
           tenantId: context.tenantId,
           companyId: context.companyId,
           productId: item.productId,
+          variantId: item.variantId ?? undefined,
           locationId: before.locationId,
           quantity: item.quantity,
           movementType: StockMovementType.SALE_VOID_IN,
@@ -469,8 +538,15 @@ export class SaleService {
       );
     }
 
-    const itemsByProductId = new Map(
-      sale.items.map((item) => [item.productId, item]),
+    // Keyed by productId+variantId (not productId alone) — a single sale
+    // can have two separate lines for the same Product in different
+    // variants (e.g. Red/S and Blue/S of the same T-Shirt), which would
+    // otherwise collide on a bare productId key.
+    const itemsByKey = new Map(
+      sale.items.map((item) => [
+        `${item.productId}:${item.variantId ?? ''}`,
+        item,
+      ]),
     );
 
     const result = await this.prisma.$transaction(async (tx) => {
@@ -486,16 +562,21 @@ export class SaleService {
       });
 
       for (const line of dto.items) {
-        const saleItem = itemsByProductId.get(line.productId);
+        const saleItem = itemsByKey.get(
+          `${line.productId}:${line.variantId ?? ''}`,
+        );
         if (!saleItem) {
           throw new BadRequestException(
-            `productId ${line.productId} was not part of this sale`,
+            line.variantId
+              ? `variantId ${line.variantId} of product ${line.productId} was not part of this sale`
+              : `productId ${line.productId} was not part of this sale`,
           );
         }
         await this.inventoryService.increaseStock(tx, {
           tenantId: context.tenantId,
           companyId: context.companyId,
           productId: line.productId,
+          variantId: line.variantId,
           locationId: sale.locationId,
           quantity: line.quantity,
           movementType: StockMovementType.SALE_RETURN_IN,

@@ -12,9 +12,11 @@ describe('InventoryService', () => {
 
   const mockTx = {
     inventory: {
-      upsert: jest.fn(),
+      findFirst: jest.fn(),
+      findFirstOrThrow: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
       updateMany: jest.fn(),
-      findUniqueOrThrow: jest.fn(),
     },
     stockMovement: {
       create: jest.fn(),
@@ -27,7 +29,7 @@ describe('InventoryService', () => {
   };
 
   const mockPrisma = {
-    inventory: { findUnique: jest.fn() },
+    inventory: { findFirst: jest.fn() },
     stockMovement: { findMany: jest.fn() },
   };
 
@@ -46,6 +48,10 @@ describe('InventoryService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    // clearAllMocks() only resets call history, not a previously configured
+    // mockResolvedValue — reset the "no existing row" default explicitly so
+    // one test's findFirst stub can't leak into the next.
+    mockTx.inventory.findFirst.mockResolvedValue(null);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -59,24 +65,27 @@ describe('InventoryService', () => {
   });
 
   describe('increaseStock', () => {
-    it('upserts the balance up and writes a positive StockMovement with the resulting balance', async () => {
-      mockTx.inventory.upsert.mockResolvedValue({ quantity: 25 });
+    it('creates a new balance row when none exists yet and writes a positive StockMovement with the resulting balance', async () => {
+      mockTx.inventory.findFirst.mockResolvedValue(null);
+      mockTx.inventory.create.mockResolvedValue({ quantity: 25 });
       mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-1' });
 
       await service.increaseStock(mockTx as any, baseInput);
 
-      expect(mockTx.inventory.upsert).toHaveBeenCalledWith(
+      expect(mockTx.inventory.findFirst).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {
-            tenantId_companyId_locationId_productId: {
-              tenantId: 'tenant-1',
-              companyId: 'company-1',
-              locationId: 'location-1',
-              productId: 'product-1',
-            },
+            tenantId: 'tenant-1',
+            companyId: 'company-1',
+            productId: 'product-1',
+            locationId: 'location-1',
+            variantId: null,
           },
-          create: expect.objectContaining({ quantity: 10 }),
-          update: { quantity: { increment: 10 } },
+        }),
+      );
+      expect(mockTx.inventory.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ quantity: 10 }),
         }),
       );
       expect(mockTx.stockMovement.create).toHaveBeenCalledWith(
@@ -88,6 +97,22 @@ describe('InventoryService', () => {
           }),
         }),
       );
+    });
+
+    it('increments the existing balance row when one already exists', async () => {
+      mockTx.inventory.findFirst.mockResolvedValue({ id: 'inv-1' });
+      mockTx.inventory.update.mockResolvedValue({ quantity: 25 });
+      mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-1b' });
+
+      await service.increaseStock(mockTx as any, baseInput);
+
+      expect(mockTx.inventory.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'inv-1' },
+          data: { quantity: { increment: 10 } },
+        }),
+      );
+      expect(mockTx.inventory.create).not.toHaveBeenCalled();
     });
 
     describe('Out-of-Stock / Low-Stock edge-triggered notification (band-transition, shared with decreaseStock)', () => {
@@ -102,7 +127,7 @@ describe('InventoryService', () => {
           sku: 'RICE-10-05',
           reorderLevel: new Prisma.Decimal(5),
         });
-        mockTx.inventory.upsert.mockResolvedValue({
+        mockTx.inventory.create.mockResolvedValue({
           quantity: new Prisma.Decimal(3),
         }); // after = 3
 
@@ -134,7 +159,7 @@ describe('InventoryService', () => {
           sku: 'RICE-1',
           reorderLevel: new Prisma.Decimal(5),
         });
-        mockTx.inventory.upsert.mockResolvedValue({
+        mockTx.inventory.create.mockResolvedValue({
           quantity: new Prisma.Decimal(15),
         }); // after = 15
 
@@ -153,7 +178,7 @@ describe('InventoryService', () => {
           sku: 'RICE-1',
           reorderLevel: new Prisma.Decimal(5),
         });
-        mockTx.inventory.upsert.mockResolvedValue({
+        mockTx.inventory.create.mockResolvedValue({
           quantity: new Prisma.Decimal(20),
         }); // after = 20
 
@@ -172,7 +197,7 @@ describe('InventoryService', () => {
           sku: 'RICE-1',
           reorderLevel: new Prisma.Decimal(5),
         });
-        mockTx.inventory.upsert.mockResolvedValue({
+        mockTx.inventory.create.mockResolvedValue({
           quantity: new Prisma.Decimal(4),
         }); // after = 4
 
@@ -187,7 +212,7 @@ describe('InventoryService', () => {
 
       it('does not throw and does not notify when the product cannot be found', async () => {
         mockTx.product.findUnique.mockResolvedValue(null);
-        mockTx.inventory.upsert.mockResolvedValue({
+        mockTx.inventory.create.mockResolvedValue({
           quantity: new Prisma.Decimal(3),
         });
 
@@ -207,7 +232,7 @@ describe('InventoryService', () => {
   describe('decreaseStock', () => {
     it('uses a conditional gte updateMany (not check-then-update) when allowNegative is false', async () => {
       mockTx.inventory.updateMany.mockResolvedValue({ count: 1 });
-      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+      mockTx.inventory.findFirstOrThrow.mockResolvedValue({
         quantity: new Prisma.Decimal(5),
       });
       mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-2' });
@@ -224,6 +249,7 @@ describe('InventoryService', () => {
           companyId: 'company-1',
           productId: 'product-1',
           locationId: 'location-1',
+          variantId: null,
           quantity: { gte: 10 },
         },
         data: { quantity: { decrement: 10 } },
@@ -232,7 +258,7 @@ describe('InventoryService', () => {
 
     it('omits the gte guard entirely when allowNegative is true', async () => {
       mockTx.inventory.updateMany.mockResolvedValue({ count: 1 });
-      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+      mockTx.inventory.findFirstOrThrow.mockResolvedValue({
         quantity: new Prisma.Decimal(-5),
       });
       mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-3' });
@@ -249,6 +275,7 @@ describe('InventoryService', () => {
           companyId: 'company-1',
           productId: 'product-1',
           locationId: 'location-1',
+          variantId: null,
         },
         data: { quantity: { decrement: 10 } },
       });
@@ -278,7 +305,7 @@ describe('InventoryService', () => {
 
     it('writes changeQty as the negated quantity on success', async () => {
       mockTx.inventory.updateMany.mockResolvedValue({ count: 1 });
-      mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+      mockTx.inventory.findFirstOrThrow.mockResolvedValue({
         quantity: new Prisma.Decimal(0),
       });
       mockTx.stockMovement.create.mockResolvedValue({ id: 'movement-4' });
@@ -307,7 +334,7 @@ describe('InventoryService', () => {
           sku: 'RICE-1',
           reorderLevel: new Prisma.Decimal(10),
         });
-        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+        mockTx.inventory.findFirstOrThrow.mockResolvedValue({
           quantity: new Prisma.Decimal(0),
         }); // after = 0
 
@@ -340,7 +367,7 @@ describe('InventoryService', () => {
           sku: 'RICE-1',
           reorderLevel: new Prisma.Decimal(10),
         });
-        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+        mockTx.inventory.findFirstOrThrow.mockResolvedValue({
           quantity: new Prisma.Decimal(8),
         }); // after = 8
 
@@ -364,7 +391,7 @@ describe('InventoryService', () => {
           sku: 'RICE-1',
           reorderLevel: new Prisma.Decimal(10),
         });
-        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+        mockTx.inventory.findFirstOrThrow.mockResolvedValue({
           quantity: new Prisma.Decimal(4),
         }); // after = 4
 
@@ -380,7 +407,7 @@ describe('InventoryService', () => {
 
       it('does not throw and does not notify when the product cannot be found', async () => {
         mockTx.product.findUnique.mockResolvedValue(null);
-        mockTx.inventory.findUniqueOrThrow.mockResolvedValue({
+        mockTx.inventory.findFirstOrThrow.mockResolvedValue({
           quantity: new Prisma.Decimal(0),
         });
 
@@ -400,7 +427,7 @@ describe('InventoryService', () => {
 
   describe('getBalance', () => {
     it('returns a zero-quantity default when no Inventory row exists yet', async () => {
-      mockPrisma.inventory.findUnique.mockResolvedValue(null);
+      mockPrisma.inventory.findFirst.mockResolvedValue(null);
 
       const result = await service.getBalance(
         { tenantId: 'tenant-1', companyId: 'company-1' } as any,

@@ -43,6 +43,7 @@ const PO_SELECT = {
     select: {
       id: true,
       productId: true,
+      variantId: true,
       orderedQty: true,
       receivedQty: true,
       unitCost: true,
@@ -101,6 +102,7 @@ export class PurchaseOrderService {
       context,
       dto.locationId,
     );
+    await this.requireVariantConsistency(context, dto.items);
 
     const totalAmount = dto.items.reduce(
       (sum, item) => sum + item.orderedQty * item.unitCost,
@@ -123,6 +125,7 @@ export class PurchaseOrderService {
           items: {
             create: dto.items.map((item) => ({
               productId: item.productId,
+              variantId: item.variantId,
               orderedQty: item.orderedQty,
               unitCost: item.unitCost,
             })),
@@ -159,6 +162,10 @@ export class PurchaseOrderService {
       );
     }
 
+    if (dto.items) {
+      await this.requireVariantConsistency(context, dto.items);
+    }
+
     const totalAmount = dto.items
       ? dto.items.reduce(
           (sum, item) => sum + item.orderedQty * item.unitCost,
@@ -189,6 +196,7 @@ export class PurchaseOrderService {
                 items: {
                   create: dto.items.map((item) => ({
                     productId: item.productId,
+                    variantId: item.variantId,
                     orderedQty: item.orderedQty,
                     unitCost: item.unitCost,
                   })),
@@ -316,12 +324,14 @@ export class PurchaseOrderService {
           orderItem.productId,
           line.receivedQty,
           orderItem.unitCost,
+          orderItem.variantId ?? undefined,
         );
 
         await this.inventoryService.increaseStock(tx, {
           tenantId: context.tenantId,
           companyId: context.companyId,
           productId: orderItem.productId,
+          variantId: orderItem.variantId ?? undefined,
           locationId: order.locationId,
           quantity: line.receivedQty,
           movementType: StockMovementType.PURCHASE,
@@ -437,6 +447,7 @@ export class PurchaseOrderService {
         'Cannot return goods for a purchase order that has never been received',
       );
     }
+    await this.requireVariantConsistency(context, dto.items);
 
     const result = await this.prisma.$transaction(async (tx) => {
       const purchaseReturn = await tx.purchaseReturn.create({
@@ -456,6 +467,7 @@ export class PurchaseOrderService {
             tenantId: context.tenantId,
             companyId: context.companyId,
             productId: line.productId,
+            variantId: line.variantId,
             locationId: order.locationId,
             quantity: line.quantity,
             movementType: StockMovementType.PURCHASE_RETURN_OUT,
@@ -518,6 +530,74 @@ export class PurchaseOrderService {
       orderBy: { createdAt: 'desc' },
     });
     return { success: true, count: returns.length, data: returns };
+  }
+
+  /**
+   * A product with variants must be ordered/received/returned by variant,
+   * never at the parent-product level (which variant would the stock even
+   * land on?) — and a variant-less product must never carry a variantId
+   * it has no variants to resolve. Checked once here rather than inside
+   * the transaction, so a bad line fails the whole request up front
+   * instead of partially writing purchase order items.
+   */
+  private async requireVariantConsistency(
+    context: CompanyContext,
+    items: { productId: string; variantId?: string }[],
+  ) {
+    const productIds = [...new Set(items.map((i) => i.productId))];
+    const products = await this.prisma.product.findMany({
+      where: {
+        id: { in: productIds },
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
+      select: { id: true, hasVariants: true },
+    });
+    const productsById = new Map(products.map((p) => [p.id, p]));
+
+    for (const item of items) {
+      const product = productsById.get(item.productId);
+      if (!product) {
+        throw new BadRequestException(
+          `productId ${item.productId} does not refer to a product in this company`,
+        );
+      }
+      if (product.hasVariants && !item.variantId) {
+        throw new BadRequestException(
+          `variantId is required for product ${item.productId} — it has variants`,
+        );
+      }
+      if (!product.hasVariants && item.variantId) {
+        throw new BadRequestException(
+          `product ${item.productId} has no variants — omit variantId`,
+        );
+      }
+    }
+
+    const variantIds = items
+      .map((i) => i.variantId)
+      .filter((v): v is string => !!v);
+    if (variantIds.length === 0) return;
+
+    const variants = await this.prisma.productVariant.findMany({
+      where: {
+        id: { in: variantIds },
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
+      select: { id: true, productId: true },
+    });
+    const variantsById = new Map(variants.map((v) => [v.id, v]));
+
+    for (const item of items) {
+      if (!item.variantId) continue;
+      const variant = variantsById.get(item.variantId);
+      if (!variant || variant.productId !== item.productId) {
+        throw new BadRequestException(
+          `variantId ${item.variantId} does not belong to product ${item.productId} in this company`,
+        );
+      }
+    }
   }
 
   private async requireOrder(context: CompanyContext, id: string) {

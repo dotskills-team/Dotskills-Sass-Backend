@@ -17,8 +17,6 @@ const SETTINGS_SELECT = {
   enableMultiUnit: true,
   enableCustomerDue: true,
   enableBarcode: true,
-  enableProductVariant: true,
-  enableComboOffer: true,
   enableMultiLocation: true,
   allowNegativeStock: true,
   maxCustomerDueLimit: true,
@@ -81,12 +79,6 @@ export class CompanySettingsService {
             : {}),
           ...(dto.enableBarcode !== undefined
             ? { enableBarcode: dto.enableBarcode }
-            : {}),
-          ...(dto.enableProductVariant !== undefined
-            ? { enableProductVariant: dto.enableProductVariant }
-            : {}),
-          ...(dto.enableComboOffer !== undefined
-            ? { enableComboOffer: dto.enableComboOffer }
             : {}),
           ...(dto.enableMultiLocation !== undefined
             ? { enableMultiLocation: dto.enableMultiLocation }

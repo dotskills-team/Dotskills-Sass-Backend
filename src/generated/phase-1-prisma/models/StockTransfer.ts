@@ -41,6 +41,7 @@ export type StockTransferMinAggregateOutputType = {
   fromLocationId: string | null
   toLocationId: string | null
   productId: string | null
+  variantId: string | null
   quantity: runtime.Decimal | null
   status: $Enums.StockTransferStatus | null
   dispatchedAt: Date | null
@@ -57,6 +58,7 @@ export type StockTransferMaxAggregateOutputType = {
   fromLocationId: string | null
   toLocationId: string | null
   productId: string | null
+  variantId: string | null
   quantity: runtime.Decimal | null
   status: $Enums.StockTransferStatus | null
   dispatchedAt: Date | null
@@ -73,6 +75,7 @@ export type StockTransferCountAggregateOutputType = {
   fromLocationId: number
   toLocationId: number
   productId: number
+  variantId: number
   quantity: number
   status: number
   dispatchedAt: number
@@ -99,6 +102,7 @@ export type StockTransferMinAggregateInputType = {
   fromLocationId?: true
   toLocationId?: true
   productId?: true
+  variantId?: true
   quantity?: true
   status?: true
   dispatchedAt?: true
@@ -115,6 +119,7 @@ export type StockTransferMaxAggregateInputType = {
   fromLocationId?: true
   toLocationId?: true
   productId?: true
+  variantId?: true
   quantity?: true
   status?: true
   dispatchedAt?: true
@@ -131,6 +136,7 @@ export type StockTransferCountAggregateInputType = {
   fromLocationId?: true
   toLocationId?: true
   productId?: true
+  variantId?: true
   quantity?: true
   status?: true
   dispatchedAt?: true
@@ -234,6 +240,7 @@ export type StockTransferGroupByOutputType = {
   fromLocationId: string
   toLocationId: string
   productId: string
+  variantId: string | null
   quantity: runtime.Decimal
   status: $Enums.StockTransferStatus
   dispatchedAt: Date | null
@@ -273,6 +280,7 @@ export type StockTransferWhereInput = {
   fromLocationId?: Prisma.UuidFilter<"StockTransfer"> | string
   toLocationId?: Prisma.UuidFilter<"StockTransfer"> | string
   productId?: Prisma.UuidFilter<"StockTransfer"> | string
+  variantId?: Prisma.UuidNullableFilter<"StockTransfer"> | string | null
   quantity?: Prisma.DecimalFilter<"StockTransfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFilter<"StockTransfer"> | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.DateTimeNullableFilter<"StockTransfer"> | Date | string | null
@@ -285,6 +293,7 @@ export type StockTransferWhereInput = {
   fromLocation?: Prisma.XOR<Prisma.LocationScalarRelationFilter, Prisma.LocationWhereInput>
   toLocation?: Prisma.XOR<Prisma.LocationScalarRelationFilter, Prisma.LocationWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
+  variant?: Prisma.XOR<Prisma.ProductVariantNullableScalarRelationFilter, Prisma.ProductVariantWhereInput> | null
 }
 
 export type StockTransferOrderByWithRelationInput = {
@@ -294,6 +303,7 @@ export type StockTransferOrderByWithRelationInput = {
   fromLocationId?: Prisma.SortOrder
   toLocationId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
+  variantId?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrder
   status?: Prisma.SortOrder
   dispatchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -306,6 +316,7 @@ export type StockTransferOrderByWithRelationInput = {
   fromLocation?: Prisma.LocationOrderByWithRelationInput
   toLocation?: Prisma.LocationOrderByWithRelationInput
   product?: Prisma.ProductOrderByWithRelationInput
+  variant?: Prisma.ProductVariantOrderByWithRelationInput
 }
 
 export type StockTransferWhereUniqueInput = Prisma.AtLeast<{
@@ -318,6 +329,7 @@ export type StockTransferWhereUniqueInput = Prisma.AtLeast<{
   fromLocationId?: Prisma.UuidFilter<"StockTransfer"> | string
   toLocationId?: Prisma.UuidFilter<"StockTransfer"> | string
   productId?: Prisma.UuidFilter<"StockTransfer"> | string
+  variantId?: Prisma.UuidNullableFilter<"StockTransfer"> | string | null
   quantity?: Prisma.DecimalFilter<"StockTransfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFilter<"StockTransfer"> | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.DateTimeNullableFilter<"StockTransfer"> | Date | string | null
@@ -330,6 +342,7 @@ export type StockTransferWhereUniqueInput = Prisma.AtLeast<{
   fromLocation?: Prisma.XOR<Prisma.LocationScalarRelationFilter, Prisma.LocationWhereInput>
   toLocation?: Prisma.XOR<Prisma.LocationScalarRelationFilter, Prisma.LocationWhereInput>
   product?: Prisma.XOR<Prisma.ProductScalarRelationFilter, Prisma.ProductWhereInput>
+  variant?: Prisma.XOR<Prisma.ProductVariantNullableScalarRelationFilter, Prisma.ProductVariantWhereInput> | null
 }, "id">
 
 export type StockTransferOrderByWithAggregationInput = {
@@ -339,6 +352,7 @@ export type StockTransferOrderByWithAggregationInput = {
   fromLocationId?: Prisma.SortOrder
   toLocationId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
+  variantId?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrder
   status?: Prisma.SortOrder
   dispatchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -363,6 +377,7 @@ export type StockTransferScalarWhereWithAggregatesInput = {
   fromLocationId?: Prisma.UuidWithAggregatesFilter<"StockTransfer"> | string
   toLocationId?: Prisma.UuidWithAggregatesFilter<"StockTransfer"> | string
   productId?: Prisma.UuidWithAggregatesFilter<"StockTransfer"> | string
+  variantId?: Prisma.UuidNullableWithAggregatesFilter<"StockTransfer"> | string | null
   quantity?: Prisma.DecimalWithAggregatesFilter<"StockTransfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusWithAggregatesFilter<"StockTransfer"> | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"StockTransfer"> | Date | string | null
@@ -386,6 +401,7 @@ export type StockTransferCreateInput = {
   fromLocation: Prisma.LocationCreateNestedOneWithoutTransfersFromInput
   toLocation: Prisma.LocationCreateNestedOneWithoutTransfersToInput
   product: Prisma.ProductCreateNestedOneWithoutStockTransfersInput
+  variant?: Prisma.ProductVariantCreateNestedOneWithoutStockTransfersInput
 }
 
 export type StockTransferUncheckedCreateInput = {
@@ -395,6 +411,7 @@ export type StockTransferUncheckedCreateInput = {
   fromLocationId: string
   toLocationId: string
   productId: string
+  variantId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StockTransferStatus
   dispatchedAt?: Date | string | null
@@ -418,6 +435,7 @@ export type StockTransferUpdateInput = {
   fromLocation?: Prisma.LocationUpdateOneRequiredWithoutTransfersFromNestedInput
   toLocation?: Prisma.LocationUpdateOneRequiredWithoutTransfersToNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutStockTransfersNestedInput
+  variant?: Prisma.ProductVariantUpdateOneWithoutStockTransfersNestedInput
 }
 
 export type StockTransferUncheckedUpdateInput = {
@@ -427,6 +445,7 @@ export type StockTransferUncheckedUpdateInput = {
   fromLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   toLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -443,6 +462,7 @@ export type StockTransferCreateManyInput = {
   fromLocationId: string
   toLocationId: string
   productId: string
+  variantId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StockTransferStatus
   dispatchedAt?: Date | string | null
@@ -470,6 +490,7 @@ export type StockTransferUncheckedUpdateManyInput = {
   fromLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   toLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -496,6 +517,7 @@ export type StockTransferCountOrderByAggregateInput = {
   fromLocationId?: Prisma.SortOrder
   toLocationId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
+  variantId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   status?: Prisma.SortOrder
   dispatchedAt?: Prisma.SortOrder
@@ -516,6 +538,7 @@ export type StockTransferMaxOrderByAggregateInput = {
   fromLocationId?: Prisma.SortOrder
   toLocationId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
+  variantId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   status?: Prisma.SortOrder
   dispatchedAt?: Prisma.SortOrder
@@ -532,6 +555,7 @@ export type StockTransferMinOrderByAggregateInput = {
   fromLocationId?: Prisma.SortOrder
   toLocationId?: Prisma.SortOrder
   productId?: Prisma.SortOrder
+  variantId?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   status?: Prisma.SortOrder
   dispatchedAt?: Prisma.SortOrder
@@ -755,6 +779,48 @@ export type StockTransferUncheckedUpdateManyWithoutProductNestedInput = {
   deleteMany?: Prisma.StockTransferScalarWhereInput | Prisma.StockTransferScalarWhereInput[]
 }
 
+export type StockTransferCreateNestedManyWithoutVariantInput = {
+  create?: Prisma.XOR<Prisma.StockTransferCreateWithoutVariantInput, Prisma.StockTransferUncheckedCreateWithoutVariantInput> | Prisma.StockTransferCreateWithoutVariantInput[] | Prisma.StockTransferUncheckedCreateWithoutVariantInput[]
+  connectOrCreate?: Prisma.StockTransferCreateOrConnectWithoutVariantInput | Prisma.StockTransferCreateOrConnectWithoutVariantInput[]
+  createMany?: Prisma.StockTransferCreateManyVariantInputEnvelope
+  connect?: Prisma.StockTransferWhereUniqueInput | Prisma.StockTransferWhereUniqueInput[]
+}
+
+export type StockTransferUncheckedCreateNestedManyWithoutVariantInput = {
+  create?: Prisma.XOR<Prisma.StockTransferCreateWithoutVariantInput, Prisma.StockTransferUncheckedCreateWithoutVariantInput> | Prisma.StockTransferCreateWithoutVariantInput[] | Prisma.StockTransferUncheckedCreateWithoutVariantInput[]
+  connectOrCreate?: Prisma.StockTransferCreateOrConnectWithoutVariantInput | Prisma.StockTransferCreateOrConnectWithoutVariantInput[]
+  createMany?: Prisma.StockTransferCreateManyVariantInputEnvelope
+  connect?: Prisma.StockTransferWhereUniqueInput | Prisma.StockTransferWhereUniqueInput[]
+}
+
+export type StockTransferUpdateManyWithoutVariantNestedInput = {
+  create?: Prisma.XOR<Prisma.StockTransferCreateWithoutVariantInput, Prisma.StockTransferUncheckedCreateWithoutVariantInput> | Prisma.StockTransferCreateWithoutVariantInput[] | Prisma.StockTransferUncheckedCreateWithoutVariantInput[]
+  connectOrCreate?: Prisma.StockTransferCreateOrConnectWithoutVariantInput | Prisma.StockTransferCreateOrConnectWithoutVariantInput[]
+  upsert?: Prisma.StockTransferUpsertWithWhereUniqueWithoutVariantInput | Prisma.StockTransferUpsertWithWhereUniqueWithoutVariantInput[]
+  createMany?: Prisma.StockTransferCreateManyVariantInputEnvelope
+  set?: Prisma.StockTransferWhereUniqueInput | Prisma.StockTransferWhereUniqueInput[]
+  disconnect?: Prisma.StockTransferWhereUniqueInput | Prisma.StockTransferWhereUniqueInput[]
+  delete?: Prisma.StockTransferWhereUniqueInput | Prisma.StockTransferWhereUniqueInput[]
+  connect?: Prisma.StockTransferWhereUniqueInput | Prisma.StockTransferWhereUniqueInput[]
+  update?: Prisma.StockTransferUpdateWithWhereUniqueWithoutVariantInput | Prisma.StockTransferUpdateWithWhereUniqueWithoutVariantInput[]
+  updateMany?: Prisma.StockTransferUpdateManyWithWhereWithoutVariantInput | Prisma.StockTransferUpdateManyWithWhereWithoutVariantInput[]
+  deleteMany?: Prisma.StockTransferScalarWhereInput | Prisma.StockTransferScalarWhereInput[]
+}
+
+export type StockTransferUncheckedUpdateManyWithoutVariantNestedInput = {
+  create?: Prisma.XOR<Prisma.StockTransferCreateWithoutVariantInput, Prisma.StockTransferUncheckedCreateWithoutVariantInput> | Prisma.StockTransferCreateWithoutVariantInput[] | Prisma.StockTransferUncheckedCreateWithoutVariantInput[]
+  connectOrCreate?: Prisma.StockTransferCreateOrConnectWithoutVariantInput | Prisma.StockTransferCreateOrConnectWithoutVariantInput[]
+  upsert?: Prisma.StockTransferUpsertWithWhereUniqueWithoutVariantInput | Prisma.StockTransferUpsertWithWhereUniqueWithoutVariantInput[]
+  createMany?: Prisma.StockTransferCreateManyVariantInputEnvelope
+  set?: Prisma.StockTransferWhereUniqueInput | Prisma.StockTransferWhereUniqueInput[]
+  disconnect?: Prisma.StockTransferWhereUniqueInput | Prisma.StockTransferWhereUniqueInput[]
+  delete?: Prisma.StockTransferWhereUniqueInput | Prisma.StockTransferWhereUniqueInput[]
+  connect?: Prisma.StockTransferWhereUniqueInput | Prisma.StockTransferWhereUniqueInput[]
+  update?: Prisma.StockTransferUpdateWithWhereUniqueWithoutVariantInput | Prisma.StockTransferUpdateWithWhereUniqueWithoutVariantInput[]
+  updateMany?: Prisma.StockTransferUpdateManyWithWhereWithoutVariantInput | Prisma.StockTransferUpdateManyWithWhereWithoutVariantInput[]
+  deleteMany?: Prisma.StockTransferScalarWhereInput | Prisma.StockTransferScalarWhereInput[]
+}
+
 export type EnumStockTransferStatusFieldUpdateOperationsInput = {
   set?: $Enums.StockTransferStatus
 }
@@ -772,6 +838,7 @@ export type StockTransferCreateWithoutTenantInput = {
   fromLocation: Prisma.LocationCreateNestedOneWithoutTransfersFromInput
   toLocation: Prisma.LocationCreateNestedOneWithoutTransfersToInput
   product: Prisma.ProductCreateNestedOneWithoutStockTransfersInput
+  variant?: Prisma.ProductVariantCreateNestedOneWithoutStockTransfersInput
 }
 
 export type StockTransferUncheckedCreateWithoutTenantInput = {
@@ -780,6 +847,7 @@ export type StockTransferUncheckedCreateWithoutTenantInput = {
   fromLocationId: string
   toLocationId: string
   productId: string
+  variantId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StockTransferStatus
   dispatchedAt?: Date | string | null
@@ -825,6 +893,7 @@ export type StockTransferScalarWhereInput = {
   fromLocationId?: Prisma.UuidFilter<"StockTransfer"> | string
   toLocationId?: Prisma.UuidFilter<"StockTransfer"> | string
   productId?: Prisma.UuidFilter<"StockTransfer"> | string
+  variantId?: Prisma.UuidNullableFilter<"StockTransfer"> | string | null
   quantity?: Prisma.DecimalFilter<"StockTransfer"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFilter<"StockTransfer"> | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.DateTimeNullableFilter<"StockTransfer"> | Date | string | null
@@ -847,6 +916,7 @@ export type StockTransferCreateWithoutCompanyInput = {
   fromLocation: Prisma.LocationCreateNestedOneWithoutTransfersFromInput
   toLocation: Prisma.LocationCreateNestedOneWithoutTransfersToInput
   product: Prisma.ProductCreateNestedOneWithoutStockTransfersInput
+  variant?: Prisma.ProductVariantCreateNestedOneWithoutStockTransfersInput
 }
 
 export type StockTransferUncheckedCreateWithoutCompanyInput = {
@@ -855,6 +925,7 @@ export type StockTransferUncheckedCreateWithoutCompanyInput = {
   fromLocationId: string
   toLocationId: string
   productId: string
+  variantId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StockTransferStatus
   dispatchedAt?: Date | string | null
@@ -903,6 +974,7 @@ export type StockTransferCreateWithoutFromLocationInput = {
   company: Prisma.CompanyCreateNestedOneWithoutStockTransfersInput
   toLocation: Prisma.LocationCreateNestedOneWithoutTransfersToInput
   product: Prisma.ProductCreateNestedOneWithoutStockTransfersInput
+  variant?: Prisma.ProductVariantCreateNestedOneWithoutStockTransfersInput
 }
 
 export type StockTransferUncheckedCreateWithoutFromLocationInput = {
@@ -911,6 +983,7 @@ export type StockTransferUncheckedCreateWithoutFromLocationInput = {
   companyId: string
   toLocationId: string
   productId: string
+  variantId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StockTransferStatus
   dispatchedAt?: Date | string | null
@@ -943,6 +1016,7 @@ export type StockTransferCreateWithoutToLocationInput = {
   company: Prisma.CompanyCreateNestedOneWithoutStockTransfersInput
   fromLocation: Prisma.LocationCreateNestedOneWithoutTransfersFromInput
   product: Prisma.ProductCreateNestedOneWithoutStockTransfersInput
+  variant?: Prisma.ProductVariantCreateNestedOneWithoutStockTransfersInput
 }
 
 export type StockTransferUncheckedCreateWithoutToLocationInput = {
@@ -951,6 +1025,7 @@ export type StockTransferUncheckedCreateWithoutToLocationInput = {
   companyId: string
   fromLocationId: string
   productId: string
+  variantId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StockTransferStatus
   dispatchedAt?: Date | string | null
@@ -1015,6 +1090,7 @@ export type StockTransferCreateWithoutProductInput = {
   company: Prisma.CompanyCreateNestedOneWithoutStockTransfersInput
   fromLocation: Prisma.LocationCreateNestedOneWithoutTransfersFromInput
   toLocation: Prisma.LocationCreateNestedOneWithoutTransfersToInput
+  variant?: Prisma.ProductVariantCreateNestedOneWithoutStockTransfersInput
 }
 
 export type StockTransferUncheckedCreateWithoutProductInput = {
@@ -1023,6 +1099,7 @@ export type StockTransferUncheckedCreateWithoutProductInput = {
   companyId: string
   fromLocationId: string
   toLocationId: string
+  variantId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StockTransferStatus
   dispatchedAt?: Date | string | null
@@ -1058,12 +1135,71 @@ export type StockTransferUpdateManyWithWhereWithoutProductInput = {
   data: Prisma.XOR<Prisma.StockTransferUpdateManyMutationInput, Prisma.StockTransferUncheckedUpdateManyWithoutProductInput>
 }
 
+export type StockTransferCreateWithoutVariantInput = {
+  id?: string
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.StockTransferStatus
+  dispatchedAt?: Date | string | null
+  receivedAt?: Date | string | null
+  actorUserId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutStockTransfersInput
+  company: Prisma.CompanyCreateNestedOneWithoutStockTransfersInput
+  fromLocation: Prisma.LocationCreateNestedOneWithoutTransfersFromInput
+  toLocation: Prisma.LocationCreateNestedOneWithoutTransfersToInput
+  product: Prisma.ProductCreateNestedOneWithoutStockTransfersInput
+}
+
+export type StockTransferUncheckedCreateWithoutVariantInput = {
+  id?: string
+  tenantId: string
+  companyId: string
+  fromLocationId: string
+  toLocationId: string
+  productId: string
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.StockTransferStatus
+  dispatchedAt?: Date | string | null
+  receivedAt?: Date | string | null
+  actorUserId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type StockTransferCreateOrConnectWithoutVariantInput = {
+  where: Prisma.StockTransferWhereUniqueInput
+  create: Prisma.XOR<Prisma.StockTransferCreateWithoutVariantInput, Prisma.StockTransferUncheckedCreateWithoutVariantInput>
+}
+
+export type StockTransferCreateManyVariantInputEnvelope = {
+  data: Prisma.StockTransferCreateManyVariantInput | Prisma.StockTransferCreateManyVariantInput[]
+  skipDuplicates?: boolean
+}
+
+export type StockTransferUpsertWithWhereUniqueWithoutVariantInput = {
+  where: Prisma.StockTransferWhereUniqueInput
+  update: Prisma.XOR<Prisma.StockTransferUpdateWithoutVariantInput, Prisma.StockTransferUncheckedUpdateWithoutVariantInput>
+  create: Prisma.XOR<Prisma.StockTransferCreateWithoutVariantInput, Prisma.StockTransferUncheckedCreateWithoutVariantInput>
+}
+
+export type StockTransferUpdateWithWhereUniqueWithoutVariantInput = {
+  where: Prisma.StockTransferWhereUniqueInput
+  data: Prisma.XOR<Prisma.StockTransferUpdateWithoutVariantInput, Prisma.StockTransferUncheckedUpdateWithoutVariantInput>
+}
+
+export type StockTransferUpdateManyWithWhereWithoutVariantInput = {
+  where: Prisma.StockTransferScalarWhereInput
+  data: Prisma.XOR<Prisma.StockTransferUpdateManyMutationInput, Prisma.StockTransferUncheckedUpdateManyWithoutVariantInput>
+}
+
 export type StockTransferCreateManyTenantInput = {
   id?: string
   companyId: string
   fromLocationId: string
   toLocationId: string
   productId: string
+  variantId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StockTransferStatus
   dispatchedAt?: Date | string | null
@@ -1086,6 +1222,7 @@ export type StockTransferUpdateWithoutTenantInput = {
   fromLocation?: Prisma.LocationUpdateOneRequiredWithoutTransfersFromNestedInput
   toLocation?: Prisma.LocationUpdateOneRequiredWithoutTransfersToNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutStockTransfersNestedInput
+  variant?: Prisma.ProductVariantUpdateOneWithoutStockTransfersNestedInput
 }
 
 export type StockTransferUncheckedUpdateWithoutTenantInput = {
@@ -1094,6 +1231,7 @@ export type StockTransferUncheckedUpdateWithoutTenantInput = {
   fromLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   toLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1109,6 +1247,7 @@ export type StockTransferUncheckedUpdateManyWithoutTenantInput = {
   fromLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   toLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1124,6 +1263,7 @@ export type StockTransferCreateManyCompanyInput = {
   fromLocationId: string
   toLocationId: string
   productId: string
+  variantId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StockTransferStatus
   dispatchedAt?: Date | string | null
@@ -1146,6 +1286,7 @@ export type StockTransferUpdateWithoutCompanyInput = {
   fromLocation?: Prisma.LocationUpdateOneRequiredWithoutTransfersFromNestedInput
   toLocation?: Prisma.LocationUpdateOneRequiredWithoutTransfersToNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutStockTransfersNestedInput
+  variant?: Prisma.ProductVariantUpdateOneWithoutStockTransfersNestedInput
 }
 
 export type StockTransferUncheckedUpdateWithoutCompanyInput = {
@@ -1154,6 +1295,7 @@ export type StockTransferUncheckedUpdateWithoutCompanyInput = {
   fromLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   toLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1169,6 +1311,7 @@ export type StockTransferUncheckedUpdateManyWithoutCompanyInput = {
   fromLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   toLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1184,6 +1327,7 @@ export type StockTransferCreateManyFromLocationInput = {
   companyId: string
   toLocationId: string
   productId: string
+  variantId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StockTransferStatus
   dispatchedAt?: Date | string | null
@@ -1199,6 +1343,7 @@ export type StockTransferCreateManyToLocationInput = {
   companyId: string
   fromLocationId: string
   productId: string
+  variantId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StockTransferStatus
   dispatchedAt?: Date | string | null
@@ -1221,6 +1366,7 @@ export type StockTransferUpdateWithoutFromLocationInput = {
   company?: Prisma.CompanyUpdateOneRequiredWithoutStockTransfersNestedInput
   toLocation?: Prisma.LocationUpdateOneRequiredWithoutTransfersToNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutStockTransfersNestedInput
+  variant?: Prisma.ProductVariantUpdateOneWithoutStockTransfersNestedInput
 }
 
 export type StockTransferUncheckedUpdateWithoutFromLocationInput = {
@@ -1229,6 +1375,7 @@ export type StockTransferUncheckedUpdateWithoutFromLocationInput = {
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   toLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1244,6 +1391,7 @@ export type StockTransferUncheckedUpdateManyWithoutFromLocationInput = {
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   toLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1266,6 +1414,7 @@ export type StockTransferUpdateWithoutToLocationInput = {
   company?: Prisma.CompanyUpdateOneRequiredWithoutStockTransfersNestedInput
   fromLocation?: Prisma.LocationUpdateOneRequiredWithoutTransfersFromNestedInput
   product?: Prisma.ProductUpdateOneRequiredWithoutStockTransfersNestedInput
+  variant?: Prisma.ProductVariantUpdateOneWithoutStockTransfersNestedInput
 }
 
 export type StockTransferUncheckedUpdateWithoutToLocationInput = {
@@ -1274,6 +1423,7 @@ export type StockTransferUncheckedUpdateWithoutToLocationInput = {
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   fromLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1289,6 +1439,7 @@ export type StockTransferUncheckedUpdateManyWithoutToLocationInput = {
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   fromLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   productId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1304,6 +1455,7 @@ export type StockTransferCreateManyProductInput = {
   companyId: string
   fromLocationId: string
   toLocationId: string
+  variantId?: string | null
   quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: $Enums.StockTransferStatus
   dispatchedAt?: Date | string | null
@@ -1326,6 +1478,7 @@ export type StockTransferUpdateWithoutProductInput = {
   company?: Prisma.CompanyUpdateOneRequiredWithoutStockTransfersNestedInput
   fromLocation?: Prisma.LocationUpdateOneRequiredWithoutTransfersFromNestedInput
   toLocation?: Prisma.LocationUpdateOneRequiredWithoutTransfersToNestedInput
+  variant?: Prisma.ProductVariantUpdateOneWithoutStockTransfersNestedInput
 }
 
 export type StockTransferUncheckedUpdateWithoutProductInput = {
@@ -1334,6 +1487,7 @@ export type StockTransferUncheckedUpdateWithoutProductInput = {
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   fromLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   toLocationId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1349,6 +1503,71 @@ export type StockTransferUncheckedUpdateManyWithoutProductInput = {
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   fromLocationId?: Prisma.StringFieldUpdateOperationsInput | string
   toLocationId?: Prisma.StringFieldUpdateOperationsInput | string
+  variantId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
+  dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actorUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StockTransferCreateManyVariantInput = {
+  id?: string
+  tenantId: string
+  companyId: string
+  fromLocationId: string
+  toLocationId: string
+  productId: string
+  quantity: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.StockTransferStatus
+  dispatchedAt?: Date | string | null
+  receivedAt?: Date | string | null
+  actorUserId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type StockTransferUpdateWithoutVariantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
+  dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actorUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutStockTransfersNestedInput
+  company?: Prisma.CompanyUpdateOneRequiredWithoutStockTransfersNestedInput
+  fromLocation?: Prisma.LocationUpdateOneRequiredWithoutTransfersFromNestedInput
+  toLocation?: Prisma.LocationUpdateOneRequiredWithoutTransfersToNestedInput
+  product?: Prisma.ProductUpdateOneRequiredWithoutStockTransfersNestedInput
+}
+
+export type StockTransferUncheckedUpdateWithoutVariantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromLocationId?: Prisma.StringFieldUpdateOperationsInput | string
+  toLocationId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.StringFieldUpdateOperationsInput | string
+  quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
+  dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  receivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  actorUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type StockTransferUncheckedUpdateManyWithoutVariantInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  fromLocationId?: Prisma.StringFieldUpdateOperationsInput | string
+  toLocationId?: Prisma.StringFieldUpdateOperationsInput | string
+  productId?: Prisma.StringFieldUpdateOperationsInput | string
   quantity?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   status?: Prisma.EnumStockTransferStatusFieldUpdateOperationsInput | $Enums.StockTransferStatus
   dispatchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1367,6 +1586,7 @@ export type StockTransferSelect<ExtArgs extends runtime.Types.Extensions.Interna
   fromLocationId?: boolean
   toLocationId?: boolean
   productId?: boolean
+  variantId?: boolean
   quantity?: boolean
   status?: boolean
   dispatchedAt?: boolean
@@ -1379,6 +1599,7 @@ export type StockTransferSelect<ExtArgs extends runtime.Types.Extensions.Interna
   fromLocation?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
   toLocation?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  variant?: boolean | Prisma.StockTransfer$variantArgs<ExtArgs>
 }, ExtArgs["result"]["stockTransfer"]>
 
 export type StockTransferSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1388,6 +1609,7 @@ export type StockTransferSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   fromLocationId?: boolean
   toLocationId?: boolean
   productId?: boolean
+  variantId?: boolean
   quantity?: boolean
   status?: boolean
   dispatchedAt?: boolean
@@ -1400,6 +1622,7 @@ export type StockTransferSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   fromLocation?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
   toLocation?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  variant?: boolean | Prisma.StockTransfer$variantArgs<ExtArgs>
 }, ExtArgs["result"]["stockTransfer"]>
 
 export type StockTransferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1409,6 +1632,7 @@ export type StockTransferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   fromLocationId?: boolean
   toLocationId?: boolean
   productId?: boolean
+  variantId?: boolean
   quantity?: boolean
   status?: boolean
   dispatchedAt?: boolean
@@ -1421,6 +1645,7 @@ export type StockTransferSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   fromLocation?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
   toLocation?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  variant?: boolean | Prisma.StockTransfer$variantArgs<ExtArgs>
 }, ExtArgs["result"]["stockTransfer"]>
 
 export type StockTransferSelectScalar = {
@@ -1430,6 +1655,7 @@ export type StockTransferSelectScalar = {
   fromLocationId?: boolean
   toLocationId?: boolean
   productId?: boolean
+  variantId?: boolean
   quantity?: boolean
   status?: boolean
   dispatchedAt?: boolean
@@ -1439,13 +1665,14 @@ export type StockTransferSelectScalar = {
   updatedAt?: boolean
 }
 
-export type StockTransferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "companyId" | "fromLocationId" | "toLocationId" | "productId" | "quantity" | "status" | "dispatchedAt" | "receivedAt" | "actorUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["stockTransfer"]>
+export type StockTransferOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "companyId" | "fromLocationId" | "toLocationId" | "productId" | "variantId" | "quantity" | "status" | "dispatchedAt" | "receivedAt" | "actorUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["stockTransfer"]>
 export type StockTransferInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   fromLocation?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
   toLocation?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  variant?: boolean | Prisma.StockTransfer$variantArgs<ExtArgs>
 }
 export type StockTransferIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
@@ -1453,6 +1680,7 @@ export type StockTransferIncludeCreateManyAndReturn<ExtArgs extends runtime.Type
   fromLocation?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
   toLocation?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  variant?: boolean | Prisma.StockTransfer$variantArgs<ExtArgs>
 }
 export type StockTransferIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
@@ -1460,6 +1688,7 @@ export type StockTransferIncludeUpdateManyAndReturn<ExtArgs extends runtime.Type
   fromLocation?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
   toLocation?: boolean | Prisma.LocationDefaultArgs<ExtArgs>
   product?: boolean | Prisma.ProductDefaultArgs<ExtArgs>
+  variant?: boolean | Prisma.StockTransfer$variantArgs<ExtArgs>
 }
 
 export type $StockTransferPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1470,6 +1699,7 @@ export type $StockTransferPayload<ExtArgs extends runtime.Types.Extensions.Inter
     fromLocation: Prisma.$LocationPayload<ExtArgs>
     toLocation: Prisma.$LocationPayload<ExtArgs>
     product: Prisma.$ProductPayload<ExtArgs>
+    variant: Prisma.$ProductVariantPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1478,6 +1708,7 @@ export type $StockTransferPayload<ExtArgs extends runtime.Types.Extensions.Inter
     fromLocationId: string
     toLocationId: string
     productId: string
+    variantId: string | null
     quantity: runtime.Decimal
     status: $Enums.StockTransferStatus
     dispatchedAt: Date | null
@@ -1884,6 +2115,7 @@ export interface Prisma__StockTransferClient<T, Null = never, ExtArgs extends ru
   fromLocation<T extends Prisma.LocationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LocationDefaultArgs<ExtArgs>>): Prisma.Prisma__LocationClient<runtime.Types.Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   toLocation<T extends Prisma.LocationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.LocationDefaultArgs<ExtArgs>>): Prisma.Prisma__LocationClient<runtime.Types.Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   product<T extends Prisma.ProductDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProductDefaultArgs<ExtArgs>>): Prisma.Prisma__ProductClient<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  variant<T extends Prisma.StockTransfer$variantArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StockTransfer$variantArgs<ExtArgs>>): Prisma.Prisma__ProductVariantClient<runtime.Types.Result.GetResult<Prisma.$ProductVariantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1919,6 +2151,7 @@ export interface StockTransferFieldRefs {
   readonly fromLocationId: Prisma.FieldRef<"StockTransfer", 'String'>
   readonly toLocationId: Prisma.FieldRef<"StockTransfer", 'String'>
   readonly productId: Prisma.FieldRef<"StockTransfer", 'String'>
+  readonly variantId: Prisma.FieldRef<"StockTransfer", 'String'>
   readonly quantity: Prisma.FieldRef<"StockTransfer", 'Decimal'>
   readonly status: Prisma.FieldRef<"StockTransfer", 'StockTransferStatus'>
   readonly dispatchedAt: Prisma.FieldRef<"StockTransfer", 'DateTime'>
@@ -2324,6 +2557,25 @@ export type StockTransferDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many StockTransfers to delete.
    */
   limit?: number
+}
+
+/**
+ * StockTransfer.variant
+ */
+export type StockTransfer$variantArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ProductVariant
+   */
+  select?: Prisma.ProductVariantSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ProductVariant
+   */
+  omit?: Prisma.ProductVariantOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ProductVariantInclude<ExtArgs> | null
+  where?: Prisma.ProductVariantWhereInput
 }
 
 /**

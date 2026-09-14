@@ -16,23 +16,45 @@ import { calculateWeightedAverageCost } from './costing.util';
  */
 @Injectable()
 export class ProductCostingService {
+  /**
+   * `variantId` is a new, purely-additive last parameter (existing callers
+   * that don't pass it keep averaging against the parent Product's own
+   * `costPrice`, unchanged). When given, the average is computed and
+   * stored against that `ProductVariant`'s own `costPrice` instead — each
+   * variant carries its own cost, never the parent's — and the Inventory
+   * aggregate is scoped to that variant specifically, not the product's
+   * combined stock across all its variants (which would blend costs that
+   * should stay independent, e.g. a Red T-Shirt's cost must never be
+   * diluted by a Blue T-Shirt's purchase price).
+   */
   async applyPurchaseCost(
     tx: Prisma.TransactionClient,
     context: { tenantId: string; companyId: string },
     productId: string,
     incomingQty: Prisma.Decimal | number | string,
     incomingUnitCost: Prisma.Decimal | number | string,
+    variantId?: string,
   ): Promise<Prisma.Decimal> {
-    const [product, stockAcrossLocations] = await Promise.all([
-      tx.product.findUniqueOrThrow({
-        where: { id: productId },
-        select: { costPrice: true },
-      }),
+    const [currentCost, stockAcrossLocations] = await Promise.all([
+      variantId
+        ? tx.productVariant
+            .findUniqueOrThrow({
+              where: { id: variantId },
+              select: { costPrice: true },
+            })
+            .then((v) => v.costPrice)
+        : tx.product
+            .findUniqueOrThrow({
+              where: { id: productId },
+              select: { costPrice: true },
+            })
+            .then((p) => p.costPrice),
       tx.inventory.aggregate({
         where: {
           tenantId: context.tenantId,
           companyId: context.companyId,
           productId,
+          variantId: variantId ?? null,
         },
         _sum: { quantity: true },
       }),
@@ -42,15 +64,22 @@ export class ProductCostingService {
       stockAcrossLocations._sum.quantity ?? new Prisma.Decimal(0);
     const newCost = calculateWeightedAverageCost(
       currentQty,
-      product.costPrice,
+      currentCost,
       incomingQty,
       incomingUnitCost,
     );
 
-    await tx.product.update({
-      where: { id: productId },
-      data: { costPrice: newCost },
-    });
+    if (variantId) {
+      await tx.productVariant.update({
+        where: { id: variantId },
+        data: { costPrice: newCost },
+      });
+    } else {
+      await tx.product.update({
+        where: { id: productId },
+        data: { costPrice: newCost },
+      });
+    }
 
     return newCost;
   }

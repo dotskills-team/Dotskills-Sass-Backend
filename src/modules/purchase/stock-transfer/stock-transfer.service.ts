@@ -24,6 +24,7 @@ const TRANSFER_SELECT = {
   fromLocationId: true,
   toLocationId: true,
   productId: true,
+  variantId: true,
   quantity: true,
   status: true,
   dispatchedAt: true,
@@ -95,6 +96,7 @@ export class StockTransferService {
       context,
       dto.fromLocationId,
     );
+    await this.requireVariantConsistency(context, dto.productId, dto.variantId);
 
     const transfer = await this.prisma.$transaction(async (tx) => {
       const created = await tx.stockTransfer.create({
@@ -104,6 +106,7 @@ export class StockTransferService {
           fromLocationId: dto.fromLocationId,
           toLocationId: dto.toLocationId,
           productId: dto.productId,
+          variantId: dto.variantId,
           quantity: dto.quantity,
           actorUserId: actor.userId,
         },
@@ -145,6 +148,7 @@ export class StockTransferService {
         tenantId: context.tenantId,
         companyId: context.companyId,
         productId: before.productId,
+        variantId: before.variantId ?? undefined,
         locationId: before.fromLocationId,
         quantity: before.quantity,
         movementType: StockMovementType.TRANSFER_OUT,
@@ -193,6 +197,7 @@ export class StockTransferService {
         tenantId: context.tenantId,
         companyId: context.companyId,
         productId: before.productId,
+        variantId: before.variantId ?? undefined,
         locationId: before.toLocationId,
         quantity: before.quantity,
         movementType: StockMovementType.TRANSFER_IN,
@@ -218,6 +223,53 @@ export class StockTransferService {
     });
 
     return { success: true, data: transfer };
+  }
+
+  /** Same rule as Purchase Order's own variant-consistency check: a variant-tracked product must be transferred by variant, a variant-less product must never carry a variantId. */
+  private async requireVariantConsistency(
+    context: CompanyContext,
+    productId: string,
+    variantId: string | undefined,
+  ) {
+    const product = await this.prisma.product.findFirst({
+      where: {
+        id: productId,
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
+      select: { id: true, hasVariants: true },
+    });
+    if (!product) {
+      throw new BadRequestException(
+        `productId ${productId} does not refer to a product in this company`,
+      );
+    }
+    if (product.hasVariants && !variantId) {
+      throw new BadRequestException(
+        `variantId is required for product ${productId} — it has variants`,
+      );
+    }
+    if (!product.hasVariants && variantId) {
+      throw new BadRequestException(
+        `product ${productId} has no variants — omit variantId`,
+      );
+    }
+    if (variantId) {
+      const variant = await this.prisma.productVariant.findFirst({
+        where: {
+          id: variantId,
+          productId,
+          tenantId: context.tenantId,
+          companyId: context.companyId,
+        },
+        select: { id: true },
+      });
+      if (!variant) {
+        throw new BadRequestException(
+          `variantId ${variantId} does not belong to product ${productId} in this company`,
+        );
+      }
+    }
   }
 
   private async requireTransfer(context: CompanyContext, id: string) {

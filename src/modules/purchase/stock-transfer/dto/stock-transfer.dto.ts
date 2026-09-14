@@ -1,4 +1,4 @@
-import { IsNumber, IsUUID, Min } from 'class-validator';
+import { IsNumber, IsOptional, IsUUID, Min } from 'class-validator';
 
 import { PaginationQueryDto } from '../../../../common/dto/pagination-query.dto';
 
@@ -14,6 +14,11 @@ export class CreateStockTransferDto {
 
   @IsUUID()
   productId!: string;
+
+  /** Required when the product has variants — checked against `Product.hasVariants` in the service. */
+  @IsOptional()
+  @IsUUID()
+  variantId?: string;
 
   @IsNumber(
     { maxDecimalPlaces: 4 },
