@@ -11,9 +11,26 @@ import {
 import { PrismaService } from '../../../prisma/prisma.service';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
 import { ProductCostingService } from '../../master-data/product/product-costing.service';
+import { UnitConversionService } from '../../master-data/unit/unit-conversion.service';
 import { LocationAccessService } from '../../../common/services/location-access.service';
 import { NotificationService } from '../../notification/notification.service';
 import { PurchaseOrderService } from './purchase-order.service';
+
+/**
+ * Unit-Conversion made every line-item value into a `Prisma.Decimal` by
+ * the time it reaches `costingService`/`inventoryService` (even at
+ * factor 1, the no-conversion case) — this asymmetric matcher compares
+ * via `.toString()` instead of `toHaveBeenCalledWith`'s default
+ * deep-equal, which would otherwise fail a Decimal against a plain
+ * number even when the represented value is identical.
+ */
+function decimalMatch(expected: string) {
+  return {
+    asymmetricMatch: (actual: { toString(): string }) =>
+      actual?.toString?.() === expected,
+    toString: () => `Decimal(${expected})`,
+  };
+}
 
 describe('PurchaseOrderService', () => {
   let service: PurchaseOrderService;
@@ -38,6 +55,7 @@ describe('PurchaseOrderService', () => {
     purchaseReturn: { findMany: jest.fn() },
     companySettings: { findUniqueOrThrow: jest.fn() },
     product: { findMany: jest.fn() },
+    unit: { findFirst: jest.fn() },
     productVariant: { findMany: jest.fn() },
     $transaction: jest.fn((arg: any) =>
       typeof arg === 'function' ? arg(mockTx) : Promise.all(arg),
@@ -71,11 +89,14 @@ describe('PurchaseOrderService', () => {
     });
     // Default: every requested productId is a plain non-variant product —
     // matches every existing test's fixtures, which never pass variantId.
-    mockPrisma.product.findMany.mockImplementation(
-      ({ where }: any) =>
-        Promise.resolve(
-          where.id.in.map((id: string) => ({ id, hasVariants: false })),
-        ),
+    mockPrisma.product.findMany.mockImplementation(({ where }: any) =>
+      Promise.resolve(
+        where.id.in.map((id: string) => ({
+          id,
+          hasVariants: false,
+          baseUnitId: 'base-unit-1',
+        })),
+      ),
     );
     mockPrisma.productVariant.findMany.mockResolvedValue([]);
 
@@ -85,6 +106,7 @@ describe('PurchaseOrderService', () => {
         { provide: PrismaService, useValue: mockPrisma },
         { provide: InventoryService, useValue: mockInventoryService },
         { provide: ProductCostingService, useValue: mockCostingService },
+        UnitConversionService,
         {
           provide: LocationAccessService,
           useValue: mockLocationAccessService,
@@ -274,12 +296,18 @@ describe('PurchaseOrderService', () => {
         actor,
       );
 
+      // Purchase Order + Sale line data now converts to Decimal at the
+      // Unit-Conversion boundary before reaching costing/inventory — even
+      // with no real conversion in play (factor 1, the common case), the
+      // values arrive as Decimal instances, not the original plain
+      // numbers, so `decimalMatch()` compares via `.toString()` instead
+      // of `===`/deep-equal.
       expect(mockCostingService.applyPurchaseCost).toHaveBeenCalledWith(
         mockTx,
         context,
         'product-1',
-        4,
-        50,
+        decimalMatch('4'),
+        decimalMatch('50'),
         undefined,
       );
       expect(mockInventoryService.increaseStock).toHaveBeenCalledWith(
@@ -288,7 +316,8 @@ describe('PurchaseOrderService', () => {
           productId: 'product-1',
           variantId: undefined,
           locationId: 'location-1',
-          quantity: 4,
+          quantity: decimalMatch('4'),
+          unitCost: decimalMatch('50'),
           movementType: StockMovementType.PURCHASE,
           referenceId: 'receipt-1',
         }),

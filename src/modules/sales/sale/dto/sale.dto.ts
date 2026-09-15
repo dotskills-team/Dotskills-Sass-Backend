@@ -30,6 +30,11 @@ export class SaleItemInputDto {
   @IsUUID()
   variantId?: string;
 
+  /** The Unit this line is sold in (e.g. "Carton") — omit to use the Product's own base unit, unchanged from today. Must resolve directly to the Product's base unit (one level of nesting only), checked via `UnitConversionService`. */
+  @IsOptional()
+  @IsUUID()
+  unitId?: string;
+
   @IsNumber(
     { maxDecimalPlaces: 4 },
     { message: 'quantity must have maximum 4 decimal places' },
@@ -53,6 +58,12 @@ export class SaleItemInputDto {
   )
   @Min(0, { message: 'discountAmount cannot be negative' })
   discountAmount?: number;
+
+  /** Free-text serial/IMEI captured at sale time (electronics resale, etc.) — a manual note only, not validated or checked for uniqueness. */
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  serialNote?: string;
 }
 
 export class SalePaymentInputDto {

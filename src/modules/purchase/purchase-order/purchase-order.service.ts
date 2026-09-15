@@ -18,6 +18,7 @@ import type { CompanyContext } from '../../../common/types/company-context.type'
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
 import { ProductCostingService } from '../../master-data/product/product-costing.service';
+import { UnitConversionService } from '../../master-data/unit/unit-conversion.service';
 import { LocationAccessService } from '../../../common/services/location-access.service';
 import { NotificationService } from '../../notification/notification.service';
 import {
@@ -44,6 +45,7 @@ const PO_SELECT = {
       id: true,
       productId: true,
       variantId: true,
+      unitId: true,
       orderedQty: true,
       receivedQty: true,
       unitCost: true,
@@ -57,6 +59,7 @@ export class PurchaseOrderService {
     private readonly prisma: PrismaService,
     private readonly inventoryService: InventoryService,
     private readonly costingService: ProductCostingService,
+    private readonly unitConversionService: UnitConversionService,
     private readonly locationAccessService: LocationAccessService,
     private readonly notificationService: NotificationService,
   ) {}
@@ -126,6 +129,7 @@ export class PurchaseOrderService {
             create: dto.items.map((item) => ({
               productId: item.productId,
               variantId: item.variantId,
+              unitId: item.unitId,
               orderedQty: item.orderedQty,
               unitCost: item.unitCost,
             })),
@@ -197,6 +201,7 @@ export class PurchaseOrderService {
                   create: dto.items.map((item) => ({
                     productId: item.productId,
                     variantId: item.variantId,
+                    unitId: item.unitId,
                     orderedQty: item.orderedQty,
                     unitCost: item.unitCost,
                   })),
@@ -301,6 +306,27 @@ export class PurchaseOrderService {
       return sum + line.receivedQty * Number(orderItem.unitCost);
     }, 0);
 
+    // Base-unit products (baseUnitId) resolved once, up front — each
+    // line's conversion factor is computed from its own product's base
+    // unit vs. the PurchaseOrderItem's own `unitId` (set at create()
+    // time, never re-derived from anything else).
+    const productIds = [
+      ...new Set(
+        dto.items.map(
+          (line) => itemsById.get(line.purchaseOrderItemId)!.productId,
+        ),
+      ),
+    ];
+    const products = await this.prisma.product.findMany({
+      where: {
+        id: { in: productIds },
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
+      select: { id: true, baseUnitId: true },
+    });
+    const productsById = new Map(products.map((p) => [p.id, p]));
+
     const result = await this.prisma.$transaction(async (tx) => {
       const receipt = await tx.goodsReceipt.create({
         data: {
@@ -317,13 +343,34 @@ export class PurchaseOrderService {
 
       for (const line of dto.items) {
         const orderItem = itemsById.get(line.purchaseOrderItemId)!;
+        const product = productsById.get(orderItem.productId)!;
+
+        // Conversion happens exactly here — the boundary between this
+        // PurchaseOrderItem's own entered unit (orderItem.unitId, e.g.
+        // "Carton") and the base unit Inventory/Costing always operate
+        // in. `factor` is Decimal(1) for every pre-existing, non-
+        // conversion line (unitId omitted), so this is a no-op change
+        // for every order that doesn't use it.
+        const factor = await this.unitConversionService.resolveFactor(
+          context,
+          product.baseUnitId,
+          orderItem.unitId,
+        );
+        const baseQty = this.unitConversionService.toBaseQuantity(
+          line.receivedQty,
+          factor,
+        );
+        const baseUnitCost = this.unitConversionService.toBaseUnitCost(
+          orderItem.unitCost,
+          factor,
+        );
 
         await this.costingService.applyPurchaseCost(
           tx,
           context,
           orderItem.productId,
-          line.receivedQty,
-          orderItem.unitCost,
+          baseQty,
+          baseUnitCost,
           orderItem.variantId ?? undefined,
         );
 
@@ -333,13 +380,17 @@ export class PurchaseOrderService {
           productId: orderItem.productId,
           variantId: orderItem.variantId ?? undefined,
           locationId: order.locationId,
-          quantity: line.receivedQty,
+          quantity: baseQty,
           movementType: StockMovementType.PURCHASE,
           referenceId: receipt.id,
           actorUserId: actor.userId,
-          unitCost: orderItem.unitCost,
+          unitCost: baseUnitCost,
         });
 
+        // receivedQty stays in the line's OWN entered unit (e.g. cartons
+        // received against cartons ordered) — never the converted
+        // base-unit figure, so the "cannot receive more than ordered"
+        // check above keeps comparing like-for-like.
         await tx.purchaseOrderItem.update({
           where: { id: orderItem.id },
           data: { receivedQty: { increment: line.receivedQty } },
@@ -536,13 +587,15 @@ export class PurchaseOrderService {
    * A product with variants must be ordered/received/returned by variant,
    * never at the parent-product level (which variant would the stock even
    * land on?) — and a variant-less product must never carry a variantId
-   * it has no variants to resolve. Checked once here rather than inside
-   * the transaction, so a bad line fails the whole request up front
-   * instead of partially writing purchase order items.
+   * it has no variants to resolve. Also validates each line's `unitId`
+   * (when given) resolves against that same product's own base unit —
+   * checked once here rather than inside the transaction, so a bad line
+   * fails the whole request up front instead of partially writing
+   * purchase order items.
    */
   private async requireVariantConsistency(
     context: CompanyContext,
-    items: { productId: string; variantId?: string }[],
+    items: { productId: string; variantId?: string; unitId?: string }[],
   ) {
     const productIds = [...new Set(items.map((i) => i.productId))];
     const products = await this.prisma.product.findMany({
@@ -551,7 +604,7 @@ export class PurchaseOrderService {
         tenantId: context.tenantId,
         companyId: context.companyId,
       },
-      select: { id: true, hasVariants: true },
+      select: { id: true, hasVariants: true, baseUnitId: true },
     });
     const productsById = new Map(products.map((p) => [p.id, p]));
 
@@ -572,6 +625,14 @@ export class PurchaseOrderService {
           `product ${item.productId} has no variants — omit variantId`,
         );
       }
+      // Validated here purely for fast, up-front feedback — the actual
+      // conversion (and its resolved factor) is recomputed at receive()
+      // time from this same product/unitId pair, never persisted.
+      await this.unitConversionService.resolveFactor(
+        context,
+        product.baseUnitId,
+        item.unitId,
+      );
     }
 
     const variantIds = items

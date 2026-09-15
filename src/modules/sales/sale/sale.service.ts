@@ -20,6 +20,7 @@ import { LocationAccessService } from '../../../common/services/location-access.
 import type { CompanyContext } from '../../../common/types/company-context.type';
 import type { AuthenticatedUser } from '../../../common/types/authenticated-user.type';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
+import { UnitConversionService } from '../../master-data/unit/unit-conversion.service';
 import { NotificationService } from '../../notification/notification.service';
 import {
   CreateSaleDto,
@@ -50,12 +51,14 @@ const SALE_SELECT = {
       id: true,
       productId: true,
       variantId: true,
+      unitId: true,
       productName: true,
       quantity: true,
       unitPrice: true,
       unitCost: true,
       discountAmount: true,
       subtotal: true,
+      serialNote: true,
     },
   },
   payments: {
@@ -72,6 +75,7 @@ export class SaleService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly inventoryService: InventoryService,
+    private readonly unitConversionService: UnitConversionService,
     private readonly locationAccessService: LocationAccessService,
     private readonly notificationService: NotificationService,
   ) {}
@@ -149,9 +153,15 @@ export class SaleService {
         salePrice: true,
         costPrice: true,
         hasVariants: true,
+        baseUnitId: true,
       },
     });
     const productsById = new Map(products.map((p) => [p.id, p]));
+    // Resolved once here (fail-fast, before any DB write) and reused
+    // below when building lineItems — Decimal(1) for every pre-existing,
+    // non-conversion line (unitId omitted), so this is a no-op for every
+    // sale that doesn't use it.
+    const unitFactors: Prisma.Decimal[] = [];
     for (const item of dto.items) {
       const product = productsById.get(item.productId);
       if (!product) {
@@ -169,6 +179,13 @@ export class SaleService {
           `product ${item.productId} has no variants — omit variantId`,
         );
       }
+      unitFactors.push(
+        await this.unitConversionService.resolveFactor(
+          context,
+          product.baseUnitId,
+          item.unitId,
+        ),
+      );
     }
 
     const variantIds = dto.items
@@ -234,15 +251,22 @@ export class SaleService {
     }
 
     // --- server-computed money math: item discount -> sale discount -> tax -> round ---
-    const lineItems = dto.items.map((item) => {
+    // `unitCost`/the default `unitPrice` are scaled to the LINE'S OWN
+    // entered unit (factor 1 = unchanged from today) — quantity * unitPrice
+    // must stay internally consistent for revenue/COGS math (a Carton's
+    // price is the whole carton's price, not one piece's), exactly
+    // mirroring how PurchaseOrderItem.unitCost stays in its own entered
+    // unit rather than being pre-converted to the base unit.
+    const lineItems = dto.items.map((item, index) => {
       const product = productsById.get(item.productId)!;
       const variant = item.variantId
         ? variantsById.get(item.variantId)
         : undefined;
-      const defaultUnitPrice = variant
-        ? Number(variant.salePrice)
-        : Number(product.salePrice);
-      const unitCost = variant ? variant.costPrice : product.costPrice;
+      const factor = unitFactors[index];
+      const baseSalePrice = variant ? variant.salePrice : product.salePrice;
+      const baseCostPrice = variant ? variant.costPrice : product.costPrice;
+      const enteredUnitCost = baseCostPrice.times(factor);
+      const defaultUnitPrice = Number(baseSalePrice.times(factor));
       const unitPrice = item.unitPrice ?? defaultUnitPrice;
       const discountAmount = item.discountAmount ?? 0;
       const lineSubtotal = item.quantity * unitPrice - discountAmount;
@@ -250,7 +274,9 @@ export class SaleService {
         item,
         product,
         variantId: item.variantId,
-        unitCost,
+        factor,
+        baseCostPrice,
+        unitCost: enteredUnitCost,
         unitPrice,
         discountAmount,
         lineSubtotal,
@@ -333,12 +359,14 @@ export class SaleService {
               create: lineItems.map((l) => ({
                 productId: l.product.id,
                 variantId: l.variantId,
+                unitId: l.item.unitId,
                 productName: l.product.name,
                 quantity: l.item.quantity,
                 unitPrice: l.unitPrice,
                 unitCost: l.unitCost,
                 discountAmount: l.discountAmount,
                 subtotal: l.lineSubtotal,
+                serialNote: l.item.serialNote?.trim() || undefined,
               })),
             },
             payments: {
@@ -352,17 +380,22 @@ export class SaleService {
         });
 
         for (const l of lineItems) {
+          // Conversion boundary — Inventory always operates in the
+          // Product's base unit, regardless of which unit this line was
+          // actually sold in. `baseCostPrice` (not `l.unitCost`, which is
+          // scaled to the line's own entered unit) is the correct
+          // per-base-unit cost for StockMovement.
           await this.inventoryService.decreaseStock(tx, {
             tenantId: context.tenantId,
             companyId: context.companyId,
             productId: l.product.id,
             variantId: l.variantId,
             locationId: dto.locationId,
-            quantity: l.item.quantity,
+            quantity: new Prisma.Decimal(l.item.quantity).times(l.factor),
             movementType: StockMovementType.SALE,
             referenceId: created.id,
             actorUserId: actor.userId,
-            unitCost: l.unitCost,
+            unitCost: l.baseCostPrice,
             allowNegative: settings.allowNegativeStock,
           });
         }
@@ -457,19 +490,40 @@ export class SaleService {
       .filter((p) => p.method === SalePaymentMethod.DUE)
       .reduce((sum, p) => sum + Number(p.amount), 0);
 
+    // Same conversion boundary as create() — `item.quantity`/`item.unitCost`
+    // are stored in each line's own entered unit, so restoring stock
+    // needs that line's factor recomputed from its own `unitId`, never
+    // assumed to already be in the Product's base unit.
+    const productIds = [...new Set(before.items.map((item) => item.productId))];
+    const products = await this.prisma.product.findMany({
+      where: {
+        id: { in: productIds },
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
+      select: { id: true, baseUnitId: true },
+    });
+    const productsById = new Map(products.map((p) => [p.id, p]));
+
     const sale = await this.prisma.$transaction(async (tx) => {
       for (const item of before.items) {
+        const product = productsById.get(item.productId)!;
+        const factor = await this.unitConversionService.resolveFactor(
+          context,
+          product.baseUnitId,
+          item.unitId,
+        );
         await this.inventoryService.increaseStock(tx, {
           tenantId: context.tenantId,
           companyId: context.companyId,
           productId: item.productId,
           variantId: item.variantId ?? undefined,
           locationId: before.locationId,
-          quantity: item.quantity,
+          quantity: new Prisma.Decimal(item.quantity).times(factor),
           movementType: StockMovementType.SALE_VOID_IN,
           referenceId: before.id,
           actorUserId: actor.userId,
-          unitCost: item.unitCost,
+          unitCost: new Prisma.Decimal(item.unitCost).dividedBy(factor),
         });
       }
 
@@ -549,6 +603,20 @@ export class SaleService {
       ]),
     );
 
+    // Same conversion boundary as void() — a return quantity is entered
+    // in the ORIGINAL sale line's own unit (never re-specified by the
+    // caller), so its factor is recomputed from that line's `unitId`.
+    const productIds = [...new Set(sale.items.map((item) => item.productId))];
+    const products = await this.prisma.product.findMany({
+      where: {
+        id: { in: productIds },
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
+      select: { id: true, baseUnitId: true },
+    });
+    const productsById = new Map(products.map((p) => [p.id, p]));
+
     const result = await this.prisma.$transaction(async (tx) => {
       const saleReturn = await tx.saleReturn.create({
         data: {
@@ -572,17 +640,23 @@ export class SaleService {
               : `productId ${line.productId} was not part of this sale`,
           );
         }
+        const product = productsById.get(line.productId)!;
+        const factor = await this.unitConversionService.resolveFactor(
+          context,
+          product.baseUnitId,
+          saleItem.unitId,
+        );
         await this.inventoryService.increaseStock(tx, {
           tenantId: context.tenantId,
           companyId: context.companyId,
           productId: line.productId,
           variantId: line.variantId,
           locationId: sale.locationId,
-          quantity: line.quantity,
+          quantity: new Prisma.Decimal(line.quantity).times(factor),
           movementType: StockMovementType.SALE_RETURN_IN,
           referenceId: saleReturn.id,
           actorUserId: actor.userId,
-          unitCost: saleItem.unitCost,
+          unitCost: new Prisma.Decimal(saleItem.unitCost).dividedBy(factor),
         });
       }
 

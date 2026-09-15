@@ -5,6 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 
+import { Prisma } from '../../../generated/phase-1-prisma/client';
 import {
   SalePaymentMethod,
   SaleStatus,
@@ -12,9 +13,26 @@ import {
 } from '../../../generated/phase-1-prisma/enums';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { InventoryService } from '../../master-data/inventory/inventory.service';
+import { UnitConversionService } from '../../master-data/unit/unit-conversion.service';
 import { LocationAccessService } from '../../../common/services/location-access.service';
 import { NotificationService } from '../../notification/notification.service';
 import { SaleService } from './sale.service';
+
+/**
+ * Unit-Conversion made every line-item value into a `Prisma.Decimal` by
+ * the time it reaches `inventoryService` (even at factor 1, the
+ * no-conversion case) — this asymmetric matcher compares via
+ * `.toString()` instead of `toHaveBeenCalledWith`'s default deep-equal,
+ * which would otherwise fail a Decimal against a plain number even when
+ * the represented value is identical.
+ */
+function decimalMatch(expected: string) {
+  return {
+    asymmetricMatch: (actual: { toString(): string }) =>
+      actual?.toString?.() === expected,
+    toString: () => `Decimal(${expected})`,
+  };
+}
 
 describe('SaleService', () => {
   let service: SaleService;
@@ -31,6 +49,8 @@ describe('SaleService', () => {
   const mockPrisma = {
     companySettings: { findUniqueOrThrow: jest.fn() },
     product: { findMany: jest.fn() },
+    productVariant: { findMany: jest.fn() },
+    unit: { findFirst: jest.fn() },
     customer: { findFirst: jest.fn() },
     sale: { findFirst: jest.fn(), findMany: jest.fn() },
     saleReturn: { findMany: jest.fn() },
@@ -64,6 +84,7 @@ describe('SaleService', () => {
         SaleService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: InventoryService, useValue: mockInventoryService },
+        UnitConversionService,
         { provide: LocationAccessService, useValue: mockLocationAccessService },
         { provide: NotificationService, useValue: mockNotificationService },
       ],
@@ -78,7 +99,13 @@ describe('SaleService', () => {
       maxCustomerDueLimit: null,
     });
     mockPrisma.product.findMany.mockResolvedValue([
-      { id: 'product-1', name: 'Rice', salePrice: 100, costPrice: 60 },
+      {
+        id: 'product-1',
+        name: 'Rice',
+        salePrice: new Prisma.Decimal(100),
+        costPrice: new Prisma.Decimal(60),
+        baseUnitId: 'base-unit-1',
+      },
     ]);
     mockTx.$queryRaw.mockResolvedValue([{ lastNumber: 1 }]);
     mockTx.sale.create.mockImplementation(({ data }: any) =>
@@ -245,9 +272,9 @@ describe('SaleService', () => {
         mockTx,
         expect.objectContaining({
           productId: 'product-1',
-          quantity: 1,
+          quantity: decimalMatch('1'),
           movementType: StockMovementType.SALE,
-          unitCost: 60,
+          unitCost: decimalMatch('60'),
           allowNegative: false,
         }),
       );
@@ -475,7 +502,7 @@ describe('SaleService', () => {
         mockTx,
         expect.objectContaining({
           productId: 'product-1',
-          quantity: 2,
+          quantity: decimalMatch('2'),
           movementType: StockMovementType.SALE_VOID_IN,
         }),
       );
@@ -552,7 +579,7 @@ describe('SaleService', () => {
         mockTx,
         expect.objectContaining({
           productId: 'product-1',
-          quantity: 1,
+          quantity: decimalMatch('1'),
           movementType: StockMovementType.SALE_RETURN_IN,
         }),
       );

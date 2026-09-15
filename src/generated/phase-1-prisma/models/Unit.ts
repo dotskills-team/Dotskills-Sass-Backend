@@ -261,6 +261,8 @@ export type UnitWhereInput = {
   baseUnit?: Prisma.XOR<Prisma.UnitNullableScalarRelationFilter, Prisma.UnitWhereInput> | null
   derivedUnits?: Prisma.UnitListRelationFilter
   products?: Prisma.ProductListRelationFilter
+  purchaseOrderItems?: Prisma.PurchaseOrderItemListRelationFilter
+  saleItems?: Prisma.SaleItemListRelationFilter
 }
 
 export type UnitOrderByWithRelationInput = {
@@ -279,6 +281,8 @@ export type UnitOrderByWithRelationInput = {
   baseUnit?: Prisma.UnitOrderByWithRelationInput
   derivedUnits?: Prisma.UnitOrderByRelationAggregateInput
   products?: Prisma.ProductOrderByRelationAggregateInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemOrderByRelationAggregateInput
+  saleItems?: Prisma.SaleItemOrderByRelationAggregateInput
 }
 
 export type UnitWhereUniqueInput = Prisma.AtLeast<{
@@ -301,6 +305,8 @@ export type UnitWhereUniqueInput = Prisma.AtLeast<{
   baseUnit?: Prisma.XOR<Prisma.UnitNullableScalarRelationFilter, Prisma.UnitWhereInput> | null
   derivedUnits?: Prisma.UnitListRelationFilter
   products?: Prisma.ProductListRelationFilter
+  purchaseOrderItems?: Prisma.PurchaseOrderItemListRelationFilter
+  saleItems?: Prisma.SaleItemListRelationFilter
 }, "id" | "tenantId_companyId_code">
 
 export type UnitOrderByWithAggregationInput = {
@@ -350,6 +356,8 @@ export type UnitCreateInput = {
   baseUnit?: Prisma.UnitCreateNestedOneWithoutDerivedUnitsInput
   derivedUnits?: Prisma.UnitCreateNestedManyWithoutBaseUnitInput
   products?: Prisma.ProductCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemCreateNestedManyWithoutUnitInput
+  saleItems?: Prisma.SaleItemCreateNestedManyWithoutUnitInput
 }
 
 export type UnitUncheckedCreateInput = {
@@ -365,6 +373,8 @@ export type UnitUncheckedCreateInput = {
   updatedAt?: Date | string
   derivedUnits?: Prisma.UnitUncheckedCreateNestedManyWithoutBaseUnitInput
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedCreateNestedManyWithoutUnitInput
+  saleItems?: Prisma.SaleItemUncheckedCreateNestedManyWithoutUnitInput
 }
 
 export type UnitUpdateInput = {
@@ -380,6 +390,8 @@ export type UnitUpdateInput = {
   baseUnit?: Prisma.UnitUpdateOneWithoutDerivedUnitsNestedInput
   derivedUnits?: Prisma.UnitUpdateManyWithoutBaseUnitNestedInput
   products?: Prisma.ProductUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUpdateManyWithoutUnitNestedInput
+  saleItems?: Prisma.SaleItemUpdateManyWithoutUnitNestedInput
 }
 
 export type UnitUncheckedUpdateInput = {
@@ -395,6 +407,8 @@ export type UnitUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   derivedUnits?: Prisma.UnitUncheckedUpdateManyWithoutBaseUnitNestedInput
   products?: Prisma.ProductUncheckedUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedUpdateManyWithoutUnitNestedInput
+  saleItems?: Prisma.SaleItemUncheckedUpdateManyWithoutUnitNestedInput
 }
 
 export type UnitCreateManyInput = {
@@ -666,6 +680,38 @@ export type UnitUpdateOneRequiredWithoutProductsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UnitUpdateToOneWithWhereWithoutProductsInput, Prisma.UnitUpdateWithoutProductsInput>, Prisma.UnitUncheckedUpdateWithoutProductsInput>
 }
 
+export type UnitCreateNestedOneWithoutPurchaseOrderItemsInput = {
+  create?: Prisma.XOR<Prisma.UnitCreateWithoutPurchaseOrderItemsInput, Prisma.UnitUncheckedCreateWithoutPurchaseOrderItemsInput>
+  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutPurchaseOrderItemsInput
+  connect?: Prisma.UnitWhereUniqueInput
+}
+
+export type UnitUpdateOneWithoutPurchaseOrderItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.UnitCreateWithoutPurchaseOrderItemsInput, Prisma.UnitUncheckedCreateWithoutPurchaseOrderItemsInput>
+  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutPurchaseOrderItemsInput
+  upsert?: Prisma.UnitUpsertWithoutPurchaseOrderItemsInput
+  disconnect?: Prisma.UnitWhereInput | boolean
+  delete?: Prisma.UnitWhereInput | boolean
+  connect?: Prisma.UnitWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UnitUpdateToOneWithWhereWithoutPurchaseOrderItemsInput, Prisma.UnitUpdateWithoutPurchaseOrderItemsInput>, Prisma.UnitUncheckedUpdateWithoutPurchaseOrderItemsInput>
+}
+
+export type UnitCreateNestedOneWithoutSaleItemsInput = {
+  create?: Prisma.XOR<Prisma.UnitCreateWithoutSaleItemsInput, Prisma.UnitUncheckedCreateWithoutSaleItemsInput>
+  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutSaleItemsInput
+  connect?: Prisma.UnitWhereUniqueInput
+}
+
+export type UnitUpdateOneWithoutSaleItemsNestedInput = {
+  create?: Prisma.XOR<Prisma.UnitCreateWithoutSaleItemsInput, Prisma.UnitUncheckedCreateWithoutSaleItemsInput>
+  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutSaleItemsInput
+  upsert?: Prisma.UnitUpsertWithoutSaleItemsInput
+  disconnect?: Prisma.UnitWhereInput | boolean
+  delete?: Prisma.UnitWhereInput | boolean
+  connect?: Prisma.UnitWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UnitUpdateToOneWithWhereWithoutSaleItemsInput, Prisma.UnitUpdateWithoutSaleItemsInput>, Prisma.UnitUncheckedUpdateWithoutSaleItemsInput>
+}
+
 export type UnitCreateWithoutTenantInput = {
   id?: string
   name: string
@@ -678,6 +724,8 @@ export type UnitCreateWithoutTenantInput = {
   baseUnit?: Prisma.UnitCreateNestedOneWithoutDerivedUnitsInput
   derivedUnits?: Prisma.UnitCreateNestedManyWithoutBaseUnitInput
   products?: Prisma.ProductCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemCreateNestedManyWithoutUnitInput
+  saleItems?: Prisma.SaleItemCreateNestedManyWithoutUnitInput
 }
 
 export type UnitUncheckedCreateWithoutTenantInput = {
@@ -692,6 +740,8 @@ export type UnitUncheckedCreateWithoutTenantInput = {
   updatedAt?: Date | string
   derivedUnits?: Prisma.UnitUncheckedCreateNestedManyWithoutBaseUnitInput
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedCreateNestedManyWithoutUnitInput
+  saleItems?: Prisma.SaleItemUncheckedCreateNestedManyWithoutUnitInput
 }
 
 export type UnitCreateOrConnectWithoutTenantInput = {
@@ -748,6 +798,8 @@ export type UnitCreateWithoutCompanyInput = {
   baseUnit?: Prisma.UnitCreateNestedOneWithoutDerivedUnitsInput
   derivedUnits?: Prisma.UnitCreateNestedManyWithoutBaseUnitInput
   products?: Prisma.ProductCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemCreateNestedManyWithoutUnitInput
+  saleItems?: Prisma.SaleItemCreateNestedManyWithoutUnitInput
 }
 
 export type UnitUncheckedCreateWithoutCompanyInput = {
@@ -762,6 +814,8 @@ export type UnitUncheckedCreateWithoutCompanyInput = {
   updatedAt?: Date | string
   derivedUnits?: Prisma.UnitUncheckedCreateNestedManyWithoutBaseUnitInput
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedCreateNestedManyWithoutUnitInput
+  saleItems?: Prisma.SaleItemUncheckedCreateNestedManyWithoutUnitInput
 }
 
 export type UnitCreateOrConnectWithoutCompanyInput = {
@@ -802,6 +856,8 @@ export type UnitCreateWithoutDerivedUnitsInput = {
   company: Prisma.CompanyCreateNestedOneWithoutUnitsInput
   baseUnit?: Prisma.UnitCreateNestedOneWithoutDerivedUnitsInput
   products?: Prisma.ProductCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemCreateNestedManyWithoutUnitInput
+  saleItems?: Prisma.SaleItemCreateNestedManyWithoutUnitInput
 }
 
 export type UnitUncheckedCreateWithoutDerivedUnitsInput = {
@@ -816,6 +872,8 @@ export type UnitUncheckedCreateWithoutDerivedUnitsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedCreateNestedManyWithoutUnitInput
+  saleItems?: Prisma.SaleItemUncheckedCreateNestedManyWithoutUnitInput
 }
 
 export type UnitCreateOrConnectWithoutDerivedUnitsInput = {
@@ -835,6 +893,8 @@ export type UnitCreateWithoutBaseUnitInput = {
   company: Prisma.CompanyCreateNestedOneWithoutUnitsInput
   derivedUnits?: Prisma.UnitCreateNestedManyWithoutBaseUnitInput
   products?: Prisma.ProductCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemCreateNestedManyWithoutUnitInput
+  saleItems?: Prisma.SaleItemCreateNestedManyWithoutUnitInput
 }
 
 export type UnitUncheckedCreateWithoutBaseUnitInput = {
@@ -849,6 +909,8 @@ export type UnitUncheckedCreateWithoutBaseUnitInput = {
   updatedAt?: Date | string
   derivedUnits?: Prisma.UnitUncheckedCreateNestedManyWithoutBaseUnitInput
   products?: Prisma.ProductUncheckedCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedCreateNestedManyWithoutUnitInput
+  saleItems?: Prisma.SaleItemUncheckedCreateNestedManyWithoutUnitInput
 }
 
 export type UnitCreateOrConnectWithoutBaseUnitInput = {
@@ -884,6 +946,8 @@ export type UnitUpdateWithoutDerivedUnitsInput = {
   company?: Prisma.CompanyUpdateOneRequiredWithoutUnitsNestedInput
   baseUnit?: Prisma.UnitUpdateOneWithoutDerivedUnitsNestedInput
   products?: Prisma.ProductUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUpdateManyWithoutUnitNestedInput
+  saleItems?: Prisma.SaleItemUpdateManyWithoutUnitNestedInput
 }
 
 export type UnitUncheckedUpdateWithoutDerivedUnitsInput = {
@@ -898,6 +962,8 @@ export type UnitUncheckedUpdateWithoutDerivedUnitsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   products?: Prisma.ProductUncheckedUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedUpdateManyWithoutUnitNestedInput
+  saleItems?: Prisma.SaleItemUncheckedUpdateManyWithoutUnitNestedInput
 }
 
 export type UnitUpsertWithWhereUniqueWithoutBaseUnitInput = {
@@ -928,6 +994,8 @@ export type UnitCreateWithoutProductsInput = {
   company: Prisma.CompanyCreateNestedOneWithoutUnitsInput
   baseUnit?: Prisma.UnitCreateNestedOneWithoutDerivedUnitsInput
   derivedUnits?: Prisma.UnitCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemCreateNestedManyWithoutUnitInput
+  saleItems?: Prisma.SaleItemCreateNestedManyWithoutUnitInput
 }
 
 export type UnitUncheckedCreateWithoutProductsInput = {
@@ -942,6 +1010,8 @@ export type UnitUncheckedCreateWithoutProductsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   derivedUnits?: Prisma.UnitUncheckedCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedCreateNestedManyWithoutUnitInput
+  saleItems?: Prisma.SaleItemUncheckedCreateNestedManyWithoutUnitInput
 }
 
 export type UnitCreateOrConnectWithoutProductsInput = {
@@ -972,6 +1042,8 @@ export type UnitUpdateWithoutProductsInput = {
   company?: Prisma.CompanyUpdateOneRequiredWithoutUnitsNestedInput
   baseUnit?: Prisma.UnitUpdateOneWithoutDerivedUnitsNestedInput
   derivedUnits?: Prisma.UnitUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUpdateManyWithoutUnitNestedInput
+  saleItems?: Prisma.SaleItemUpdateManyWithoutUnitNestedInput
 }
 
 export type UnitUncheckedUpdateWithoutProductsInput = {
@@ -986,6 +1058,168 @@ export type UnitUncheckedUpdateWithoutProductsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   derivedUnits?: Prisma.UnitUncheckedUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedUpdateManyWithoutUnitNestedInput
+  saleItems?: Prisma.SaleItemUncheckedUpdateManyWithoutUnitNestedInput
+}
+
+export type UnitCreateWithoutPurchaseOrderItemsInput = {
+  id?: string
+  name: string
+  code: string
+  conversionFactor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.UnitStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutUnitsInput
+  company: Prisma.CompanyCreateNestedOneWithoutUnitsInput
+  baseUnit?: Prisma.UnitCreateNestedOneWithoutDerivedUnitsInput
+  derivedUnits?: Prisma.UnitCreateNestedManyWithoutBaseUnitInput
+  products?: Prisma.ProductCreateNestedManyWithoutBaseUnitInput
+  saleItems?: Prisma.SaleItemCreateNestedManyWithoutUnitInput
+}
+
+export type UnitUncheckedCreateWithoutPurchaseOrderItemsInput = {
+  id?: string
+  tenantId: string
+  companyId: string
+  baseUnitId?: string | null
+  name: string
+  code: string
+  conversionFactor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.UnitStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  derivedUnits?: Prisma.UnitUncheckedCreateNestedManyWithoutBaseUnitInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutBaseUnitInput
+  saleItems?: Prisma.SaleItemUncheckedCreateNestedManyWithoutUnitInput
+}
+
+export type UnitCreateOrConnectWithoutPurchaseOrderItemsInput = {
+  where: Prisma.UnitWhereUniqueInput
+  create: Prisma.XOR<Prisma.UnitCreateWithoutPurchaseOrderItemsInput, Prisma.UnitUncheckedCreateWithoutPurchaseOrderItemsInput>
+}
+
+export type UnitUpsertWithoutPurchaseOrderItemsInput = {
+  update: Prisma.XOR<Prisma.UnitUpdateWithoutPurchaseOrderItemsInput, Prisma.UnitUncheckedUpdateWithoutPurchaseOrderItemsInput>
+  create: Prisma.XOR<Prisma.UnitCreateWithoutPurchaseOrderItemsInput, Prisma.UnitUncheckedCreateWithoutPurchaseOrderItemsInput>
+  where?: Prisma.UnitWhereInput
+}
+
+export type UnitUpdateToOneWithWhereWithoutPurchaseOrderItemsInput = {
+  where?: Prisma.UnitWhereInput
+  data: Prisma.XOR<Prisma.UnitUpdateWithoutPurchaseOrderItemsInput, Prisma.UnitUncheckedUpdateWithoutPurchaseOrderItemsInput>
+}
+
+export type UnitUpdateWithoutPurchaseOrderItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  conversionFactor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutUnitsNestedInput
+  company?: Prisma.CompanyUpdateOneRequiredWithoutUnitsNestedInput
+  baseUnit?: Prisma.UnitUpdateOneWithoutDerivedUnitsNestedInput
+  derivedUnits?: Prisma.UnitUpdateManyWithoutBaseUnitNestedInput
+  products?: Prisma.ProductUpdateManyWithoutBaseUnitNestedInput
+  saleItems?: Prisma.SaleItemUpdateManyWithoutUnitNestedInput
+}
+
+export type UnitUncheckedUpdateWithoutPurchaseOrderItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  baseUnitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  conversionFactor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  derivedUnits?: Prisma.UnitUncheckedUpdateManyWithoutBaseUnitNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutBaseUnitNestedInput
+  saleItems?: Prisma.SaleItemUncheckedUpdateManyWithoutUnitNestedInput
+}
+
+export type UnitCreateWithoutSaleItemsInput = {
+  id?: string
+  name: string
+  code: string
+  conversionFactor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.UnitStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutUnitsInput
+  company: Prisma.CompanyCreateNestedOneWithoutUnitsInput
+  baseUnit?: Prisma.UnitCreateNestedOneWithoutDerivedUnitsInput
+  derivedUnits?: Prisma.UnitCreateNestedManyWithoutBaseUnitInput
+  products?: Prisma.ProductCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemCreateNestedManyWithoutUnitInput
+}
+
+export type UnitUncheckedCreateWithoutSaleItemsInput = {
+  id?: string
+  tenantId: string
+  companyId: string
+  baseUnitId?: string | null
+  name: string
+  code: string
+  conversionFactor?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: $Enums.UnitStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  derivedUnits?: Prisma.UnitUncheckedCreateNestedManyWithoutBaseUnitInput
+  products?: Prisma.ProductUncheckedCreateNestedManyWithoutBaseUnitInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedCreateNestedManyWithoutUnitInput
+}
+
+export type UnitCreateOrConnectWithoutSaleItemsInput = {
+  where: Prisma.UnitWhereUniqueInput
+  create: Prisma.XOR<Prisma.UnitCreateWithoutSaleItemsInput, Prisma.UnitUncheckedCreateWithoutSaleItemsInput>
+}
+
+export type UnitUpsertWithoutSaleItemsInput = {
+  update: Prisma.XOR<Prisma.UnitUpdateWithoutSaleItemsInput, Prisma.UnitUncheckedUpdateWithoutSaleItemsInput>
+  create: Prisma.XOR<Prisma.UnitCreateWithoutSaleItemsInput, Prisma.UnitUncheckedCreateWithoutSaleItemsInput>
+  where?: Prisma.UnitWhereInput
+}
+
+export type UnitUpdateToOneWithWhereWithoutSaleItemsInput = {
+  where?: Prisma.UnitWhereInput
+  data: Prisma.XOR<Prisma.UnitUpdateWithoutSaleItemsInput, Prisma.UnitUncheckedUpdateWithoutSaleItemsInput>
+}
+
+export type UnitUpdateWithoutSaleItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  conversionFactor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutUnitsNestedInput
+  company?: Prisma.CompanyUpdateOneRequiredWithoutUnitsNestedInput
+  baseUnit?: Prisma.UnitUpdateOneWithoutDerivedUnitsNestedInput
+  derivedUnits?: Prisma.UnitUpdateManyWithoutBaseUnitNestedInput
+  products?: Prisma.ProductUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUpdateManyWithoutUnitNestedInput
+}
+
+export type UnitUncheckedUpdateWithoutSaleItemsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  baseUnitId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  conversionFactor?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  derivedUnits?: Prisma.UnitUncheckedUpdateManyWithoutBaseUnitNestedInput
+  products?: Prisma.ProductUncheckedUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedUpdateManyWithoutUnitNestedInput
 }
 
 export type UnitCreateManyTenantInput = {
@@ -1012,6 +1246,8 @@ export type UnitUpdateWithoutTenantInput = {
   baseUnit?: Prisma.UnitUpdateOneWithoutDerivedUnitsNestedInput
   derivedUnits?: Prisma.UnitUpdateManyWithoutBaseUnitNestedInput
   products?: Prisma.ProductUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUpdateManyWithoutUnitNestedInput
+  saleItems?: Prisma.SaleItemUpdateManyWithoutUnitNestedInput
 }
 
 export type UnitUncheckedUpdateWithoutTenantInput = {
@@ -1026,6 +1262,8 @@ export type UnitUncheckedUpdateWithoutTenantInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   derivedUnits?: Prisma.UnitUncheckedUpdateManyWithoutBaseUnitNestedInput
   products?: Prisma.ProductUncheckedUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedUpdateManyWithoutUnitNestedInput
+  saleItems?: Prisma.SaleItemUncheckedUpdateManyWithoutUnitNestedInput
 }
 
 export type UnitUncheckedUpdateManyWithoutTenantInput = {
@@ -1064,6 +1302,8 @@ export type UnitUpdateWithoutCompanyInput = {
   baseUnit?: Prisma.UnitUpdateOneWithoutDerivedUnitsNestedInput
   derivedUnits?: Prisma.UnitUpdateManyWithoutBaseUnitNestedInput
   products?: Prisma.ProductUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUpdateManyWithoutUnitNestedInput
+  saleItems?: Prisma.SaleItemUpdateManyWithoutUnitNestedInput
 }
 
 export type UnitUncheckedUpdateWithoutCompanyInput = {
@@ -1078,6 +1318,8 @@ export type UnitUncheckedUpdateWithoutCompanyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   derivedUnits?: Prisma.UnitUncheckedUpdateManyWithoutBaseUnitNestedInput
   products?: Prisma.ProductUncheckedUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedUpdateManyWithoutUnitNestedInput
+  saleItems?: Prisma.SaleItemUncheckedUpdateManyWithoutUnitNestedInput
 }
 
 export type UnitUncheckedUpdateManyWithoutCompanyInput = {
@@ -1116,6 +1358,8 @@ export type UnitUpdateWithoutBaseUnitInput = {
   company?: Prisma.CompanyUpdateOneRequiredWithoutUnitsNestedInput
   derivedUnits?: Prisma.UnitUpdateManyWithoutBaseUnitNestedInput
   products?: Prisma.ProductUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUpdateManyWithoutUnitNestedInput
+  saleItems?: Prisma.SaleItemUpdateManyWithoutUnitNestedInput
 }
 
 export type UnitUncheckedUpdateWithoutBaseUnitInput = {
@@ -1130,6 +1374,8 @@ export type UnitUncheckedUpdateWithoutBaseUnitInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   derivedUnits?: Prisma.UnitUncheckedUpdateManyWithoutBaseUnitNestedInput
   products?: Prisma.ProductUncheckedUpdateManyWithoutBaseUnitNestedInput
+  purchaseOrderItems?: Prisma.PurchaseOrderItemUncheckedUpdateManyWithoutUnitNestedInput
+  saleItems?: Prisma.SaleItemUncheckedUpdateManyWithoutUnitNestedInput
 }
 
 export type UnitUncheckedUpdateManyWithoutBaseUnitInput = {
@@ -1152,11 +1398,15 @@ export type UnitUncheckedUpdateManyWithoutBaseUnitInput = {
 export type UnitCountOutputType = {
   derivedUnits: number
   products: number
+  purchaseOrderItems: number
+  saleItems: number
 }
 
 export type UnitCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   derivedUnits?: boolean | UnitCountOutputTypeCountDerivedUnitsArgs
   products?: boolean | UnitCountOutputTypeCountProductsArgs
+  purchaseOrderItems?: boolean | UnitCountOutputTypeCountPurchaseOrderItemsArgs
+  saleItems?: boolean | UnitCountOutputTypeCountSaleItemsArgs
 }
 
 /**
@@ -1183,6 +1433,20 @@ export type UnitCountOutputTypeCountProductsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.ProductWhereInput
 }
 
+/**
+ * UnitCountOutputType without action
+ */
+export type UnitCountOutputTypeCountPurchaseOrderItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PurchaseOrderItemWhereInput
+}
+
+/**
+ * UnitCountOutputType without action
+ */
+export type UnitCountOutputTypeCountSaleItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SaleItemWhereInput
+}
+
 
 export type UnitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1200,6 +1464,8 @@ export type UnitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   baseUnit?: boolean | Prisma.Unit$baseUnitArgs<ExtArgs>
   derivedUnits?: boolean | Prisma.Unit$derivedUnitsArgs<ExtArgs>
   products?: boolean | Prisma.Unit$productsArgs<ExtArgs>
+  purchaseOrderItems?: boolean | Prisma.Unit$purchaseOrderItemsArgs<ExtArgs>
+  saleItems?: boolean | Prisma.Unit$saleItemsArgs<ExtArgs>
   _count?: boolean | Prisma.UnitCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["unit"]>
 
@@ -1255,6 +1521,8 @@ export type UnitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   baseUnit?: boolean | Prisma.Unit$baseUnitArgs<ExtArgs>
   derivedUnits?: boolean | Prisma.Unit$derivedUnitsArgs<ExtArgs>
   products?: boolean | Prisma.Unit$productsArgs<ExtArgs>
+  purchaseOrderItems?: boolean | Prisma.Unit$purchaseOrderItemsArgs<ExtArgs>
+  saleItems?: boolean | Prisma.Unit$saleItemsArgs<ExtArgs>
   _count?: boolean | Prisma.UnitCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UnitIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1276,6 +1544,8 @@ export type $UnitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     baseUnit: Prisma.$UnitPayload<ExtArgs> | null
     derivedUnits: Prisma.$UnitPayload<ExtArgs>[]
     products: Prisma.$ProductPayload<ExtArgs>[]
+    purchaseOrderItems: Prisma.$PurchaseOrderItemPayload<ExtArgs>[]
+    saleItems: Prisma.$SaleItemPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1687,6 +1957,8 @@ export interface Prisma__UnitClient<T, Null = never, ExtArgs extends runtime.Typ
   baseUnit<T extends Prisma.Unit$baseUnitArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Unit$baseUnitArgs<ExtArgs>>): Prisma.Prisma__UnitClient<runtime.Types.Result.GetResult<Prisma.$UnitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   derivedUnits<T extends Prisma.Unit$derivedUnitsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Unit$derivedUnitsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UnitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   products<T extends Prisma.Unit$productsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Unit$productsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  purchaseOrderItems<T extends Prisma.Unit$purchaseOrderItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Unit$purchaseOrderItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PurchaseOrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  saleItems<T extends Prisma.Unit$saleItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Unit$saleItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SaleItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2191,6 +2463,54 @@ export type Unit$productsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.ProductScalarFieldEnum | Prisma.ProductScalarFieldEnum[]
+}
+
+/**
+ * Unit.purchaseOrderItems
+ */
+export type Unit$purchaseOrderItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PurchaseOrderItem
+   */
+  select?: Prisma.PurchaseOrderItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PurchaseOrderItem
+   */
+  omit?: Prisma.PurchaseOrderItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PurchaseOrderItemInclude<ExtArgs> | null
+  where?: Prisma.PurchaseOrderItemWhereInput
+  orderBy?: Prisma.PurchaseOrderItemOrderByWithRelationInput | Prisma.PurchaseOrderItemOrderByWithRelationInput[]
+  cursor?: Prisma.PurchaseOrderItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PurchaseOrderItemScalarFieldEnum | Prisma.PurchaseOrderItemScalarFieldEnum[]
+}
+
+/**
+ * Unit.saleItems
+ */
+export type Unit$saleItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SaleItem
+   */
+  select?: Prisma.SaleItemSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SaleItem
+   */
+  omit?: Prisma.SaleItemOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SaleItemInclude<ExtArgs> | null
+  where?: Prisma.SaleItemWhereInput
+  orderBy?: Prisma.SaleItemOrderByWithRelationInput | Prisma.SaleItemOrderByWithRelationInput[]
+  cursor?: Prisma.SaleItemWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SaleItemScalarFieldEnum | Prisma.SaleItemScalarFieldEnum[]
 }
 
 /**

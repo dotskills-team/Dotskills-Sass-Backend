@@ -26,6 +26,11 @@ export class PurchaseOrderItemInputDto {
   @IsUUID()
   variantId?: string;
 
+  /** The Unit this line is entered in (e.g. "Carton") — omit to use the Product's own base unit, unchanged from today. Must resolve directly to the Product's base unit (one level of nesting only), checked via `UnitConversionService`. */
+  @IsOptional()
+  @IsUUID()
+  unitId?: string;
+
   @IsNumber(
     { maxDecimalPlaces: 4 },
     { message: 'orderedQty must have maximum 4 decimal places' },
