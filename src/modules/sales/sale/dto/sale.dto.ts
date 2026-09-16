@@ -11,7 +11,10 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { SalePaymentMethod } from 'src/generated/phase-1-prisma/enums';
+import {
+  SalePaymentMethod,
+  SaleStatus,
+} from 'src/generated/phase-1-prisma/enums';
 import { PaginationQueryDto } from '../../../../common/dto/pagination-query.dto';
 
 /** A shop can realistically record thousands of Sales over its lifetime — same reasoning as Purchase Order/Stock Transfer's pagination. */
@@ -19,6 +22,11 @@ export class ListSalesQueryDto extends PaginationQueryDto {
   @IsOptional()
   @IsUUID()
   locationId?: string;
+
+  /** Lets the Owner's Needs-Review inbox reuse this same list endpoint (`?status=NEEDS_REVIEW`) instead of a bespoke one. */
+  @IsOptional()
+  @IsEnum(SaleStatus)
+  status?: SaleStatus;
 }
 
 export class SaleItemInputDto {
@@ -110,6 +118,12 @@ export class CreateSaleDto {
   @IsString()
   @MaxLength(2000)
   note?: string;
+
+  /** Sent only by an offline sale replayed on reconnect — a client-generated key (e.g. a UUID minted at checkout time while offline). Omit for a normal, real-time sale. A replay with an already-seen key returns the existing Sale instead of creating a duplicate. */
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  idempotencyKey?: string;
 }
 
 export class VoidSaleDto {

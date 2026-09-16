@@ -671,6 +671,7 @@ export const SaleScalarFieldEnum = {
   cashDrawerSessionId: 'cashDrawerSessionId',
   saleNumber: 'saleNumber',
   status: 'status',
+  idempotencyKey: 'idempotencyKey',
   saleDate: 'saleDate',
   subtotal: 'subtotal',
   itemDiscountTotal: 'itemDiscountTotal',

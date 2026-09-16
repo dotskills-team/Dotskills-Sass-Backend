@@ -36,6 +36,7 @@ const SALE_SELECT = {
   processedByUserId: true,
   saleNumber: true,
   status: true,
+  idempotencyKey: true,
   saleDate: true,
   subtotal: true,
   itemDiscountTotal: true,
@@ -66,8 +67,8 @@ const SALE_SELECT = {
   },
 } satisfies Prisma.SaleSelect;
 
-function roundToNearestUnit(value: number): number {
-  return Math.round(value);
+function roundToNearestUnit(value: Prisma.Decimal): Prisma.Decimal {
+  return value.toDecimalPlaces(0);
 }
 
 @Injectable()
@@ -88,6 +89,7 @@ export class SaleService {
       tenantId: context.tenantId,
       companyId: context.companyId,
       ...(query.locationId ? { locationId: query.locationId } : {}),
+      ...(query.status ? { status: query.status } : {}),
     };
 
     const [sales, total] = await this.prisma.$transaction([
@@ -129,6 +131,26 @@ export class SaleService {
       context,
       dto.locationId,
     );
+
+    // Offline-sync replay guard — a queued offline sale carries a
+    // client-generated idempotencyKey; if this exact sale already made it
+    // to the server (e.g. the device retried after a flaky reconnect, or
+    // the same queued sale got synced twice), return the Sale that already
+    // exists instead of creating a duplicate. A normal, real-time sale
+    // never sends this field and always falls through unchanged.
+    if (dto.idempotencyKey) {
+      const existing = await this.prisma.sale.findFirst({
+        where: {
+          tenantId: context.tenantId,
+          companyId: context.companyId,
+          idempotencyKey: dto.idempotencyKey,
+        },
+        select: SALE_SELECT,
+      });
+      if (existing) {
+        return { success: true, data: existing, warnings: [] };
+      }
+    }
 
     const settings = await this.prisma.companySettings.findUniqueOrThrow({
       where: { companyId: context.companyId },
@@ -266,10 +288,14 @@ export class SaleService {
       const baseSalePrice = variant ? variant.salePrice : product.salePrice;
       const baseCostPrice = variant ? variant.costPrice : product.costPrice;
       const enteredUnitCost = baseCostPrice.times(factor);
-      const defaultUnitPrice = Number(baseSalePrice.times(factor));
-      const unitPrice = item.unitPrice ?? defaultUnitPrice;
-      const discountAmount = item.discountAmount ?? 0;
-      const lineSubtotal = item.quantity * unitPrice - discountAmount;
+      const defaultUnitPrice = baseSalePrice.times(factor);
+      const unitPrice =
+        item.unitPrice != null
+          ? new Prisma.Decimal(item.unitPrice)
+          : defaultUnitPrice;
+      const discountAmount = new Prisma.Decimal(item.discountAmount ?? 0);
+      const quantity = new Prisma.Decimal(item.quantity);
+      const lineSubtotal = quantity.times(unitPrice).minus(discountAmount);
       return {
         item,
         product,
@@ -277,46 +303,92 @@ export class SaleService {
         factor,
         baseCostPrice,
         unitCost: enteredUnitCost,
+        quantity,
         unitPrice,
         discountAmount,
         lineSubtotal,
       };
     });
 
+    // Offline-sync stock check — only for a replayed offline sale
+    // (dto.idempotencyKey set). A normal, real-time sale keeps today's
+    // behavior unchanged: insufficient stock rejects the whole sale
+    // outright, below, via decreaseStock's own ConflictException. A
+    // replayed offline sale instead gets recorded as NEEDS_REVIEW rather
+    // than rejected or forced negative — the cashier already handed the
+    // goods over before the connection came back, so rejecting now would
+    // be meaningless, and forcing stock negative would violate the
+    // non-negotiable rule. Aggregated per product+variant (not per line)
+    // since two lines can target the same product/variant.
+    let needsReview = false;
+    if (dto.idempotencyKey && !settings.allowNegativeStock) {
+      const requiredByKey = new Map<string, Prisma.Decimal>();
+      for (const l of lineItems) {
+        const key = `${l.product.id}:${l.variantId ?? ''}`;
+        const baseQty = l.quantity.times(l.factor);
+        requiredByKey.set(
+          key,
+          (requiredByKey.get(key) ?? new Prisma.Decimal(0)).plus(baseQty),
+        );
+      }
+      for (const [key, requiredQty] of requiredByKey) {
+        const [productId, variantId] = key.split(':');
+        const balance = await this.inventoryService.getBalance(
+          context,
+          productId,
+          dto.locationId,
+          variantId || undefined,
+        );
+        if (new Prisma.Decimal(balance.data.quantity).lessThan(requiredQty)) {
+          needsReview = true;
+          break;
+        }
+      }
+    }
+
     const subtotal = lineItems.reduce(
-      (sum, l) => sum + l.item.quantity * l.unitPrice,
-      0,
+      (sum, l) => sum.plus(l.quantity.times(l.unitPrice)),
+      new Prisma.Decimal(0),
     );
     const itemDiscountTotal = lineItems.reduce(
-      (sum, l) => sum + l.discountAmount,
-      0,
+      (sum, l) => sum.plus(l.discountAmount),
+      new Prisma.Decimal(0),
     );
-    const afterItemDiscounts = subtotal - itemDiscountTotal;
-    const saleDiscountAmount = dto.saleDiscountAmount ?? 0;
-    const afterSaleDiscount = afterItemDiscounts - saleDiscountAmount;
+    const afterItemDiscounts = subtotal.minus(itemDiscountTotal);
+    const saleDiscountAmount = new Prisma.Decimal(dto.saleDiscountAmount ?? 0);
+    const afterSaleDiscount = afterItemDiscounts.minus(saleDiscountAmount);
     const taxAmount = settings.enableTax
-      ? afterSaleDiscount * (Number(settings.defaultTaxRate) / 100)
-      : 0;
-    const totalAmount = roundToNearestUnit(afterSaleDiscount + taxAmount);
+      ? afterSaleDiscount.times(settings.defaultTaxRate).dividedBy(100)
+      : new Prisma.Decimal(0);
+    const totalAmount = roundToNearestUnit(afterSaleDiscount.plus(taxAmount));
 
-    const paymentsTotal = dto.payments.reduce((sum, p) => sum + p.amount, 0);
-    if (Math.abs(paymentsTotal - totalAmount) > 0.01) {
+    const paymentsTotal = dto.payments.reduce(
+      (sum, p) => sum.plus(p.amount),
+      new Prisma.Decimal(0),
+    );
+    if (paymentsTotal.minus(totalAmount).abs().greaterThan(0.01)) {
       throw new BadRequestException(
-        `Sum of payments (${paymentsTotal}) must equal the computed total (${totalAmount})`,
+        `Sum of payments (${paymentsTotal.toString()}) must equal the computed total (${totalAmount.toString()})`,
       );
     }
 
-    const dueAmountThisSale = duePayments.reduce((sum, p) => sum + p.amount, 0);
+    const dueAmountThisSale = duePayments.reduce(
+      (sum, p) => sum.plus(p.amount),
+      new Prisma.Decimal(0),
+    );
     const warnings: string[] = [];
     if (
       customer &&
       settings.maxCustomerDueLimit != null &&
-      dueAmountThisSale > 0
+      dueAmountThisSale.greaterThan(0)
     ) {
-      const projectedDue = Number(customer.dueBalance) + dueAmountThisSale;
-      if (projectedDue > Number(settings.maxCustomerDueLimit)) {
+      const projectedDue = customer.dueBalance.plus(dueAmountThisSale);
+      if (projectedDue.greaterThan(settings.maxCustomerDueLimit)) {
         warnings.push('DUE_LIMIT_EXCEEDED');
       }
+    }
+    if (needsReview) {
+      warnings.push('NEEDS_REVIEW_INSUFFICIENT_STOCK');
     }
 
     let sale;
@@ -349,6 +421,8 @@ export class SaleService {
             processedByUserId: actor.userId,
             cashDrawerSessionId: openSession?.id ?? null,
             saleNumber,
+            status: needsReview ? SaleStatus.NEEDS_REVIEW : undefined,
+            idempotencyKey: dto.idempotencyKey,
             subtotal,
             itemDiscountTotal,
             saleDiscountAmount,
@@ -361,7 +435,7 @@ export class SaleService {
                 variantId: l.variantId,
                 unitId: l.item.unitId,
                 productName: l.product.name,
-                quantity: l.item.quantity,
+                quantity: l.quantity,
                 unitPrice: l.unitPrice,
                 unitCost: l.unitCost,
                 discountAmount: l.discountAmount,
@@ -379,28 +453,34 @@ export class SaleService {
           select: SALE_SELECT,
         });
 
-        for (const l of lineItems) {
-          // Conversion boundary — Inventory always operates in the
-          // Product's base unit, regardless of which unit this line was
-          // actually sold in. `baseCostPrice` (not `l.unitCost`, which is
-          // scaled to the line's own entered unit) is the correct
-          // per-base-unit cost for StockMovement.
-          await this.inventoryService.decreaseStock(tx, {
-            tenantId: context.tenantId,
-            companyId: context.companyId,
-            productId: l.product.id,
-            variantId: l.variantId,
-            locationId: dto.locationId,
-            quantity: new Prisma.Decimal(l.item.quantity).times(l.factor),
-            movementType: StockMovementType.SALE,
-            referenceId: created.id,
-            actorUserId: actor.userId,
-            unitCost: l.baseCostPrice,
-            allowNegative: settings.allowNegativeStock,
-          });
+        // Inventory is deliberately left untouched for a NEEDS_REVIEW sale
+        // — the pre-transaction check above already found it insufficient,
+        // and decrementing anyway (even with allowNegative) would pre-empt
+        // the Owner's manual resolution this status exists for.
+        if (!needsReview) {
+          for (const l of lineItems) {
+            // Conversion boundary — Inventory always operates in the
+            // Product's base unit, regardless of which unit this line was
+            // actually sold in. `baseCostPrice` (not `l.unitCost`, which is
+            // scaled to the line's own entered unit) is the correct
+            // per-base-unit cost for StockMovement.
+            await this.inventoryService.decreaseStock(tx, {
+              tenantId: context.tenantId,
+              companyId: context.companyId,
+              productId: l.product.id,
+              variantId: l.variantId,
+              locationId: dto.locationId,
+              quantity: l.quantity.times(l.factor),
+              movementType: StockMovementType.SALE,
+              referenceId: created.id,
+              actorUserId: actor.userId,
+              unitCost: l.baseCostPrice,
+              allowNegative: settings.allowNegativeStock,
+            });
+          }
         }
 
-        if (dueAmountThisSale > 0 && customer) {
+        if (dueAmountThisSale.greaterThan(0) && customer) {
           await tx.customerDueLedger.create({
             data: {
               tenantId: context.tenantId,
@@ -424,10 +504,13 @@ export class SaleService {
           // per the plan's Q5 duplicate-prevention design. Resets only
           // once a payment brings them back under the limit.
           if (settings.maxCustomerDueLimit != null) {
-            const beforeDue = Number(customer.dueBalance);
-            const afterDue = beforeDue + dueAmountThisSale;
-            const limit = Number(settings.maxCustomerDueLimit);
-            if (beforeDue <= limit && afterDue > limit) {
+            const beforeDue = customer.dueBalance;
+            const afterDue = beforeDue.plus(dueAmountThisSale);
+            const limit = settings.maxCustomerDueLimit;
+            if (
+              beforeDue.lessThanOrEqualTo(limit) &&
+              afterDue.greaterThan(limit)
+            ) {
               await this.notificationService.create(tx, context, {
                 type: NotificationType.CUSTOMER_DUE_OVERDUE,
                 relatedEntityType: NotificationRelatedEntityType.CUSTOMER,
@@ -440,6 +523,19 @@ export class SaleService {
               });
             }
           }
+        }
+
+        if (needsReview) {
+          await this.notificationService.create(tx, context, {
+            type: NotificationType.SALE_NEEDS_REVIEW,
+            relatedEntityType: NotificationRelatedEntityType.SALE,
+            relatedEntityId: created.id,
+            locationId: dto.locationId,
+            metadata: {
+              saleNumber,
+              reason: 'INSUFFICIENT_STOCK_AT_SYNC',
+            },
+          });
         }
 
         await this.createAudit(
@@ -488,7 +584,7 @@ export class SaleService {
 
     const dueAmount = before.payments
       .filter((p) => p.method === SalePaymentMethod.DUE)
-      .reduce((sum, p) => sum + Number(p.amount), 0);
+      .reduce((sum, p) => sum.plus(p.amount), new Prisma.Decimal(0));
 
     // Same conversion boundary as create() — `item.quantity`/`item.unitCost`
     // are stored in each line's own entered unit, so restoring stock
@@ -519,32 +615,22 @@ export class SaleService {
           productId: item.productId,
           variantId: item.variantId ?? undefined,
           locationId: before.locationId,
-          quantity: new Prisma.Decimal(item.quantity).times(factor),
+          quantity: item.quantity.times(factor),
           movementType: StockMovementType.SALE_VOID_IN,
           referenceId: before.id,
           actorUserId: actor.userId,
-          unitCost: new Prisma.Decimal(item.unitCost).dividedBy(factor),
+          unitCost: item.unitCost.dividedBy(factor),
         });
       }
 
-      if (dueAmount > 0 && before.customerId) {
-        await tx.customerDueLedger.create({
-          data: {
-            tenantId: context.tenantId,
-            companyId: context.companyId,
-            customerId: before.customerId,
-            entryType: CustomerLedgerEntryType.PAYMENT,
-            amount: dueAmount,
-            referenceId: before.id,
-            note: 'Sale voided — due reversed',
-            actorUserId: actor.userId,
-          },
-        });
-        await tx.customer.update({
-          where: { id: before.customerId },
-          data: { dueBalance: { decrement: dueAmount } },
-        });
-      }
+      await this.reverseDueLedgerIfAny(
+        tx,
+        context,
+        before,
+        dueAmount,
+        actor.userId,
+        'Sale voided — due reversed',
+      );
 
       const updated = await tx.sale.update({
         where: { id },
@@ -562,6 +648,161 @@ export class SaleService {
         context,
         actor.userId,
         'SALE_VOIDED',
+        updated.id,
+        before,
+        updated,
+      );
+      return updated;
+    });
+
+    return { success: true, data: sale };
+  }
+
+  /**
+   * Owner/Manager resolves a NEEDS_REVIEW sale (an offline-replayed sale
+   * whose stock check failed at sync time) by re-attempting the stock
+   * decrement now, exactly as create() would have. If stock is still
+   * insufficient, decreaseStock's own ConflictException rolls back the
+   * whole attempt and the sale stays NEEDS_REVIEW untouched — approve()
+   * never forces stock negative, the same non-negotiable rule create()
+   * itself follows. Uses the normal SALE movement type (not a "late" or
+   * "review" variant) since this is simply the originally-intended
+   * decrement, delayed — referenced against the sale's own id, same as
+   * create() would have stamped it.
+   */
+  async approveNeedsReview(
+    context: CompanyContext,
+    id: string,
+    actor: AuthenticatedUser,
+  ) {
+    const before = await this.requireSale(context, id);
+    if (before.status !== SaleStatus.NEEDS_REVIEW) {
+      throw new BadRequestException(
+        `Only a NEEDS_REVIEW sale can be approved (current status: ${before.status})`,
+      );
+    }
+
+    const settings = await this.prisma.companySettings.findUniqueOrThrow({
+      where: { companyId: context.companyId },
+      select: { allowNegativeStock: true },
+    });
+
+    const productIds = [...new Set(before.items.map((item) => item.productId))];
+    const products = await this.prisma.product.findMany({
+      where: {
+        id: { in: productIds },
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+      },
+      select: { id: true, baseUnitId: true },
+    });
+    const productsById = new Map(products.map((p) => [p.id, p]));
+
+    let sale;
+    try {
+      sale = await this.prisma.$transaction(async (tx) => {
+        for (const item of before.items) {
+          const product = productsById.get(item.productId)!;
+          const factor = await this.unitConversionService.resolveFactor(
+            context,
+            product.baseUnitId,
+            item.unitId,
+          );
+          await this.inventoryService.decreaseStock(tx, {
+            tenantId: context.tenantId,
+            companyId: context.companyId,
+            productId: item.productId,
+            variantId: item.variantId ?? undefined,
+            locationId: before.locationId,
+            quantity: item.quantity.times(factor),
+            movementType: StockMovementType.SALE,
+            referenceId: before.id,
+            actorUserId: actor.userId,
+            unitCost: item.unitCost.dividedBy(factor),
+            allowNegative: settings.allowNegativeStock,
+          });
+        }
+
+        const updated = await tx.sale.update({
+          where: { id },
+          data: { status: SaleStatus.COMPLETED },
+          select: SALE_SELECT,
+        });
+
+        await this.createAudit(
+          tx,
+          context,
+          actor.userId,
+          'SALE_NEEDS_REVIEW_APPROVED',
+          updated.id,
+          before,
+          updated,
+        );
+        return updated;
+      });
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw new BadRequestException(
+          'INSUFFICIENT_STOCK: stock is still not enough to approve this sale — adjust stock first, or reject the sale instead',
+        );
+      }
+      throw error;
+    }
+
+    return { success: true, data: sale };
+  }
+
+  /**
+   * Owner/Manager rejects a NEEDS_REVIEW sale outright — voids it without
+   * ever touching Inventory (there is nothing to restore: a NEEDS_REVIEW
+   * sale's stock was deliberately never decremented in the first place).
+   * Reverses any DUE portion the same way void() does, since that ledger
+   * entry/balance update already happened unconditionally at create()
+   * time, independent of the stock outcome.
+   */
+  async rejectNeedsReview(
+    context: CompanyContext,
+    id: string,
+    dto: VoidSaleDto,
+    actor: AuthenticatedUser,
+  ) {
+    const before = await this.requireSale(context, id);
+    if (before.status !== SaleStatus.NEEDS_REVIEW) {
+      throw new BadRequestException(
+        `Only a NEEDS_REVIEW sale can be rejected (current status: ${before.status})`,
+      );
+    }
+
+    const dueAmount = before.payments
+      .filter((p) => p.method === SalePaymentMethod.DUE)
+      .reduce((sum, p) => sum.plus(p.amount), new Prisma.Decimal(0));
+
+    const sale = await this.prisma.$transaction(async (tx) => {
+      await this.reverseDueLedgerIfAny(
+        tx,
+        context,
+        before,
+        dueAmount,
+        actor.userId,
+        'Sale rejected — due reversed',
+      );
+
+      const updated = await tx.sale.update({
+        where: { id },
+        data: {
+          status: SaleStatus.VOIDED,
+          voidedAt: new Date(),
+          voidReason: dto.reason.trim(),
+          voidedByUserId: actor.userId,
+        },
+        select: SALE_SELECT,
+      });
+
+      await this.createAudit(
+        tx,
+        context,
+        actor.userId,
+        'SALE_NEEDS_REVIEW_REJECTED',
         updated.id,
         before,
         updated,
@@ -617,6 +858,8 @@ export class SaleService {
     });
     const productsById = new Map(products.map((p) => [p.id, p]));
 
+    const refundAmount = new Prisma.Decimal(dto.refundAmount ?? 0);
+
     const result = await this.prisma.$transaction(async (tx) => {
       const saleReturn = await tx.saleReturn.create({
         data: {
@@ -624,7 +867,7 @@ export class SaleService {
           companyId: context.companyId,
           saleId: id,
           reason: dto.reason.trim(),
-          refundAmount: dto.refundAmount ?? 0,
+          refundAmount,
           actorUserId: actor.userId,
         },
       });
@@ -656,12 +899,11 @@ export class SaleService {
           movementType: StockMovementType.SALE_RETURN_IN,
           referenceId: saleReturn.id,
           actorUserId: actor.userId,
-          unitCost: new Prisma.Decimal(saleItem.unitCost).dividedBy(factor),
+          unitCost: saleItem.unitCost.dividedBy(factor),
         });
       }
 
-      const refundAmount = dto.refundAmount ?? 0;
-      if (refundAmount > 0 && sale.customerId) {
+      if (refundAmount.greaterThan(0) && sale.customerId) {
         await tx.customerDueLedger.create({
           data: {
             tenantId: context.tenantId,
@@ -714,6 +956,41 @@ export class SaleService {
     });
     if (!sale) throw new NotFoundException('Sale was not found');
     return sale;
+  }
+
+  /**
+   * Shared by void() and rejectNeedsReview() — both are "this sale is no
+   * longer happening" outcomes that must reverse any DUE portion the same
+   * way, differing only in whether Inventory also needs restoring (void()
+   * does its own stock-restore loop first; a NEEDS_REVIEW sale never had
+   * its stock decremented, so rejectNeedsReview() has nothing to restore).
+   */
+  private async reverseDueLedgerIfAny(
+    tx: Prisma.TransactionClient,
+    context: CompanyContext,
+    sale: { id: string; customerId: string | null },
+    dueAmount: Prisma.Decimal,
+    actorUserId: string,
+    note: string,
+  ) {
+    if (!dueAmount.greaterThan(0) || !sale.customerId) return;
+
+    await tx.customerDueLedger.create({
+      data: {
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+        customerId: sale.customerId,
+        entryType: CustomerLedgerEntryType.PAYMENT,
+        amount: dueAmount,
+        referenceId: sale.id,
+        note,
+        actorUserId,
+      },
+    });
+    await tx.customer.update({
+      where: { id: sale.customerId },
+      data: { dueBalance: { decrement: dueAmount } },
+    });
   }
 
   /** Company-scoped sequence, mirrors PurchaseOrderService.reserveOrderNumber() exactly. */

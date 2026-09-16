@@ -95,4 +95,31 @@ export class SaleController {
   ) {
     return this.service.createReturn(context, id, dto, actor);
   }
+
+  /**
+   * Owner/Manager-only, same tier as void() — resolves a NEEDS_REVIEW
+   * sale (an offline-replayed sale whose stock check failed at sync
+   * time) by re-attempting the stock decrement now.
+   */
+  @Post(':id/approve')
+  @RequireCompanyPermissions(COMPANY_PERMISSIONS.SALE_VOID)
+  approveNeedsReview(
+    @CurrentCompany() context: CompanyContext,
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.service.approveNeedsReview(context, id, actor);
+  }
+
+  /** Owner/Manager-only, same tier as void() — rejects a NEEDS_REVIEW sale outright, never touching Inventory. */
+  @Post(':id/reject')
+  @RequireCompanyPermissions(COMPANY_PERMISSIONS.SALE_VOID)
+  rejectNeedsReview(
+    @CurrentCompany() context: CompanyContext,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: VoidSaleDto,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.service.rejectNeedsReview(context, id, dto, actor);
+  }
 }

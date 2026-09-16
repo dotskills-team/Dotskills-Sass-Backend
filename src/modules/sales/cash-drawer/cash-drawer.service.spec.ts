@@ -17,6 +17,21 @@ import { LocationAccessService } from '../../../common/services/location-access.
 import { NotificationService } from '../../notification/notification.service';
 import { CashDrawerSessionService } from './cash-drawer.service';
 
+/**
+ * closeSession()/openSession() now compute in `Prisma.Decimal` end-to-end
+ * — this asymmetric matcher compares via `.toString()` instead of
+ * `toHaveBeenCalledWith`'s default deep-equal, which would otherwise fail
+ * a Decimal against a plain number even when the represented value is
+ * identical.
+ */
+function decimalMatch(expected: string) {
+  return {
+    asymmetricMatch: (actual: { toString(): string }) =>
+      actual?.toString?.() === expected,
+    toString: () => `Decimal(${expected})`,
+  };
+}
+
 describe('CashDrawerSessionService', () => {
   let service: CashDrawerSessionService;
 
@@ -114,12 +129,12 @@ describe('CashDrawerSessionService', () => {
       expect(mockTx.cashDrawerSession.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            openingBalance: 500,
+            openingBalance: decimalMatch('500'),
             cashierId: 'cashier-1',
           }),
         }),
       );
-      expect(result.data.openingBalance).toBe(500);
+      expect(result.data.openingBalance).toEqual(decimalMatch('500'));
     });
 
     it("derives openingBalance from the previous CLOSED session's actualClosingBalance, ignoring any client-supplied value", async () => {
@@ -134,7 +149,7 @@ describe('CashDrawerSessionService', () => {
       );
 
       const createCall = mockTx.cashDrawerSession.create.mock.calls[0][0];
-      expect(createCall.data.openingBalance).toBe(742.5);
+      expect(createCall.data.openingBalance).toEqual(decimalMatch('742.5'));
     });
 
     it('translates a P2002 (partial unique index violation) into ConflictException', async () => {
@@ -263,9 +278,13 @@ describe('CashDrawerSessionService', () => {
         }),
       );
       const updateCall = mockTx.cashDrawerSession.update.mock.calls[0][0];
-      expect(updateCall.data.expectedClosingBalance).toBe(1350); // 1000 + 350
-      expect(updateCall.data.actualClosingBalance).toBe(1340);
-      expect(updateCall.data.variance).toBe(-10); // 1340 - 1350
+      expect(updateCall.data.expectedClosingBalance).toEqual(
+        decimalMatch('1350'),
+      ); // 1000 + 350
+      expect(updateCall.data.actualClosingBalance).toEqual(
+        decimalMatch('1340'),
+      );
+      expect(updateCall.data.variance).toEqual(decimalMatch('-10')); // 1340 - 1350
       expect(updateCall.data.status).toBe(CashDrawerSessionStatus.CLOSED);
       expect(result.success).toBe(true);
     });
@@ -284,7 +303,7 @@ describe('CashDrawerSessionService', () => {
 
       expect(result.success).toBe(true);
       const updateCall = mockTx.cashDrawerSession.update.mock.calls[0][0];
-      expect(updateCall.data.variance).toBe(4000); // 5000 - 1000 (no cash sales)
+      expect(updateCall.data.variance).toEqual(decimalMatch('4000')); // 5000 - 1000 (no cash sales)
     });
 
     describe('CASH_DRAWER_VARIANCE notification', () => {

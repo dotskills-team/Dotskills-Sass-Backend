@@ -52,6 +52,7 @@ export type SaleMinAggregateOutputType = {
   cashDrawerSessionId: string | null
   saleNumber: string | null
   status: $Enums.SaleStatus | null
+  idempotencyKey: string | null
   saleDate: Date | null
   subtotal: runtime.Decimal | null
   itemDiscountTotal: runtime.Decimal | null
@@ -76,6 +77,7 @@ export type SaleMaxAggregateOutputType = {
   cashDrawerSessionId: string | null
   saleNumber: string | null
   status: $Enums.SaleStatus | null
+  idempotencyKey: string | null
   saleDate: Date | null
   subtotal: runtime.Decimal | null
   itemDiscountTotal: runtime.Decimal | null
@@ -100,6 +102,7 @@ export type SaleCountAggregateOutputType = {
   cashDrawerSessionId: number
   saleNumber: number
   status: number
+  idempotencyKey: number
   saleDate: number
   subtotal: number
   itemDiscountTotal: number
@@ -142,6 +145,7 @@ export type SaleMinAggregateInputType = {
   cashDrawerSessionId?: true
   saleNumber?: true
   status?: true
+  idempotencyKey?: true
   saleDate?: true
   subtotal?: true
   itemDiscountTotal?: true
@@ -166,6 +170,7 @@ export type SaleMaxAggregateInputType = {
   cashDrawerSessionId?: true
   saleNumber?: true
   status?: true
+  idempotencyKey?: true
   saleDate?: true
   subtotal?: true
   itemDiscountTotal?: true
@@ -190,6 +195,7 @@ export type SaleCountAggregateInputType = {
   cashDrawerSessionId?: true
   saleNumber?: true
   status?: true
+  idempotencyKey?: true
   saleDate?: true
   subtotal?: true
   itemDiscountTotal?: true
@@ -301,6 +307,7 @@ export type SaleGroupByOutputType = {
   cashDrawerSessionId: string | null
   saleNumber: string
   status: $Enums.SaleStatus
+  idempotencyKey: string | null
   saleDate: Date
   subtotal: runtime.Decimal
   itemDiscountTotal: runtime.Decimal
@@ -348,6 +355,7 @@ export type SaleWhereInput = {
   cashDrawerSessionId?: Prisma.UuidNullableFilter<"Sale"> | string | null
   saleNumber?: Prisma.StringFilter<"Sale"> | string
   status?: Prisma.EnumSaleStatusFilter<"Sale"> | $Enums.SaleStatus
+  idempotencyKey?: Prisma.StringNullableFilter<"Sale"> | string | null
   saleDate?: Prisma.DateTimeFilter<"Sale"> | Date | string
   subtotal?: Prisma.DecimalFilter<"Sale"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFilter<"Sale"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -380,6 +388,7 @@ export type SaleOrderByWithRelationInput = {
   cashDrawerSessionId?: Prisma.SortOrderInput | Prisma.SortOrder
   saleNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder
   saleDate?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   itemDiscountTotal?: Prisma.SortOrder
@@ -416,6 +425,7 @@ export type SaleWhereUniqueInput = Prisma.AtLeast<{
   cashDrawerSessionId?: Prisma.UuidNullableFilter<"Sale"> | string | null
   saleNumber?: Prisma.StringFilter<"Sale"> | string
   status?: Prisma.EnumSaleStatusFilter<"Sale"> | $Enums.SaleStatus
+  idempotencyKey?: Prisma.StringNullableFilter<"Sale"> | string | null
   saleDate?: Prisma.DateTimeFilter<"Sale"> | Date | string
   subtotal?: Prisma.DecimalFilter<"Sale"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFilter<"Sale"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -448,6 +458,7 @@ export type SaleOrderByWithAggregationInput = {
   cashDrawerSessionId?: Prisma.SortOrderInput | Prisma.SortOrder
   saleNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrderInput | Prisma.SortOrder
   saleDate?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   itemDiscountTotal?: Prisma.SortOrder
@@ -480,6 +491,7 @@ export type SaleScalarWhereWithAggregatesInput = {
   cashDrawerSessionId?: Prisma.UuidNullableWithAggregatesFilter<"Sale"> | string | null
   saleNumber?: Prisma.StringWithAggregatesFilter<"Sale"> | string
   status?: Prisma.EnumSaleStatusWithAggregatesFilter<"Sale"> | $Enums.SaleStatus
+  idempotencyKey?: Prisma.StringNullableWithAggregatesFilter<"Sale"> | string | null
   saleDate?: Prisma.DateTimeWithAggregatesFilter<"Sale"> | Date | string
   subtotal?: Prisma.DecimalWithAggregatesFilter<"Sale"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalWithAggregatesFilter<"Sale"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -499,6 +511,7 @@ export type SaleCreateInput = {
   processedByUserId: string
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -531,6 +544,7 @@ export type SaleUncheckedCreateInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -553,6 +567,7 @@ export type SaleUpdateInput = {
   processedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -585,6 +600,7 @@ export type SaleUncheckedUpdateInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -612,6 +628,7 @@ export type SaleCreateManyInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -631,6 +648,7 @@ export type SaleUpdateManyMutationInput = {
   processedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -655,6 +673,7 @@ export type SaleUncheckedUpdateManyInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -695,6 +714,7 @@ export type SaleCountOrderByAggregateInput = {
   cashDrawerSessionId?: Prisma.SortOrder
   saleNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
   saleDate?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   itemDiscountTotal?: Prisma.SortOrder
@@ -727,6 +747,7 @@ export type SaleMaxOrderByAggregateInput = {
   cashDrawerSessionId?: Prisma.SortOrder
   saleNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
   saleDate?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   itemDiscountTotal?: Prisma.SortOrder
@@ -751,6 +772,7 @@ export type SaleMinOrderByAggregateInput = {
   cashDrawerSessionId?: Prisma.SortOrder
   saleNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  idempotencyKey?: Prisma.SortOrder
   saleDate?: Prisma.SortOrder
   subtotal?: Prisma.SortOrder
   itemDiscountTotal?: Prisma.SortOrder
@@ -1039,6 +1061,7 @@ export type SaleCreateWithoutTenantInput = {
   processedByUserId: string
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1069,6 +1092,7 @@ export type SaleUncheckedCreateWithoutTenantInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1125,6 +1149,7 @@ export type SaleScalarWhereInput = {
   cashDrawerSessionId?: Prisma.UuidNullableFilter<"Sale"> | string | null
   saleNumber?: Prisma.StringFilter<"Sale"> | string
   status?: Prisma.EnumSaleStatusFilter<"Sale"> | $Enums.SaleStatus
+  idempotencyKey?: Prisma.StringNullableFilter<"Sale"> | string | null
   saleDate?: Prisma.DateTimeFilter<"Sale"> | Date | string
   subtotal?: Prisma.DecimalFilter<"Sale"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFilter<"Sale"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1144,6 +1169,7 @@ export type SaleCreateWithoutCompanyInput = {
   processedByUserId: string
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1174,6 +1200,7 @@ export type SaleUncheckedCreateWithoutCompanyInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1222,6 +1249,7 @@ export type SaleCreateWithoutLocationInput = {
   processedByUserId: string
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1252,6 +1280,7 @@ export type SaleUncheckedCreateWithoutLocationInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1300,6 +1329,7 @@ export type SaleCreateWithoutCustomerInput = {
   processedByUserId: string
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1330,6 +1360,7 @@ export type SaleUncheckedCreateWithoutCustomerInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1378,6 +1409,7 @@ export type SaleCreateWithoutItemsInput = {
   processedByUserId: string
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1409,6 +1441,7 @@ export type SaleUncheckedCreateWithoutItemsInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1446,6 +1479,7 @@ export type SaleUpdateWithoutItemsInput = {
   processedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1477,6 +1511,7 @@ export type SaleUncheckedUpdateWithoutItemsInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1498,6 +1533,7 @@ export type SaleCreateWithoutPaymentsInput = {
   processedByUserId: string
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1529,6 +1565,7 @@ export type SaleUncheckedCreateWithoutPaymentsInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1566,6 +1603,7 @@ export type SaleUpdateWithoutPaymentsInput = {
   processedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1597,6 +1635,7 @@ export type SaleUncheckedUpdateWithoutPaymentsInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1618,6 +1657,7 @@ export type SaleCreateWithoutReturnsInput = {
   processedByUserId: string
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1649,6 +1689,7 @@ export type SaleUncheckedCreateWithoutReturnsInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1686,6 +1727,7 @@ export type SaleUpdateWithoutReturnsInput = {
   processedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1717,6 +1759,7 @@ export type SaleUncheckedUpdateWithoutReturnsInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1738,6 +1781,7 @@ export type SaleCreateWithoutCashDrawerSessionInput = {
   processedByUserId: string
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1768,6 +1812,7 @@ export type SaleUncheckedCreateWithoutCashDrawerSessionInput = {
   processedByUserId: string
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1820,6 +1865,7 @@ export type SaleCreateManyTenantInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1839,6 +1885,7 @@ export type SaleUpdateWithoutTenantInput = {
   processedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1869,6 +1916,7 @@ export type SaleUncheckedUpdateWithoutTenantInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1895,6 +1943,7 @@ export type SaleUncheckedUpdateManyWithoutTenantInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1918,6 +1967,7 @@ export type SaleCreateManyCompanyInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1937,6 +1987,7 @@ export type SaleUpdateWithoutCompanyInput = {
   processedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1967,6 +2018,7 @@ export type SaleUncheckedUpdateWithoutCompanyInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1993,6 +2045,7 @@ export type SaleUncheckedUpdateManyWithoutCompanyInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2016,6 +2069,7 @@ export type SaleCreateManyLocationInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2035,6 +2089,7 @@ export type SaleUpdateWithoutLocationInput = {
   processedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2065,6 +2120,7 @@ export type SaleUncheckedUpdateWithoutLocationInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2091,6 +2147,7 @@ export type SaleUncheckedUpdateManyWithoutLocationInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2114,6 +2171,7 @@ export type SaleCreateManyCustomerInput = {
   cashDrawerSessionId?: string | null
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2133,6 +2191,7 @@ export type SaleUpdateWithoutCustomerInput = {
   processedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2163,6 +2222,7 @@ export type SaleUncheckedUpdateWithoutCustomerInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2189,6 +2249,7 @@ export type SaleUncheckedUpdateManyWithoutCustomerInput = {
   cashDrawerSessionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2212,6 +2273,7 @@ export type SaleCreateManyCashDrawerSessionInput = {
   processedByUserId: string
   saleNumber: string
   status?: $Enums.SaleStatus
+  idempotencyKey?: string | null
   saleDate?: Date | string
   subtotal: runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2231,6 +2293,7 @@ export type SaleUpdateWithoutCashDrawerSessionInput = {
   processedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2261,6 +2324,7 @@ export type SaleUncheckedUpdateWithoutCashDrawerSessionInput = {
   processedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2287,6 +2351,7 @@ export type SaleUncheckedUpdateManyWithoutCashDrawerSessionInput = {
   processedByUserId?: Prisma.StringFieldUpdateOperationsInput | string
   saleNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumSaleStatusFieldUpdateOperationsInput | $Enums.SaleStatus
+  idempotencyKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saleDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subtotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   itemDiscountTotal?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2360,6 +2425,7 @@ export type SaleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   cashDrawerSessionId?: boolean
   saleNumber?: boolean
   status?: boolean
+  idempotencyKey?: boolean
   saleDate?: boolean
   subtotal?: boolean
   itemDiscountTotal?: boolean
@@ -2393,6 +2459,7 @@ export type SaleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   cashDrawerSessionId?: boolean
   saleNumber?: boolean
   status?: boolean
+  idempotencyKey?: boolean
   saleDate?: boolean
   subtotal?: boolean
   itemDiscountTotal?: boolean
@@ -2422,6 +2489,7 @@ export type SaleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   cashDrawerSessionId?: boolean
   saleNumber?: boolean
   status?: boolean
+  idempotencyKey?: boolean
   saleDate?: boolean
   subtotal?: boolean
   itemDiscountTotal?: boolean
@@ -2451,6 +2519,7 @@ export type SaleSelectScalar = {
   cashDrawerSessionId?: boolean
   saleNumber?: boolean
   status?: boolean
+  idempotencyKey?: boolean
   saleDate?: boolean
   subtotal?: boolean
   itemDiscountTotal?: boolean
@@ -2465,7 +2534,7 @@ export type SaleSelectScalar = {
   updatedAt?: boolean
 }
 
-export type SaleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "companyId" | "locationId" | "customerId" | "processedByUserId" | "cashDrawerSessionId" | "saleNumber" | "status" | "saleDate" | "subtotal" | "itemDiscountTotal" | "saleDiscountAmount" | "taxAmount" | "totalAmount" | "voidedAt" | "voidReason" | "voidedByUserId" | "note" | "createdAt" | "updatedAt", ExtArgs["result"]["sale"]>
+export type SaleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "companyId" | "locationId" | "customerId" | "processedByUserId" | "cashDrawerSessionId" | "saleNumber" | "status" | "idempotencyKey" | "saleDate" | "subtotal" | "itemDiscountTotal" | "saleDiscountAmount" | "taxAmount" | "totalAmount" | "voidedAt" | "voidReason" | "voidedByUserId" | "note" | "createdAt" | "updatedAt", ExtArgs["result"]["sale"]>
 export type SaleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
@@ -2514,6 +2583,10 @@ export type $SalePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     cashDrawerSessionId: string | null
     saleNumber: string
     status: $Enums.SaleStatus
+    /**
+     * * Client-generated (e.g. a UUID minted at cart-checkout time), sent only by an offline sale replayed on reconnect — a replay with an already-seen key returns the existing Sale instead of creating a duplicate. Null for every online, real-time sale, unchanged from today.
+     */
+    idempotencyKey: string | null
     saleDate: Date
     subtotal: runtime.Decimal
     itemDiscountTotal: runtime.Decimal
@@ -2966,6 +3039,7 @@ export interface SaleFieldRefs {
   readonly cashDrawerSessionId: Prisma.FieldRef<"Sale", 'String'>
   readonly saleNumber: Prisma.FieldRef<"Sale", 'String'>
   readonly status: Prisma.FieldRef<"Sale", 'SaleStatus'>
+  readonly idempotencyKey: Prisma.FieldRef<"Sale", 'String'>
   readonly saleDate: Prisma.FieldRef<"Sale", 'DateTime'>
   readonly subtotal: Prisma.FieldRef<"Sale", 'Decimal'>
   readonly itemDiscountTotal: Prisma.FieldRef<"Sale", 'Decimal'>

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, ForbiddenException } from '@nestjs/common';
 
+import { Prisma } from '../../../generated/phase-1-prisma/client';
 import {
   PurchaseOrderStatus,
   StockMovementType,
@@ -85,7 +86,7 @@ describe('PurchaseOrderService', () => {
     });
     mockTx.supplier.findUnique.mockResolvedValue({
       name: 'Test Supplier',
-      payableBalance: 0,
+      payableBalance: new Prisma.Decimal(0),
     });
     // Default: every requested productId is a plain non-variant product —
     // matches every existing test's fixtures, which never pass variantId.
@@ -197,9 +198,9 @@ describe('PurchaseOrderService', () => {
         {
           id: 'item-1',
           productId: 'product-1',
-          orderedQty: 10,
-          receivedQty: 0,
-          unitCost: 50,
+          orderedQty: new Prisma.Decimal(10),
+          receivedQty: new Prisma.Decimal(0),
+          unitCost: new Prisma.Decimal(50),
         },
       ],
     };
@@ -211,7 +212,10 @@ describe('PurchaseOrderService', () => {
       mockInventoryService.increaseStock.mockResolvedValue({});
       mockTx.purchaseOrderItem.update.mockResolvedValue({});
       mockTx.purchaseOrderItem.findMany.mockResolvedValue([
-        { orderedQty: 10, receivedQty: 4 },
+        {
+          orderedQty: new Prisma.Decimal(10),
+          receivedQty: new Prisma.Decimal(4),
+        },
       ]);
       mockTx.purchaseOrder.update.mockResolvedValue({ id: 'po-1' });
 
@@ -282,7 +286,10 @@ describe('PurchaseOrderService', () => {
       mockInventoryService.increaseStock.mockResolvedValue({});
       mockTx.purchaseOrderItem.update.mockResolvedValue({});
       mockTx.purchaseOrderItem.findMany.mockResolvedValue([
-        { orderedQty: 10, receivedQty: 4 },
+        {
+          orderedQty: new Prisma.Decimal(10),
+          receivedQty: new Prisma.Decimal(4),
+        },
       ]);
       mockTx.purchaseOrder.update.mockResolvedValue({
         id: 'po-1',
@@ -336,7 +343,10 @@ describe('PurchaseOrderService', () => {
       mockInventoryService.increaseStock.mockResolvedValue({});
       mockTx.purchaseOrderItem.update.mockResolvedValue({});
       mockTx.purchaseOrderItem.findMany.mockResolvedValue([
-        { orderedQty: 10, receivedQty: 10 },
+        {
+          orderedQty: new Prisma.Decimal(10),
+          receivedQty: new Prisma.Decimal(10),
+        },
       ]);
       mockTx.purchaseOrder.update.mockResolvedValue({
         id: 'po-1',
@@ -364,7 +374,10 @@ describe('PurchaseOrderService', () => {
       mockInventoryService.increaseStock.mockResolvedValue({});
       mockTx.purchaseOrderItem.update.mockResolvedValue({});
       mockTx.purchaseOrderItem.findMany.mockResolvedValue([
-        { orderedQty: 10, receivedQty: 4 },
+        {
+          orderedQty: new Prisma.Decimal(10),
+          receivedQty: new Prisma.Decimal(4),
+        },
       ]);
       mockTx.purchaseOrder.update.mockResolvedValue({ id: 'po-1' });
 
@@ -379,14 +392,14 @@ describe('PurchaseOrderService', () => {
         expect.objectContaining({
           data: expect.objectContaining({
             entryType: SupplierLedgerEntryType.PAYABLE,
-            amount: 200,
+            amount: decimalMatch('200'),
             supplierId: 'supplier-1',
           }),
         }),
       );
       expect(mockTx.supplier.update).toHaveBeenCalledWith({
         where: { id: 'supplier-1' },
-        data: { payableBalance: { increment: 200 } },
+        data: { payableBalance: { increment: decimalMatch('200') } },
       });
     });
 
@@ -398,7 +411,10 @@ describe('PurchaseOrderService', () => {
         mockInventoryService.increaseStock.mockResolvedValue({});
         mockTx.purchaseOrderItem.update.mockResolvedValue({});
         mockTx.purchaseOrderItem.findMany.mockResolvedValue([
-          { orderedQty: 10, receivedQty: 4 },
+          {
+            orderedQty: new Prisma.Decimal(10),
+            receivedQty: new Prisma.Decimal(4),
+          },
         ]);
         mockTx.purchaseOrder.update.mockResolvedValue({ id: 'po-1' });
       });
@@ -409,7 +425,7 @@ describe('PurchaseOrderService', () => {
         });
         mockTx.supplier.findUnique.mockResolvedValue({
           name: 'Rahim Traders',
-          payableBalance: 900,
+          payableBalance: new Prisma.Decimal(900),
         });
 
         await service.receive(
@@ -441,7 +457,7 @@ describe('PurchaseOrderService', () => {
         });
         mockTx.supplier.findUnique.mockResolvedValue({
           name: 'Rahim Traders',
-          payableBalance: 1100,
+          payableBalance: new Prisma.Decimal(1100),
         });
 
         await service.receive(
@@ -460,7 +476,7 @@ describe('PurchaseOrderService', () => {
         });
         mockTx.supplier.findUnique.mockResolvedValue({
           name: 'Rahim Traders',
-          payableBalance: 900,
+          payableBalance: new Prisma.Decimal(900),
         });
 
         await service.receive(

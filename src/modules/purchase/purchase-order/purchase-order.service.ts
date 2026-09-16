@@ -108,8 +108,9 @@ export class PurchaseOrderService {
     await this.requireVariantConsistency(context, dto.items);
 
     const totalAmount = dto.items.reduce(
-      (sum, item) => sum + item.orderedQty * item.unitCost,
-      0,
+      (sum, item) =>
+        sum.plus(new Prisma.Decimal(item.orderedQty).times(item.unitCost)),
+      new Prisma.Decimal(0),
     );
 
     const order = await this.prisma.$transaction(async (tx) => {
@@ -172,8 +173,9 @@ export class PurchaseOrderService {
 
     const totalAmount = dto.items
       ? dto.items.reduce(
-          (sum, item) => sum + item.orderedQty * item.unitCost,
-          0,
+          (sum, item) =>
+            sum.plus(new Prisma.Decimal(item.orderedQty).times(item.unitCost)),
+          new Prisma.Decimal(0),
         )
       : undefined;
 
@@ -293,18 +295,20 @@ export class PurchaseOrderService {
           `purchaseOrderItemId ${line.purchaseOrderItemId} does not belong to this purchase order`,
         );
       }
-      const wouldBeReceived = Number(orderItem.receivedQty) + line.receivedQty;
-      if (wouldBeReceived > Number(orderItem.orderedQty) + 1e-9) {
+      const wouldBeReceived = orderItem.receivedQty.plus(line.receivedQty);
+      if (wouldBeReceived.greaterThan(orderItem.orderedQty)) {
         throw new BadRequestException(
-          `Cannot receive more than ordered for product ${orderItem.productId} (ordered ${orderItem.orderedQty}, already received ${orderItem.receivedQty})`,
+          `Cannot receive more than ordered for product ${orderItem.productId} (ordered ${orderItem.orderedQty.toString()}, already received ${orderItem.receivedQty.toString()})`,
         );
       }
     }
 
     const receiptTotal = dto.items.reduce((sum, line) => {
       const orderItem = itemsById.get(line.purchaseOrderItemId)!;
-      return sum + line.receivedQty * Number(orderItem.unitCost);
-    }, 0);
+      return sum.plus(
+        new Prisma.Decimal(line.receivedQty).times(orderItem.unitCost),
+      );
+    }, new Prisma.Decimal(0));
 
     // Base-unit products (baseUnitId) resolved once, up front — each
     // line's conversion factor is computed from its own product's base
@@ -397,7 +401,7 @@ export class PurchaseOrderService {
         });
       }
 
-      if (receiptTotal > 0) {
+      if (receiptTotal.greaterThan(0)) {
         await tx.supplierPayableLedger.create({
           data: {
             tenantId: context.tenantId,
@@ -419,10 +423,13 @@ export class PurchaseOrderService {
         });
 
         if (settings.maxSupplierPayableLimit != null && supplier) {
-          const beforePayable = Number(supplier.payableBalance);
-          const afterPayable = beforePayable + receiptTotal;
-          const limit = Number(settings.maxSupplierPayableLimit);
-          if (beforePayable <= limit && afterPayable > limit) {
+          const beforePayable = supplier.payableBalance;
+          const afterPayable = beforePayable.plus(receiptTotal);
+          const limit = settings.maxSupplierPayableLimit;
+          if (
+            beforePayable.lessThanOrEqualTo(limit) &&
+            afterPayable.greaterThan(limit)
+          ) {
             await this.notificationService.create(tx, context, {
               type: NotificationType.SUPPLIER_PAYABLE_OVERDUE,
               relatedEntityType: NotificationRelatedEntityType.SUPPLIER,
@@ -441,8 +448,8 @@ export class PurchaseOrderService {
         where: { purchaseOrderId: id },
         select: { orderedQty: true, receivedQty: true },
       });
-      const fullyReceived = refreshedItems.every(
-        (item) => Number(item.receivedQty) >= Number(item.orderedQty) - 1e-9,
+      const fullyReceived = refreshedItems.every((item) =>
+        item.receivedQty.greaterThanOrEqualTo(item.orderedQty),
       );
 
       const updatedOrder = await tx.purchaseOrder.update({
@@ -500,6 +507,8 @@ export class PurchaseOrderService {
     }
     await this.requireVariantConsistency(context, dto.items);
 
+    const refundAmount = new Prisma.Decimal(dto.refundAmount ?? 0);
+
     const result = await this.prisma.$transaction(async (tx) => {
       const purchaseReturn = await tx.purchaseReturn.create({
         data: {
@@ -507,7 +516,7 @@ export class PurchaseOrderService {
           companyId: context.companyId,
           purchaseOrderId: id,
           reason: dto.reason.trim(),
-          refundAmount: dto.refundAmount ?? 0,
+          refundAmount,
           actorUserId: actor.userId,
         },
       });
@@ -536,8 +545,7 @@ export class PurchaseOrderService {
         }
       }
 
-      const refundAmount = dto.refundAmount ?? 0;
-      if (refundAmount > 0) {
+      if (refundAmount.greaterThan(0)) {
         await tx.supplierPayableLedger.create({
           data: {
             tenantId: context.tenantId,

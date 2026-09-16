@@ -62,6 +62,7 @@ describe('SaleService', () => {
   const mockInventoryService = {
     increaseStock: jest.fn(),
     decreaseStock: jest.fn(),
+    getBalance: jest.fn(),
   };
 
   /** Unrestricted by default — Location-scoping is exercised in its own dedicated describe block below. */
@@ -112,6 +113,10 @@ describe('SaleService', () => {
       Promise.resolve({ id: 'sale-1', ...data, items: [], payments: [] }),
     );
     mockInventoryService.decreaseStock.mockResolvedValue({});
+    mockInventoryService.getBalance.mockResolvedValue({
+      success: true,
+      data: { quantity: new Prisma.Decimal(1000) },
+    });
     mockTx.cashDrawerSession.findFirst.mockResolvedValue(null);
   });
 
@@ -218,11 +223,11 @@ describe('SaleService', () => {
       );
 
       const createCall = mockTx.sale.create.mock.calls[0][0];
-      expect(createCall.data.subtotal).toBe(200);
-      expect(createCall.data.itemDiscountTotal).toBe(20);
-      expect(createCall.data.saleDiscountAmount).toBe(10);
-      expect(createCall.data.taxAmount).toBeCloseTo(17);
-      expect(createCall.data.totalAmount).toBe(187);
+      expect(createCall.data.subtotal).toEqual(decimalMatch('200'));
+      expect(createCall.data.itemDiscountTotal).toEqual(decimalMatch('20'));
+      expect(createCall.data.saleDiscountAmount).toEqual(decimalMatch('10'));
+      expect(createCall.data.taxAmount).toEqual(decimalMatch('17'));
+      expect(createCall.data.totalAmount).toEqual(decimalMatch('187'));
     });
 
     it('rejects when the sum of payments does not equal the computed total', async () => {
@@ -252,7 +257,9 @@ describe('SaleService', () => {
       );
 
       const createCall = mockTx.sale.create.mock.calls[0][0];
-      expect(createCall.data.items.create[0].unitPrice).toBe(100);
+      expect(createCall.data.items.create[0].unitPrice).toEqual(
+        decimalMatch('100'),
+      );
     });
   });
 
@@ -315,7 +322,7 @@ describe('SaleService', () => {
     it('writes a CustomerDueLedger DUE entry and increments Customer.dueBalance for the DUE portion', async () => {
       mockPrisma.customer.findFirst.mockResolvedValue({
         id: 'customer-1',
-        dueBalance: 0,
+        dueBalance: new Prisma.Decimal(0),
       });
 
       await service.create(
@@ -333,14 +340,14 @@ describe('SaleService', () => {
         expect.objectContaining({
           data: expect.objectContaining({
             entryType: 'DUE',
-            amount: 100,
+            amount: decimalMatch('100'),
             customerId: 'customer-1',
           }),
         }),
       );
       expect(mockTx.customer.update).toHaveBeenCalledWith({
         where: { id: 'customer-1' },
-        data: { dueBalance: { increment: 100 } },
+        data: { dueBalance: { increment: decimalMatch('100') } },
       });
     });
 
@@ -353,7 +360,7 @@ describe('SaleService', () => {
       });
       mockPrisma.customer.findFirst.mockResolvedValue({
         id: 'customer-1',
-        dueBalance: 0,
+        dueBalance: new Prisma.Decimal(0),
       });
 
       const result = await service.create(
@@ -383,7 +390,7 @@ describe('SaleService', () => {
         mockPrisma.customer.findFirst.mockResolvedValue({
           id: 'customer-1',
           name: 'Customer One',
-          dueBalance: 0, // before = 0 <= 50
+          dueBalance: new Prisma.Decimal(0), // before = 0 <= 50
         });
 
         await service.create(
@@ -423,7 +430,7 @@ describe('SaleService', () => {
         mockPrisma.customer.findFirst.mockResolvedValue({
           id: 'customer-1',
           name: 'Customer One',
-          dueBalance: 200, // already over the 50 limit before this sale
+          dueBalance: new Prisma.Decimal(200), // already over the 50 limit before this sale
         });
 
         await service.create(
@@ -444,7 +451,7 @@ describe('SaleService', () => {
         mockPrisma.customer.findFirst.mockResolvedValue({
           id: 'customer-1',
           name: 'Customer One',
-          dueBalance: 0,
+          dueBalance: new Prisma.Decimal(0),
         });
 
         await service.create(
@@ -463,14 +470,186 @@ describe('SaleService', () => {
     });
   });
 
+  describe('create — offline-sync (idempotency + needs-review)', () => {
+    const offlineSaleInput = {
+      locationId: 'loc-1',
+      items: [{ productId: 'product-1', quantity: 5 }],
+      payments: [{ method: SalePaymentMethod.CASH, amount: 500 }],
+    };
+
+    describe('idempotent replay', () => {
+      it('returns the existing Sale instead of creating a duplicate when idempotencyKey was already used', async () => {
+        const existingSale = {
+          id: 'sale-existing',
+          idempotencyKey: 'offline-key-1',
+        };
+        mockPrisma.sale.findFirst.mockResolvedValue(existingSale);
+
+        const result = await service.create(
+          context,
+          { ...offlineSaleInput, idempotencyKey: 'offline-key-1' },
+          actor,
+        );
+
+        expect(result).toEqual({
+          success: true,
+          data: existingSale,
+          warnings: [],
+        });
+        expect(mockTx.sale.create).not.toHaveBeenCalled();
+      });
+
+      it('checks for an existing sale scoped to tenant+company+idempotencyKey', async () => {
+        mockPrisma.sale.findFirst.mockResolvedValue(null);
+
+        await service.create(
+          context,
+          { ...offlineSaleInput, idempotencyKey: 'offline-key-2' },
+          actor,
+        );
+
+        expect(mockPrisma.sale.findFirst).toHaveBeenCalledWith(
+          expect.objectContaining({
+            where: {
+              tenantId: 'tenant-1',
+              companyId: 'company-1',
+              idempotencyKey: 'offline-key-2',
+            },
+          }),
+        );
+      });
+
+      it('never checks for an existing sale when idempotencyKey is omitted (normal online sale, unchanged behavior)', async () => {
+        await service.create(context, offlineSaleInput, actor);
+
+        expect(mockPrisma.sale.findFirst).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('needs-review (offline replay finds insufficient stock at sync time)', () => {
+      beforeEach(() => {
+        mockPrisma.sale.findFirst.mockResolvedValue(null);
+      });
+
+      it('records the sale as NEEDS_REVIEW and skips stock decrement when the offline replay finds insufficient stock', async () => {
+        mockInventoryService.getBalance.mockResolvedValue({
+          success: true,
+          data: { quantity: new Prisma.Decimal(0) },
+        });
+
+        await service.create(
+          context,
+          { ...offlineSaleInput, idempotencyKey: 'offline-key-3' },
+          actor,
+        );
+
+        const createCall = mockTx.sale.create.mock.calls[0][0];
+        expect(createCall.data.status).toBe(SaleStatus.NEEDS_REVIEW);
+        expect(mockInventoryService.decreaseStock).not.toHaveBeenCalled();
+      });
+
+      it('notifies with SALE_NEEDS_REVIEW when flagged', async () => {
+        mockInventoryService.getBalance.mockResolvedValue({
+          success: true,
+          data: { quantity: new Prisma.Decimal(0) },
+        });
+
+        await service.create(
+          context,
+          { ...offlineSaleInput, idempotencyKey: 'offline-key-4' },
+          actor,
+        );
+
+        expect(mockNotificationService.create).toHaveBeenCalledWith(
+          mockTx,
+          context,
+          expect.objectContaining({
+            type: 'SALE_NEEDS_REVIEW',
+            relatedEntityType: 'SALE',
+          }),
+        );
+      });
+
+      it('returns a NEEDS_REVIEW_INSUFFICIENT_STOCK warning instead of rejecting the sale', async () => {
+        mockInventoryService.getBalance.mockResolvedValue({
+          success: true,
+          data: { quantity: new Prisma.Decimal(0) },
+        });
+
+        const result = await service.create(
+          context,
+          { ...offlineSaleInput, idempotencyKey: 'offline-key-5' },
+          actor,
+        );
+
+        expect(result.success).toBe(true);
+        expect(result.warnings).toContain('NEEDS_REVIEW_INSUFFICIENT_STOCK');
+      });
+
+      it('proceeds as a normal COMPLETED sale (decrementing stock as usual) when the offline replay finds sufficient stock', async () => {
+        mockInventoryService.getBalance.mockResolvedValue({
+          success: true,
+          data: { quantity: new Prisma.Decimal(1000) },
+        });
+
+        await service.create(
+          context,
+          { ...offlineSaleInput, idempotencyKey: 'offline-key-6' },
+          actor,
+        );
+
+        expect(mockInventoryService.decreaseStock).toHaveBeenCalled();
+        const createCall = mockTx.sale.create.mock.calls[0][0];
+        expect(createCall.data.status).toBeUndefined(); // omitted -> defaults to COMPLETED at the DB level
+      });
+
+      it('never runs the offline-sync stock pre-check for a normal online sale (no idempotencyKey) — insufficient stock still rejects the whole sale via the existing decreaseStock path, unchanged', async () => {
+        mockInventoryService.decreaseStock.mockRejectedValue(
+          new ConflictException('INSUFFICIENT_STOCK'),
+        );
+
+        await expect(
+          service.create(context, offlineSaleInput as any, actor),
+        ).rejects.toThrow(BadRequestException);
+        expect(mockInventoryService.getBalance).not.toHaveBeenCalled();
+      });
+
+      it('skips the stock pre-check entirely when allowNegativeStock is true, even for an offline replay', async () => {
+        mockPrisma.companySettings.findUniqueOrThrow.mockResolvedValue({
+          allowNegativeStock: true,
+          enableTax: false,
+          defaultTaxRate: 0,
+          maxCustomerDueLimit: null,
+        });
+
+        await service.create(
+          context,
+          { ...offlineSaleInput, idempotencyKey: 'offline-key-7' },
+          actor,
+        );
+
+        expect(mockInventoryService.getBalance).not.toHaveBeenCalled();
+        expect(mockInventoryService.decreaseStock).toHaveBeenCalled();
+      });
+    });
+  });
+
   describe('void', () => {
     const completedSale = {
       id: 'sale-1',
       locationId: 'loc-1',
       customerId: 'customer-1',
       status: SaleStatus.COMPLETED,
-      items: [{ productId: 'product-1', quantity: 2, unitCost: 60 }],
-      payments: [{ method: SalePaymentMethod.DUE, amount: 200 }],
+      items: [
+        {
+          productId: 'product-1',
+          quantity: new Prisma.Decimal(2),
+          unitCost: new Prisma.Decimal(60),
+        },
+      ],
+      payments: [
+        { method: SalePaymentMethod.DUE, amount: new Prisma.Decimal(200) },
+      ],
     };
 
     it('rejects voiding a sale that is not COMPLETED', async () => {
@@ -524,7 +703,166 @@ describe('SaleService', () => {
 
       expect(mockTx.customer.update).toHaveBeenCalledWith({
         where: { id: 'customer-1' },
-        data: { dueBalance: { decrement: 200 } },
+        data: { dueBalance: { decrement: decimalMatch('200') } },
+      });
+    });
+  });
+
+  describe('approveNeedsReview', () => {
+    const needsReviewSale = {
+      id: 'sale-2',
+      locationId: 'loc-1',
+      customerId: null,
+      status: SaleStatus.NEEDS_REVIEW,
+      items: [
+        {
+          productId: 'product-1',
+          variantId: null,
+          unitId: undefined,
+          quantity: new Prisma.Decimal(5),
+          unitCost: new Prisma.Decimal(60),
+        },
+      ],
+      payments: [],
+    };
+
+    it('rejects approving a sale that is not NEEDS_REVIEW', async () => {
+      mockPrisma.sale.findFirst.mockResolvedValue({
+        ...needsReviewSale,
+        status: SaleStatus.COMPLETED,
+      });
+
+      await expect(
+        service.approveNeedsReview(context, 'sale-2', actor),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('decrements stock via the normal SALE movement type and sets status to COMPLETED when stock is now sufficient', async () => {
+      mockPrisma.sale.findFirst.mockResolvedValue(needsReviewSale);
+      mockPrisma.companySettings.findUniqueOrThrow.mockResolvedValue({
+        allowNegativeStock: false,
+      });
+      mockInventoryService.decreaseStock.mockResolvedValue({});
+      mockTx.sale.update.mockResolvedValue({
+        id: 'sale-2',
+        status: SaleStatus.COMPLETED,
+      });
+
+      const result = await service.approveNeedsReview(context, 'sale-2', actor);
+
+      expect(mockInventoryService.decreaseStock).toHaveBeenCalledWith(
+        mockTx,
+        expect.objectContaining({
+          productId: 'product-1',
+          quantity: decimalMatch('5'),
+          movementType: StockMovementType.SALE,
+          referenceId: 'sale-2',
+          allowNegative: false,
+        }),
+      );
+      expect(mockTx.sale.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: { status: SaleStatus.COMPLETED },
+        }),
+      );
+      expect(result.success).toBe(true);
+    });
+
+    it('translates a still-insufficient-stock ConflictException into a BadRequestException and never updates the sale', async () => {
+      mockPrisma.sale.findFirst.mockResolvedValue(needsReviewSale);
+      mockPrisma.companySettings.findUniqueOrThrow.mockResolvedValue({
+        allowNegativeStock: false,
+      });
+      mockInventoryService.decreaseStock.mockRejectedValue(
+        new ConflictException('INSUFFICIENT_STOCK'),
+      );
+
+      await expect(
+        service.approveNeedsReview(context, 'sale-2', actor),
+      ).rejects.toThrow(BadRequestException);
+      expect(mockTx.sale.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('rejectNeedsReview', () => {
+    const needsReviewSaleWithDue = {
+      id: 'sale-3',
+      locationId: 'loc-1',
+      customerId: 'customer-1',
+      status: SaleStatus.NEEDS_REVIEW,
+      items: [
+        {
+          productId: 'product-1',
+          variantId: null,
+          unitId: undefined,
+          quantity: new Prisma.Decimal(5),
+          unitCost: new Prisma.Decimal(60),
+        },
+      ],
+      payments: [
+        { method: SalePaymentMethod.DUE, amount: new Prisma.Decimal(500) },
+      ],
+    };
+
+    it('rejects rejecting a sale that is not NEEDS_REVIEW', async () => {
+      mockPrisma.sale.findFirst.mockResolvedValue({
+        ...needsReviewSaleWithDue,
+        status: SaleStatus.COMPLETED,
+      });
+
+      await expect(
+        service.rejectNeedsReview(
+          context,
+          'sale-3',
+          { reason: 'x' } as any,
+          actor,
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('marks the sale VOIDED and never touches Inventory (nothing was ever decremented)', async () => {
+      mockPrisma.sale.findFirst.mockResolvedValue(needsReviewSaleWithDue);
+      mockTx.sale.update.mockResolvedValue({
+        id: 'sale-3',
+        status: SaleStatus.VOIDED,
+      });
+
+      await service.rejectNeedsReview(
+        context,
+        'sale-3',
+        { reason: 'customer no longer wants the item' },
+        actor,
+      );
+
+      expect(mockTx.sale.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            status: SaleStatus.VOIDED,
+            voidReason: 'customer no longer wants the item',
+          }),
+        }),
+      );
+      expect(mockInventoryService.increaseStock).not.toHaveBeenCalled();
+      expect(mockInventoryService.decreaseStock).not.toHaveBeenCalled();
+    });
+
+    it('reverses the DUE portion of Customer.dueBalance, same as void()', async () => {
+      mockPrisma.sale.findFirst.mockResolvedValue(needsReviewSaleWithDue);
+      mockTx.sale.update.mockResolvedValue({
+        id: 'sale-3',
+        status: SaleStatus.VOIDED,
+      });
+
+      await service.rejectNeedsReview(
+        context,
+        'sale-3',
+        { reason: 'x' },
+        actor,
+      );
+
+      expect(mockTx.customer.update).toHaveBeenCalledWith({
+        where: { id: 'customer-1' },
+        data: { dueBalance: { decrement: decimalMatch('500') } },
       });
     });
   });
@@ -535,7 +873,13 @@ describe('SaleService', () => {
       locationId: 'loc-1',
       customerId: null,
       status: SaleStatus.COMPLETED,
-      items: [{ productId: 'product-1', quantity: 5, unitCost: 60 }],
+      items: [
+        {
+          productId: 'product-1',
+          quantity: new Prisma.Decimal(5),
+          unitCost: new Prisma.Decimal(60),
+        },
+      ],
       payments: [],
     };
 

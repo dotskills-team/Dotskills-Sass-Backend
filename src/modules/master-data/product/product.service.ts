@@ -32,6 +32,30 @@ const PRODUCT_SELECT = {
   updatedAt: true,
 } satisfies Prisma.ProductSelect;
 
+/** Mirrors `ProductVariantService`'s own `VARIANT_SELECT` exactly — kept as a separate local copy rather than a cross-service import, since this is the only variant read `ProductService` ever does. */
+const VARIANT_SELECT = {
+  id: true,
+  productId: true,
+  sku: true,
+  barcode: true,
+  costPrice: true,
+  salePrice: true,
+  status: true,
+  createdAt: true,
+  updatedAt: true,
+  attributeValues: {
+    select: {
+      attributeValue: {
+        select: {
+          id: true,
+          value: true,
+          attribute: { select: { id: true, name: true } },
+        },
+      },
+    },
+  },
+} satisfies Prisma.ProductVariantSelect;
+
 @Injectable()
 export class ProductService {
   constructor(private readonly prisma: PrismaService) {}
@@ -70,6 +94,65 @@ export class ProductService {
       data: products,
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     };
+  }
+
+  /**
+   * POS barcode-scan lookup — an EXACT match only (never the fuzzy
+   * `search` used by manual typing), checked against `Product.barcode`
+   * first and `ProductVariant.barcode` second (a variant-tracked product
+   * can carry its own distinct barcode per variant, e.g. one per T-Shirt
+   * size/color). Both checks are `tenantId+companyId+barcode` equality —
+   * exactly the columns Postgres already backs with a unique index via
+   * each model's own `@@unique([tenantId, companyId, barcode])`, so this
+   * is a genuine indexed point lookup, not a table scan.
+   *
+   * Deliberately does NOT filter by status — an INACTIVE match is still
+   * returned (with its real status) so the caller can show a specific
+   * "this product is inactive" message instead of conflating it with
+   * "no such barcode". Returns `data: null` (200, not 404) when nothing
+   * matches at all — a scanned code not belonging to any product is an
+   * expected, routine outcome of scanning, not a server error.
+   */
+  async findByBarcode(context: CompanyContext, code: string) {
+    const product = await this.prisma.product.findFirst({
+      where: {
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+        barcode: code,
+      },
+      select: PRODUCT_SELECT,
+    });
+    if (product) {
+      return { success: true, data: { product, variant: null } };
+    }
+
+    const variant = await this.prisma.productVariant.findFirst({
+      where: {
+        tenantId: context.tenantId,
+        companyId: context.companyId,
+        barcode: code,
+      },
+      select: VARIANT_SELECT,
+    });
+    if (variant) {
+      const parentProduct = await this.prisma.product.findFirst({
+        where: {
+          id: variant.productId,
+          tenantId: context.tenantId,
+          companyId: context.companyId,
+        },
+        select: PRODUCT_SELECT,
+      });
+      // The variant's own tenant/company scoping already guarantees its
+      // parent Product belongs here too (both written in the same
+      // transaction, never re-parented) — this null-check is just
+      // defensive, not a real expected path.
+      if (parentProduct) {
+        return { success: true, data: { product: parentProduct, variant } };
+      }
+    }
+
+    return { success: true, data: null };
   }
 
   async findOne(context: CompanyContext, id: string) {

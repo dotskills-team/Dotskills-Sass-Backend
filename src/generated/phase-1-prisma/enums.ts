@@ -341,7 +341,8 @@ export type SupplierLedgerEntryType = (typeof SupplierLedgerEntryType)[keyof typ
 
 export const SaleStatus = {
   COMPLETED: 'COMPLETED',
-  VOIDED: 'VOIDED'
+  VOIDED: 'VOIDED',
+  NEEDS_REVIEW: 'NEEDS_REVIEW'
 } as const
 
 export type SaleStatus = (typeof SaleStatus)[keyof typeof SaleStatus]
@@ -382,7 +383,8 @@ export const NotificationType = {
   SUPPLIER_PAYABLE_OVERDUE: 'SUPPLIER_PAYABLE_OVERDUE',
   SUBSCRIPTION_EXPIRING_SOON: 'SUBSCRIPTION_EXPIRING_SOON',
   SUBSCRIPTION_PAST_DUE: 'SUBSCRIPTION_PAST_DUE',
-  STAFF_ACTIVITY: 'STAFF_ACTIVITY'
+  STAFF_ACTIVITY: 'STAFF_ACTIVITY',
+  SALE_NEEDS_REVIEW: 'SALE_NEEDS_REVIEW'
 } as const
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
@@ -394,7 +396,8 @@ export const NotificationRelatedEntityType = {
   CUSTOMER: 'CUSTOMER',
   SUPPLIER: 'SUPPLIER',
   SUBSCRIPTION: 'SUBSCRIPTION',
-  COMPANY_MEMBER: 'COMPANY_MEMBER'
+  COMPANY_MEMBER: 'COMPANY_MEMBER',
+  SALE: 'SALE'
 } as const
 
 export type NotificationRelatedEntityType = (typeof NotificationRelatedEntityType)[keyof typeof NotificationRelatedEntityType]

@@ -178,16 +178,16 @@ export class CashDrawerSessionService {
       select: { actualClosingBalance: true },
     });
 
-    let openingBalance: number;
-    if (previousClosed) {
-      openingBalance = Number(previousClosed.actualClosingBalance);
+    let openingBalance: Prisma.Decimal;
+    if (previousClosed?.actualClosingBalance != null) {
+      openingBalance = previousClosed.actualClosingBalance;
     } else {
       if (dto.openingBalance === undefined) {
         throw new BadRequestException(
           "openingBalance is required for this cashier's first session at this location",
         );
       }
-      openingBalance = dto.openingBalance;
+      openingBalance = new Prisma.Decimal(dto.openingBalance);
     }
 
     try {
@@ -258,10 +258,10 @@ export class CashDrawerSessionService {
         },
         _sum: { amount: true },
       });
-      const cashSalesTotal = Number(cashTotal._sum.amount ?? 0);
-      const expectedClosingBalance =
-        Number(before.openingBalance) + cashSalesTotal;
-      const variance = dto.actualClosingBalance - expectedClosingBalance;
+      const cashSalesTotal = cashTotal._sum.amount ?? new Prisma.Decimal(0);
+      const expectedClosingBalance = before.openingBalance.plus(cashSalesTotal);
+      const actualClosingBalance = new Prisma.Decimal(dto.actualClosingBalance);
+      const variance = actualClosingBalance.minus(expectedClosingBalance);
 
       const updated = await tx.cashDrawerSession.update({
         where: { id },
@@ -269,7 +269,7 @@ export class CashDrawerSessionService {
           status: CashDrawerSessionStatus.CLOSED,
           shiftEnd: new Date(),
           expectedClosingBalance,
-          actualClosingBalance: dto.actualClosingBalance,
+          actualClosingBalance,
           variance,
           note: dto.note?.trim(),
         },
@@ -294,7 +294,7 @@ export class CashDrawerSessionService {
       // Out-of-Stock/Low-Stock, each session-close is already a one-time,
       // discrete event (no "continuously in a bad state" to re-enter), so
       // no dedup logic is needed here.
-      if (variance !== 0) {
+      if (!variance.isZero()) {
         const location = await tx.location.findUnique({
           where: { id: before.locationId },
           select: { name: true },
@@ -308,7 +308,7 @@ export class CashDrawerSessionService {
             locationName: location?.name ?? '',
             variance: variance.toString(),
             expectedClosingBalance: expectedClosingBalance.toString(),
-            actualClosingBalance: dto.actualClosingBalance.toString(),
+            actualClosingBalance: actualClosingBalance.toString(),
           },
         });
       }

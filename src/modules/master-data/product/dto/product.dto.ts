@@ -42,6 +42,14 @@ export class ListProductsQueryDto {
   search?: string;
 }
 
+/** POS barcode-scan lookup (`GET .../products/barcode-lookup?code=...`) — an exact-match query, never the fuzzy `search` above. */
+export class LookupProductByBarcodeQueryDto {
+  @IsString()
+  @MinLength(1)
+  @MaxLength(64)
+  code!: string;
+}
+
 export class CreateProductDto {
   @IsString()
   @MinLength(1)

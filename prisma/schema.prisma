@@ -1053,6 +1053,8 @@ model SaleSequence {
 enum SaleStatus {
   COMPLETED
   VOIDED
+  /** Written only by an offline-sync replay whose stock check failed at sync time — never rejected outright, held for the Owner to resolve manually. Inventory is deliberately left untouched for a sale in this status. */
+  NEEDS_REVIEW
 }
 
 model Sale {
@@ -1065,6 +1067,8 @@ model Sale {
   cashDrawerSessionId String?   @db.Uuid
   saleNumber         String     @db.VarChar(40)
   status             SaleStatus @default(COMPLETED)
+  /** Client-generated (e.g. a UUID minted at cart-checkout time), sent only by an offline sale replayed on reconnect — a replay with an already-seen key returns the existing Sale instead of creating a duplicate. Null for every online, real-time sale, unchanged from today. */
+  idempotencyKey     String?    @db.VarChar(200)
   saleDate           DateTime   @default(now()) @db.Timestamptz(6)
   subtotal           Decimal    @db.Decimal(20, 4)
   itemDiscountTotal  Decimal    @default(0) @db.Decimal(20, 4)
@@ -1091,6 +1095,11 @@ model Sale {
   @@index([cashDrawerSessionId])
   @@map("sales")
 }
+// A partial unique index on (tenantId, companyId, idempotencyKey) WHERE
+// idempotencyKey IS NOT NULL is added via raw SQL in this feature's
+// migration — Prisma's declarative @@unique can't express a NULL-excluding
+// partial index (same reasoning as inventory_no_variant_unique/
+// inventory_variant_unique above).
 
 model SaleItem {
   id             String          @id @default(uuid()) @db.Uuid
@@ -1364,6 +1373,7 @@ enum NotificationType {
   SUBSCRIPTION_EXPIRING_SOON
   SUBSCRIPTION_PAST_DUE
   STAFF_ACTIVITY
+  SALE_NEEDS_REVIEW
 }
 
 enum NotificationRelatedEntityType {
@@ -1373,6 +1383,7 @@ enum NotificationRelatedEntityType {
   SUPPLIER
   SUBSCRIPTION
   COMPANY_MEMBER
+  SALE
 }
 
 /**

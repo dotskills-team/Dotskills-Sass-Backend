@@ -25,6 +25,7 @@ import { ProductBulkImportService } from './product-bulk-import.service';
 import {
   CreateProductDto,
   ListProductsQueryDto,
+  LookupProductByBarcodeQueryDto,
   UpdateProductDto,
 } from './dto/product.dto';
 import { BulkImportProductsDto } from './dto/bulk-import-products.dto';
@@ -49,6 +50,16 @@ export class ProductController {
     @Query() query: ListProductsQueryDto,
   ) {
     return this.service.list(context, query);
+  }
+
+  /** Registered before `:id` — otherwise Nest would match "barcode-lookup" itself as an `:id` value. */
+  @Get('barcode-lookup')
+  @RequireCompanyPermissions(COMPANY_PERMISSIONS.PRODUCT_READ)
+  findByBarcode(
+    @CurrentCompany() context: CompanyContext,
+    @Query() query: LookupProductByBarcodeQueryDto,
+  ) {
+    return this.service.findByBarcode(context, query.code);
   }
 
   @Get(':id')
