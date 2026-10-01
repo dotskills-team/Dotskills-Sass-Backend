@@ -24,7 +24,8 @@
     "prisma:migrate:dev": "prisma migrate dev --config prisma.phase-1.config.ts",
     "prisma:migrate:deploy": "prisma migrate deploy --config prisma.phase-1.config.ts",
     "prisma:seed": "prisma db seed --config prisma.phase-1.config.ts",
-    "prisma:studio": "prisma studio --config prisma.phase-1.config.ts"
+    "prisma:studio": "prisma studio --config prisma.phase-1.config.ts",
+    "db:production-bootstrap": "tsx prisma/production-bootstrap.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -77,6 +78,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
   },

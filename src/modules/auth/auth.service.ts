@@ -134,7 +134,7 @@ export class AuthService {
 
     const hasRequiredMembership = requirePlatformStaff
       ? this.hasActivePlatformMembership(user, roles)
-      : this.hasActiveMembership(user, roles);
+      :this.hasActiveCompanyMembership(user);
 
     if (!hasRequiredMembership) {
       await this.recordLoginEvent(
@@ -258,22 +258,45 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    if (session.revokedAt) {
-      if (session.replacedByHash) {
-        await this.revokeAllSessions(session.userId, 'REFRESH_TOKEN_REUSE');
-      }
-      throw new UnauthorizedException('Refresh token has been revoked');
-    }
+    // if (session.revokedAt) {
+    //   if (session.replacedByHash) {
+    //     await this.revokeAllSessions(session.userId, 'REFRESH_TOKEN_REUSE');
+    //   }
+    //   throw new UnauthorizedException('Refresh token has been revoked');
+    // }
 
-    const now = new Date();
-    if (session.expiresAt <= now) {
-      await this.prisma.authSession.updateMany({
-        where: { id: session.id, revokedAt: null },
-        data: { revokedAt: now, revokeReason: 'EXPIRED' },
-      });
-      throw new UnauthorizedException('Refresh token has expired');
-    }
+    // const now = new Date();
+    // if (session.expiresAt <= now) {
+    //   await this.prisma.authSession.updateMany({
+    //     where: { id: session.id, revokedAt: null },
+    //     data: { revokedAt: now, revokeReason: 'EXPIRED' },
+    //   });
+    //   throw new UnauthorizedException('Refresh token has expired');
+    // }
+const now = new Date();
 
+if (session.revokedAt) {
+  const withinGrace =
+    session.revokeReason === 'ROTATED' &&
+    now.getTime() - session.revokedAt.getTime() < 10_000;
+
+  if (withinGrace) {
+    throw new UnauthorizedException('Refresh token was already used');
+  }
+
+  if (session.replacedByHash) {
+    await this.revokeAllSessions(session.userId, 'REFRESH_TOKEN_REUSE');
+  }
+  throw new UnauthorizedException('Refresh token has been revoked');
+}
+
+if (session.expiresAt <= now) {
+  await this.prisma.authSession.updateMany({
+    where: { id: session.id, revokedAt: null },
+    data: { revokedAt: now, revokeReason: 'EXPIRED' },
+  });
+  throw new UnauthorizedException('Refresh token has expired');
+}
     const user = session.user;
     const roles = this.activeRoleCodes(user);
     if (
@@ -484,10 +507,15 @@ export class AuthService {
   private hasActivePlatformMembership(
     user: PlatformUser,
     roles: string[],
+    
   ): boolean {
     return user.platformMember?.status === 'ACTIVE' && roles.length > 0;
   }
-
+  private hasActiveCompanyMembership(user: PlatformUser): boolean {
+    return user.companyMemberships.some(
+      (membership) => membership.status === 'ACTIVE',
+    );
+  }
   /**
    * `GET /auth/me` (called by the frontend's silent-refresh session
    * restore on every fresh page load) was returning the bare
