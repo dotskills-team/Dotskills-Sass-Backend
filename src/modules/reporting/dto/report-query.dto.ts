@@ -71,4 +71,12 @@ export class StockReportQueryDto extends PaginationQueryDto {
   @Type(() => Boolean)
   @IsBoolean()
   belowReorderOnly?: boolean;
+    /** Optional sales window: both or none. */
+  @IsOptional()
+  @IsDateString()
+  dateFrom?: string;
+
+  @IsOptional()
+  @IsDateString()
+  dateTo?: string;
 }
